@@ -174,6 +174,8 @@ Exit: All new minutes/transcriptions must carry case_reference; DB constraints e
 **Objective:** Practitioners can capture audio on mobile with no network and auto-sync later.
 
 Actions
+0) Framework upgrade prerequisite
+   - Upgrade frontend to Next.js 15.5 + React 19 and switch builds to Turbopack/typed routes (`next build --turbopack`, `next dev --turbo`) to reduce bundle times and enable stable App Router caching needed for PWA. Audit: run `npm run lint`, `npm run build -- --turbopack`, Playwright smoke for `/new` + `/capture`, and regenerate API client after typed-route adoption. citeturn0search1turn0search5
 1) PWA foundation
    - Add service worker + manifest in `frontend/public/`, register in `frontend/app/layout.tsx`; cache app shell, fonts, icons.
    - Use `workbox-background-sync` or custom queue for failed POSTs to `/api/recordings`.
@@ -315,6 +317,9 @@ Exit: Dashboards present; alarms firing to on-call; SLOs calculated.
 **Objective:** Handle long recordings and keep spend predictable.
 
 Actions
+0) Runtime upgrades and stability hardening
+   - Backend: bump FastAPI to ^0.120.x and Pydantic to 2.11 for faster schema builds and security fixes; rerun `poetry lock`, execute full API test suite, and verify `model_validate/from_attributes` paths. citeturn0search8turn0search0
+   - Worker: bump Ray to ^2.43 and configure longer worker register timeouts plus namespace isolation in `worker/worker_service.py`; run `ray up` smoke and queue load test to ensure actor restarts continue to work. citeturn1search1
 1) Worker autoscale: configure ACA/KEDA triggers on queue depth for transcription & LLM queues.
 2) Long audio path: automatically switch to Azure batch transcription for >60 min (`TRANSCRIPTION_SERVICES` order) and skip LLM until transcript ready; use batch pricing (cheaper than realtime) and submit via `contentContainerUrl` when multiple files are queued.
 3) Storage costs: enable gzip for transcripts; configure blob lifecycle; avoid double copies.

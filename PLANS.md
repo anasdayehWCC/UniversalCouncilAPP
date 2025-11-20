@@ -1,26 +1,30 @@
 # PLANS.md — Long-Horizon Exec Plan (Codex-Max, 24h+ capable)
 
 ## Purpose / Big Picture
+
 - Deliver the Social Care-ready Minute platform per `minute-main/ROADMAP_social_care.md`, under the behavioral guardrails in `AGENTS.md`.
 - Optimize for Codex-Max long-run sessions (compaction, multi-window) while keeping costs and safety controls explicit.
 - Record progress and blockers so extended autonomous runs remain coherent.
 
 ## References
+
 - Behavioral rules: `AGENTS.md` (auth, migrations, cost controls, logging/retention, feature flags, dev-preview).
 - Delivery roadmap: `minute-main/ROADMAP_social_care.md` (phases 1–14, success criteria).
 - Model context: GPT-5.1-Codex-Max (compaction; can run 24h+). citeturn0search0
 
 ## Operating Model for Long Sessions
-1) Read AGENTS and Roadmap before edits; obey local-only fake-JWT and dev-preview gating.
-2) Always web-search when uncertain or selecting services/models/policies (AGENTS rule 26).
-3) Work phase-by-phase (see “Plan of Work”). After each phase:
+
+1. Read AGENTS and Roadmap before edits; obey local-only fake-JWT and dev-preview gating.
+2. Always web-search when uncertain or selecting services/models/policies (AGENTS rule 26).
+3. Work phase-by-phase (see “Plan of Work”). After each phase:
    - Update **Progress** checklist (with timestamps).
    - Run required tests; fix failures before advancing.
    - Update `CHANGELOG.md` per AGENTS rule 27.
-4) Use compaction-friendly notes: summarise context into this file’s Progress section after major hops or >4h runtime.
-5) Spillover tasks (>24h) get a “handover” summary appended to Progress.
+4. Use compaction-friendly notes: summarise context into this file’s Progress section after major hops or >4h runtime.
+5. Spillover tasks (>24h) get a “handover” summary appended to Progress.
 
 ## Plan of Work (mapped to Roadmap phases)
+
 - Phase 1: Identity/RBAC (Entra), org/domain models, local preview safety.
 - Phase 1.5: Premium UI & Council Theming (WCC/RBKC colors, glassmorphism, Tailwind design system).
 - Phase 2: Infra & secrets (Azure UK, private endpoints, dev-preview slot).
@@ -36,8 +40,14 @@
 - Phase 12: Testing gates (unit/integration/e2e/security).
 - Phase 13: IaC + pipelines (ACA/AKS, ACR, blue/green).
 - Phase 14: Pilot/rollout (children first, adults next; domain packs).
+- Platform upgrades (cross-phase enabler): Next.js 15.5/React 19 + Turbopack, FastAPI 0.120 + Pydantic 2.11, Ray 2.43 stability.
 
 ## Concrete Steps & Commands (per phase, repeatable)
+
+- Framework upgrade audits:
+  - Frontend: `npm run lint && npm run build -- --turbopack`; Playwright smoke for `/` → `/new` → `/templates`; regenerate API client (`npm run openapi-ts`) after typed routes flip. citeturn0search1turn0search5
+  - Backend: bump FastAPI/Pydantic, run `poetry lock`, `make test`, ensure `model_validate`/`TypeAdapter` replacements where ORM used. citeturn0search8turn0search0
+  - Worker: bump Ray, set `RAY_worker_register_timeout_ms=20000`, namespace calls; run queue load smoke to verify restarts. citeturn1search1
 - Install deps: `docker compose up --build` (local stack), `npm install`/`npm run dev` (frontend), `npm run openapi-ts` (regenerate client), `make test` (backend/worker tests).
 - Lint/format: follow repo defaults (`ruff`, `npm lint`, `npm format` if present).
 - Frontend preview: `ENVIRONMENT=local npm run dev` with dev JWT; `DEV_PREVIEW_MODE=on` only in local.
@@ -45,6 +55,7 @@
 - Tests per change: backend unit, worker integration, Playwright for offline/relabel/export as added.
 
 ## Progress (update inline)
+
 - [ ] Phase 1 Identity/RBAC
 - [ ] Phase 1.5 Premium UI & Council Theming
 - [ ] Phase 2 Infra/Secrets
@@ -60,9 +71,12 @@
 - [ ] Phase 12 Testing gates
 - [ ] Phase 13 IaC/Pipelines
 - [ ] Phase 14 Pilot/Rollout
+- [ ] Platform upgrades (Next.js/FastAPI/Pydantic/Ray)
 
 ## Validation & Acceptance
+
 - Per-phase exit criteria in Roadmap; all tests green; citations present when web lookups inform decisions; CHANGELOG updated for every change.
 
 ## Blockers & Decisions Log
+
 - Record any blocking issues, proposed mitigations, and owner; keep minimal to preserve compaction.

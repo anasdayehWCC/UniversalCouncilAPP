@@ -1,0 +1,13 @@
+**/.git
+**/.gitignore
+**/.vscode
+**/node_modules
+**/npm-debug.log
+**/.next
+**/.DS_Store
+**/.venv
+**/__pycache__
+*.ipynb
+*/*.pdf
+Dockerfile
+.dockerignore

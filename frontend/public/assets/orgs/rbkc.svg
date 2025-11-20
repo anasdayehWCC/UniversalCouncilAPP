@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 80">
+  <path fill="#ffffff" d="M40,10 L70,10 L70,60 L40,70 L10,60 L10,10 Z" />
+  <text x="80" y="45" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#ffffff">THE ROYAL BOROUGH OF</text>
+  <text x="80" y="70" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#ffffff">KENSINGTON AND CHELSEA</text>
+</svg>

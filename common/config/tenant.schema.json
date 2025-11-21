@@ -1,0 +1,171 @@
+{
+  "$defs": {
+    "ModuleConfig": {
+      "properties": {
+        "id": {
+          "description": "Module identifier, e.g. transcription, minutes",
+          "title": "Id",
+          "type": "string"
+        },
+        "enabled": {
+          "default": true,
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Display label for navigation",
+          "title": "Label"
+        },
+        "icon": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional icon name for navigation",
+          "title": "Icon"
+        },
+        "feature_flags": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional feature flag identifiers required for this module",
+          "title": "Feature Flags"
+        },
+        "departments": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional list of service_domain ids this module applies to",
+          "title": "Departments"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "title": "ModuleConfig",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "id": {
+      "description": "Stable tenant/council identifier",
+      "title": "Id",
+      "type": "string"
+    },
+    "name": {
+      "title": "Name",
+      "type": "string"
+    },
+    "version": {
+      "description": "Config version tag, e.g. 1.0.0",
+      "title": "Version",
+      "type": "string"
+    },
+    "defaultLocale": {
+      "pattern": "^[a-z]{2}-[A-Z]{2}$",
+      "title": "Defaultlocale",
+      "type": "string"
+    },
+    "designTokens": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Designtokens"
+    },
+    "retentionDaysDefault": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Default retention in days for recordings/transcriptions/minutes",
+      "title": "Retentiondaysdefault"
+    },
+    "sharepoint_library_path": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Default SharePoint library path",
+      "title": "Sharepoint Library Path"
+    },
+    "planner": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Optional Planner plan/bucket ids",
+      "title": "Planner"
+    },
+    "modules": {
+      "items": {
+        "$ref": "#/$defs/ModuleConfig"
+      },
+      "title": "Modules",
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "version",
+    "defaultLocale",
+    "modules"
+  ],
+  "title": "TenantConfig",
+  "type": "object"
+}

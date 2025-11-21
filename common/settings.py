@@ -42,6 +42,10 @@ class Settings(BaseSettings):
     )
 
     APP_URL: str = Field(description="used for CORS origin validation")
+    TENANT_CONFIG_ID: str = Field(
+        description="Tenant config identifier used for module/flag gating and config endpoint defaults",
+        default="pilot_children",
+    )
 
     # if using AWS
     AWS_ACCOUNT_ID: str | None = Field(description="AWS account ID", default=None)

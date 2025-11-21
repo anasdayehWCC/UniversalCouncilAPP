@@ -11,6 +11,7 @@ from common.services.export_handler_service import ExportHandlerService
 from common.services.storage_services import get_storage_service
 from common.services.queue_services import get_queue_service
 from common.settings import get_settings
+from common.config.access import is_module_enabled
 from common.types import (
     EditMessageData,
     ExportResponse,
@@ -31,10 +32,17 @@ llm_queue_service = get_queue_service(
 minutes_router = APIRouter(tags=["Minutes"])
 
 
+def ensure_minutes_module_enabled():
+    tenant_id = getattr(settings, "TENANT_CONFIG_ID", None)
+    if not is_module_enabled("minutes", tenant_id):
+        raise HTTPException(status_code=403, detail="Minutes module is disabled for this tenant")
+
+
 @minutes_router.get("/transcription/{transcription_id}/minutes")
 async def list_minutes_for_transcription(
     transcription_id: uuid.UUID, session: SQLSessionDep, user: UserDep
 ) -> list[MinuteListItem]:
+    ensure_minutes_module_enabled()
     transcription = await session.get(Transcription, transcription_id)
     if (
         not transcription
@@ -74,6 +82,7 @@ async def list_minutes_for_transcription(
 async def create_minute(
     transcription_id: uuid.UUID, request: MinutesCreateRequest, session: SQLSessionDep, user: UserDep, request_obj: Request
 ):
+    ensure_minutes_module_enabled()
     transcription = await session.get(Transcription, transcription_id)
     if (
         not transcription
@@ -113,6 +122,7 @@ async def create_minute(
 
 @minutes_router.get("/minutes/{minutes_id}")
 async def get_minute(minutes_id: uuid.UUID, session: SQLSessionDep, user: UserDep) -> Minute:
+    ensure_minutes_module_enabled()
     query = (
         select(Minute)
         .where(Minute.id == minutes_id)
@@ -136,6 +146,7 @@ async def get_minute(minutes_id: uuid.UUID, session: SQLSessionDep, user: UserDe
 async def list_minute_versions(
     minute_id: uuid.UUID, session: SQLSessionDep, user: UserDep
 ) -> list[MinuteVersionResponse]:
+    ensure_minutes_module_enabled()
     result = await session.exec(
         select(Minute)
         .where(Minute.id == minute_id)
@@ -170,6 +181,7 @@ async def list_minute_versions(
 async def create_minute_version(
     minute_id: uuid.UUID, request: MinuteVersionCreateRequest, session: SQLSessionDep, user: UserDep, request_obj: Request
 ) -> MinuteVersionResponse:
+    ensure_minutes_module_enabled()
     minute = await get_minute(minute_id, session, user)
     minute_version = MinuteVersion(
         id=uuid.uuid4(),

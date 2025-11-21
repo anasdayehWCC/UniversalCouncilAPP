@@ -85,6 +85,8 @@
 - [x] Platform upgrades (Next.js 15.1 / React 19, FastAPI 0.120.x, Pydantic 2.11, Ray 2.47) — Completed 2025-11-21T02:18Z (versions bumped, Ray namespace/timeout tuned, npm deps updated)
 - [x] Phase 15A Architecture doc — Completed 2025-11-21T17:05Z (`docs/architecture.md` authored with exec summary, capability map, crosswalk; README pointer added)
 - [x] Phase 15B Foundations gap map — Completed 2025-11-21T17:05Z (`docs/universal_council_app_foundations.md` updated with evidence, gap map, phase crosswalk, landing zone checklist)
+- [x] Phase 16A Config schema hardening — Completed 2025-11-21T17:40Z (tenant config model expanded with version/nav metadata/retention; schema emitted `common/config/tenant.schema.json`; config validation tests updated; pilot config aligned)
+- [x] Phase 16B Backend module/flag surfacing — Completed 2025-11-21T17:40Z (module gating helper, minutes routes guarded via tenant config, TENANT_CONFIG_ID setting added, module flag tests added)
 
 ### Context Snapshot [2025-11-21T02:35Z]
 - Completed: Phases 1-14 + platform upgrades; frontend build passes on Next 15.5/React 19; backend pytest smoke green.

@@ -9,3 +9,4 @@ def test_all_configs_validate():
     for cfg in configs:
         assert cfg.id
         assert cfg.modules
+        assert cfg.version

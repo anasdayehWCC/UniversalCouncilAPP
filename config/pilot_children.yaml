@@ -1,5 +1,7 @@
 organisation: "Westminster"
 service_domain: "Children"
+version: "1.0.0"
+defaultLocale: "en-GB"
 templates:
   - home_visit
   - strategy_discussion
@@ -18,9 +20,14 @@ roles:
 modules:
   - id: transcription
     enabled: true
+    label: "Capture & Transcribe"
+    icon: "mic"
     departments:
       - "Children"
   - id: minutes
     enabled: true
+    label: "Minutes"
+    icon: "file-text"
     departments:
       - "Children"
+retentionDaysDefault: 365

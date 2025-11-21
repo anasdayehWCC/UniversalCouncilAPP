@@ -37,7 +37,14 @@ async def list_chat(
     current_user: UserDep,
 ) -> ChatGetAllResponse:
     transcription = await session.get(Transcription, transcription_id)
-    if not transcription or transcription.user_id != current_user.id:
+    if (
+        not transcription
+        or transcription.user_id != current_user.id
+        or transcription.organisation_id != current_user.organisation_id
+        or (
+            current_user.service_domain_id and transcription.service_domain_id != current_user.service_domain_id
+        )
+    ):
         raise HTTPException(404, "Not found")
 
     query = select(Chat).where(Chat.transcription_id == transcription_id).order_by(col(Chat.updated_datetime).asc())
@@ -67,7 +74,14 @@ async def create_chat(
     current_user: UserDep,
 ) -> ChatCreateResponse:
     transcription = await session.get(Transcription, transcription_id)
-    if not transcription or transcription.user_id != current_user.id:
+    if (
+        not transcription
+        or transcription.user_id != current_user.id
+        or transcription.organisation_id != current_user.organisation_id
+        or (
+            current_user.service_domain_id and transcription.service_domain_id != current_user.service_domain_id
+        )
+    ):
         raise HTTPException(404, "Not found")
     chat_id = uuid.uuid4()
     chat = Chat(user_content=request.user_content, transcription_id=transcription_id, id=chat_id)
@@ -86,7 +100,14 @@ async def get_chat(
     current_user: UserDep,
 ) -> ChatGetResponse:
     transcription = await session.get(Transcription, transcription_id)
-    if not transcription or transcription.user_id != current_user.id:
+    if (
+        not transcription
+        or transcription.user_id != current_user.id
+        or transcription.organisation_id != current_user.organisation_id
+        or (
+            current_user.service_domain_id and transcription.service_domain_id != current_user.service_domain_id
+        )
+    ):
         raise HTTPException(status_code=404, detail="Transcription not found")
 
     chat = await session.get(Chat, chat_id)
@@ -105,7 +126,14 @@ async def delete_chat(transcription_id: uuid.UUID, chat_id: uuid.UUID, session: 
     """Delete a specific transcription by ID."""
     # First check if the transcription exists and belongs to the user
     transcription = await session.get(Transcription, transcription_id)
-    if not transcription or transcription.user_id != current_user.id:
+    if (
+        not transcription
+        or transcription.user_id != current_user.id
+        or transcription.organisation_id != current_user.organisation_id
+        or (
+            current_user.service_domain_id and transcription.service_domain_id != current_user.service_domain_id
+        )
+    ):
         raise HTTPException(status_code=404, detail="Transcription not found")
     chat = await session.get(Chat, chat_id)
     # Delete the transcription
@@ -117,7 +145,14 @@ async def delete_chat(transcription_id: uuid.UUID, chat_id: uuid.UUID, session: 
 async def delete_chats(transcription_id: uuid.UUID, session: SQLSessionDep, current_user: UserDep):
     # First check if the transcription exists and belongs to the user
     transcription = await session.get(Transcription, transcription_id)
-    if not transcription or transcription.user_id != current_user.id:
+    if (
+        not transcription
+        or transcription.user_id != current_user.id
+        or transcription.organisation_id != current_user.organisation_id
+        or (
+            current_user.service_domain_id and transcription.service_domain_id != current_user.service_domain_id
+        )
+    ):
         raise HTTPException(status_code=404, detail="Transcription not found")
     await session.execute(delete(Chat).where(Chat.transcription_id == transcription_id))
 

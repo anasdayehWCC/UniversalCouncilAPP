@@ -7,7 +7,7 @@ from sqlmodel import col, select
 
 from backend.api.dependencies import UserDep
 from backend.api.dependencies.get_session import SQLSessionDep
-from common.database.postgres_models import TemplateQuestion, TemplateType, UserTemplate
+from common.database.postgres_models import ServiceDomainTemplate, TemplateQuestion, TemplateType, UserTemplate
 from common.services.template_manager import TemplateManager
 from common.settings import get_settings
 from common.types import (
@@ -25,14 +25,26 @@ ga_only_template_metadata = [template for template in all_template_metadata if t
 
 
 @templates_router.get("/templates")
-def get_templates(user: UserDep) -> list[TemplateMetadata]:  # noqa: ARG001
+async def get_templates(user: UserDep, session: SQLSessionDep) -> list[TemplateMetadata]:
     """Get metadata for all templates."""
-    # currently we have no beta templates. Uncomment this code to enable this feature
-    # if posthog_client and posthog_client.get_feature_flag("beta-templates", user.email):
-    #     return all_template_metadata
-    # else:
-    #     return ga_only_template_metadata
-    return ga_only_template_metadata
+    allowed_templates: set[str] | None = None
+    if user.service_domain_id:
+        mappings = (
+            await session.exec(
+                select(ServiceDomainTemplate).where(
+                    ServiceDomainTemplate.service_domain_id == user.service_domain_id,
+                    ServiceDomainTemplate.enabled.is_(True),
+                )
+            )
+        ).all()
+        if mappings:
+            allowed_templates = {m.template_name for m in mappings}
+
+    return [
+        t
+        for t in ga_only_template_metadata
+        if (allowed_templates is None or t.name in allowed_templates)
+    ]
 
 
 @templates_router.get("/user-templates")

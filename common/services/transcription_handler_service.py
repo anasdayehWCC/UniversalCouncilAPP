@@ -7,6 +7,7 @@ from sqlmodel import col, select
 from common.audio.speakers import process_speakers_and_dialogue_entries
 from common.database.postgres_database import SessionLocal
 from common.database.postgres_models import Chat, JobStatus, Minute, Transcription
+from common.metrics import offline_sync_total
 from common.generate_meeting_title import generate_meeting_title
 from common.llm.client import FastOrBestLLM, create_default_chatbot
 from common.prompts import get_chat_with_transcript_system_message
@@ -143,7 +144,10 @@ class TranscriptionHandlerService:
 
     @classmethod
     async def process_transcription(
-        cls, minute_id: UUID, async_transcription_message_data: TranscriptionJobMessageData | None = None
+        cls,
+        minute_id: UUID,
+        async_transcription_message_data: TranscriptionJobMessageData | None = None,
+        preferred_adapter: str | None = None,
     ) -> TranscriptionJobMessageData:
         """Process a transcription job and save results. Returns True if job is complete, False otherwise."""
         try:
@@ -160,7 +164,9 @@ class TranscriptionHandlerService:
             else:
                 # it's a new transcription job
                 cls.update_transcription(transcription.id, JobStatus.IN_PROGRESS)
-                transcription_job = await transcription_manager.perform_transcription_steps(transcription=transcription)
+                transcription_job = await transcription_manager.perform_transcription_steps(
+                    transcription=transcription, preferred_adapter=preferred_adapter
+                )
 
             if transcription_job.transcript:
                 dialogue_entries = await cls.identify_speakers(transcription_job.transcript)
@@ -168,6 +174,8 @@ class TranscriptionHandlerService:
                 cls.update_transcription(
                     transcription.id, status=JobStatus.COMPLETED, transcript=dialogue_entries, title=meeting_title
                 )
+                if transcription.recordings and transcription.recordings[0].captured_offline:
+                    offline_sync_total.labels(stage="sync_completed").inc()
 
         except Exception as e:
             msg = f"Transcription failed: {e!s}"

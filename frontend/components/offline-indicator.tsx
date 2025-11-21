@@ -1,11 +1,13 @@
 'use client';
 
 import { useSyncManager } from '@/hooks/use-sync-manager';
+import { useAccessToken } from '@/hooks/use-access-token';
 import { Wifi, WifiOff, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function OfflineIndicator() {
-    const { isOnline, isSyncing, pendingCount } = useSyncManager();
+    const { accessToken } = useAccessToken();
+    const { isOnline, isSyncing, pendingCount } = useSyncManager(accessToken);
 
     if (isOnline && pendingCount === 0) return null;
 

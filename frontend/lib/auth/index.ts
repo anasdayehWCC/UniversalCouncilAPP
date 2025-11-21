@@ -2,19 +2,8 @@ import { jwtVerify, JWTPayload, decodeJwt, errors, importSPKI } from 'jose'
 import { DecodedKeycloakToken, ParsedAuthTokenResult } from './types'
 
 export async function isAuthorisedUser(header: string): Promise<boolean> {
-  if (!process.env.REPO) {
-    console.error('REPO environment variable not set')
-    return false
-  }
-
   const parsedToken = await parseAuthToken(header)
-
-  if (!parsedToken) {
-    console.error('No token found for user')
-    return false
-  }
-
-  return parsedToken.roles.some((role) => role === process.env.REPO)
+  return parsedToken !== null
 }
 
 async function parseAuthToken(
@@ -25,30 +14,26 @@ async function parseAuthToken(
     return null
   }
 
-  const verifyJwtSource = !process.env.DISABLE_AUTH_SIGNATURE_VERIFICATION
+  const verifyJwtSource =
+    Boolean(process.env.AUTH_PROVIDER_PUBLIC_KEY) && !process.env.DISABLE_AUTH_SIGNATURE_VERIFICATION
   const tokenContent = await getDecodedJwt(header, verifyJwtSource)
 
   if (!tokenContent) {
     return null
   }
 
-  const email = tokenContent.email
+  const email =
+    (tokenContent as DecodedKeycloakToken).preferred_username || (tokenContent as DecodedKeycloakToken).email
   if (!email) {
     console.error('No email found in token')
     return null
   }
 
-  const realmAccess = tokenContent.realm_access
-  if (!realmAccess) {
-    console.error('No realm access information found in token')
-    return null
-  }
-
-  const roles = tokenContent.realm_access.roles || []
+  const roles = (tokenContent as DecodedKeycloakToken).roles || []
   console.debug(`Roles found for user ${email}: ${roles}`)
   return {
     email,
-    roles,
+    roles: Array.isArray(roles) ? roles : [roles],
   }
 }
 

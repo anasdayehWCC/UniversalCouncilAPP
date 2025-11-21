@@ -9,6 +9,7 @@ export type Template = {
   id: string | null
   name: string
   agenda_usage: AgendaUsage
+  service_domains?: string[] | null
 }
 
 export type TemplateData = {

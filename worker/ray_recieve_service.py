@@ -5,11 +5,13 @@ from typing import Any
 import ray
 
 from common.services.exceptions import InteractionFailedError, TranscriptionFailedError
+from common.services.export_handler_service import ExportHandlerService
 from common.services.minute_handler_service import MinuteGenerationFailedError, MinuteHandlerService
 from common.services.queue_services.base import QueueService
 from common.services.transcription_handler_service import TranscriptionHandlerService
 from common.settings import get_settings
 from common.types import TaskType, WorkerMessage
+from common.tracing import set_trace_id
 from worker.healthcheck import HEARTBEAT_DIR
 
 logger = logging.getLogger(__name__)
@@ -51,8 +53,11 @@ class RayTranscriptionService:
             for message, receipt_handle in messages:
                 try:
                     logger.info("Received minute id for transcription: %s", message.id)
+                    preferred_adapter = None
+                    if message.data and message.data.processing_mode == "economy":
+                        preferred_adapter = "azure_stt_batch"
                     transcription_job = await TranscriptionHandlerService.process_transcription(
-                        message.id, message.data
+                        message.id, message.data, preferred_adapter=preferred_adapter
                     )
                 except TranscriptionFailedError:
                     logger.exception("Transcription failed for minute id: %s", message.id)
@@ -68,7 +73,12 @@ class RayTranscriptionService:
                     else:
                         logger.info("Async transcription job not ready yet. Re-queueing minute id: %s", message.id)
                         self.transcription_queue_service.publish_message(
-                            WorkerMessage(id=message.id, type=TaskType.TRANSCRIPTION, data=transcription_job)
+                            WorkerMessage(
+                                id=message.id,
+                                type=TaskType.TRANSCRIPTION,
+                                data=transcription_job,
+                                trace_id=message.trace_id,
+                            )
                         )
                 # Delete the message to prevent repeated processing
                 self.transcription_queue_service.complete_message(receipt_handle)
@@ -92,6 +102,7 @@ class RayLlmService:
             messages = self.queue_service.receive_message(max_messages=10)
             tasks: list[asyncio.Task] = []
             for message, receipt_handle in messages:
+                set_trace_id(message.trace_id)
                 match message.type:
                     case TaskType.MINUTE:
                         tasks.append(asyncio.create_task(self.process_minute_task(message, receipt_handle)))
@@ -99,6 +110,8 @@ class RayLlmService:
                         tasks.append(asyncio.create_task(self.process_edit_task(message, receipt_handle)))
                     case TaskType.INTERACTIVE:
                         tasks.append(asyncio.create_task(self.process_interactive_task(message, receipt_handle)))
+                    case TaskType.EXPORT:
+                        tasks.append(asyncio.create_task(self.process_export_task(message, receipt_handle)))
                     case _:
                         logger.warning("Unknown task type: %s", message.type)
                         self.queue_service.deadletter_message(message, receipt_handle)
@@ -133,10 +146,21 @@ class RayLlmService:
             await MinuteHandlerService.process_minute_edit_message(
                 target_minute_version_id=message.id, source_minute_version_id=message.data.source_id
             )
+            await ExportHandlerService.export_minute_version(message.id)
 
             logger.info("Minute edit complete for MinuteVersion id %s", message.id)
         except MinuteGenerationFailedError:
             logger.exception("Minute edit for MinuteVersion id %s failed", message.id)
+            self.queue_service.complete_message(receipt_handle=receipt_handle)
+        else:
+            self.queue_service.complete_message(receipt_handle=receipt_handle)
+
+    async def process_export_task(self, message: WorkerMessage, receipt_handle: Any) -> None:
+        try:
+            logger.info("Received export message for minute version id %s", message.id)
+            await ExportHandlerService.export_minute_version(message.id)
+        except Exception:  # noqa: BLE001
+            logger.exception("Export failed for minute version %s", message.id)
             self.queue_service.complete_message(receipt_handle=receipt_handle)
         else:
             self.queue_service.complete_message(receipt_handle=receipt_handle)

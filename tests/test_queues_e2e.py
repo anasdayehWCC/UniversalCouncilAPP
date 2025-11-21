@@ -73,7 +73,13 @@ async def load_db_test_instance(file_type: FileTypeTests) -> set[UUID]:
             with test_file.open("rb") as f:
                 http_response = requests.put(response_json["upload_url"], data=f.read(), timeout=60)  # noqa: ASYNC210
                 assert http_response.status_code == 200, f"failed to upload recording for {response_json['upload_url']}"
-                request = TranscriptionCreateRequest(recording_id=response_json["id"], template="General")
+                request = TranscriptionCreateRequest(
+                    recording_id=response_json["id"],
+                    template_name="General",
+                    template_id=None,
+                    agenda=None,
+                    case_reference="TEST-CASE",
+                )
                 response = await ac.post("/transcriptions", content=request.model_dump_json())
                 assert response.status_code == 201, f"failed to create transcription for {request.model_dump_json()}"
 

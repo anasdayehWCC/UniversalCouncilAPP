@@ -12,6 +12,7 @@ def convert_to_dialogue_entries(phrases: list[dict[str, Any]]) -> list[DialogueE
             text=entry["text"],
             start_time=float(entry["offsetMilliseconds"]) / 1000,
             end_time=(float(entry["offsetMilliseconds"]) + float(entry["durationMilliseconds"])) / 1000,
+            canonical_speaker=None,
         )
         for entry in phrases
     ]

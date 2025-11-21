@@ -59,6 +59,20 @@ export default function NewTranscriptPage() {
           </p>
         </div>
       </Link>
+      <Link
+        href="/capture"
+        className="flex items-center gap-2 rounded-xl border p-6 hover:bg-blue-100"
+      >
+        <div className="rounded bg-blue-200 p-2 text-blue-500">
+          <Mic size={25} />
+        </div>
+        <div>
+          <h3 className="text-xl font-bold">Offline capture (mobile)</h3>
+          <p className="text-sm text-slate-500">
+            Use in low-signal areas and auto-sync later.
+          </p>
+        </div>
+      </Link>
     </div>
   )
 }

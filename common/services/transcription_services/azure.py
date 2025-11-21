@@ -5,6 +5,7 @@ from typing import Any
 import aiofiles
 import httpx
 import sentry_sdk
+import json
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from common.database.postgres_models import Recording
@@ -47,17 +48,25 @@ class AzureSpeechAdapter(TranscriptionAdapter):
         with sentry_sdk.start_transaction(op="process", name="read_file_before_azure_transcribe") as transaction:
             async with aiofiles.open(audio_file_path_or_recording, "rb") as audio_file:
                 audio_content = await audio_file.read()
+                locales = ["en-GB"] + settings.AZURE_SPEECH_ADDITIONAL_LOCALES
+                definition = {
+                    "locales": locales,
+                    "diarization": {"enabled": True},
+                    "profanityFilterMode": "None",
+                }
+                if settings.AZURE_SPEECH_PHRASE_LIST:
+                    definition["phraseList"] = settings.AZURE_SPEECH_PHRASE_LIST
                 files: Any = {
                     "audio": ("audio.wav", audio_content),
                     "definition": (
                         None,
-                        '{"locales":["en-GB"],"diarization":{"enabled":true},"profanityFilterMode":"None"}',
+                        json.dumps(definition),
                     ),
                 }
             transaction.set_data("file_size", audio_file_path_or_recording.stat().st_size)
             transaction.set_data("file_type", audio_file_path_or_recording.suffix.lower())
 
-            params = {"api-version": "2024-11-15"}
+            params = {"api-version": settings.AZURE_SPEECH_API_VERSION}
 
             timeout_settings = httpx.Timeout(
                 timeout=900.0,

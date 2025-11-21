@@ -45,6 +45,7 @@ class TemplateManager:
                 description=template.description,
                 category=template.category,
                 agenda_usage=template.agenda_usage,
+                service_domains=getattr(template, "service_domains", None),
             )
             for template in cls.templates.values()
         ]

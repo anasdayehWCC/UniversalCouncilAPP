@@ -1,0 +1,45 @@
+{
+  "rules": [
+    {
+      "enabled": true,
+      "name": "delete-raw-recordings",
+      "type": "Lifecycle",
+      "definition": {
+        "filters": {
+          "blobTypes": [
+            "blockBlob"
+          ],
+          "prefixMatch": [
+            "recordings/"
+          ]
+        },
+        "actions": {
+          "baseBlob": {
+            "deleteAfterDaysSinceModificationGreaterThan": 30
+          }
+        }
+      }
+    },
+    {
+      "enabled": true,
+      "name": "tier-templates",
+      "type": "Lifecycle",
+      "definition": {
+        "filters": {
+          "blobTypes": [
+            "blockBlob"
+          ],
+          "prefixMatch": [
+            "templates/"
+          ]
+        },
+        "actions": {
+          "baseBlob": {
+            "tierToCoolAfterDaysSinceModificationGreaterThan": 30,
+            "tierToArchiveAfterDaysSinceModificationGreaterThan": 90
+          }
+        }
+      }
+    }
+  ]
+}

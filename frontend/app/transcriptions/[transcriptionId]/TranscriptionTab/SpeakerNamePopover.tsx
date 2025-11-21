@@ -2,6 +2,13 @@ import { DialogueEntryForm } from '@/app/transcriptions/[transcriptionId]/Transc
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -23,6 +30,7 @@ export const SpeakerNamePopover = ({
   const [open, setOpen] = useState(false)
   const { getValues } = useFormContext<DialogueEntryForm>()
   const [newName, setNewName] = useState(entry.speaker)
+  const [canonical, setCanonical] = useState(entry.canonical_speaker || '')
   const handleUpdateAll = useCallback(() => {
     getValues('entries')
       .map((e, i) => ({
@@ -31,22 +39,22 @@ export const SpeakerNamePopover = ({
       }))
       .filter((e) => e.speaker === entry.speaker)
       .forEach(({ i, ...entry }) => {
-        update(i, { ...entry, speaker: newName })
+        update(i, { ...entry, speaker: newName, canonical_speaker: canonical || null })
       })
     posthog.capture('speaker_name_edited_in_transcript', {
       update_type: 'all_occurances',
     })
-  }, [entry.speaker, getValues, newName, update])
+  }, [entry.speaker, getValues, newName, update, canonical])
   const handleUpdateSingle = useCallback(
     (index: number) => () => {
-      update(index, { ...entry, speaker: newName })
+      update(index, { ...entry, speaker: newName, canonical_speaker: canonical || null })
       setOpen(false)
       posthog.capture('speaker_name_edited_in_transcript', {
         update_type: 'single_occurrence',
         entry_index: index,
       })
     },
-    [entry, newName, update]
+    [entry, newName, update, canonical]
   )
   return (
     <Popover open={open} onOpenChange={(open) => setOpen(open)}>
@@ -76,6 +84,23 @@ export const SpeakerNamePopover = ({
               onChange={(e) => setNewName(e.target.value)}
               className="col-span-3"
             />
+            <Select
+              value={canonical}
+              onValueChange={(v) => setCanonical(v === 'none' ? '' : v)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Set role (optional)" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No canonical role</SelectItem>
+                <SelectItem value="social_worker">Social worker</SelectItem>
+                <SelectItem value="mother">Mother/Carer</SelectItem>
+                <SelectItem value="father">Father/Carer</SelectItem>
+                <SelectItem value="child">Child/Young person</SelectItem>
+                <SelectItem value="interpreter">Interpreter</SelectItem>
+                <SelectItem value="professional">Professional/Health/Police</SelectItem>
+              </SelectContent>
+            </Select>
             <div className="">
               <Button onClick={handleUpdateSingle(index)} variant="outline">
                 Update this occurrence

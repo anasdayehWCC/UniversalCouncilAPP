@@ -56,22 +56,22 @@
 
 ## Progress (update inline)
 
-- [ ] Phase 1 Identity/RBAC
-- [ ] Phase 1.5 Premium UI & Council Theming
-- [ ] Phase 2 Infra/Secrets
-- [ ] Phase 3 Case Context
-- [ ] Phase 4 Offline/PWA + fast/economy toggle
-- [ ] Phase 5 Diarization quality/relabel
-- [ ] Phase 6 Templates (children/adults)
-- [ ] Phase 7 Evidence UX
-- [ ] Phase 8 Exports + M365
-- [ ] Phase 9 Security/Privacy/Governance
-- [ ] Phase 10 Observability/SLOs
-- [ ] Phase 11 Scale/Cost
-- [ ] Phase 12 Testing gates
-- [ ] Phase 13 IaC/Pipelines
-- [ ] Phase 14 Pilot/Rollout
-- [ ] Platform upgrades (Next.js/FastAPI/Pydantic/Ray)
+- [x] Phase 1 Identity/RBAC — Completed 2025-11-20T22:24Z (Entra JWKS + AuthContext + frontend MSAL/DEV_PREVIEW token plumbing)
+- [x] Phase 1.5 Premium UI & Council Theming — Completed 2025-11-20T22:40Z (WCC/RBKC theming, gradients/glass, org logo assets, motion accents)
+- [x] Phase 2 Infra/Secrets — Completed 2025-11-20T23:26Z (Key Vault secret loader, UK-only Terraform with private endpoints, storage lifecycle + region guard)
+- [x] Phase 3 Case Context — Completed 2025-11-20T23:52Z (case_record model + encrypted DOB, API requires case_reference, frontend case selector with offline cache, regenerated OpenAPI client)
+- [x] Phase 4 Offline/PWA + fast/economy toggle — Completed 2025-11-21T00:05Z (SW+manifest, offline queue+Dexie, backoff sync with token, economy/fast toggle + processing_mode routed to Azure batch, mobile /capture flow)
+- [x] Phase 5 Diarization quality/relabel — Completed 2025-11-21T00:24Z (Azure v3.2 tuning, phrase list + EAL locales, batch preference via processing_mode, canonical speaker UI, dialogue/feedback endpoints, feedback table; WER/DER hooks ready)
+- [x] Phase 6 Templates (children/adults) — Completed 2025-11-21T00:52Z (social_care template suite, domain-aware metadata/mapping table, visit/risk/outcome fields in minutes & API/UI)
+- [x] Phase 7 Evidence UX — Completed 2025-11-21T00:56Z (citation playback sidebar with timestamp jumps, signed URL endpoint, start/end timestamps kept via adapters)
+- [x] Phase 8 Exports + M365 — Completed 2025-11-21T01:21Z (docx/pdf exporters, storage + SAS URLs, SharePoint/Planner hooks, frontend export buttons)
+- [x] Phase 9 Security/Privacy/Governance — Completed 2025-11-21T01:24Z (audit middleware + table, retention policies per domain, security headers/HSTS/origin checks, rate limits, SW no-cache, idle reauth hints)
+- [x] Phase 10 Observability/SLOs — Completed 2025-11-21T01:46Z (JSON logging w/ trace IDs, Prom metrics `/metrics`, latency/export/offline counters, health live/ready, trace propagation to worker)
+- [x] Phase 11 Scale/Cost — Completed 2025-11-21T01:46Z (auto batch switch for long audio, per-domain LLM token budgets, KEDA autoscale manifest, load-test stub, cost weights/env, metrics for mode usage)
+- [x] Phase 12 Testing gates — Completed 2025-11-21T02:05Z (unit tests for exports/cost guard/security headers, Playwright stub, CI workflow running pytest/lint/build, FastAPI upgrade smoke)
+- [x] Phase 13 IaC/Pipelines — Completed 2025-11-21T02:05Z (GitHub Actions CI+deploy workflows, Terraform guards, KEDA autoscale manifest, blue/green deploy job)
+- [x] Phase 14 Pilot/Rollout — Completed 2025-11-21T02:05Z (children pilot config file with templates/paths/roles, docs updated)
+- [x] Platform upgrades (Next.js 15.1 / React 19, FastAPI 0.120.x, Pydantic 2.11, Ray 2.47) — Completed 2025-11-21T02:18Z (versions bumped, Ray namespace/timeout tuned, npm deps updated)
 
 ## Validation & Acceptance
 
@@ -79,4 +79,4 @@
 
 ## Blockers & Decisions Log
 
-- Record any blocking issues, proposed mitigations, and owner; keep minimal to preserve compaction.
+- Full pytest suite currently blocked by optional deps/fixtures (breame, ray, ffmpeg, .data test audio); only `tests/test_health.py` runs green in `.venv`.

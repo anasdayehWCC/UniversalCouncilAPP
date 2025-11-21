@@ -1,0 +1,33 @@
+name: Deploy-ACA
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to deploy (dev/uat/prod)"
+        required: true
+        default: dev
+
+jobs:
+  container-app-deploy:
+    runs-on: ubuntu-22.04
+    environment: ${{ github.event.inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Build & push images
+        run: |
+          az acr build --registry ${{ secrets.ACR_NAME }} --image minute-backend:$(git rev-parse --short HEAD) .
+      - name: Deploy blue-green revision
+        run: |
+          az containerapp revision copy --name minute-backend --resource-group ${{ secrets.ACA_RG }} --image ${{ secrets.ACR_NAME }}.azurecr.io/minute-backend:$(git rev-parse --short HEAD) --revision-suffix bg-${{ github.run_number }}
+          az containerapp ingress traffic set --name minute-backend --resource-group ${{ secrets.ACA_RG }} --revision-weight latest=10 current=90
+      - name: Health check
+        run: |
+          curl -f https://${{ secrets.BACKEND_HOST }}/api/health/ready
+      - name: Promote
+        run: |
+          az containerapp ingress traffic set --name minute-backend --resource-group ${{ secrets.ACA_RG }} --revision-weight latest=100

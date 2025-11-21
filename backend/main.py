@@ -6,8 +6,12 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from backend.api.routes import router as api_router
+from backend.api.middleware.audit import AuditMiddleware
+from backend.api.middleware.security import OriginCheckMiddleware, SecurityHeadersMiddleware, SimpleRateLimitMiddleware
+from backend.api.middleware.tracing import TracingMiddleware
 from common.database.postgres_database import init_cleanup_scheduler
 from common.settings import get_settings
 
@@ -56,7 +60,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.add_middleware(TracingMiddleware)
+app.add_middleware(OriginCheckMiddleware, allowed_origins=origins)
+
+app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(
+    SimpleRateLimitMiddleware,
+    limit=120,
+    window_seconds=60,
+    protected_paths=["/api/recordings", "/api/transcriptions", "/api/minutes", "/api/users"],
+)
+app.add_middleware(AuditMiddleware, skip_paths=["/api/health", "/health", "/unauthorised/health"])
+
 app.include_router(api_router)
+
+if settings.METRICS_ENABLED:
+    Instrumentator().instrument(app).expose(app, endpoint="/metrics", include_in_schema=False)
 
 if settings.STORAGE_SERVICE_NAME == "local":
     from common.services.storage_services.local.mock_storage_service import mock_storage_app

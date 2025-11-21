@@ -1,16 +1,19 @@
 import uuid
 from datetime import UTC, datetime
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query, Request
 from sqlalchemy.orm import selectinload
 from sqlmodel import col, select
 
 from backend.api.dependencies import SQLSessionDep, UserDep
-from common.database.postgres_models import JobStatus, Minute, MinuteVersion, Transcription
+from common.database.postgres_models import ExportStatus, JobStatus, Minute, MinuteVersion, Transcription
+from common.services.export_handler_service import ExportHandlerService
+from common.services.storage_services import get_storage_service
 from common.services.queue_services import get_queue_service
 from common.settings import get_settings
 from common.types import (
     EditMessageData,
+    ExportResponse,
     MinuteListItem,
     MinutesCreateRequest,
     MinuteVersionCreateRequest,
@@ -33,12 +36,21 @@ async def list_minutes_for_transcription(
     transcription_id: uuid.UUID, session: SQLSessionDep, user: UserDep
 ) -> list[MinuteListItem]:
     transcription = await session.get(Transcription, transcription_id)
-    if not transcription or transcription.user_id != user.id:
+    if (
+        not transcription
+        or transcription.user_id != user.id
+        or transcription.organisation_id != user.organisation_id
+        or (user.service_domain_id and transcription.service_domain_id != user.service_domain_id)
+    ):
         raise HTTPException(404, "Not found")
 
-    query = (
-        select(Minute).where(Minute.transcription_id == transcription_id).order_by(col(Minute.updated_datetime).desc())
+    query = select(Minute).where(
+        Minute.transcription_id == transcription_id,
+        Minute.organisation_id == user.organisation_id,
     )
+    if user.service_domain_id:
+        query = query.where(Minute.service_domain_id == user.service_domain_id)
+    query = query.order_by(col(Minute.updated_datetime).desc())
     result = await session.exec(query)
     minutes = result.all()
     return [
@@ -49,6 +61,10 @@ async def list_minutes_for_transcription(
             transcription_id=minute.transcription_id,
             template_name=minute.template_name,
             agenda=minute.agenda,
+            case_reference=minute.case_reference,
+            visit_type=minute.visit_type,
+            intended_outcomes=minute.intended_outcomes,
+            risk_flags=minute.risk_flags,
         )
         for minute in minutes
     ]
@@ -56,23 +72,43 @@ async def list_minutes_for_transcription(
 
 @minutes_router.post("/transcription/{transcription_id}/minutes")
 async def create_minute(
-    transcription_id: uuid.UUID, request: MinutesCreateRequest, session: SQLSessionDep, user: UserDep
+    transcription_id: uuid.UUID, request: MinutesCreateRequest, session: SQLSessionDep, user: UserDep, request_obj: Request
 ):
     transcription = await session.get(Transcription, transcription_id)
-    if not transcription or transcription.user_id != user.id:
+    if (
+        not transcription
+        or transcription.user_id != user.id
+        or transcription.organisation_id != user.organisation_id
+        or (user.service_domain_id and transcription.service_domain_id != user.service_domain_id)
+    ):
         raise HTTPException(404, "Not found")
     minute = Minute(
         transcription_id=transcription_id,
         template_name=request.template_name,
         agenda=request.agenda,
         user_template_id=request.template_id,
+        organisation_id=user.organisation_id,
+        service_domain_id=user.service_domain_id,
+        created_by_user_id=user.id,
+        case_id=transcription.case_id,
+        case_reference=transcription.case_reference,
+        worker_team=transcription.worker_team,
+        subject_initials=transcription.subject_initials,
+        subject_dob_ciphertext=transcription.subject_dob_ciphertext,
+        visit_type=request.visit_type,
+        intended_outcomes=request.intended_outcomes,
+        risk_flags=request.risk_flags,
     )
     session.add(minute)
     minute_version = MinuteVersion(id=uuid.uuid4(), minute_id=minute.id)
     session.add(minute_version)
     await session.commit()
     await session.refresh(minute_version)
-    llm_queue_service.publish_message(WorkerMessage(id=minute_version.id, type=TaskType.MINUTE))
+    from common.tracing import get_trace_id
+
+    llm_queue_service.publish_message(
+        WorkerMessage(id=minute_version.id, type=TaskType.MINUTE, trace_id=get_trace_id())
+    )
 
 
 @minutes_router.get("/minutes/{minutes_id}")
@@ -84,7 +120,13 @@ async def get_minute(minutes_id: uuid.UUID, session: SQLSessionDep, user: UserDe
     )
     result = await session.exec(query)
     minute = result.first()
-    if not minute or not minute.transcription.user_id or minute.transcription.user_id != user.id:
+    if (
+        not minute
+        or not minute.transcription.user_id
+        or minute.transcription.user_id != user.id
+        or minute.organisation_id != user.organisation_id
+        or (user.service_domain_id and minute.service_domain_id != user.service_domain_id)
+    ):
         raise HTTPException(404, "Not found")
 
     return minute
@@ -100,7 +142,13 @@ async def list_minute_versions(
         .options(selectinload(Minute.minute_versions), selectinload(Minute.transcription))
     )
     minute = result.first()
-    if not minute or not minute.transcription.user_id or minute.transcription.user_id != user.id:
+    if (
+        not minute
+        or not minute.transcription.user_id
+        or minute.transcription.user_id != user.id
+        or minute.organisation_id != user.organisation_id
+        or (user.service_domain_id and minute.service_domain_id != user.service_domain_id)
+    ):
         raise HTTPException(404)
 
     return [
@@ -120,7 +168,7 @@ async def list_minute_versions(
 
 @minutes_router.post("/minutes/{minute_id}/versions")
 async def create_minute_version(
-    minute_id: uuid.UUID, request: MinuteVersionCreateRequest, session: SQLSessionDep, user: UserDep
+    minute_id: uuid.UUID, request: MinuteVersionCreateRequest, session: SQLSessionDep, user: UserDep, request_obj: Request
 ) -> MinuteVersionResponse:
     minute = await get_minute(minute_id, session, user)
     minute_version = MinuteVersion(
@@ -136,12 +184,22 @@ async def create_minute_version(
     await session.commit()
     await session.refresh(minute_version)
     if request.ai_edit_instructions:
+        from common.tracing import get_trace_id
+
         llm_queue_service.publish_message(
             WorkerMessage(
                 id=minute_version.id,
                 data=EditMessageData(source_id=request.ai_edit_instructions.source_id),
                 type=TaskType.EDIT,
+                trace_id=get_trace_id(),
             )
+        )
+    else:
+        # Manual edits export asynchronously via worker
+        from common.tracing import get_trace_id
+
+        llm_queue_service.publish_message(
+            WorkerMessage(id=minute_version.id, type=TaskType.EXPORT, trace_id=get_trace_id())
         )
     return MinuteVersionResponse(
         id=minute_version.id,
@@ -167,6 +225,10 @@ async def get_minute_version(minute_version_id: uuid.UUID, session: SQLSessionDe
         not minute_version
         or not minute_version.minute.transcription.user_id
         or minute_version.minute.transcription.user_id != user.id
+        or minute_version.minute.organisation_id != user.organisation_id
+        or (
+            user.service_domain_id and minute_version.minute.service_domain_id != user.service_domain_id
+        )
     ):
         raise HTTPException(404, "Not found")
 
@@ -185,8 +247,49 @@ async def delete_minute_version(minute_version_id: uuid.UUID, session: SQLSessio
         not minute_version
         or not minute_version.minute.transcription.user_id
         or minute_version.minute.transcription.user_id != user.id
+        or minute_version.minute.organisation_id != user.organisation_id
+        or (
+            user.service_domain_id and minute_version.minute.service_domain_id != user.service_domain_id
+        )
     ):
         raise HTTPException(404, "Not found")
 
     await session.delete(minute_version)
+
+
+@minutes_router.post("/minutes/{minute_id}/export", response_model=ExportResponse)
+async def export_minute(  # noqa: PLR0913
+    minute_id: uuid.UUID,
+    session: SQLSessionDep,
+    user: UserDep,
+    format: str = Query("docx", pattern="^(docx|pdf)$"),
+):
+    minute = await get_minute(minute_id, session, user)
+    if not minute.minute_versions:
+        raise HTTPException(404, "No minute versions found")
+
+    latest_version = minute.minute_versions[0]
+    if latest_version.status != JobStatus.COMPLETED:
+        raise HTTPException(409, "Minute still generating")
+
+    # Ensure exports exist or regenerate
+    if minute.export_status != ExportStatus.COMPLETED or (
+        format == "docx" and not minute.docx_blob_path
+    ) or (format == "pdf" and not minute.pdf_blob_path):
+        await ExportHandlerService.export_minute_version(latest_version.id, formats=[format])
+        await session.refresh(minute)
+
+    storage_service = get_storage_service(settings.STORAGE_SERVICE_NAME)
+    key = minute.docx_blob_path if format == "docx" else minute.pdf_blob_path
+    if not key:
+        raise HTTPException(503, "Export is still processing")
+
+    filename = f"minute-{minute_id}.{format}"
+    url = await storage_service.generate_presigned_url_get_object(
+        key, filename, settings.EXPORT_URL_EXPIRY_SECONDS
+    )
+    sharepoint_id = minute.sharepoint_docx_item_id if format == "docx" else minute.sharepoint_pdf_item_id
+    return ExportResponse(
+        url=url, format=format, sharepoint_item_id=sharepoint_id, planner_task_ids=minute.planner_task_ids
+    )
     await session.commit()

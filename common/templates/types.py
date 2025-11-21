@@ -30,6 +30,7 @@ class Template(Protocol):
     description: str
     category: str
     agenda_usage: AgendaUsage
+    service_domains: list[str] | None
     temperature = 0.0
 
     @classmethod
@@ -94,7 +95,25 @@ class SimpleTemplate(Template, Protocol):
         minute: Minute,
     ) -> MinuteAndHallucinations:
         chatbot = create_default_chatbot(FastOrBestLLM.BEST)
-        minutes = await chatbot.chat(cls.prompt(minute.transcription.dialogue_entries, minute.agenda))
+        context_bits: list[str] = []
+        if minute.case_reference:
+            context_bits.append(f"case_reference: {minute.case_reference}")
+        if minute.visit_type:
+            context_bits.append(f"visit_type: {minute.visit_type}")
+        if minute.intended_outcomes:
+            context_bits.append(f"intended_outcomes: {minute.intended_outcomes}")
+        if minute.risk_flags:
+            context_bits.append(f"risk_flags: {minute.risk_flags}")
+        if minute.worker_team:
+            context_bits.append(f"worker_team: {minute.worker_team}")
+        context_msg = (
+            "Context: "
+            + "; ".join(context_bits)
+            + " (use only as framing; prioritise transcript evidence and cite timestamps)."
+        )
+        messages = cls.prompt(minute.transcription.dialogue_entries, minute.agenda)
+        messages.insert(0, {"role": "system", "content": context_msg})
+        minutes = await chatbot.chat(messages)
         hallucinations = await chatbot.hallucination_check()
         if cls.citations_required:
             minutes = await add_citations_to_minute(
@@ -165,6 +184,20 @@ class SectionTemplate(Template, Protocol):
         minute: Minute,
     ) -> MinuteAndHallucinations:
         transcript = minute.transcription.dialogue_entries
+        context_bits: list[str] = []
+        if minute.case_reference:
+            context_bits.append(f"case_reference: {minute.case_reference}")
+        if minute.visit_type:
+            context_bits.append(f"visit_type: {minute.visit_type}")
+        if minute.intended_outcomes:
+            context_bits.append(f"intended_outcomes: {minute.intended_outcomes}")
+        if minute.risk_flags:
+            context_bits.append(f"risk_flags: {minute.risk_flags}")
+        context_msg = (
+            "Context: "
+            + "; ".join(context_bits)
+            + " (use only as framing; rely on transcript evidence and cite timestamps)."
+        )
         sections = await cls.sections(transcript, minute.agenda)
         # Generate content for each section
         final_sections = []
@@ -175,6 +208,7 @@ class SectionTemplate(Template, Protocol):
                 # use system message exactly once
                 section_contents = await chatbot.chat(
                     [
+                        string_to_system_message(context_msg),
                         string_to_system_message(cls.system_prompt(transcript)),
                         get_section_for_agenda_prompt(section),
                     ]

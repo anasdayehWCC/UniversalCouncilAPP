@@ -1,0 +1,17 @@
+organisation: "Westminster"
+service_domain: "Children"
+templates:
+  - home_visit
+  - strategy_discussion
+  - lac_review
+sharepoint_library_path: "Shared Documents/Children/Visits/2025/"
+lexicon:
+  - "WCC"
+  - "Kensington"
+  - "Chelsea"
+planner:
+  plan_id: "<planner-plan-id>"
+  bucket_id: "<planner-bucket-id>"
+roles:
+  - social_worker
+  - manager

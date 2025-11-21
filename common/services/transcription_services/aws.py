@@ -95,6 +95,7 @@ class AWSTranscribeAdapter(TranscriptionAdapter):
                 text=segment["transcript"],
                 start_time=float(segment["start_time"]),
                 end_time=float(segment["end_time"]),
+                canonical_speaker=None,
             )
             for segment in phrases
         ]

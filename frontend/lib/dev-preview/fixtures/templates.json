@@ -1,0 +1,14 @@
+[
+  {
+    "name": "Home Visit",
+    "description": "Structure for home visit minutes with actions and child voice",
+    "category": "children",
+    "agenda_usage": "visit"
+  },
+  {
+    "name": "Strategy Discussion",
+    "description": "Multi-agency safeguarding strategy discussion template",
+    "category": "children",
+    "agenda_usage": "strategy"
+  }
+]

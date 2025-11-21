@@ -1,20 +1,19 @@
+"use client"
+
 import Link from 'next/link'
 
 export const Footer = () => (
-  <footer className="h-[50px] w-full bg-black px-4 py-2 text-white">
-    <div className="mx-auto max-w-7xl">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-8">
-          <nav className="flex gap-6">
-            <Link href="/privacy" target="_blank">
-              Privacy
-            </Link>
-            <Link href="/support" target="_blank">
-              Support
-            </Link>
-          </nav>
-        </div>
-      </div>
+  <footer className="glass-panel border-t border-border/40 px-4 py-3 text-sm text-white">
+    <div className="mx-auto flex max-w-7xl items-center justify-between">
+      <nav className="flex gap-4">
+        <Link href="/privacy" target="_blank" className="hover:underline">
+          Privacy
+        </Link>
+        <Link href="/support" target="_blank" className="hover:underline">
+          Support
+        </Link>
+      </nav>
+      <div className="text-xs text-white/80">UK-hosted • Entra secured</div>
     </div>
   </footer>
 )

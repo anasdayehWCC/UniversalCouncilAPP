@@ -1,5 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 80">
-  <path fill="#ffffff" d="M40,10 L70,10 L70,60 L40,70 L10,60 L10,10 Z" />
-  <text x="80" y="45" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#ffffff">THE ROYAL BOROUGH OF</text>
-  <text x="80" y="70" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#ffffff">KENSINGTON AND CHELSEA</text>
+<svg width="240" height="60" viewBox="0 0 240 60" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Royal Borough of Kensington and Chelsea">
+  <defs>
+    <linearGradient id="rbkcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop stop-color="#273971" offset="0%" />
+      <stop stop-color="#4c63b8" offset="40%" />
+      <stop stop-color="#A2CDE0" offset="100%" />
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="240" height="60" rx="12" fill="url(#rbkcGrad)" />
+  <text x="20" y="32" fill="white" font-family="Inter, 'Segoe UI', sans-serif" font-size="16" font-weight="700">Kensington &amp; Chelsea</text>
+  <text x="20" y="48" fill="white" font-family="Inter, 'Segoe UI', sans-serif" font-size="10" opacity="0.9">Royal Borough</text>
 </svg>

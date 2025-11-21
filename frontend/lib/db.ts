@@ -9,10 +9,22 @@ export interface OfflineRecording {
     duration?: number;
     status: 'pending' | 'syncing' | 'synced' | 'failed';
     error?: string;
+    case_reference?: string;
     metadata?: {
-        patientId?: string;
-        visitType?: string;
-        notes?: string;
+        case_reference: string;
+        service_domain_id?: string | null;
+        template_name?: string | null;
+        template_id?: string | null;
+        agenda?: string | null;
+        notes?: string | null;
+        worker_team?: string | null;
+        subject_initials?: string | null;
+        subject_dob?: string | null;
+        fast_path?: boolean;
+        processing_mode?: 'fast' | 'economy';
+        visit_type?: string | null;
+        intended_outcomes?: string | null;
+        risk_flags?: string | null;
     };
 }
 
@@ -23,6 +35,14 @@ export class CareMinutesDB extends Dexie {
         super('CareMinutesDB');
         this.version(1).stores({
             recordings: '++id, status, createdAt' // Primary key and indexed props
+        });
+        this.version(2).stores({
+            recordings: '++id, status, createdAt, case_reference'
+        }).upgrade((tx) => {
+            return tx.table('recordings').toCollection().modify((recording: any) => {
+                recording.metadata = recording.metadata || {};
+                recording.case_reference = recording.case_reference || recording.metadata?.case_reference;
+            });
         });
     }
 }

@@ -52,6 +52,19 @@ export default function TranscriptionPage({
 
   const date = new Date(transcription.created_datetime)
   const dateLabel = `${date.toDateString()} at ${date.toLocaleTimeString()}`
+  const caseLabel = transcription.case_reference
+    ? `Case ${transcription.case_reference}${
+        transcription.worker_team ? ` • ${transcription.worker_team}` : ''
+      }`
+    : null
+  const subjectLabel =
+    transcription.subject_initials || transcription.subject_dob
+      ? `${transcription.subject_initials || 'Subject'}${
+          transcription.subject_dob
+            ? ` • DOB ${new Date(transcription.subject_dob).toLocaleDateString()}`
+            : ''
+        }`
+      : null
 
   if (
     transcription.status &&
@@ -64,9 +77,13 @@ export default function TranscriptionPage({
           transcriptionId={transcription.id}
           status={transcription.status}
         />
-        <div className="flex items-center gap-1 text-xs text-slate-500">
+        <div className="flex flex-wrap items-center gap-1 text-xs text-slate-500">
           <Clock size="0.8rem" />
           {dateLabel}
+          {caseLabel && <span className="rounded-full bg-slate-100 px-2 py-0.5">{caseLabel}</span>}
+          {subjectLabel && (
+            <span className="rounded-full bg-slate-100 px-2 py-0.5">{subjectLabel}</span>
+          )}
         </div>
         <div className="flex flex-col items-center justify-center">
           <AudioWav />
@@ -87,9 +104,13 @@ export default function TranscriptionPage({
           transcriptionId={transcription.id}
           status={transcription.status}
         />
-        <div className="flex items-center gap-1 text-xs text-slate-500">
+        <div className="flex flex-wrap items-center gap-1 text-xs text-slate-500">
           <Clock size="0.8rem" />
           {dateLabel}
+          {caseLabel && <span className="rounded-full bg-slate-100 px-2 py-0.5">{caseLabel}</span>}
+          {subjectLabel && (
+            <span className="rounded-full bg-slate-100 px-2 py-0.5">{subjectLabel}</span>
+          )}
         </div>
         <div className="flex flex-col items-center justify-center gap-2">
           <Frown size={100} />
@@ -112,6 +133,10 @@ export default function TranscriptionPage({
       <div className="mb-4 flex items-center gap-1 text-xs text-slate-500">
         <Clock size="0.8rem" />
         {dateLabel}
+        {caseLabel && <span className="rounded-full bg-slate-100 px-2 py-0.5">{caseLabel}</span>}
+        {subjectLabel && (
+          <span className="rounded-full bg-slate-100 px-2 py-0.5">{subjectLabel}</span>
+        )}
       </div>
       <Tabs defaultValue="summary" className="w-full">
         <TabsList className="h-12 w-full">

@@ -1,8 +1,17 @@
+import os
 from contextlib import asynccontextmanager
 from enum import StrEnum, auto
 
 from bs4 import BeautifulSoup
 from httpx import ASGITransport, AsyncClient
+
+# Ensure tests do not attempt to reach external queues/services
+os.environ.setdefault("QUEUE_SERVICE_NAME", "noop")
+os.environ.setdefault("TRANSCRIPTION_QUEUE_NAME", "noop-transcription")
+os.environ.setdefault("TRANSCRIPTION_DEADLETTER_QUEUE_NAME", "noop-transcription-deadletter")
+os.environ.setdefault("LLM_QUEUE_NAME", "noop-llm")
+os.environ.setdefault("LLM_DEADLETTER_QUEUE_NAME", "noop-llm-deadletter")
+os.environ["SENTRY_DSN"] = ""
 
 from backend.main import app
 

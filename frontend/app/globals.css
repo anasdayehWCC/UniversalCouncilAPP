@@ -1,5 +1,4 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
 @plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
@@ -45,59 +44,120 @@
 }
 
 :root {
-  --radius: 0.625rem;
   --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --foreground: oklch(0.15 0 0);
+
+  /* WCC Brand Colors - HIGH VIBRANCY */
+  --primary: oklch(0.32 0.15 230);
+  /* Dark Blue #004B65 - BOOSTED */
+  --primary-foreground: oklch(1 0 0);
+  --primary-50: oklch(0.95 0.02 230);
+  --primary-100: oklch(0.90 0.04 230);
+  --primary-200: oklch(0.80 0.08 230);
+
+  --secondary: oklch(0.72 0.18 130);
+  /* Green #7CAE22 - BOOSTED */
+  --secondary-foreground: oklch(0.15 0 0);
+  --secondary-50: oklch(0.95 0.03 130);
+  --secondary-100: oklch(0.90 0.06 130);
+
+  --accent: oklch(0.65 0.12 180);
+  /* Teal #3BA08D - BOOSTED */
+  --accent-foreground: oklch(1 0 0);
+  --accent-50: oklch(0.95 0.02 180);
+  --accent-100: oklch(0.90 0.04 180);
+
+  --accent-alt: oklch(0.70 0.20 50);
+  /* Orange #F28E00 - BOOSTED */
+  --accent-alt-foreground: oklch(0.15 0 0);
+
+  --accent-pink: oklch(0.60 0.16 350);
+  /* Pink #C75D92 - BOOSTED */
+  --accent-pink-foreground: oklch(1 0 0);
+
+  --muted: oklch(0.96 0 0);
+  --muted-foreground: oklch(0.45 0 0);
+
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.15 0 0);
+
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --popover-foreground: oklch(0.15 0 0);
+
+  --border: oklch(0.90 0 0);
+  --input: oklch(0.92 0 0);
+  --ring: oklch(0.32 0.15 230);
+
+  --radius: 0.75rem;
+
+  /* Typography */
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --chart-1: oklch(0.65 0.15 130);
+  /* Green variant */
+  --chart-2: oklch(0.60 0.12 180);
+  /* Teal variant */
+  --chart-3: oklch(0.35 0.10 230);
+  /* Blue variant */
+  --chart-4: oklch(0.75 0.18 50);
+  /* Orange variant */
+  --chart-5: oklch(0.65 0.14 350);
+  /* Pink variant */
+
+  --sidebar: oklch(0.98 0.005 230);
+  --sidebar-foreground: oklch(0.145 0.015 230);
+  --sidebar-primary: oklch(0.32 0.08 230);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.96 0.005 230);
+  --sidebar-accent-foreground: oklch(0.32 0.08 230);
+  --sidebar-border: oklch(0.91 0.008 230);
+  --sidebar-ring: oklch(0.32 0.08 230);
+
+  /* Glassmorphism Effects */
+  --glass-bg: oklch(1 0 0 / 0.7);
+  --glass-border: oklch(0.95 0.01 230 / 0.3);
+}
+
+.theme-rbkc {
+  /* RBKC Brand Colors - Astronaut Blue #273971, Regent St Blue #A2CDE0 */
+  --primary: oklch(0.28 0.14 250);
+  /* Astronaut Blue #273971 - BOOSTED */
+  --primary-50: oklch(0.95 0.02 250);
+  --primary-100: oklch(0.90 0.04 250);
+  --secondary: oklch(0.78 0.10 210);
+  /* Regent St Blue #A2CDE0 - BOOSTED */
+  --secondary-50: oklch(0.95 0.02 210);
+  --accent: oklch(0.78 0.06 210);
+  --ring: oklch(0.28 0.10 250);
+  --sidebar-primary: oklch(0.28 0.10 250);
+  --sidebar-ring: oklch(0.28 0.10 250);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --background: oklch(0.14 0 0);
+  --foreground: oklch(0.98 0 0);
+
+  --primary: oklch(0.40 0.12 230);
+  --primary-foreground: oklch(1 0 0);
+  --primary-50: oklch(0.18 0.02 230);
+  --primary-100: oklch(0.22 0.04 230);
+
+  --secondary: oklch(0.75 0.16 130);
+  --secondary-foreground: oklch(0.15 0 0);
+  --secondary-50: oklch(0.18 0.03 130);
+
+  --accent: oklch(0.65 0.12 180);
+  --accent-50: oklch(0.18 0.02 180);
+
+  --muted: oklch(0.20 0 0);
+  --muted-foreground: oklch(0.65 0 0);
+
+  --card: oklch(0.14 0 0);
+  --card-foreground: oklch(0.98 0 0);
+
+  --border: oklch(0.28 0 0);
+  --input: oklch(0.24 0 0);
+  --ring: oklch(0.45 0.10 230);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -136,6 +196,8 @@
     --sidebar-accent: #00384d;
     --sidebar-accent-foreground: #ffffff;
     --sidebar-border: #00384d;
+    --surface-gradient: linear-gradient(135deg, #004b65 0%, #0b5f7a 40%, #52b788 100%);
+    --glass-border: rgba(255, 255, 255, 0.18);
   }
 
   .theme-rbkc {
@@ -152,11 +214,35 @@
     --sidebar-accent: #1d2b55;
     --sidebar-accent-foreground: #ffffff;
     --sidebar-border: #1d2b55;
+    --surface-gradient: linear-gradient(135deg, #273971 0%, #3c4c9a 45%, #a2cde0 100%);
+    --glass-border: rgba(255, 255, 255, 0.16);
   }
 
   .glass {
     @apply bg-white/10 backdrop-blur-md border border-white/20 shadow-lg;
   }
+
+  .glass-panel {
+    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.12));
+    background: color-mix(in srgb, var(--primary) 8%, transparent);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 18px 40px -20px rgba(0, 0, 0, 0.25);
+  }
+
+  .card-premium {
+    background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1), transparent 45%),
+      radial-gradient(circle at 80% 0%, rgba(255, 255, 255, 0.08), transparent 35%),
+      color-mix(in srgb, var(--surface-gradient, #0f172a) 30%, transparent);
+    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.12));
+    backdrop-filter: blur(10px);
+  }
+}
+
+.bg-page {
+  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.6), transparent 35%),
+    radial-gradient(circle at 80% 0%, rgba(255, 255, 255, 0.45), transparent 30%),
+    var(--surface-gradient);
+  min-height: 100vh;
 }
 
 .header-grid {
@@ -311,4 +397,60 @@
 
 .editor-content code:not(pre code) {
   color: red;
+}
+
+/* ==================== PREMIUM UTILITIES ==================== */
+
+/* Typography */
+body {
+  font-family: var(--font-body);
+  line-height: 1.7;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+/* Focus Ring Utility */
+.focus-ring {
+  outline: none;
+  transition: box-shadow 200ms ease-out;
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid oklch(0.65 0.12 180);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px oklch(0.65 0.12 180 / 0.2);
+}
+
+/* Premium Button Utility */
+.btn-premium {
+  font-weight: 600;
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-premium:hover {
+  transform: scale(1.02);
+}
+
+.btn-premium:active {
+  transform: scale(0.98);
+}
+
+/* Card Premium Hover Effect */
+.card-hover {
+  transition: all 300ms ease-out;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 12px 48px rgba(0, 75, 101, 0.15), 0 8px 16px rgba(0, 0, 0, 0.08);
 }

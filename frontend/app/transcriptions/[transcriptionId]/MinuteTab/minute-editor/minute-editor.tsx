@@ -11,6 +11,7 @@ import { citationRegex, citationRegexWithSpace } from '@/lib/citationRegex'
 import {
   MinuteListItem,
   MinuteVersionResponse,
+  ExportResponse,
   Transcription,
 } from '@/lib/client'
 import {
@@ -18,8 +19,9 @@ import {
   deleteMinuteVersionMinuteVersionsMinuteVersionIdDeleteMutation,
   listMinuteVersionsMinutesMinuteIdVersionsGetOptions,
   listMinuteVersionsMinutesMinuteIdVersionsGetQueryKey,
+  exportMinuteMinutesMinuteIdExportPostMutation,
 } from '@/lib/client/@tanstack/react-query.gen'
-import convertAIMinutesToWordDoc from '@/lib/download-word-doc'
+import { getRecordingsForTranscriptionTranscriptionsTranscriptionIdRecordingsGetOptions } from '@/lib/client/@tanstack/react-query.gen'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   Download,
@@ -34,7 +36,7 @@ import {
   Undo,
 } from 'lucide-react'
 import posthog from 'posthog-js'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
 type MinuteEditorForm = {
@@ -79,6 +81,7 @@ export function MinuteEditor({
 
   const queryClient = useQueryClient()
   const [isEditable, setIsEditable] = useState(false)
+  const [lastExportInfo, setLastExportInfo] = useState<ExportResponse | null>(null)
   const form = useForm<MinuteEditorForm>()
   useEffect(() => {
     if (minuteVersion) {
@@ -96,6 +99,31 @@ export function MinuteEditor({
   const { mutate: saveEdit } = useMutation({
     ...createMinuteVersionMinutesMinuteIdVersionsPostMutation(),
   })
+
+  const exportMutation = useMutation({
+    ...exportMinuteMinutesMinuteIdExportPostMutation(),
+  })
+
+  const { data: recordings } = useQuery({
+    ...getRecordingsForTranscriptionTranscriptionsTranscriptionIdRecordingsGetOptions(
+      { path: { transcription_id: transcription.id! } }
+    ),
+  })
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const uniqueCitations = useMemo(() => {
+    if (!htmlContent) return []
+    const matches = htmlContent.match(citationRegex)
+    if (!matches) return []
+    const nums = matches
+      .flatMap((m) =>
+        m
+          .replace(/\[|\]/g, '')
+          .split('-')
+          .map((n) => Number(n))
+      )
+      .filter((n) => !Number.isNaN(n))
+    return Array.from(new Set(nums)).sort((a, b) => a - b)
+  }, [htmlContent])
 
   const onSuccess = useCallback(() => {
     setIsEditable(false)
@@ -126,23 +154,27 @@ export function MinuteEditor({
     },
     [minute.id, minuteVersion?.html_content, onSuccess, saveEdit]
   )
-  const handleWordDocDownload = useCallback(() => {
-    posthog.capture('minutes_downloaded', {
-      format: 'word',
-      version_id: minuteVersion?.id,
-    })
-
-    convertAIMinutesToWordDoc(
-      htmlContent,
-      transcription.dialogue_entries || [],
-      transcription.title || 'minutes.docx'
-    )
-  }, [
-    htmlContent,
-    minuteVersion?.id,
-    transcription.dialogue_entries,
-    transcription.title,
-  ])
+  const handleExport = useCallback(
+    (format: 'docx' | 'pdf') => {
+      if (!minuteVersion) return
+      exportMutation.mutate(
+        { path: { minute_id: minute.id! }, query: { format } },
+        {
+          onSuccess: (data: ExportResponse) => {
+            posthog.capture('minutes_exported', {
+              format,
+              version_id: minuteVersion.id,
+            })
+            if (data?.url) {
+              window.open(data.url, '_blank')
+            }
+            setLastExportInfo(data)
+          },
+        }
+      )
+    },
+    [exportMutation, minute.id, minuteVersion]
+  )
 
   if (isLoading) {
     return (
@@ -254,10 +286,20 @@ export function MinuteEditor({
           <Button
             type="button"
             className="bg-green-600 text-white hover:bg-green-700 active:bg-yellow-500"
-            onClick={handleWordDocDownload}
+            onClick={() => handleExport('docx')}
+            disabled={exportMutation.isPending}
           >
             <Download />
-            Download
+            {exportMutation.isPending ? 'Exporting…' : 'Export DOCX'}
+          </Button>
+          <Button
+            type="button"
+            className="bg-emerald-600 text-white hover:bg-emerald-700 active:bg-yellow-500"
+            onClick={() => handleExport('pdf')}
+            disabled={exportMutation.isPending}
+          >
+            <Download />
+            {exportMutation.isPending ? 'Exporting…' : 'Export PDF'}
           </Button>
           <CopyButton
             textToCopy={contentToCopy}
@@ -284,6 +326,14 @@ export function MinuteEditor({
             </Button>
           )}
         </div>
+        {lastExportInfo && (
+          <p className="text-xs text-slate-500">
+            Latest export ready ({lastExportInfo.format.toUpperCase()})
+            {lastExportInfo.sharepoint_item_id
+              ? ` • Uploaded to SharePoint (item ${lastExportInfo.sharepoint_item_id})`
+              : ''}
+          </p>
+        )}
         <div className="flex gap-2">
           <RatingButton
             minuteVersionId={minuteVersion.id}
@@ -292,21 +342,65 @@ export function MinuteEditor({
           />
         </div>
       </div>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <Controller
-          control={form.control}
-          name="html"
-          render={({ field: { onChange } }) => (
-            <SimpleEditor
-              currentTranscription={transcription}
-              initialContent={minuteVersion.html_content || ''}
-              isEditing={isEditable}
-              onContentChange={onChange}
-              hideCitations={hideCitations && !isEditable}
-            />
+      <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <p className="mb-2 text-xs text-amber-600">
+            Avoid pasting raw PII (full names, addresses, phone numbers). Focus on case references and role titles only.
+          </p>
+          <Controller
+            control={form.control}
+            name="html"
+            render={({ field: { onChange } }) => (
+              <SimpleEditor
+                currentTranscription={transcription}
+                initialContent={minuteVersion.html_content || ''}
+                isEditing={isEditable}
+                onContentChange={onChange}
+                hideCitations={hideCitations && !isEditable}
+              />
+            )}
+          />
+        </form>
+        <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+          <h4 className="mb-2 text-sm font-semibold text-slate-700">
+            Evidence playback
+          </h4>
+          {recordings && recordings.length > 0 ? (
+            <>
+              <audio ref={audioRef} controls className="w-full" src={recordings[0].url} />
+              {uniqueCitations.length > 0 ? (
+                <div className="mt-2 flex flex-col gap-2 text-xs">
+                  {uniqueCitations.map((c) => {
+                    const entry = transcription.dialogue_entries?.[c - 1]
+                    const start = entry?.start_time ?? 0
+                    const label = new Date(start * 1000).toISOString().substring(11, 19)
+                    return (
+                      <Button
+                        key={c}
+                        variant="outline"
+                        size="sm"
+                        className="justify-between"
+                        onClick={() => {
+                          if (audioRef.current && entry) {
+                            audioRef.current.currentTime = entry.start_time
+                            audioRef.current.play()
+                          }
+                        }}
+                      >
+                        Citation [{c}] → {label}
+                      </Button>
+                    )
+                  })}
+                </div>
+              ) : (
+                <p className="text-xs text-slate-500">No citations detected.</p>
+              )}
+            </>
+          ) : (
+            <p className="text-xs text-slate-500">No recording available.</p>
           )}
-        />
-      </form>
+        </div>
+      </div>
     </div>
   )
 }

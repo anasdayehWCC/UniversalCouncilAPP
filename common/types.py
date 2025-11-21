@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from enum import IntEnum, StrEnum, auto
 
 from pydantic import BaseModel, Field
@@ -15,6 +15,10 @@ class TranscriptionMetadata(BaseModel):
     title: str | None = None
     text: str
     status: JobStatus
+    case_reference: str | None = None
+    processing_mode: str | None = None
+    visit_type: str | None = None
+    worker_team: str | None = None
 
 
 class PaginatedTranscriptionsResponse(BaseModel):
@@ -33,10 +37,21 @@ class TranscriptionCreateRequest(BaseModel):
     template_id: uuid.UUID | None = None
     agenda: str | None = None
     title: str | None = None
+    case_reference: str
+    worker_team: str | None = None
+    subject_initials: str | None = None
+    subject_dob: date | None = None
+    processing_mode: str | None = Field(
+        default="fast", description="fast (realtime) or economy (batch/off-peak)"
+    )
+    visit_type: str | None = None
+    intended_outcomes: str | None = None
+    risk_flags: str | None = None
 
 
 class RecordingCreateRequest(BaseModel):
     file_extension: str
+    captured_offline: bool | None = False
 
 
 class RecordingCreateResponse(BaseModel):
@@ -55,6 +70,17 @@ class TranscriptionConfirmResponse(BaseModel):
 class TranscriptionPatchRequest(BaseModel):
     title: str | None = None
     dialogue_entries: list[DialogueEntry] | None = None
+    canonical_speaker: str | None = None
+
+
+class TranscriptionDialogueUpdate(BaseModel):
+    dialogue_entries: list[DialogueEntry]
+
+
+class TranscriptionFeedbackRequest(BaseModel):
+    payload: dict
+    wer: float | None = None
+    der: float | None = None
 
 
 class ChatCreateRequest(BaseModel):
@@ -97,6 +123,11 @@ class TranscriptionGetResponse(BaseModel):
     dialogue_entries: list[DialogueEntry] | None
     status: JobStatus
     created_datetime: datetime
+    case_reference: str | None = None
+    worker_team: str | None = None
+    subject_initials: str | None = None
+    subject_dob: date | None = None
+    processing_mode: str | None = None
 
 
 class SingleRecording(BaseModel):
@@ -112,12 +143,19 @@ class MinuteListItem(BaseModel):
     transcription_id: uuid.UUID
     template_name: str
     agenda: str | None
+    case_reference: str | None = None
+    visit_type: str | None = None
+    intended_outcomes: str | None = None
+    risk_flags: str | None = None
 
 
 class MinutesCreateRequest(BaseModel):
     template_name: str = Field(description="Name of the template to use for the minutes")
     template_id: uuid.UUID | None = Field(description="Optional id of user template")
     agenda: str | None = Field(description="The agenda for the meeting", default=None)
+    visit_type: str | None = Field(default=None)
+    intended_outcomes: str | None = Field(default=None)
+    risk_flags: str | None = Field(default=None)
 
 
 class AiEdit(BaseModel):
@@ -173,6 +211,7 @@ class TaskType(IntEnum):
     MINUTE = 2
     EDIT = 3
     INTERACTIVE = 4
+    EXPORT = 5
 
 
 class EditMessageData(BaseModel):
@@ -186,12 +225,14 @@ class TranscriptionJobMessageData(BaseModel):
         default="synchronous",
     )
     transcript: list[DialogueEntry] | None = Field(description="Transcript of the transcription", default=None)
+    processing_mode: str | None = Field(default="fast")
 
 
 class WorkerMessage(BaseModel):
     id: uuid.UUID
     type: TaskType
     data: EditMessageData | TranscriptionJobMessageData | None = Field(default=None)
+    trace_id: str | None = Field(default=None)
 
 
 class LLMHallucination(BaseModel):
@@ -220,6 +261,7 @@ class TemplateMetadata(BaseModel):
     description: str
     category: str
     agenda_usage: AgendaUsage
+    service_domains: list[str] | None = None
 
 
 class CreateQuestion(BaseModel):
@@ -237,6 +279,13 @@ class PatchUserTemplateRequest(BaseModel):
     content: str | None = None
     description: str | None = None
     questions: list[CreateQuestion | Question] | None = None
+
+
+class ExportResponse(BaseModel):
+    url: str
+    format: str
+    sharepoint_item_id: str | None = None
+    planner_task_ids: list[str] | None = None
 
 
 class TemplateResponse(BaseModel):

@@ -1,16 +1,27 @@
+from __future__ import annotations
+
 import logging
 from typing import TypeVar
 
-from google import genai
-from google.genai import types
-from google.genai.types import (
-    Content,
-    GenerateContentConfig,
-    HttpOptions,
-    ModelContent,
-    Part,
-    UserContent,
-)
+try:  # Optional dependency during tests/local runs
+    from google import genai
+    from google.genai import types
+    from google.genai.types import (
+        Content,
+        GenerateContentConfig,
+        HttpOptions,
+        ModelContent,
+        Part,
+        UserContent,
+    )
+except Exception:  # pragma: no cover - fallback when google libs not installed
+    genai = None
+    types = None
+
+    class _MissingGoogleType:  # pragma: no cover - sentinel to keep type hints import-safe
+        ...
+
+    Content = GenerateContentConfig = HttpOptions = ModelContent = Part = UserContent = _MissingGoogleType
 
 from common.settings import get_settings
 
@@ -29,6 +40,9 @@ class GeminiModelAdapter(ModelAdapter):
         http_options: HttpOptions | None = None,
         **kwargs,
     ) -> None:
+        if genai is None or GenerateContentConfig is None:
+            msg = "google-genai is required for the Gemini adapter; install google-genai to enable Gemini"
+            raise ImportError(msg)
         self.generate_content_config = generate_content_config
         self._model = model
         # Note, env vars GOOGLE_CLOUD_PROJECT and GOOGLE_APPLICATION_CREDENTIALS are automatically used by the client
@@ -38,6 +52,8 @@ class GeminiModelAdapter(ModelAdapter):
 
     @staticmethod
     def no_safety_settings() -> list[types.SafetySetting]:
+        if types is None:
+            return []
         return [
             types.SafetySetting(
                 category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH,

@@ -14,6 +14,11 @@ export const TranscriptionCard = ({
   const date = new Date(transcription.created_datetime)
   return (
     <div className={className}>
+      {transcription.case_reference && (
+        <div className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+          Case: {transcription.case_reference}
+        </div>
+      )}
       <div className="mb-1 line-clamp-1 items-center gap-2 font-semibold overflow-ellipsis">
         {transcription.title ||
           (['awaiting_start', 'in_progress'].includes(transcription.status)

@@ -1,0 +1,39 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: minute-transcription-queue
+spec:
+  scaleTargetRef:
+    name: backend
+  pollingInterval: 30
+  cooldownPeriod: 120
+  minReplicaCount: 1
+  maxReplicaCount: 10
+  triggers:
+    - type: azure-servicebus
+      metadata:
+        queueName: ${TRANSCRIPTION_QUEUE_NAME}
+        namespace: ${AZURE_SERVICEBUS_NAMESPACE}
+        messageCount: "5"
+      authenticationRef:
+        name: keda-servicebus-auth
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: minute-llm-queue
+spec:
+  scaleTargetRef:
+    name: worker
+  pollingInterval: 30
+  cooldownPeriod: 120
+  minReplicaCount: 1
+  maxReplicaCount: 10
+  triggers:
+    - type: azure-servicebus
+      metadata:
+        queueName: ${LLM_QUEUE_NAME}
+        namespace: ${AZURE_SERVICEBUS_NAMESPACE}
+        messageCount: "5"
+      authenticationRef:
+        name: keda-servicebus-auth

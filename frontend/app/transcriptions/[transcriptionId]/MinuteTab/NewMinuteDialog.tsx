@@ -26,6 +26,9 @@ import { useController, useForm } from 'react-hook-form'
 type CreateMinuteForm = {
   template: Template
   agenda?: string
+  visit_type?: string
+  intended_outcomes?: string
+  risk_flags?: string
 }
 
 export function NewMinuteDialog({
@@ -40,6 +43,9 @@ export function NewMinuteDialog({
     defaultValues: {
       template: { name: 'General', agenda_usage: 'optional', id: null },
       agenda,
+      visit_type: '',
+      intended_outcomes: '',
+      risk_flags: '',
     },
   })
   useEffect(() => {
@@ -47,6 +53,9 @@ export function NewMinuteDialog({
       form.reset({
         template: { name: 'General', agenda_usage: 'optional', id: null },
         agenda,
+        visit_type: '',
+        intended_outcomes: '',
+        risk_flags: '',
       })
     }
   }, [agenda, form, open])
@@ -58,7 +67,13 @@ export function NewMinuteDialog({
     ...createMinuteTranscriptionTranscriptionIdMinutesPostMutation(),
   })
 
-  const onSubmit = ({ template, agenda }: CreateMinuteForm) => {
+  const onSubmit = ({
+    template,
+    agenda,
+    visit_type,
+    intended_outcomes,
+    risk_flags,
+  }: CreateMinuteForm) => {
     createMinute(
       {
         path: { transcription_id: transcriptionId },
@@ -67,6 +82,9 @@ export function NewMinuteDialog({
           template_id: template.id,
           agenda:
             selectedTemplate.agenda_usage != 'not_used' ? agenda : undefined,
+          visit_type: visit_type || undefined,
+          intended_outcomes: intended_outcomes || undefined,
+          risk_flags: risk_flags || undefined,
         },
       },
       {
@@ -134,6 +152,41 @@ Agenda item 3
               />
             </div>
           )}
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <h4 className="text-sm font-semibold text-slate-700">
+                Visit type (optional)
+              </h4>
+              <textarea
+                className="bg-white w-full rounded border p-2"
+                rows={2}
+                {...form.register('visit_type')}
+                placeholder="Home visit / strategy discussion / supervision"
+              />
+            </div>
+            <div>
+              <h4 className="text-sm font-semibold text-slate-700">
+                Risk flags (optional)
+              </h4>
+              <textarea
+                className="bg-white w-full rounded border p-2"
+                rows={2}
+                {...form.register('risk_flags')}
+                placeholder="DA, neglect, missing episodes..."
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <h4 className="text-sm font-semibold text-slate-700">
+                Intended outcomes (optional)
+              </h4>
+              <Textarea
+                className="bg-white"
+                rows={3}
+                {...form.register('intended_outcomes')}
+                placeholder="Family to engage with Early Help; safety plan agreed; school attendance to improve..."
+              />
+            </div>
+          </div>
           <DialogFooter>
             <Button
               variant="secondary"

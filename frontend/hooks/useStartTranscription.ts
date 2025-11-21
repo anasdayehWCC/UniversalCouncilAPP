@@ -4,18 +4,22 @@ import {
   createTranscriptionTranscriptionsPostMutation,
 } from '@/lib/client/@tanstack/react-query.gen'
 import { getFileExtension } from '@/lib/getFileExtension'
+import { queueRecording } from '@/lib/offline-queue'
 import { useRecordingDb } from '@/providers/transcription-db-provider'
+import { useCaseCache } from '@/providers/case-cache-provider'
 import { useMutation } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import posthog from 'posthog-js'
 import { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 
 export const useStartTranscription = (
   defaultValues?: Partial<TranscriptionForm>
 ) => {
   const router = useRouter()
   const { removeRecording } = useRecordingDb()
+  const { addCase } = useCaseCache()
   const { mutateAsync: createTranscription, isPending: isCreating } =
     useMutation({
       ...createTranscriptionTranscriptionsPostMutation(),
@@ -47,7 +51,20 @@ export const useStartTranscription = (
   })
 
   const onSubmit = useCallback(
-    async ({ file, template, agenda, recordingId }: TranscriptionForm) => {
+    async ({
+      file,
+      template,
+      agenda,
+      recordingId,
+      case_reference,
+      worker_team,
+      subject_initials,
+      subject_dob,
+      processing_mode,
+      visit_type,
+      intended_outcomes,
+      risk_flags,
+    }: TranscriptionForm) => {
       if (!file) {
         return
       }
@@ -62,38 +79,67 @@ export const useStartTranscription = (
         file_type: file.type || '',
         source,
       })
-      await createRecording(
-        { body: { file_extension } },
-        {
-          onSuccess: async (recordingData) => {
-            await uploadBlob(
-              { file, uploadUrl: recordingData.upload_url },
-              {
-                onSuccess: async () => {
-                  createTranscription(
-                    {
-                      body: {
-                        recording_id: recordingData.id,
-                        template_id: template.id,
-                        template_name: template.name,
-                        agenda,
+      try {
+        await createRecording(
+          { body: { file_extension } },
+          {
+            onSuccess: async (recordingData) => {
+              await uploadBlob(
+                { file, uploadUrl: recordingData.upload_url },
+                {
+                  onSuccess: async () => {
+                    createTranscription(
+                      {
+                        body: {
+                          recording_id: recordingData.id,
+                          template_id: template.id,
+                          template_name: template.name,
+                          agenda,
+                          case_reference,
+                          worker_team,
+                          subject_initials,
+                          subject_dob: subject_dob || undefined,
+                          processing_mode: processing_mode || 'fast',
+                          visit_type,
+                          intended_outcomes,
+                          risk_flags,
+                        },
                       },
-                    },
-                    {
-                      onSuccess: async (transcriptionData) => {
-                        if (recordingId) {
-                          await removeRecording(recordingId)
-                        }
-                        router.push(`/transcriptions/${transcriptionData.id}`)
-                      },
-                    }
-                  )
-                },
-              }
-            )
-          },
-        }
-      )
+                      {
+                        onSuccess: async (transcriptionData) => {
+                          if (recordingId) {
+                            await removeRecording(recordingId)
+                          }
+                          await addCase({ case_reference })
+                          router.push(`/transcriptions/${transcriptionData.id}`)
+                        },
+                      }
+                    )
+                  },
+                }
+              )
+            },
+          }
+        )
+      } catch (err) {
+        await queueRecording(file, {
+          case_reference,
+          service_domain_id: null,
+          template_name: template.name,
+          template_id: (template.id as string | null) ?? null,
+          agenda: agenda || null,
+          worker_team: worker_team || null,
+          subject_initials: subject_initials || null,
+          subject_dob: subject_dob || null,
+          fast_path: true,
+          notes: null,
+          processing_mode: processing_mode || 'fast',
+          visit_type: visit_type || null,
+          intended_outcomes: intended_outcomes || null,
+          risk_flags: risk_flags || null,
+        }, isFile && 'name' in file ? file.name : undefined)
+        toast.warning('Offline — saved locally. We will sync when back online.')
+      }
     },
     [
       createRecording,
@@ -102,12 +148,19 @@ export const useStartTranscription = (
       removeRecording,
       router,
       uploadBlob,
+      addCase,
+      queueRecording,
     ]
   )
   const form = useForm<TranscriptionForm>({
     defaultValues: {
       file: null,
       template: { name: 'General', agenda_usage: 'optional' },
+      case_reference: '',
+      processing_mode: 'fast',
+      visit_type: '',
+      intended_outcomes: '',
+      risk_flags: '',
       ...defaultValues,
     },
   })

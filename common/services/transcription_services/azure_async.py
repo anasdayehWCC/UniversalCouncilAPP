@@ -41,7 +41,7 @@ timeout_settings = httpx.Timeout(
     read=30.0,
     write=30.0,
 )
-params = {"api-version": "2024-11-15"}
+params = {"api-version": settings.AZURE_SPEECH_API_VERSION}
 
 
 class AzureBatchTranscriptionAdapter(TranscriptionAdapter):
@@ -90,6 +90,13 @@ class AzureBatchTranscriptionAdapter(TranscriptionAdapter):
                     "destinationContainerUrl": f"{container_client.url}?{sas_token}",
                 },
             }
+            if settings.AZURE_SPEECH_ADDITIONAL_LOCALES:
+                data["languageIdentification"] = {
+                    "enabled": True,
+                    "candidateLocales": ["en-GB", *settings.AZURE_SPEECH_ADDITIONAL_LOCALES],
+                }
+            if settings.AZURE_SPEECH_PHRASE_LIST:
+                data["properties"]["phraseList"] = settings.AZURE_SPEECH_PHRASE_LIST
 
         async with httpx.AsyncClient(timeout=timeout_settings) as client:
             response = await client.post(submit_url, headers=headers, json=data, params=params)
@@ -163,6 +170,7 @@ class AzureBatchTranscriptionAdapter(TranscriptionAdapter):
                 text=entry["nBest"][0]["display"],
                 start_time=float(entry["offsetMilliseconds"]) / 1000,
                 end_time=(float(entry["offsetMilliseconds"]) + float(entry["durationMilliseconds"])) / 1000,
+                canonical_speaker=None,
             )
             for entry in phrases["recognizedPhrases"]
         ]

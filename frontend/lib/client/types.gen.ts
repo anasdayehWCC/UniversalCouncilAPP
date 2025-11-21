@@ -30,6 +30,10 @@ export type TranscriptionPatchRequest = {
    * Dialogue Entries
    */
   dialogue_entries?: Array<DialogueEntry> | null
+  /**
+   * Canonical Speaker
+   */
+  canonical_speaker?: string | null
 }
 
 /**
@@ -52,6 +56,10 @@ export type DialogueEntry = {
    * End Time
    */
   end_time: number
+  /**
+   * Canonical Speaker
+   */
+  canonical_speaker: string | null
 }
 
 /**
@@ -76,6 +84,22 @@ export type TranscriptionMetadata = {
    */
   text: string
   status: JobStatus
+  /**
+   * Case Reference
+   */
+  case_reference?: string | null
+  /**
+   * Processing Mode
+   */
+  processing_mode?: string | null
+  /**
+   * Visit Type
+   */
+  visit_type?: string | null
+  /**
+   * Worker Team
+   */
+  worker_team?: string | null
 }
 
 /**
@@ -108,6 +132,56 @@ export type TranscriptionGetResponse = {
    * Created Datetime
    */
   created_datetime: string
+  /**
+   * Case Reference
+   */
+  case_reference?: string | null
+  /**
+   * Worker Team
+   */
+  worker_team?: string | null
+  /**
+   * Subject Initials
+   */
+  subject_initials?: string | null
+  /**
+   * Subject Dob
+   */
+  subject_dob?: string | null
+  /**
+   * Processing Mode
+   */
+  processing_mode?: string | null
+}
+
+/**
+ * TranscriptionFeedbackRequest
+ */
+export type TranscriptionFeedbackRequest = {
+  /**
+   * Payload
+   */
+  payload: {
+    [key: string]: unknown
+  }
+  /**
+   * Wer
+   */
+  wer?: number | null
+  /**
+   * Der
+   */
+  der?: number | null
+}
+
+/**
+ * TranscriptionDialogueUpdate
+ */
+export type TranscriptionDialogueUpdate = {
+  /**
+   * Dialogue Entries
+   */
+  dialogue_entries: Array<DialogueEntry>
 }
 
 /**
@@ -144,6 +218,39 @@ export type TranscriptionCreateRequest = {
    * Title
    */
   title?: string | null
+  /**
+   * Case Reference
+   */
+  case_reference: string
+  /**
+   * Worker Team
+   */
+  worker_team?: string | null
+  /**
+   * Subject Initials
+   */
+  subject_initials?: string | null
+  /**
+   * Subject Dob
+   */
+  subject_dob?: string | null
+  /**
+   * Processing Mode
+   * fast (realtime) or economy (batch/off-peak)
+   */
+  processing_mode?: string | null
+  /**
+   * Visit Type
+   */
+  visit_type?: string | null
+  /**
+   * Intended Outcomes
+   */
+  intended_outcomes?: string | null
+  /**
+   * Risk Flags
+   */
+  risk_flags?: string | null
 }
 
 /**
@@ -180,12 +287,94 @@ export type Transcription = {
    */
   user_id?: string | null
   /**
+   * Organisation Id
+   */
+  organisation_id?: string | null
+  /**
+   * Service Domain Id
+   */
+  service_domain_id?: string | null
+  /**
+   * Case Id
+   */
+  case_id?: string | null
+  /**
+   * Case Reference
+   */
+  case_reference?: string | null
+  /**
+   * Worker Team
+   */
+  worker_team?: string | null
+  /**
+   * Subject Initials
+   */
+  subject_initials?: string | null
+  /**
+   * Subject Dob Ciphertext
+   */
+  subject_dob_ciphertext?: string | null
+  /**
+   * Visit Type
+   */
+  visit_type?: string | null
+  /**
+   * Intended Outcomes
+   */
+  intended_outcomes?: string | null
+  /**
+   * Risk Flags
+   */
+  risk_flags?: string | null
+  /**
+   * Docx Blob Path
+   */
+  docx_blob_path?: string | null
+  /**
+   * Pdf Blob Path
+   */
+  pdf_blob_path?: string | null
+  /**
+   * Sharepoint Docx Item Id
+   */
+  sharepoint_docx_item_id?: string | null
+  /**
+   * Sharepoint Pdf Item Id
+   */
+  sharepoint_pdf_item_id?: string | null
+  /**
+   * Planner Task Ids
+   */
+  planner_task_ids?: Array<string>
+  export_status?: ExportStatus | null
+  /**
+   * Export Error
+   */
+  export_error?: string | null
+  /**
+   * Last Exported At
+   */
+  last_exported_at?: string | null
+  /**
+   * Processing Mode
+   */
+  processing_mode?: string
+  /**
    * Legacy Minute Versions
    */
   legacy_minute_versions?: Array<{
     [key: string]: unknown
   }> | null
 }
+
+/**
+ * ExportStatus
+ */
+export type ExportStatus =
+  | 'awaiting_start'
+  | 'in_progress'
+  | 'completed'
+  | 'failed'
 
 /**
  * TemplateType
@@ -262,6 +451,10 @@ export type TemplateMetadata = {
    */
   category: string
   agenda_usage: AgendaUsage
+  /**
+   * Service Domains
+   */
+  service_domains?: Array<string> | null
 }
 
 /**
@@ -309,6 +502,10 @@ export type RecordingCreateRequest = {
    * File Extension
    */
   file_extension: string
+  /**
+   * Captured Offline
+   */
+  captured_offline?: boolean | null
 }
 
 /**
@@ -397,6 +594,18 @@ export type MinutesCreateRequest = {
    * The agenda for the meeting
    */
   agenda?: string | null
+  /**
+   * Visit Type
+   */
+  visit_type?: string | null
+  /**
+   * Intended Outcomes
+   */
+  intended_outcomes?: string | null
+  /**
+   * Risk Flags
+   */
+  risk_flags?: string | null
 }
 
 /**
@@ -530,6 +739,22 @@ export type MinuteListItem = {
    * Agenda
    */
   agenda: string | null
+  /**
+   * Case Reference
+   */
+  case_reference?: string | null
+  /**
+   * Visit Type
+   */
+  visit_type?: string | null
+  /**
+   * Intended Outcomes
+   */
+  intended_outcomes?: string | null
+  /**
+   * Risk Flags
+   */
+  risk_flags?: string | null
 }
 
 /**
@@ -561,9 +786,41 @@ export type Minute = {
    */
   user_template_id?: string | null
   /**
+   * Created By User Id
+   */
+  created_by_user_id?: string | null
+  /**
    * Agenda
    */
   agenda?: string | null
+  /**
+   * Organisation Id
+   */
+  organisation_id?: string | null
+  /**
+   * Service Domain Id
+   */
+  service_domain_id?: string | null
+  /**
+   * Case Id
+   */
+  case_id?: string | null
+  /**
+   * Case Reference
+   */
+  case_reference?: string | null
+  /**
+   * Worker Team
+   */
+  worker_team?: string | null
+  /**
+   * Subject Initials
+   */
+  subject_initials?: string | null
+  /**
+   * Subject Dob Ciphertext
+   */
+  subject_dob_ciphertext?: string | null
 }
 
 /**
@@ -604,6 +861,28 @@ export type GetUserResponse = {
    * Strict Data Retention
    */
   strict_data_retention: boolean
+}
+
+/**
+ * ExportResponse
+ */
+export type ExportResponse = {
+  /**
+   * Url
+   */
+  url: string
+  /**
+   * Format
+   */
+  format: string
+  /**
+   * Sharepoint Item Id
+   */
+  sharepoint_item_id?: string | null
+  /**
+   * Planner Task Ids
+   */
+  planner_task_ids?: Array<string> | null
 }
 
 /**
@@ -700,6 +979,10 @@ export type ListTranscriptionsTranscriptionsGetData = {
   body?: never
   headers?: {
     /**
+     * Authorization
+     */
+    authorization?: string | null
+    /**
      * X-Amzn-Oidc-Accesstoken
      */
     'x-amzn-oidc-accesstoken'?: string | null
@@ -744,6 +1027,10 @@ export type CreateTranscriptionTranscriptionsPostData = {
   body: TranscriptionCreateRequest
   headers?: {
     /**
+     * Authorization
+     */
+    authorization?: string | null
+    /**
      * X-Amzn-Oidc-Accesstoken
      */
     'x-amzn-oidc-accesstoken'?: string | null
@@ -777,6 +1064,10 @@ export type CreateRecordingRecordingsPostData = {
   body: RecordingCreateRequest
   headers?: {
     /**
+     * Authorization
+     */
+    authorization?: string | null
+    /**
      * X-Amzn-Oidc-Accesstoken
      */
     'x-amzn-oidc-accesstoken'?: string | null
@@ -809,6 +1100,10 @@ export type CreateRecordingRecordingsPostResponse =
 export type DeleteTranscriptionTranscriptionsTranscriptionIdDeleteData = {
   body?: never
   headers?: {
+    /**
+     * Authorization
+     */
+    authorization?: string | null
     /**
      * X-Amzn-Oidc-Accesstoken
      */
@@ -848,6 +1143,10 @@ export type GetTranscriptionTranscriptionsTranscriptionIdGetData = {
   body?: never
   headers?: {
     /**
+     * Authorization
+     */
+    authorization?: string | null
+    /**
      * X-Amzn-Oidc-Accesstoken
      */
     'x-amzn-oidc-accesstoken'?: string | null
@@ -885,6 +1184,10 @@ export type GetTranscriptionTranscriptionsTranscriptionIdGetResponse =
 export type SaveTranscriptionTranscriptionsTranscriptionIdPatchData = {
   body: TranscriptionPatchRequest
   headers?: {
+    /**
+     * Authorization
+     */
+    authorization?: string | null
     /**
      * X-Amzn-Oidc-Accesstoken
      */
@@ -925,6 +1228,10 @@ export type GetRecordingsForTranscriptionTranscriptionsTranscriptionIdRecordings
     body?: never
     headers?: {
       /**
+       * Authorization
+       */
+      authorization?: string | null
+      /**
        * X-Amzn-Oidc-Accesstoken
        */
       'x-amzn-oidc-accesstoken'?: string | null
@@ -962,9 +1269,184 @@ export type GetRecordingsForTranscriptionTranscriptionsTranscriptionIdRecordings
 export type GetRecordingsForTranscriptionTranscriptionsTranscriptionIdRecordingsGetResponse =
   GetRecordingsForTranscriptionTranscriptionsTranscriptionIdRecordingsGetResponses[keyof GetRecordingsForTranscriptionTranscriptionsTranscriptionIdRecordingsGetResponses]
 
+export type GetSignedRecordingRecordingsRecordingIdSignedUrlGetData = {
+  body?: never
+  headers?: {
+    /**
+     * Authorization
+     */
+    authorization?: string | null
+    /**
+     * X-Amzn-Oidc-Accesstoken
+     */
+    'x-amzn-oidc-accesstoken'?: string | null
+  }
+  path: {
+    /**
+     * Recording Id
+     */
+    recording_id: string
+  }
+  query?: never
+  url: '/recordings/{recording_id}/signed-url'
+}
+
+export type GetSignedRecordingRecordingsRecordingIdSignedUrlGetErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type GetSignedRecordingRecordingsRecordingIdSignedUrlGetError =
+  GetSignedRecordingRecordingsRecordingIdSignedUrlGetErrors[keyof GetSignedRecordingRecordingsRecordingIdSignedUrlGetErrors]
+
+export type GetSignedRecordingRecordingsRecordingIdSignedUrlGetResponses = {
+  /**
+   * Successful Response
+   */
+  200: SingleRecording
+}
+
+export type GetSignedRecordingRecordingsRecordingIdSignedUrlGetResponse =
+  GetSignedRecordingRecordingsRecordingIdSignedUrlGetResponses[keyof GetSignedRecordingRecordingsRecordingIdSignedUrlGetResponses]
+
+export type GetDialogueTranscriptionsTranscriptionIdDialogueGetData = {
+  body?: never
+  headers?: {
+    /**
+     * Authorization
+     */
+    authorization?: string | null
+    /**
+     * X-Amzn-Oidc-Accesstoken
+     */
+    'x-amzn-oidc-accesstoken'?: string | null
+  }
+  path: {
+    /**
+     * Transcription Id
+     */
+    transcription_id: string
+  }
+  query?: never
+  url: '/transcriptions/{transcription_id}/dialogue'
+}
+
+export type GetDialogueTranscriptionsTranscriptionIdDialogueGetErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type GetDialogueTranscriptionsTranscriptionIdDialogueGetError =
+  GetDialogueTranscriptionsTranscriptionIdDialogueGetErrors[keyof GetDialogueTranscriptionsTranscriptionIdDialogueGetErrors]
+
+export type GetDialogueTranscriptionsTranscriptionIdDialogueGetResponses = {
+  /**
+   * Response Get Dialogue Transcriptions  Transcription Id  Dialogue Get
+   * Successful Response
+   */
+  200: Array<DialogueEntry>
+}
+
+export type GetDialogueTranscriptionsTranscriptionIdDialogueGetResponse =
+  GetDialogueTranscriptionsTranscriptionIdDialogueGetResponses[keyof GetDialogueTranscriptionsTranscriptionIdDialogueGetResponses]
+
+export type UpdateDialogueTranscriptionsTranscriptionIdDialoguePatchData = {
+  body: TranscriptionDialogueUpdate
+  headers?: {
+    /**
+     * Authorization
+     */
+    authorization?: string | null
+    /**
+     * X-Amzn-Oidc-Accesstoken
+     */
+    'x-amzn-oidc-accesstoken'?: string | null
+  }
+  path: {
+    /**
+     * Transcription Id
+     */
+    transcription_id: string
+  }
+  query?: never
+  url: '/transcriptions/{transcription_id}/dialogue'
+}
+
+export type UpdateDialogueTranscriptionsTranscriptionIdDialoguePatchErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type UpdateDialogueTranscriptionsTranscriptionIdDialoguePatchError =
+  UpdateDialogueTranscriptionsTranscriptionIdDialoguePatchErrors[keyof UpdateDialogueTranscriptionsTranscriptionIdDialoguePatchErrors]
+
+export type UpdateDialogueTranscriptionsTranscriptionIdDialoguePatchResponses =
+  {
+    /**
+     * Response Update Dialogue Transcriptions  Transcription Id  Dialogue Patch
+     * Successful Response
+     */
+    200: Array<DialogueEntry>
+  }
+
+export type UpdateDialogueTranscriptionsTranscriptionIdDialoguePatchResponse =
+  UpdateDialogueTranscriptionsTranscriptionIdDialoguePatchResponses[keyof UpdateDialogueTranscriptionsTranscriptionIdDialoguePatchResponses]
+
+export type SubmitFeedbackTranscriptionsTranscriptionIdFeedbackPostData = {
+  body: TranscriptionFeedbackRequest
+  headers?: {
+    /**
+     * Authorization
+     */
+    authorization?: string | null
+    /**
+     * X-Amzn-Oidc-Accesstoken
+     */
+    'x-amzn-oidc-accesstoken'?: string | null
+  }
+  path: {
+    /**
+     * Transcription Id
+     */
+    transcription_id: string
+  }
+  query?: never
+  url: '/transcriptions/{transcription_id}/feedback'
+}
+
+export type SubmitFeedbackTranscriptionsTranscriptionIdFeedbackPostErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type SubmitFeedbackTranscriptionsTranscriptionIdFeedbackPostError =
+  SubmitFeedbackTranscriptionsTranscriptionIdFeedbackPostErrors[keyof SubmitFeedbackTranscriptionsTranscriptionIdFeedbackPostErrors]
+
+export type SubmitFeedbackTranscriptionsTranscriptionIdFeedbackPostResponses = {
+  /**
+   * Successful Response
+   */
+  204: void
+}
+
+export type SubmitFeedbackTranscriptionsTranscriptionIdFeedbackPostResponse =
+  SubmitFeedbackTranscriptionsTranscriptionIdFeedbackPostResponses[keyof SubmitFeedbackTranscriptionsTranscriptionIdFeedbackPostResponses]
+
 export type GetUserUsersMeGetData = {
   body?: never
   headers?: {
+    /**
+     * Authorization
+     */
+    authorization?: string | null
     /**
      * X-Amzn-Oidc-Accesstoken
      */
@@ -999,6 +1481,10 @@ export type UpdateDataRetentionUsersDataRetentionPatchData = {
   body: DataRetentionUpdateResponse
   headers?: {
     /**
+     * Authorization
+     */
+    authorization?: string | null
+    /**
      * X-Amzn-Oidc-Accesstoken
      */
     'x-amzn-oidc-accesstoken'?: string | null
@@ -1032,6 +1518,10 @@ export type ListMinutesForTranscriptionTranscriptionTranscriptionIdMinutesGetDat
   {
     body?: never
     headers?: {
+      /**
+       * Authorization
+       */
+      authorization?: string | null
       /**
        * X-Amzn-Oidc-Accesstoken
        */
@@ -1074,6 +1564,10 @@ export type CreateMinuteTranscriptionTranscriptionIdMinutesPostData = {
   body: MinutesCreateRequest
   headers?: {
     /**
+     * Authorization
+     */
+    authorization?: string | null
+    /**
      * X-Amzn-Oidc-Accesstoken
      */
     'x-amzn-oidc-accesstoken'?: string | null
@@ -1108,6 +1602,10 @@ export type CreateMinuteTranscriptionTranscriptionIdMinutesPostResponses = {
 export type GetMinuteMinutesMinutesIdGetData = {
   body?: never
   headers?: {
+    /**
+     * Authorization
+     */
+    authorization?: string | null
     /**
      * X-Amzn-Oidc-Accesstoken
      */
@@ -1146,6 +1644,10 @@ export type GetMinuteMinutesMinutesIdGetResponse =
 export type ListMinuteVersionsMinutesMinuteIdVersionsGetData = {
   body?: never
   headers?: {
+    /**
+     * Authorization
+     */
+    authorization?: string | null
     /**
      * X-Amzn-Oidc-Accesstoken
      */
@@ -1186,6 +1688,10 @@ export type CreateMinuteVersionMinutesMinuteIdVersionsPostData = {
   body: MinuteVersionCreateRequest
   headers?: {
     /**
+     * Authorization
+     */
+    authorization?: string | null
+    /**
      * X-Amzn-Oidc-Accesstoken
      */
     'x-amzn-oidc-accesstoken'?: string | null
@@ -1224,6 +1730,10 @@ export type DeleteMinuteVersionMinuteVersionsMinuteVersionIdDeleteData = {
   body?: never
   headers?: {
     /**
+     * Authorization
+     */
+    authorization?: string | null
+    /**
      * X-Amzn-Oidc-Accesstoken
      */
     'x-amzn-oidc-accesstoken'?: string | null
@@ -1259,6 +1769,10 @@ export type GetMinuteVersionMinuteVersionsMinuteVersionIdGetData = {
   body?: never
   headers?: {
     /**
+     * Authorization
+     */
+    authorization?: string | null
+    /**
      * X-Amzn-Oidc-Accesstoken
      */
     'x-amzn-oidc-accesstoken'?: string | null
@@ -1293,9 +1807,60 @@ export type GetMinuteVersionMinuteVersionsMinuteVersionIdGetResponses = {
 export type GetMinuteVersionMinuteVersionsMinuteVersionIdGetResponse =
   GetMinuteVersionMinuteVersionsMinuteVersionIdGetResponses[keyof GetMinuteVersionMinuteVersionsMinuteVersionIdGetResponses]
 
+export type ExportMinuteMinutesMinuteIdExportPostData = {
+  body?: never
+  headers?: {
+    /**
+     * Authorization
+     */
+    authorization?: string | null
+    /**
+     * X-Amzn-Oidc-Accesstoken
+     */
+    'x-amzn-oidc-accesstoken'?: string | null
+  }
+  path: {
+    /**
+     * Minute Id
+     */
+    minute_id: string
+  }
+  query?: {
+    /**
+     * Format
+     */
+    format?: string
+  }
+  url: '/minutes/{minute_id}/export'
+}
+
+export type ExportMinuteMinutesMinuteIdExportPostErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type ExportMinuteMinutesMinuteIdExportPostError =
+  ExportMinuteMinutesMinuteIdExportPostErrors[keyof ExportMinuteMinutesMinuteIdExportPostErrors]
+
+export type ExportMinuteMinutesMinuteIdExportPostResponses = {
+  /**
+   * Successful Response
+   */
+  200: ExportResponse
+}
+
+export type ExportMinuteMinutesMinuteIdExportPostResponse =
+  ExportMinuteMinutesMinuteIdExportPostResponses[keyof ExportMinuteMinutesMinuteIdExportPostResponses]
+
 export type GetTemplatesTemplatesGetData = {
   body?: never
   headers?: {
+    /**
+     * Authorization
+     */
+    authorization?: string | null
     /**
      * X-Amzn-Oidc-Accesstoken
      */
@@ -1331,6 +1896,10 @@ export type GetUserTemplatesUserTemplatesGetData = {
   body?: never
   headers?: {
     /**
+     * Authorization
+     */
+    authorization?: string | null
+    /**
      * X-Amzn-Oidc-Accesstoken
      */
     'x-amzn-oidc-accesstoken'?: string | null
@@ -1365,6 +1934,10 @@ export type CreateUserTemplateUserTemplatesPostData = {
   body: CreateUserTemplateRequest
   headers?: {
     /**
+     * Authorization
+     */
+    authorization?: string | null
+    /**
      * X-Amzn-Oidc-Accesstoken
      */
     'x-amzn-oidc-accesstoken'?: string | null
@@ -1394,6 +1967,10 @@ export type CreateUserTemplateUserTemplatesPostResponses = {
 export type DeleteUserTemplateUserTemplatesTemplateIdDeleteData = {
   body?: never
   headers?: {
+    /**
+     * Authorization
+     */
+    authorization?: string | null
     /**
      * X-Amzn-Oidc-Accesstoken
      */
@@ -1429,6 +2006,10 @@ export type DeleteUserTemplateUserTemplatesTemplateIdDeleteResponses = {
 export type GetUserTemplateUserTemplatesTemplateIdGetData = {
   body?: never
   headers?: {
+    /**
+     * Authorization
+     */
+    authorization?: string | null
     /**
      * X-Amzn-Oidc-Accesstoken
      */
@@ -1468,6 +2049,10 @@ export type EditUserTemplateUserTemplatesTemplateIdPatchData = {
   body: PatchUserTemplateRequest
   headers?: {
     /**
+     * Authorization
+     */
+    authorization?: string | null
+    /**
      * X-Amzn-Oidc-Accesstoken
      */
     'x-amzn-oidc-accesstoken'?: string | null
@@ -1502,6 +2087,10 @@ export type EditUserTemplateUserTemplatesTemplateIdPatchResponses = {
 export type DuplicateUserTemplateUserTemplatesTemplateIdDuplicatePostData = {
   body?: never
   headers?: {
+    /**
+     * Authorization
+     */
+    authorization?: string | null
     /**
      * X-Amzn-Oidc-Accesstoken
      */
@@ -1538,6 +2127,10 @@ export type DuplicateUserTemplateUserTemplatesTemplateIdDuplicatePostResponses =
 export type DeleteChatsTranscriptionsTranscriptionIdChatDeleteData = {
   body?: never
   headers?: {
+    /**
+     * Authorization
+     */
+    authorization?: string | null
     /**
      * X-Amzn-Oidc-Accesstoken
      */
@@ -1577,6 +2170,10 @@ export type ListChatTranscriptionsTranscriptionIdChatGetData = {
   body?: never
   headers?: {
     /**
+     * Authorization
+     */
+    authorization?: string | null
+    /**
      * X-Amzn-Oidc-Accesstoken
      */
     'x-amzn-oidc-accesstoken'?: string | null
@@ -1615,6 +2212,10 @@ export type CreateChatTranscriptionsTranscriptionIdChatPostData = {
   body: ChatCreateRequest
   headers?: {
     /**
+     * Authorization
+     */
+    authorization?: string | null
+    /**
      * X-Amzn-Oidc-Accesstoken
      */
     'x-amzn-oidc-accesstoken'?: string | null
@@ -1652,6 +2253,10 @@ export type CreateChatTranscriptionsTranscriptionIdChatPostResponse =
 export type DeleteChatTranscriptionsTranscriptionIdChatChatIdDeleteData = {
   body?: never
   headers?: {
+    /**
+     * Authorization
+     */
+    authorization?: string | null
     /**
      * X-Amzn-Oidc-Accesstoken
      */
@@ -1695,6 +2300,10 @@ export type GetChatTranscriptionsTranscriptionIdChatChatIdGetData = {
   body?: never
   headers?: {
     /**
+     * Authorization
+     */
+    authorization?: string | null
+    /**
      * X-Amzn-Oidc-Accesstoken
      */
     'x-amzn-oidc-accesstoken'?: string | null
@@ -1734,5 +2343,5 @@ export type GetChatTranscriptionsTranscriptionIdChatChatIdGetResponse =
   GetChatTranscriptionsTranscriptionIdChatChatIdGetResponses[keyof GetChatTranscriptionsTranscriptionIdChatChatIdGetResponses]
 
 export type ClientOptions = {
-  baseUrl: 'http://localhost:8080' | (string & {})
+  baseUrl: `${string}://${string}` | (string & {})
 }

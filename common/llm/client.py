@@ -1,9 +1,6 @@
 from enum import Enum, auto
 from typing import TypeVar
 
-from google.genai.types import (
-    GenerateContentConfig,
-)
 from pydantic import BaseModel
 from tenacity import (
     retry,
@@ -94,6 +91,8 @@ def create_chatbot(model_type: str, model_name: str, temperature: float) -> Chat
             )
         )
     elif model_type == "gemini":
+        from google.genai.types import GenerateContentConfig
+
         return ChatBot(
             GeminiModelAdapter(
                 model=model_name,

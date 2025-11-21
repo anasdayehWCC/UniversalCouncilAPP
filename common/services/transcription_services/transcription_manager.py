@@ -2,6 +2,7 @@ import logging
 import tempfile
 import uuid
 from pathlib import Path
+from time import perf_counter
 
 import sentry_sdk
 
@@ -17,6 +18,7 @@ from common.services.transcription_services.azure import AzureSpeechAdapter
 from common.services.transcription_services.azure_async import AzureBatchTranscriptionAdapter
 from common.settings import get_settings
 from common.types import TranscriptionJobMessageData
+from common.metrics import transcription_latency_seconds, transcription_mode_total
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +54,17 @@ class TranscriptionServiceManager:
 
         return adapters
 
-    def select_adaptor(self, duration_seconds: int) -> TranscriptionAdapter:
+    def select_adaptor(self, duration_seconds: int, preferred_adapter: str | None = None) -> TranscriptionAdapter:
+        if preferred_adapter:
+            adapter = self._available_adapters.get(preferred_adapter)
+            if adapter:
+                return adapter
+            logger.warning("Preferred adapter %s not available; falling back to duration-based choice", preferred_adapter)
+        # Long audio prefers async/batch when available
+        if duration_seconds >= settings.LONG_AUDIO_BATCH_THRESHOLD_SECONDS:
+            for adaptor in self._available_adapters.values():
+                if adaptor.adapter_type == AdapterType.ASYNC:
+                    return adaptor
         for adaptor in self._available_adapters.values():
             if adaptor.max_audio_length >= duration_seconds:
                 return adaptor
@@ -72,9 +84,12 @@ class TranscriptionServiceManager:
                 entry["text"] = convert_american_to_british_spelling(entry["text"])
         return transcription_job
 
-    async def perform_transcription_steps(self, transcription: Transcription) -> TranscriptionJobMessageData:
+    async def perform_transcription_steps(
+        self, transcription: Transcription, preferred_adapter: str | None = None
+    ) -> TranscriptionJobMessageData:
         recording = transcription.recordings[0]
         file_extension = Path(recording.s3_file_key).suffix.lower()
+        start_time = perf_counter()
         with tempfile.TemporaryDirectory() as tempdir:
             temp_file_path = Path(tempdir) / Path(recording.s3_file_key).name
             await storage_service.download(recording.s3_file_key, temp_file_path)
@@ -87,7 +102,7 @@ class TranscriptionServiceManager:
                 transaction.set_data("file_size", file_path.stat().st_size)
                 transaction.set_data("file_type", file_path.suffix.lower())
 
-            adapter = self.select_adaptor(int(duration_seconds))
+            adapter = self.select_adaptor(int(duration_seconds), preferred_adapter=preferred_adapter)
             match adapter.adapter_type:
                 case AdapterType.SYNCHRONOUS:
                     transcription_job = await adapter.start(audio_file_path_or_recording=file_path)
@@ -99,6 +114,10 @@ class TranscriptionServiceManager:
 
         if not transcription_job.transcript:
             transcription_job = await self.check_transcription(adapter.name, transcription_job)
+        transcription_latency_seconds.labels(service=adapter.name, mode=transcription.processing_mode or "unknown").observe(
+            perf_counter() - start_time
+        )
+        transcription_mode_total.labels(mode=transcription.processing_mode or "unknown", service=adapter.name).inc()
         return transcription_job
 
     @classmethod

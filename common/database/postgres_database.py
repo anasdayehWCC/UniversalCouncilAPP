@@ -4,11 +4,20 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from apscheduler.schedulers.background import BackgroundScheduler
+from azure.identity import DefaultAzureCredential
 from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel import Session, and_, col, create_engine, delete, or_, select, update
 
-from common.database.postgres_models import JobStatus, MinuteVersion, Recording, Transcription, User
+from common.database.postgres_models import (
+    JobStatus,
+    Minute,
+    MinuteVersion,
+    Recording,
+    RetentionPolicy,
+    Transcription,
+    User,
+)
 from common.services.storage_services import get_storage_service
 from common.settings import get_settings
 
@@ -26,10 +35,19 @@ storage_service = get_storage_service(settings.STORAGE_SERVICE_NAME)
 
 # Get database connection details from environment variables
 DB_USER = settings.POSTGRES_USER
-DB_PASSWORD = settings.POSTGRES_PASSWORD
 DB_HOST = settings.POSTGRES_HOST
 DB_PORT = settings.POSTGRES_PORT
 DB_NAME = settings.POSTGRES_DB
+DB_AUTH_MODE = settings.POSTGRES_AUTH_MODE
+
+def _get_db_password() -> str:
+    if DB_AUTH_MODE == "managed_identity":
+        credential = DefaultAzureCredential(managed_identity_client_id=settings.AZURE_MANAGED_IDENTITY_CLIENT_ID)
+        token = credential.get_token("https://ossrdbms-aad.database.windows.net/.default")
+        return token.token
+    return settings.POSTGRES_PASSWORD
+
+DB_PASSWORD = _get_db_password()
 
 # Use psycopg2 for synchronous operations
 SYNC_DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
@@ -80,6 +98,51 @@ def cleanup_old_records():
     logger.info("Starting data retention cleanup process")
     with Session(engine) as session:
         deletion_tasks = []
+        now = datetime.now(tz=ZoneInfo("Europe/London"))
+
+        policies = session.exec(select(RetentionPolicy)).all()
+        for policy in policies:
+            recording_filters = []
+            transcription_filters = []
+            minute_filters = []
+            if policy.organisation_id:
+                recording_filters.append(Recording.organisation_id == policy.organisation_id)
+                transcription_filters.append(Transcription.organisation_id == policy.organisation_id)
+                minute_filters.append(Minute.organisation_id == policy.organisation_id)
+            if policy.service_domain_id:
+                recording_filters.append(Recording.service_domain_id == policy.service_domain_id)
+                transcription_filters.append(Transcription.service_domain_id == policy.service_domain_id)
+                minute_filters.append(Minute.service_domain_id == policy.service_domain_id)
+
+            if policy.audio_retention_days:
+                cutoff = now - timedelta(days=policy.audio_retention_days)
+                recs = session.exec(
+                    select(Recording).where(*recording_filters, Recording.created_datetime < cutoff)
+                ).all()
+                for recording in recs:
+                    try:
+                        deletion_tasks.append(asyncio.create_task(storage_service.delete(recording.s3_file_key)))
+                    finally:
+                        session.delete(recording)
+                session.commit()
+
+            if policy.transcript_retention_days:
+                cutoff = now - timedelta(days=policy.transcript_retention_days)
+                transcripts = session.exec(
+                    select(Transcription).where(*(transcription_filters), Transcription.created_datetime < cutoff)
+                ).all()
+                for t in transcripts:
+                    session.delete(t)
+                session.commit()
+
+            if policy.minute_retention_days:
+                cutoff = now - timedelta(days=policy.minute_retention_days)
+                minutes = session.exec(
+                    select(Minute).where(*(minute_filters), Minute.created_datetime < cutoff)
+                ).all()
+                for m in minutes:
+                    session.delete(m)
+                session.commit()
         # Get all users who have a retention period set
         users = session.exec(select(User)).all()
         logger.info(
@@ -115,6 +178,8 @@ def cleanup_old_records():
             finally:
                 session.delete(recording)
         session.commit()
+        if deletion_tasks:
+            asyncio.get_event_loop().run_until_complete(asyncio.gather(*deletion_tasks))
     logger.info("Data retention cleanup process completed")
 
 

@@ -27,6 +27,18 @@ import type {
   GetRecordingsForTranscriptionTranscriptionsTranscriptionIdRecordingsGetData,
   GetRecordingsForTranscriptionTranscriptionsTranscriptionIdRecordingsGetResponses,
   GetRecordingsForTranscriptionTranscriptionsTranscriptionIdRecordingsGetErrors,
+  GetSignedRecordingRecordingsRecordingIdSignedUrlGetData,
+  GetSignedRecordingRecordingsRecordingIdSignedUrlGetResponses,
+  GetSignedRecordingRecordingsRecordingIdSignedUrlGetErrors,
+  GetDialogueTranscriptionsTranscriptionIdDialogueGetData,
+  GetDialogueTranscriptionsTranscriptionIdDialogueGetResponses,
+  GetDialogueTranscriptionsTranscriptionIdDialogueGetErrors,
+  UpdateDialogueTranscriptionsTranscriptionIdDialoguePatchData,
+  UpdateDialogueTranscriptionsTranscriptionIdDialoguePatchResponses,
+  UpdateDialogueTranscriptionsTranscriptionIdDialoguePatchErrors,
+  SubmitFeedbackTranscriptionsTranscriptionIdFeedbackPostData,
+  SubmitFeedbackTranscriptionsTranscriptionIdFeedbackPostResponses,
+  SubmitFeedbackTranscriptionsTranscriptionIdFeedbackPostErrors,
   GetUserUsersMeGetData,
   GetUserUsersMeGetResponses,
   GetUserUsersMeGetErrors,
@@ -54,6 +66,9 @@ import type {
   GetMinuteVersionMinuteVersionsMinuteVersionIdGetData,
   GetMinuteVersionMinuteVersionsMinuteVersionIdGetResponses,
   GetMinuteVersionMinuteVersionsMinuteVersionIdGetErrors,
+  ExportMinuteMinutesMinuteIdExportPostData,
+  ExportMinuteMinutesMinuteIdExportPostResponses,
+  ExportMinuteMinutesMinuteIdExportPostErrors,
   GetTemplatesTemplatesGetData,
   GetTemplatesTemplatesGetResponses,
   GetTemplatesTemplatesGetErrors,
@@ -265,6 +280,98 @@ export const getRecordingsForTranscriptionTranscriptionsTranscriptionIdRecording
   }
 
 /**
+ * Get Signed Recording
+ */
+export const getSignedRecordingRecordingsRecordingIdSignedUrlGet = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    GetSignedRecordingRecordingsRecordingIdSignedUrlGetData,
+    ThrowOnError
+  >
+) => {
+  return (options.client ?? _heyApiClient).get<
+    GetSignedRecordingRecordingsRecordingIdSignedUrlGetResponses,
+    GetSignedRecordingRecordingsRecordingIdSignedUrlGetErrors,
+    ThrowOnError
+  >({
+    url: '/recordings/{recording_id}/signed-url',
+    ...options,
+  })
+}
+
+/**
+ * Get Dialogue
+ */
+export const getDialogueTranscriptionsTranscriptionIdDialogueGet = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    GetDialogueTranscriptionsTranscriptionIdDialogueGetData,
+    ThrowOnError
+  >
+) => {
+  return (options.client ?? _heyApiClient).get<
+    GetDialogueTranscriptionsTranscriptionIdDialogueGetResponses,
+    GetDialogueTranscriptionsTranscriptionIdDialogueGetErrors,
+    ThrowOnError
+  >({
+    url: '/transcriptions/{transcription_id}/dialogue',
+    ...options,
+  })
+}
+
+/**
+ * Update Dialogue
+ */
+export const updateDialogueTranscriptionsTranscriptionIdDialoguePatch = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    UpdateDialogueTranscriptionsTranscriptionIdDialoguePatchData,
+    ThrowOnError
+  >
+) => {
+  return (options.client ?? _heyApiClient).patch<
+    UpdateDialogueTranscriptionsTranscriptionIdDialoguePatchResponses,
+    UpdateDialogueTranscriptionsTranscriptionIdDialoguePatchErrors,
+    ThrowOnError
+  >({
+    url: '/transcriptions/{transcription_id}/dialogue',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  })
+}
+
+/**
+ * Submit Feedback
+ */
+export const submitFeedbackTranscriptionsTranscriptionIdFeedbackPost = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    SubmitFeedbackTranscriptionsTranscriptionIdFeedbackPostData,
+    ThrowOnError
+  >
+) => {
+  return (options.client ?? _heyApiClient).post<
+    SubmitFeedbackTranscriptionsTranscriptionIdFeedbackPostResponses,
+    SubmitFeedbackTranscriptionsTranscriptionIdFeedbackPostErrors,
+    ThrowOnError
+  >({
+    url: '/transcriptions/{transcription_id}/feedback',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  })
+}
+
+/**
  * Get User
  */
 export const getUserUsersMeGet = <ThrowOnError extends boolean = false>(
@@ -454,6 +561,24 @@ export const getMinuteVersionMinuteVersionsMinuteVersionIdGet = <
     ThrowOnError
   >({
     url: '/minute_versions/{minute_version_id}',
+    ...options,
+  })
+}
+
+/**
+ * Export Minute
+ */
+export const exportMinuteMinutesMinuteIdExportPost = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ExportMinuteMinutesMinuteIdExportPostData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).post<
+    ExportMinuteMinutesMinuteIdExportPostResponses,
+    ExportMinuteMinutesMinuteIdExportPostErrors,
+    ThrowOnError
+  >({
+    url: '/minutes/{minute_id}/export',
     ...options,
   })
 }

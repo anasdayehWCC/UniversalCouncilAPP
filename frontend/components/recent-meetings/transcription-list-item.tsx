@@ -4,6 +4,7 @@ import { DeleteDialog } from '@/components/recent-meetings/delete-transcription-
 import { RenameDialog } from '@/components/recent-meetings/rename-dialog'
 import { TranscriptionCard } from '@/components/recent-meetings/transcription-card'
 import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
 import { TranscriptionMetadata } from '@/lib/client'
 import { Edit2, Trash } from 'lucide-react'
 import Link from 'next/link'
@@ -18,12 +19,14 @@ export const TranscriptionListItem = ({
   const [renameOpen, setRenameOpen] = useState(false)
   return (
     <>
-      <Link
-        href={`/transcriptions/${transcription.id}`}
-        className="justify-between rounded-md border p-3 text-sm transition-colors hover:bg-slate-100 sm:flex"
-      >
-        <TranscriptionCard transcription={transcription} />
-        <div className="mt-2 flex gap-2">
+      <Card className="group shadow-md hover:shadow-xl hover:scale-[1.01] hover:border-accent/50 transition-all duration-300 border border-border/50 rounded-xl mb-4">
+        <Link
+          className="block p-6"
+          href={`/transcriptions/${transcription.id}`}
+        >
+          <TranscriptionCard transcription={transcription} />
+        </Link>
+        <div className="flex gap-2 px-6 pb-6 pt-0">
           <Button
             variant="outline"
             size="sm"
@@ -31,9 +34,9 @@ export const TranscriptionListItem = ({
               e.preventDefault()
               setRenameOpen(true)
             }}
-            className="text-xs hover:bg-slate-200"
+            className="text-xs hover:bg-primary/10 hover:text-primary hover:border-primary/50 transition-colors"
           >
-            <Edit2 /> Rename
+            <Edit2 className="mr-1 h-3 w-3" /> Rename
           </Button>
           <Button
             variant="outline"
@@ -42,12 +45,12 @@ export const TranscriptionListItem = ({
               e.preventDefault()
               setDeleteOpen(true)
             }}
-            className="text-xs text-red-600 hover:bg-red-100"
+            className="text-xs text-red-600 hover:bg-red-50 hover:border-red-300 transition-colors"
           >
-            <Trash color="red" /> Delete
+            <Trash className="mr-1 h-3 w-3" color="red" /> Delete
           </Button>
         </div>
-      </Link>
+      </Card>
       <DeleteDialog
         open={deleteOpen}
         setOpen={setDeleteOpen}
@@ -55,7 +58,7 @@ export const TranscriptionListItem = ({
       />
       <RenameDialog
         open={renameOpen}
-        setOpen={setRenameOpen}
+        setRenameOpen={setRenameOpen}
         transcription={transcription}
       />
     </>

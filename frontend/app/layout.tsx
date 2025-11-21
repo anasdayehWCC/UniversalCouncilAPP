@@ -1,14 +1,12 @@
-import { Footer } from '@/components/layout/footer'
-import { Header } from '@/components/layout/header'
-import { LockNavigationProvider } from '@/hooks/use-lock-navigation-context'
-import { TanstackQueryProvider } from '@/providers/TanstackQueryProvider'
-import PosthogProvider from '@/providers/posthog'
-import { RecordingDbProvider } from '@/providers/transcription-db-provider'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { Toaster } from 'sonner'
 import { OfflineIndicator } from '@/components/offline-indicator'
-import { ThemeProvider } from '@/components/theme-provider'
+import { Footer } from '@/components/layout/footer'
+import { Header } from '@/components/layout/header'
+import { ProviderShell } from '@/components/provider-shell'
+import { AuthProvider } from '@/providers/AuthProvider'
+import { ServiceWorkerRegistration } from '@/components/service-worker-registration'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -32,29 +30,20 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.className}>
       <body>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="theme-wcc"
-          themes={['theme-wcc', 'theme-rbkc']}
-        >
-          <TanstackQueryProvider>
-            <PosthogProvider>
-              <LockNavigationProvider>
-                <RecordingDbProvider>
-                  <div className="flex min-h-screen flex-col justify-between">
-                    <div>
-                      <Header />
-                      <main>{children}</main>
-                    </div>
-                    <Footer />
-                  </div>
-                  <OfflineIndicator />
-                  <Toaster />
-                </RecordingDbProvider>
-              </LockNavigationProvider>
-            </PosthogProvider>
-          </TanstackQueryProvider>
-        </ThemeProvider>
+        <AuthProvider>
+          <ProviderShell>
+            <div className="flex min-h-screen flex-col justify-between bg-page">
+              <div>
+                <Header />
+                <main className="px-4 pb-8 sm:px-8">{children}</main>
+              </div>
+              <Footer />
+            </div>
+            <ServiceWorkerRegistration />
+            <OfflineIndicator />
+            <Toaster />
+          </ProviderShell>
+        </AuthProvider>
       </body>
     </html>
   )

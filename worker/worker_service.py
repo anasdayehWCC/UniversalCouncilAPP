@@ -1,7 +1,9 @@
 import asyncio
 import logging
+import os
 
 import ray
+from prometheus_client import start_http_server
 
 from common.logger import setup_logger
 from common.services.queue_services import get_queue_service
@@ -39,6 +41,8 @@ class WorkerService:
     async def run(self) -> None:
         # note, currently a bug in python 3.12/ray that means we need to wrap the ObjectRefs in asyncio.ensure_future
         futures = [asyncio.ensure_future(call) for call in self.calls]
+        if settings.METRICS_ENABLED:
+            start_http_server(settings.METRICS_PORT)
         while not self.signal_handler.signal_received:
             await self._check_and_restart_tasks(futures)
 
@@ -78,12 +82,15 @@ def create_worker_service() -> WorkerService:
     # max concurrent ray processes
     # +4 as we need 2 for the ray Queues, 1 for the HasBeenStopped Actor, plus one 'spare'
     # we init ray here so we can handle its init in testing
+    os.environ.setdefault("RAY_worker_register_timeout_ms", str(settings.RAY_WORKER_REGISTER_TIMEOUT_MS))
     ray.init(
         log_to_driver=True,
         num_cpus=(settings.MAX_TRANSCRIPTION_PROCESSES + settings.MAX_LLM_PROCESSES + 4),
         configure_logging=True,
         dashboard_host=settings.RAY_DASHBOARD_HOST,
         dashboard_port=8265,
+        namespace=settings.RAY_NAMESPACE,
+        _system_config={"worker_register_timeout_ms": settings.RAY_WORKER_REGISTER_TIMEOUT_MS},
         runtime_env={"worker_process_setup_hook": setup_logger},
     )
     return WorkerService(transcription_queue_service=transcription_sqs_service, llm_queue_service=llm_sqs_service)

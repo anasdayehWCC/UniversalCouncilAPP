@@ -2,10 +2,19 @@
 
 import { MicRecorderForm } from '@/components/audio/mic-recorder'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Sparkles } from 'lucide-react'
+import { ArrowLeft, Dot, Sparkles } from 'lucide-react'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { getLastSync } from '@/lib/offline-queue'
+import { formatDistanceToNow } from 'date-fns'
 
 export default function CapturePage() {
+  const [lastSync, setLastSync] = useState<Date | null>(null)
+
+  useEffect(() => {
+    setLastSync(getLastSync())
+  }, [])
+
   return (
     <div className="mx-auto max-w-3xl space-y-4">
       <Button
@@ -30,6 +39,11 @@ export default function CapturePage() {
             </p>
           </div>
         </div>
+        {lastSync && (
+          <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs text-white">
+            <Dot className="h-4 w-4" /> Last sync {formatDistanceToNow(lastSync)} ago
+          </div>
+        )}
       </div>
       <p className="text-xs text-amber-700">
         Privacy reminder: avoid speaking full names, addresses, or phone numbers. Use case references and roles instead.

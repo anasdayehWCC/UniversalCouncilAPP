@@ -34,7 +34,7 @@ export default function RootLayout({
           <ProviderShell>
             <div className="flex min-h-screen flex-col justify-between bg-page">
               <div>
-                <Header />
+                <Header userTemplatesEnabled={true} />
                 <main className="px-4 pb-8 sm:px-8">{children}</main>
               </div>
               <Footer />

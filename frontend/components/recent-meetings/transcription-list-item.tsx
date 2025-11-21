@@ -58,7 +58,7 @@ export const TranscriptionListItem = ({
       />
       <RenameDialog
         open={renameOpen}
-        setRenameOpen={setRenameOpen}
+        setOpen={setRenameOpen}
         transcription={transcription}
       />
     </>

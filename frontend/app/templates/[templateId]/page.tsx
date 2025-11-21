@@ -20,10 +20,9 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
 export default function EditTemplatePage({
-  params: { templateId },
-}: {
-  params: { templateId: string }
-}) {
+  params,
+}: any) {
+  const templateId = params.templateId as string
   const { data: template } = useQuery({
     ...getUserTemplateUserTemplatesTemplateIdGetOptions({
       path: { template_id: templateId },

@@ -13,13 +13,13 @@ import {
 import { FeatureFlags } from '@/lib/feature-flags'
 import { useQuery } from '@tanstack/react-query'
 import { Clock, Frown, LoaderCircle, SearchX } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useFeatureFlagEnabled } from 'posthog-js/react'
 
 export default function TranscriptionPage({
-  params: { transcriptionId },
-}: {
-  params: { transcriptionId: string }
-}) {
+  params,
+}: any) {
+  const transcriptionId = params.transcriptionId as string
   const isChatEnabled = useFeatureFlagEnabled(FeatureFlags.ChatEnabled)
 
   const { data: transcription, isLoading } = useQuery({
@@ -35,8 +35,19 @@ export default function TranscriptionPage({
 
   if (isLoading) {
     return (
-      <div className="flex h-72 flex-col items-center justify-center">
-        <LoaderCircle size={80} className="animate-spin" />
+      <div className="space-y-4">
+        <div className="flex h-12 items-center gap-3">
+          <Skeleton className="h-10 w-10" />
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-48" />
+            <Skeleton className="h-3 w-32" />
+          </div>
+        </div>
+        <Skeleton className="h-10 w-full" />
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-[2fr_1fr]">
+          <Skeleton className="h-64 w-full" />
+          <Skeleton className="h-64 w-full" />
+        </div>
       </div>
     )
   }
@@ -49,6 +60,9 @@ export default function TranscriptionPage({
       </div>
     )
   }
+
+  // Casting to shared Transcription shape used by editor components
+  const typedTranscription: any = transcription
 
   const date = new Date(transcription.created_datetime)
   const dateLabel = `${date.toDateString()} at ${date.toLocaleTimeString()}`
@@ -130,43 +144,46 @@ export default function TranscriptionPage({
         transcriptionId={transcription.id}
         status={transcription.status}
       />
-      <div className="mb-4 flex items-center gap-1 text-xs text-slate-500">
-        <Clock size="0.8rem" />
+      <div className="mb-4 flex flex-wrap items-center gap-2 text-xs text-white">
+        <Clock size="0.8rem" className="text-white/80" />
         {dateLabel}
-        {caseLabel && <span className="rounded-full bg-slate-100 px-2 py-0.5">{caseLabel}</span>}
+        {caseLabel && <span className="rounded-full bg-white/20 px-3 py-1">{caseLabel}</span>}
         {subjectLabel && (
-          <span className="rounded-full bg-slate-100 px-2 py-0.5">{subjectLabel}</span>
+          <span className="rounded-full bg-white/20 px-3 py-1">{subjectLabel}</span>
         )}
       </div>
       <Tabs defaultValue="summary" className="w-full">
         <TabsList className="h-12 w-full">
           <TabsTrigger
             value="summary"
-            className="data-[state=active]:shadow-lg"
+            className="border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:shadow-lg focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             Meeting summary
           </TabsTrigger>
           <TabsTrigger
             value="transcript"
-            className="data-[state=active]:shadow-lg"
+            className="border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:shadow-lg focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             Transcript
           </TabsTrigger>
           {isChatEnabled && (
-            <TabsTrigger value="chat" className="data-[state=active]:shadow-lg">
+            <TabsTrigger
+              value="chat"
+              className="border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:shadow-lg focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            >
               Chat with your meeting
             </TabsTrigger>
           )}
         </TabsList>
         <TabsContent value="summary">
-          <MinuteTab transcription={transcription} />
+          <MinuteTab transcription={typedTranscription} />
         </TabsContent>
         <TabsContent value="transcript">
-          <TranscriptionTab transcription={transcription} />
+          <TranscriptionTab transcription={typedTranscription} />
         </TabsContent>
         {isChatEnabled && (
           <TabsContent value="chat">
-            <ChatTab transcription={transcription} />
+            <ChatTab transcription={typedTranscription} />
           </TabsContent>
         )}
       </Tabs>
@@ -185,7 +202,7 @@ const AudioPlayer = ({ transcriptionId }: { transcriptionId: string }) => {
   }
   return (
     <div className="mb-2 flex w-full max-w-3xl flex-col gap-2 rounded border bg-white p-2">
-      <audio controls src={recordings[0].url} className="w-full" />
+      <audio controls src={recordings[0].url} className="w-full" aria-label="Meeting audio player" />
       <div className="flex justify-end">
         <DownloadButton recordings={recordings} />
       </div>

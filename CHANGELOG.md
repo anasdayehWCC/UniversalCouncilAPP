@@ -11,6 +11,9 @@
 - Phase 13 (IaC/Pipelines): Added GitHub Actions deploy workflow for ACA blue/green (`.github/workflows/deploy.yml`) aligned with revision traffic splitting; Terraform guardrail still enforced; KEDA autoscale manifest and load test steps documented.
 - Phase 14 (Pilot/Rollout): Seeded pilot config `config/pilot_children.yaml` (Children domain templates, SharePoint path, Planner placeholders); documentation notes for rollout paths.
 - Platform upgrades: Frontend bumped to Next.js 15.1 / React 19 (npm install, peer overrides noted), backend on FastAPI 0.120.x + Pydantic 2.11; Ray init hardened with namespace + worker register timeout env; settings/.env updated. Re-ran backend smoke tests (passing). Package-lock refreshed.
+- Platform upgrades follow-up: Resolved Next.js 15.5 app router layout/params typings, updated layouts to ReactNode, fixed rename dialog prop, replaced unsupported `bg-white/10` utilities, regen package-lock with React 19; frontend build now succeeds (warnings only re cache/sourcemap size). Smoke pytest suite still green.
+- AGENTS/Docs: Added rule 35 to enforce React 19 / Next 15 layout typing guidance; Roadmap log updated with post-upgrade validation checklist; PLANS snapshot recorded.
+- UI/UX refinements: Added skeleton loaders to transcription page, glassy chips for case/subject; evidence sidebar timeline with better labels/focus and disabled state guard; export toasts; toolbar layout tightened; mobile helper text on New flow; last-sync badge on capture; reusable `Skeleton` component; added date-fns for relative time; PWA cache limit raised to silence sourcemap warning. Frontend build (Next 15.5) and backend smoke pytest still passing.
 
 ## 2025-11-20
 

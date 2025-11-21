@@ -7,6 +7,9 @@ import { MinuteVersionSelect } from '@/app/transcriptions/[transcriptionId]/Minu
 import { NewMinuteDialog } from '@/app/transcriptions/[transcriptionId]/MinuteTab/NewMinuteDialog'
 import { Button } from '@/components/ui/button'
 import CopyButton from '@/components/ui/copy-button'
+import { Separator } from '@/components/ui/separator'
+import { toast } from 'sonner'
+import { Badge } from '@/components/ui/badge'
 import { citationRegex, citationRegexWithSpace } from '@/lib/citationRegex'
 import {
   MinuteListItem,
@@ -165,10 +168,14 @@ export function MinuteEditor({
               format,
               version_id: minuteVersion.id,
             })
+            setLastExportInfo(data)
+            toast.success(
+              `Export ready (${data.format.toUpperCase()})${data.sharepoint_item_id ? ' • Saved to SharePoint' : ''}`,
+              { position: 'top-center' }
+            )
             if (data?.url) {
               window.open(data.url, '_blank')
             }
-            setLastExportInfo(data)
           },
         }
       )
@@ -253,8 +260,8 @@ export function MinuteEditor({
   }
   return (
     <div className="pt-2">
-      <div className="mb-2 flex flex-wrap justify-between gap-y-2">
-        <div className="flex flex-wrap gap-2">
+      <div className="mb-2 flex flex-wrap gap-3 lg:flex-nowrap lg:justify-between">
+        <div className="flex flex-wrap gap-2 lg:flex-nowrap">
           <MinuteVersionSelect
             minuteVersions={minuteVersions}
             version={version}
@@ -285,7 +292,7 @@ export function MinuteEditor({
           )}
           <Button
             type="button"
-            className="bg-green-600 text-white hover:bg-green-700 active:bg-yellow-500"
+            className="bg-green-600 text-white hover:bg-green-700 active:bg-yellow-500 min-w-[130px]"
             onClick={() => handleExport('docx')}
             disabled={exportMutation.isPending}
           >
@@ -294,7 +301,7 @@ export function MinuteEditor({
           </Button>
           <Button
             type="button"
-            className="bg-emerald-600 text-white hover:bg-emerald-700 active:bg-yellow-500"
+            className="bg-emerald-600 text-white hover:bg-emerald-700 active:bg-yellow-500 min-w-[120px]"
             onClick={() => handleExport('pdf')}
             disabled={exportMutation.isPending}
           >
@@ -327,14 +334,12 @@ export function MinuteEditor({
           )}
         </div>
         {lastExportInfo && (
-          <p className="text-xs text-slate-500">
-            Latest export ready ({lastExportInfo.format.toUpperCase()})
-            {lastExportInfo.sharepoint_item_id
-              ? ` • Uploaded to SharePoint (item ${lastExportInfo.sharepoint_item_id})`
-              : ''}
-          </p>
+          <Badge variant="secondary" className="text-xs">
+            Latest export: {lastExportInfo.format.toUpperCase()}
+            {lastExportInfo.sharepoint_item_id ? ' • SharePoint uploaded' : ''}
+          </Badge>
         )}
-        <div className="flex gap-2">
+        <div className="flex gap-2 self-start lg:self-center">
           <RatingButton
             minuteVersionId={minuteVersion.id}
             minutes={minuteVersion.html_content}
@@ -369,26 +374,35 @@ export function MinuteEditor({
             <>
               <audio ref={audioRef} controls className="w-full" src={recordings[0].url} />
               {uniqueCitations.length > 0 ? (
-                <div className="mt-2 flex flex-col gap-2 text-xs">
+                <div className="mt-3 relative pl-4 text-xs">
+                  <div className="absolute left-1 top-1 h-full w-px bg-slate-200" />
                   {uniqueCitations.map((c) => {
                     const entry = transcription.dialogue_entries?.[c - 1]
                     const start = entry?.start_time ?? 0
                     const label = new Date(start * 1000).toISOString().substring(11, 19)
+                    const disabled = !entry
                     return (
-                      <Button
+                      <button
                         key={c}
-                        variant="outline"
-                        size="sm"
-                        className="justify-between"
+                        aria-label={disabled ? `Citation ${c} unavailable` : `Jump to citation ${c} at ${label}`}
+                        disabled={disabled}
+                        className="mb-2 flex w-full items-center gap-2 rounded-lg bg-slate-50 px-3 py-2 text-left transition hover:-translate-y-0.5 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
                         onClick={() => {
                           if (audioRef.current && entry) {
                             audioRef.current.currentTime = entry.start_time
                             audioRef.current.play()
                           }
                         }}
+                        title={disabled ? 'Transcript segment not available' : `Jump to ${label}`}
                       >
-                        Citation [{c}] → {label}
-                      </Button>
+                        <span className="h-2 w-2 rounded-full bg-primary" />
+                        <span className="font-medium">[{c}]</span>
+                        <Separator orientation="vertical" className="h-5" />
+                        <span className="text-sm font-medium text-slate-700" title={label}>{label}</span>
+                        <span className="text-slate-500 line-clamp-1" title={entry?.text || 'Transcript segment'}>
+                          {entry?.text || 'Transcript segment'}
+                        </span>
+                      </button>
                     )
                   })}
                 </div>

@@ -1,9 +1,9 @@
-import { ReactElement } from 'react'
+import { type ReactNode } from 'react'
 
 export default function TranscriptionsLayout({
   children,
 }: {
-  children: ReactElement
+  children: ReactNode
 }) {
   return <div className="p-6">{children}</div>
 }

@@ -5,7 +5,8 @@ import { TranscriptionListItem } from '@/components/recent-meetings/transcriptio
 import { Button } from '@/components/ui/button'
 import { listTranscriptionsTranscriptionsGetOptions } from '@/lib/client/@tanstack/react-query.gen'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, FileText, Loader2 } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { useState } from 'react'
 
 export const PaginatedTranscriptions = () => {
@@ -22,9 +23,9 @@ export const PaginatedTranscriptions = () => {
     }),
     refetchInterval: (query) =>
       !!query.state.data &&
-      query.state.data.items?.some((t) =>
-        ['awaiting_start', 'in_progress'].includes(t.status)
-      )
+        query.state.data.items?.some((t) =>
+          ['awaiting_start', 'in_progress'].includes(t.status)
+        )
         ? 5000
         : false,
     placeholderData: keepPreviousData,
@@ -65,34 +66,72 @@ export const PaginatedTranscriptions = () => {
   return (
     <div>
       <OfflineRecordings />
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Recent meetings:</h1>
-        <div className="text-sm text-gray-600">
+
+      {/* Premium Section Header */}
+      <div className="mb-8 flex items-center justify-between">
+        <h2 className="text-3xl font-bold text-foreground">Recent Meetings</h2>
+        <div className="rounded-full bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary border border-primary/20">
           {totalCount} transcription{totalCount !== 1 ? 's' : ''}
         </div>
       </div>
+
       {isLoading ? (
-        <div className="flex items-center justify-center py-8">
-          <div className="text-gray-500">Loading transcriptions...</div>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col items-center justify-center py-16 rounded-2xl bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5 border border-border/50"
+        >
+          <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+          <div className="text-lg font-medium text-foreground">Loading transcriptions...</div>
+          <div className="text-sm text-muted-foreground mt-2">Please wait while we fetch your data</div>
+        </motion.div>
       ) : error ? (
-        <div className="flex items-center justify-center py-8">
-          <div className="text-red-500">Error loading transcriptions</div>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col items-center justify-center py-16 rounded-2xl bg-red-50 border-2 border-red-200"
+        >
+          <div className="text-6xl mb-4">⚠️</div>
+          <div className="text-lg font-semibold text-red-700 mb-2">Error loading transcriptions</div>
+          <div className="text-sm text-red-600">Please try refreshing the page</div>
+        </motion.div>
       ) : transcriptions.length === 0 ? (
-        <div className="flex items-center justify-center py-8">
-          <div className="text-gray-500">No transcriptions found</div>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col items-center justify-center py-20 rounded-2xl bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5 border-2 border-dashed border-border"
+        >
+          <FileText className="h-16 w-16 text-muted-foreground/50 mb-4" />
+          <div className="text-xl font-semibold text-foreground mb-2">No transcriptions yet</div>
+          <div className="text-sm text-muted-foreground mb-6">Start your first recording to see it here</div>
+          <Button
+            variant="outline"
+            className="hover:bg-primary/10 hover:text-primary hover:border-primary/50"
+          >
+            Create New Recording
+          </Button>
+        </motion.div>
       ) : (
         <>
-          <ul className="mb-6 flex flex-col gap-2">
-            {transcriptions.map((transcription) => (
-              <TranscriptionListItem
-                transcription={transcription}
+          {/* Staggered Entrance Animations */}
+          <ul className="mb-6 flex flex-col gap-4">
+            {transcriptions.map((transcription, index) => (
+              <motion.li
                 key={transcription.id}
-              />
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.3,
+                  delay: index * 0.05, // Stagger: 50ms delay per item
+                  ease: 'easeOut'
+                }}
+              >
+                <TranscriptionListItem transcription={transcription} />
+              </motion.li>
             ))}
           </ul>
+
+          {/* Premium Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-center space-x-2">
               <Button
@@ -100,6 +139,7 @@ export const PaginatedTranscriptions = () => {
                 size="sm"
                 onClick={handlePreviousPage}
                 disabled={currentPage === 1}
+                className="hover:bg-primary/10 hover:text-primary hover:border-primary/50 transition-colors"
               >
                 <ChevronLeft className="h-4 w-4" />
                 Previous
@@ -111,7 +151,10 @@ export const PaginatedTranscriptions = () => {
                   variant={currentPage === page ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setCurrentPage(page)}
-                  className="min-w-10"
+                  className={`min-w-10 ${currentPage === page
+                      ? 'bg-primary text-white shadow-md'
+                      : 'hover:bg-primary/10 hover:text-primary hover:border-primary/50'
+                    } transition-all`}
                 >
                   {page}
                 </Button>
@@ -122,13 +165,14 @@ export const PaginatedTranscriptions = () => {
                 size="sm"
                 onClick={handleNextPage}
                 disabled={currentPage === totalPages}
+                className="hover:bg-primary/10 hover:text-primary hover:border-primary/50 transition-colors"
               >
                 Next
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
           )}
-          <div className="mt-4 text-center text-sm text-gray-500">
+          <div className="mt-6 text-center text-sm text-muted-foreground font-medium">
             Page {currentPage} of {totalPages}
           </div>
         </>

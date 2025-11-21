@@ -2,12 +2,12 @@ import { HistoryBackButton } from '@/components/ui/history-back-button'
 import { FeatureFlags } from '@/lib/feature-flags'
 import { getServerSideFeatureFlag } from '@/lib/posthog'
 import { redirect } from 'next/navigation'
-import { ReactElement } from 'react'
+import { type ReactNode } from 'react'
 
 export default async function TemplatesLayout({
   children,
 }: {
-  children: ReactElement
+  children: ReactNode
 }) {
   const userTemplatesEnabled = await getServerSideFeatureFlag(
     FeatureFlags.UserTemplatesEnabled

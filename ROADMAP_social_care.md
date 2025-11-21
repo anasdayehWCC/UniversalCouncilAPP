@@ -405,6 +405,8 @@ Exit: Successful pilot sign-off; backlog of tweaks captured; Adults rollout sche
 
 ### Framework Upgrade Log (per AGENTS rule 32)
 - 2025-11-21: Frontend bumped to Next.js 15.1 + React 19 (App Router) with ESLint 9 compatibility; backend on FastAPI 0.120.x + Pydantic 2.11; Ray 2.47 with namespace + register timeout hardening. Tests: npm install (frontend) and pytest smoke (backend). Sources: Next.js 15.1 release notes, React 19 support statements, FastAPI 0.120 changelog. citeturn0search4turn0search0
+- Validation checklist post-upgrade: ensure App Router layouts use `ReactNode` props, route params typed as plain objects, rebuild OpenAPI client after API changes, run `npm run build` (or `next build --no-lint` locally) plus backend pytest smoke; resolve peer warnings for React 19 asap.
+- Added UI polish tasks: skeleton loaders for transcription/summary tabs, timeline-style evidence list, export toasts, and navigation chips to maintain premium branding while improving perceived performance.
 
 - Domain registry in DB drives: available templates, SharePoint paths, retention, feature flags, lexicons. No code changes to add a domain—just config + templates.
 - Frontend theme and copy driven by domain config pulled at login; avoid domain-specific components.

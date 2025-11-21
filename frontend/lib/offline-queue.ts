@@ -133,4 +133,30 @@ export async function syncAllQueued(token: string) {
       await markStatus(recording.id!, 'failed', message)
     }
   }
+
+  try {
+    recordLastSync()
+  } catch (err) {
+    // non-fatal; ignore storage errors
+    console.warn('unable to record last sync time', err)
+  }
+}
+
+const LAST_SYNC_KEY = 'offlineQueue:lastSync'
+
+export function recordLastSync() {
+  try {
+    if (typeof localStorage === 'undefined') return
+    localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString())
+  } catch (err) {
+    console.warn('unable to persist last sync', err)
+  }
+}
+
+export function getLastSync(): Date | null {
+  if (typeof localStorage === 'undefined') return null
+  const value = localStorage.getItem(LAST_SYNC_KEY)
+  if (!value) return null
+  const date = new Date(value)
+  return isNaN(date.getTime()) ? null : date
 }

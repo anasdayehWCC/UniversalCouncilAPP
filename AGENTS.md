@@ -33,6 +33,7 @@ These rules govern AI-assisted changes. They balance safety, cost, and velocity.
 15. Preview-only UX (mock data, dummy recorder) must be gated by `DEV_PREVIEW_MODE` and disabled in prod builds.
 16. **Premium UI/Theming**: All UI components must support dynamic theming via CSS variables (Tailwind v4 `@theme` directive) for WCC/RBKC branding. Avoid generic styles; use glassmorphism, subtle gradients, and high-quality transitions (framer-motion) to ensure a "premium app" feel.
 17. **Config-first navigation**: When adding or modifying navigation, prefer module/tenant-aware rendering driven by the config API and module registry instead of hardcoded role switch statements.
+18. **Phase 18 mobile shell**: RN/Expo code lives under `mobile/`; changes there must not modify web files. Shared UI primitives belong in `frontend/components/ui/`; add demos under `/ui-demo` rather than ad-hoc pages.
 
 ## 6) Testing & Quality
 

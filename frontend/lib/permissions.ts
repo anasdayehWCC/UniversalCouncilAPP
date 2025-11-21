@@ -10,5 +10,8 @@ export const rolePermissions: Record<Role, Permission[]> = {
 export function hasPermission(required: Permission[] | undefined, role: Role): boolean {
   if (!required || required.length === 0) return true
   const perms = rolePermissions[role] ?? []
-  return required.every((p) => perms.includes(p) || perms.includes(p.split(':')[0] + ':*'))
+  return required.every((p) => {
+    const wildcard = `${p.split(':')[0]}:*` as Permission
+    return perms.includes(p) || perms.includes(wildcard)
+  })
 }

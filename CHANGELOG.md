@@ -3,6 +3,8 @@
 ## 2025-11-21
 
 - Phase 16A/16B: Expanded tenant config schema (version tag, nav metadata fields, retention defaults, planner/sharepoint passthrough, module feature flags), generated `common/config/tenant.schema.json`, aligned `config/pilot_children.yaml`, added TENANT_CONFIG_ID setting, module gating helper (`common/config/access.py`), guarded minutes routes by module enablement, and added config/module flag tests.
+- Phase 17A/17B: Added centralized theme tokens (`frontend/lib/theme/tokens.mjs`) applied by org theme setter; ensured CSS variables align. Introduced accessibility contrast test (`frontend/tests/a11y.tokens.test.mjs`), npm script `test:a11y`, and CI step to enforce AA contrast for core tokens.
+- Phase 18A/18B: Added RN-Web friendly shared primitives (`frontend/components/ui/pressable-card.tsx`, `frontend/components/ui/token-text.tsx`, alias `frontend/lib/ui/pressable.tsx`) plus a UI playground page and Playwright snapshot stub. Refactored capture mode toggle to use the new primitives. Created isolated `mobile/` Expo stub (README, package.json, App.tsx consuming tenant config with shared tokens/module adapter, AsyncStorage offline queue, metro config, smoke test).
 - Phase 15A/15B documentation: added `docs/architecture.md` (exec summary, capability map, architecture overview, phase 15–19 crosswalk, open questions) and refreshed `docs/universal_council_app_foundations.md` with evidence-based gap map, phase crosswalk, and landing-zone checklist; linked architecture doc from README; marked progress in PLANS.
 - Phase 5 refinement: Added domain-aware Azure Speech phrase list builder with bias weight (`common/services/transcription_services/lexicon.py`, new settings/env + `.env.example`), enabled dual-channel handling for stereo via `channels=[0,1]` while keeping diarization for mono, and surfaced channel labels in dialogue entries. Azure batch adapter indentation bug fixed and supports optional custom model id; adapters now accept context (channel/domain/phrases) via `TranscriptionServiceManager`. Added regression tests in `tests/test_azure_speech_helpers.py`; smoke pytest suite still green.
 - Evidence UX: Added time-ranged signed URL endpoint and evidence click logger (`backend/api/routes/transcriptions.py`, new schemas in `common/types.py`), regenerated OpenAPI client. Minute editor citations now jump playback using signed segment URLs with media fragments; evidence list buttons reuse the same handler and log clicks; citation links in Tiptap trigger playback while respecting PII logging rules. Frontend regenerated client and wired to new endpoints.
@@ -119,6 +121,11 @@ mkdir -p packages/core/{config,plugins,flags}/__tests__ packages/ui/__tests__ ap
 - Add frontend module declarations for Transcription/Minutes and helper to filter by tenant/domain (`frontend/lib/modules.ts`).
 - Navigation now renders from tenant config (modules filtered by service domain) with loading/error states; templates button only if minutes module enabled. Added `useTenantConfig` hook and updated pilot config with module list.
 - Added config validation tests and script (`tests/test_config_loader.py`, `tests/test_config_all.py`, `scripts/validate_configs.py`); module map expanded with admin/notes placeholders; GIthub Actions workflow `config-validate.yml` runs validation on push/PR.
+
+## 2025-11-21 (Phase 18A/18B progress)
+- Added shared UI demo route (`frontend/app/ui-demo/page.tsx`) and README for the UI kit with RN-Web guidance.
+- Expanded AGENTS with mobile shell rule; PLANS updated with Phase 18A/B progress markers.
+- Added RN/Expo scaffold under `mobile/` (package/app config, Metro, TS config) with config fetch + module list view; kept web files untouched.
 - Wire nav to module/tenant config: Header now renders navigation from enabled modules per tenant/service domain; includes loading/error states; defaults to `NEXT_PUBLIC_TENANT_ID` or westminster. Added `useTenantConfig` hook. Updated pilot config with module list.
 - Enforcement docs: AGENTS adds rule for config-first navigation; PLANS marks Phase 3a tasks as done. Added `tests/test_config_loader.py` for loader. 
 

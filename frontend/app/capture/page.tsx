@@ -7,6 +7,8 @@ import { toast } from 'sonner';
 import { queueRecording } from '@/lib/offline-queue';
 import { useDevPreview } from '@/lib/dev-preview-provider';
 import { Button } from '@/components/ui/button';
+import { PressableSurface } from '@/lib/ui/pressable';
+import { TokenText } from '@/components/ui/token-text';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
@@ -109,7 +111,7 @@ export default function CapturePage() {
         <Link href="/new" className="p-2 rounded-full hover:bg-muted/50 transition-colors">
           <ArrowLeft className="w-6 h-6 text-foreground" />
         </Link>
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full glass-panel-premium border-white/10">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full glass-panel-premium border-[color:var(--border)]">
           {isOffline ? (
             <>
               <WifiOff className="w-4 h-4 text-muted-foreground" />
@@ -166,8 +168,8 @@ export default function CapturePage() {
               className="flex flex-col items-center gap-8 w-full max-w-xs"
             >
               <div className="text-center space-y-2">
-                <h1 className="text-3xl font-bold tracking-tight">New Recording</h1>
-                <p className="text-muted-foreground">Tap to start capturing audio</p>
+                <TokenText as="h1" className="text-3xl font-bold tracking-tight">New Recording</TokenText>
+                <TokenText emphasis="muted">Tap to start capturing audio</TokenText>
               </div>
 
               <Button
@@ -179,29 +181,33 @@ export default function CapturePage() {
               </Button>
 
               {/* Processing Mode Toggle */}
-              <div className="flex p-1 bg-muted rounded-full w-full">
-                <button
-                  onClick={() => setProcessingMode('fast')}
+              <div className="flex gap-2 w-full">
+                <PressableSurface
+                  onPress={() => setProcessingMode('fast')}
                   className={cn(
-                    "flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all",
+                    "flex-1 py-3 px-4",
                     processingMode === 'fast'
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "bg-background border-[color:var(--ring)]"
+                      : "bg-muted"
                   )}
+                  aria-label="Fast processing mode"
                 >
-                  Fast
-                </button>
-                <button
-                  onClick={() => setProcessingMode('economy')}
+                  <TokenText className="text-sm font-medium">Fast</TokenText>
+                  <TokenText emphasis="muted" className="text-xs">Low latency</TokenText>
+                </PressableSurface>
+                <PressableSurface
+                  onPress={() => setProcessingMode('economy')}
                   className={cn(
-                    "flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all",
+                    "flex-1 py-3 px-4",
                     processingMode === 'economy'
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "bg-background border-[color:var(--ring)]"
+                      : "bg-muted"
                   )}
+                  aria-label="Economy processing mode"
                 >
-                  Economy
-                </button>
+                  <TokenText className="text-sm font-medium">Economy</TokenText>
+                  <TokenText emphasis="muted" className="text-xs">Batch, cost optimised</TokenText>
+                </PressableSurface>
               </div>
             </motion.div>
           )}

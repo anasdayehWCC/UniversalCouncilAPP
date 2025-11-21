@@ -466,7 +466,7 @@ h6 {
 }
 
 @utility glass-panel-premium {
-  @apply border border-white/10 shadow-xl backdrop-blur-xl;
+  @apply border border-[color:var(--border)] shadow-xl backdrop-blur-xl;
   background: linear-gradient(135deg,
       color-mix(in srgb, var(--card) 60%, transparent),
       color-mix(in srgb, var(--card) 40%, transparent));

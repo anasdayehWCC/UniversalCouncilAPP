@@ -1,0 +1,17 @@
+{
+  "name": "careminutes-mobile",
+  "version": "0.1.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start",
+    "lint": "echo 'lint not configured'",
+    "test": "echo 'tests stub'"
+  },
+  "dependencies": {
+    "expo": "~51.0.0",
+    "expo-router": "^3.4.0",
+    "react": "18.2.0",
+    "react-native": "0.74.1"
+  }
+}

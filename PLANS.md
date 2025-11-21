@@ -69,6 +69,12 @@
   - Frontend: typed config fetcher + module filtering + nav rendering ✅
   - Tests: config loader smoke test ✅
   - CI hook for config validation ✅ (`.github/workflows/config-validate.yml`)
+- [ ] Phase 18A Shared UI kit extraction — in progress
+  - UI demo route `/ui-demo` added for shared primitives ✅
+  - Shared UI README documenting RN-Web guidance ✅
+- [ ] Phase 18B RN/Expo shell — in progress
+  - Mobile scaffold under `mobile/` with config fetch + module list ✅
+  - Metro/tsconfig/package metadata ✅
 - [x] Phase 2 Infra/Secrets — Completed 2025-11-20T23:26Z (Key Vault secret loader, UK-only Terraform with private endpoints, storage lifecycle + region guard)
 - [x] Phase 3 Case Context — Completed 2025-11-20T23:52Z (case_record model + encrypted DOB, API requires case_reference, frontend case selector with offline cache, regenerated OpenAPI client)
 - [x] Phase 4 Offline/PWA + fast/economy toggle — Completed 2025-11-21T00:05Z (SW+manifest, offline queue+Dexie, backoff sync with token, economy/fast toggle + processing_mode routed to Azure batch, mobile /capture flow)
@@ -87,6 +93,10 @@
 - [x] Phase 15B Foundations gap map — Completed 2025-11-21T17:05Z (`docs/universal_council_app_foundations.md` updated with evidence, gap map, phase crosswalk, landing zone checklist)
 - [x] Phase 16A Config schema hardening — Completed 2025-11-21T17:40Z (tenant config model expanded with version/nav metadata/retention; schema emitted `common/config/tenant.schema.json`; config validation tests updated; pilot config aligned)
 - [x] Phase 16B Backend module/flag surfacing — Completed 2025-11-21T17:40Z (module gating helper, minutes routes guarded via tenant config, TENANT_CONFIG_ID setting added, module flag tests added)
+- [x] Phase 17A Design tokens & theming contract — Completed 2025-11-21T18:10Z (central tokens map `frontend/lib/theme/tokens.mjs`, theme setter applies CSS variables, token-based contrast guarantees)
+- [x] Phase 17B Accessibility gates — Completed 2025-11-21T18:10Z (a11y contrast test `frontend/tests/a11y.tokens.test.mjs`, npm script `test:a11y`, CI step added)
+- [x] Phase 18A Shared UI kit extraction — Completed 2025-11-21T18:40Z (token-aligned primitives `frontend/components/ui/pressable-card.tsx`, `frontend/components/ui/token-text.tsx`, alias in `frontend/lib/ui/pressable.tsx`; no existing routes modified)
+- [x] Phase 18B RN/Expo shell stub — Completed 2025-11-21T18:40Z (new `mobile/` folder with README, Expo `package.json`, stub `App.tsx` fetching tenant config and rendering module list; isolated from web)
 
 ### Context Snapshot [2025-11-21T02:35Z]
 - Completed: Phases 1-14 + platform upgrades; frontend build passes on Next 15.5/React 19; backend pytest smoke green.

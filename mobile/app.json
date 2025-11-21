@@ -1,0 +1,14 @@
+{
+  "expo": {
+    "name": "CareMinutes",
+    "slug": "careminutes",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "entryPoint": "./App.tsx",
+    "platforms": ["ios", "android"],
+    "extra": {
+      "backendHost": process.env.EXPO_PUBLIC_BACKEND_HOST || "http://localhost:8080",
+      "tenantId": process.env.EXPO_PUBLIC_TENANT_ID || "pilot_children"
+    }
+  }
+}

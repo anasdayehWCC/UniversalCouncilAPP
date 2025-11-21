@@ -42,10 +42,10 @@
 - Phase 13: IaC + pipelines (ACA/AKS, ACR, blue/green).
 - Phase 14: Pilot/rollout (children first, adults next; domain packs).
 - Platform upgrades (cross-phase enabler): Next.js 15.5/React 19 + Turbopack, FastAPI 0.120 + Pydantic 2.11, Ray 2.43 stability.
-- Phase 15A/15B (concurrent-safe): Architecture doc authorship vs foundations gap-mapping. 15A writes the new `docs/architecture.md` (per CHANGELOG spec) plus optional `minute_architecture_diagram.png` refresh; read-only everywhere else. 15B updates `docs/universal_council_app_foundations.md` with evidence/gaps and a crosswalk; read-only elsewhere. Separate files → safe to run in parallel.
+- Phase 15A/15B (concurrent-safe): Architecture doc authorship vs foundations gap-mapping. 15A refines `docs/architecture.md` using the newly integrated `docs/universal_council_architecture.md` as a primary input, plus optional `minute_architecture_diagram.png` refresh; read-only everywhere else. 15B updates `docs/universal_council_app_foundations.md` with evidence/gaps and a crosswalk; read-only elsewhere. Separate files → safe to run in parallel.
 - Phase 16: Config + module platformisation. 16A hardens tenant/service-domain schema + validators + CI (existing `common/config/*`, `config/*.yaml`, `scripts/validate_configs.py`). 16B surfaces module/flag contracts in backend routes/services (e.g., `backend/api/routes/config.py`, guards in `common/services/*`); no frontend edits. 16C plugs frontend shell/navigation into module registry + typed config (existing `frontend/lib/modules.ts`, `frontend/lib/config/*`, nav components), avoiding backend/config writes.
 - Phase 17: Design-system and accessibility enforcement. 17A introduces a token set and theming contract using current touchpoints (`frontend/app/globals.css`, `frontend/components/theme-provider.tsx`, `frontend/components/org-theme-setter.tsx`, shared primitives under `frontend/components/`). 17B adds accessibility lint/tests and CI gates (Pa11y/axe/Playwright additions, `.github/workflows/ci.yml`), treating UI code as read-only in that sub-phase to avoid conflicts with 17A.
-- Phase 18: Cross-platform shell & shared UI kit. 18A extracts shared primitives under `frontend/components/` (optionally new `frontend/components/ui/`) for RN-Web compatibility; web routes stay untouched. 18B stands up a new `mobile/` (or `apps/mobile/`) RN/Expo shell consuming the same module registry/config API; it only reads web code and writes inside the new mobile folder.
+- Phase 18: Cross-platform shell & shared UI kit. 18A extracts shared primitives under `frontend/components/` (optionally new `frontend/components/ui/`) for RN-Web compatibility; web routes stay untouched. 18B stands up the `apps/mobile/` RN/Expo shell consuming the same module registry/config API; it only reads web code and writes inside the `apps/mobile/` folder.
 - Phase 19: Module telemetry, governance, and admin console. 19A emits structured events/metrics per module/config change (backend instrumentation + worker). 19B delivers admin UI for config/versioning/audit (frontend admin routes; relies on 16A schema; avoids files touched in 18A/18B).
 
 ## Concrete Steps & Commands (per phase, repeatable)
@@ -75,6 +75,7 @@
 - [ ] Phase 18B RN/Expo shell — in progress
   - Mobile scaffold under `mobile/` with config fetch + module list ✅
   - Metro/tsconfig/package metadata ✅
+- [x] Phase 19A Module telemetry/governance — Completed 2025-11-21T19:30Z (module/config metrics + telemetry events, config/audit logging entries, infra dashboard updates)
 - [x] Phase 2 Infra/Secrets — Completed 2025-11-20T23:26Z (Key Vault secret loader, UK-only Terraform with private endpoints, storage lifecycle + region guard)
 - [x] Phase 3 Case Context — Completed 2025-11-20T23:52Z (case_record model + encrypted DOB, API requires case_reference, frontend case selector with offline cache, regenerated OpenAPI client)
 - [x] Phase 4 Offline/PWA + fast/economy toggle — Completed 2025-11-21T00:05Z (SW+manifest, offline queue+Dexie, backoff sync with token, economy/fast toggle + processing_mode routed to Azure batch, mobile /capture flow)
@@ -97,6 +98,7 @@
 - [x] Phase 17B Accessibility gates — Completed 2025-11-21T18:10Z (a11y contrast test `frontend/tests/a11y.tokens.test.mjs`, npm script `test:a11y`, CI step added)
 - [x] Phase 18A Shared UI kit extraction — Completed 2025-11-21T18:40Z (token-aligned primitives `frontend/components/ui/pressable-card.tsx`, `frontend/components/ui/token-text.tsx`, alias in `frontend/lib/ui/pressable.tsx`; no existing routes modified)
 - [x] Phase 18B RN/Expo shell stub — Completed 2025-11-21T18:40Z (new `mobile/` folder with README, Expo `package.json`, stub `App.tsx` fetching tenant config and rendering module list; isolated from web)
+- [x] Phase 19B Admin console — Completed 2025-11-21T22:22Z (admin routes `frontend/app/(admin)/admin/configs/**`, backend routes `backend/api/routes/admin.py`, role-based access checks, config listing/detail/history/audit endpoints, audit logging to `audit_event` table, telemetry events, tests in `tests/test_admin_routes.py`)
 
 ### Context Snapshot [2025-11-21T02:35Z]
 - Completed: Phases 1-14 + platform upgrades; frontend build passes on Next 15.5/React 19; backend pytest smoke green.

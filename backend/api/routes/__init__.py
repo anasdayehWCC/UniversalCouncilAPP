@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from .admin import admin_router
 from .chat import chat_router
 from .config import config_router
 from .health import health_router
@@ -16,5 +17,6 @@ router.include_router(users_router)
 router.include_router(minutes_router)
 router.include_router(templates_router)
 router.include_router(config_router)
+router.include_router(admin_router)
 
 router.include_router(chat_router)

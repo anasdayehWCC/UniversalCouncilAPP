@@ -407,12 +407,12 @@ Exit: Successful pilot sign-off; backlog of tweaks captured; Adults rollout sche
 
 #### Phase 15A — Architecture doc (new docs/architecture.md)
 
-- **Objective:** Produce the first full `docs/architecture.md` (target defined in CHANGELOG) covering exec summary, assumptions, capability map, plugin/nav/tenant model, accessibility, testing, delivery, and migration plan.
-- **Write scope:** new `docs/architecture.md` file plus optional refreshed `minute_architecture_diagram.png` and a short pointer in `README.md`. All code is **read-only**.
-- **Dependencies:** None; uses current repo state and universal foundations as inputs.
+- **Objective:** Produce the authoritative `docs/architecture.md` (target defined in CHANGELOG) covering exec summary, assumptions, capability map, plugin/nav/tenant model, accessibility, testing, delivery, and migration plan.
+- **Write scope:** `docs/architecture.md` file plus optional refreshed `minute_architecture_diagram.png` and a short pointer in `README.md`. All code is **read-only**.
+- **Dependencies:** None; uses current repo state, `docs/universal_council_app_foundations.md`, and the newly integrated `docs/universal_council_architecture.md` as inputs.
 - **Actions:**
   1. Capture current architecture from code (backend/worker paths, queues, storage, offline queue, module registry) and note deviations from `docs/universal_council_app_foundations.md`.
-  2. Draft sections per CHANGELOG spec; embed ASCII diagram or reference `minute_architecture_diagram.png`; list open questions and risks.
+  2. Draft sections per CHANGELOG spec, incorporating the "Universal Council" vision from `docs/universal_council_architecture.md`; embed ASCII diagram or reference `minute_architecture_diagram.png`; list open questions and risks.
   3. Add crosswalk to roadmap phases (15–19) and how they deliver the target architecture.
 - **Exit:** `docs/architecture.md` exists with all required sections, cross-links to universal foundations doc, and dated open-questions list.
 
@@ -502,10 +502,10 @@ Exit: Successful pilot sign-off; backlog of tweaks captured; Adults rollout sche
 #### Phase 18B — React Native/Expo shell (mobile)
 
 - **Objective:** Stand up a minimal RN/Expo shell consuming the same module registry + config API.
-- **Write scope:** new `mobile/` (or `apps/mobile/`) directory, RN/Expo app bootstrap, module registry adapter. Web/frontend files are **read-only** to avoid conflicts with 18A.
+- **Write scope:** `apps/mobile/` directory, RN/Expo app bootstrap, module registry adapter. Web/frontend files are **read-only** to avoid conflicts with 18A.
 - **Dependencies:** 16C registry contract stable; 18A shared kit available for reuse.
 - **Actions:**
-  1. Scaffold RN/Expo app with auth + config fetch + module list view; reuse shared tokens; stub screens for transcription/minute modules.
+  1. Scaffold RN/Expo app in `apps/mobile/` with auth + config fetch + module list view; reuse shared tokens; stub screens for transcription/minute modules.
   2. Add offline queue adapter mapping to mobile storage (e.g., MMKV/AsyncStorage) without touching web Dexie code.
   3. Add minimal detox/E2E smoke to ensure config loads and nav renders per module.
 - **Exit:** RN shell builds and renders module-driven nav; shares tokens/config; no changes to web app required.

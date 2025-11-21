@@ -30,10 +30,23 @@
 - Wire Prometheus/OTel exporters and dashboards.
 
 ## Observability & SLOs
-- Prometheus metrics exposed at backend `/metrics` and worker `${METRICS_PORT}` (default 9000) via `prometheus-fastapi-instrumentator` and `prometheus_client`.
-- Key metrics: `transcription_latency_seconds{service,mode}`, `minute_generation_latency_seconds`, `export_status_total{status,format}`, `offline_sync_total{stage}`, `llm_tokens_total{domain,model}`. Health endpoints: `/health/live`, `/health/ready`.
-- Targets: P95 transcription+minute for 60-min audio < 900s; export success > 99%; offline sync success > 99% within 2h.
-- Alerts (Log Analytics/Prometheus): queue backlog, 5xx, auth failures, storage/upload errors, export failure rate >1%, offline sync stalled.
+- Prometheus metrics exposed at backend `/metrics` and worker `${METRICS_PORT}` (default 9000) via `prometheus-fastapi-instrumentator` and `prometheus_client`; labels kept low-cardinality per Prometheus best-practice guidance. citeturn0search0
+- Key metrics: `transcription_latency_seconds{service,mode}`, `minute_generation_latency_seconds`, `export_status_total{status,format}`, `offline_sync_total{stage}`, `llm_tokens_total{domain,model}`, **new:** `module_access_total{tenant,service_domain,role,module,allowed}`, `feature_flag_check_total{tenant,flag,result}`, `config_served_total{tenant,version}`, `offline_sync_outcome_total{tenant,service_domain,role,stage}`.
+- Health endpoints: `/health/live`, `/health/ready`.
+- Targets: P95 transcription+minute for 60-min audio < 900s; export success > 99%; offline sync success > 99% within 2h; config serving error rate <0.1% per tenant; feature-flag disablements raise warning when >5% of checks fail in an hour.
+- Alerts (Log Analytics/Prometheus): queue backlog, 5xx, auth failures, storage/upload errors, export failure rate >1%, offline sync stalled, module access failures per tenant > 5/min.
+
+### Module Telemetry & Config Governance (Phase 19A)
+- **Dashboards:**
+  - Module adoption board showing `module_access_total` by tenant/service domain/role to understand usage and detect disabled modules.
+  - Feature flag sheet tracking `feature_flag_check_total` to spot accidental-disable regressions.
+  - Config serve board comparing `config_served_total` with release cadences; annotate when new versions deployed.
+  - Offline queue outcome breakdown via `offline_sync_outcome_total`.
+- **Audit trail:** Config serve/publish events are written to `audit_event` (resource_type=`config`, action `config_served`) so change reviews can trace who/when configs were distributed; extend the same pattern for future admin actions per the UK audit logging guidance. citeturn1search0
+- **Alerts:**
+  - Module access denied (allowed="no") spikes > 3/min/tenant for 5 minutes.
+  - Config serve failures (HTTP 5xx) > 1/min trigger incident.
+  - Offline sync outcomes `stage='recording_queued'` without matching `sync_completed` for >2h flagged as backlog.
 
 ## Scale & Cost Controls
 - Long audio auto-switches to batch STT when duration exceeds `LONG_AUDIO_BATCH_THRESHOLD_SECONDS` (default 3600s) if Azure Batch adapter configured.

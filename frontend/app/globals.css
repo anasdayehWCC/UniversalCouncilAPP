@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
 @plugin "@tailwindcss/typography";
 
@@ -177,11 +181,16 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    border-color: var(--border);
+    outline-color: color-mix(in srgb, var(--ring) 50%, transparent);
+    outline-width: 1px;
+    outline-style: solid;
+    outline-offset: 2px;
   }
 
   body {
-    @apply bg-background text-foreground;
+    background-color: var(--background);
+    color: var(--foreground);
     font-size: var(--text-fluid-body);
   }
 
@@ -466,7 +475,9 @@ h6 {
 }
 
 @utility glass-panel-premium {
-  @apply border border-[color:var(--border)] shadow-xl backdrop-blur-xl;
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  box-shadow: 0 20px 45px -20px rgba(15, 23, 42, 0.35);
+  backdrop-filter: blur(20px);
   background: linear-gradient(135deg,
       color-mix(in srgb, var(--card) 60%, transparent),
       color-mix(in srgb, var(--card) 40%, transparent));

@@ -14,6 +14,7 @@ from common.metrics import offline_sync_total
 from common.services.queue_services import get_queue_service
 from common.services.storage_services import get_storage_service
 from common.settings import get_settings
+from common.telemetry.events import TelemetryContext, build_context, record_module_access, record_offline_stage
 from common.types import (
     DialogueEntry,
     PaginatedTranscriptionsResponse,
@@ -47,6 +48,13 @@ transcription_queue_service = get_queue_service(
 logger = logging.getLogger(__name__)
 
 
+def _context_from_user(user: UserDep) -> TelemetryContext:
+    tenant_label = str(getattr(settings, "TENANT_CONFIG_ID", None) or user.organisation_id)
+    service_domain_label = str(user.service_domain_id) if user.service_domain_id else None
+    role_label = getattr(user.role, "name", None)
+    return build_context(tenant=tenant_label, service_domain=service_domain_label, role=role_label)
+
+
 @transcriptions_router.get("/transcriptions", response_model=PaginatedTranscriptionsResponse)
 async def list_transcriptions(
     session: SQLSessionDep,
@@ -55,6 +63,8 @@ async def list_transcriptions(
     page_size: int = Query(20, ge=1, le=100, description="Number of items per page"),
 ) -> PaginatedTranscriptionsResponse:
     """Get paginated metadata for transcriptions for the current user."""
+    context = _context_from_user(current_user)
+    record_module_access(context, "transcription", True)
     count_statement = select(func.count(col(Transcription.id))).where(
         Transcription.user_id == current_user.id,
         Transcription.organisation_id == current_user.organisation_id,
@@ -103,6 +113,8 @@ async def list_transcriptions(
 async def create_recording(
     request: RecordingCreateRequest, session: SQLSessionDep, user: UserDep
 ) -> RecordingCreateResponse:
+    context = _context_from_user(user)
+    record_module_access(context, "transcription", True)
     recording_id = uuid.uuid4()
     file_name = f"{recording_id}.{request.file_extension}"
     user_upload_s3_file_key = get_file_s3_key(user.email, file_name)
@@ -117,6 +129,7 @@ async def create_recording(
     await session.commit()
     if recording.captured_offline:
         offline_sync_total.labels(stage="recording_queued").inc()
+        record_offline_stage(context, "recording_queued")
     presigned_url = await storage_service.generate_presigned_url_put_object(user_upload_s3_file_key, 3600)
     await session.refresh(recording)
     return RecordingCreateResponse(id=recording.id, upload_url=presigned_url)
@@ -130,6 +143,8 @@ async def create_transcription(
     raw_request: Request,
 ) -> TranscriptionCreateResponse:
     """Start a transcription job."""
+    context = _context_from_user(current_user)
+    record_module_access(context, "transcription", True)
     recording = await session.get(Recording, request.recording_id)
     if (
         not recording
@@ -234,6 +249,7 @@ async def get_transcription(
     current_user: UserDep,
 ) -> TranscriptionGetResponse:
     """Get a specific transcription by ID."""
+    record_module_access(_context_from_user(current_user), "transcription", True)
     transcription = await session.get(Transcription, transcription_id)
     if (
         not transcription
@@ -260,6 +276,7 @@ async def get_transcription(
 async def get_recordings_for_transcription(
     transcription_id: uuid.UUID, session: SQLSessionDep, user: UserDep
 ) -> list[SingleRecording]:
+    record_module_access(_context_from_user(user), "transcription", True)
     transcription = await session.get(Transcription, transcription_id)
     if (
         not transcription
@@ -296,6 +313,7 @@ async def get_recordings_for_transcription(
 async def get_signed_recording(
     recording_id: uuid.UUID, session: SQLSessionDep, user: UserDep
 ) -> SingleRecording:
+    record_module_access(_context_from_user(user), "transcription", True)
     recording = await session.get(Recording, recording_id)
     if (
         not recording

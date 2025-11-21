@@ -126,6 +126,11 @@ mkdir -p packages/core/{config,plugins,flags}/__tests__ packages/ui/__tests__ ap
 - Added shared UI demo route (`frontend/app/ui-demo/page.tsx`) and README for the UI kit with RN-Web guidance.
 - Expanded AGENTS with mobile shell rule; PLANS updated with Phase 18A/B progress markers.
 - Added RN/Expo scaffold under `mobile/` (package/app config, Metro, TS config) with config fetch + module list view; kept web files untouched.
+
+## 2025-11-21 (Phase 19A telemetry & governance)
+- Introduced telemetry helpers + Prometheus counters (`module_access_total`, `feature_flag_check_total`, `config_served_total`, `offline_sync_outcome_total`) with structured logging in `common/telemetry/events.py`; backend routes now record module access, flag checks, config serve events, and tenant-tagged offline outcomes.
+- Config API logs Prom metrics and writes `audit_event` entries per serve; minutes/transcription routes emit module events; offline sync completion in worker now tagged by tenant/domain/role.
+- Added tests for telemetry counters, updated module flag helper to accept telemetry context, and expanded infra docs with dashboard/alert guidance. PLANS marked Phase 19A complete.
 - Wire nav to module/tenant config: Header now renders navigation from enabled modules per tenant/service domain; includes loading/error states; defaults to `NEXT_PUBLIC_TENANT_ID` or westminster. Added `useTenantConfig` hook. Updated pilot config with module list.
 - Enforcement docs: AGENTS adds rule for config-first navigation; PLANS marks Phase 3a tasks as done. Added `tests/test_config_loader.py` for loader. 
 

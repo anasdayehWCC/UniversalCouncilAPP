@@ -1,7 +1,9 @@
-organisation: "Westminster"
-service_domain: "Children"
+id: "pilot_children"
+name: "Westminster Children Pilot"
 version: "1.0.0"
 defaultLocale: "en-GB"
+organisation: "Westminster"
+service_domain: "Children"
 templates:
   - home_visit
   - strategy_discussion

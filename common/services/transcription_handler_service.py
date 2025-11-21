@@ -16,6 +16,7 @@ from common.services.transcription_services.transcription_manager import Transcr
 from common.settings import get_settings
 from common.templates.citations import combine_consecutive_citations
 from common.types import DialogueEntry, TranscriptionJobMessageData
+from common.telemetry.events import build_context, record_offline_stage
 
 settings = get_settings()
 transcription_manager = TranscriptionServiceManager()
@@ -176,6 +177,12 @@ class TranscriptionHandlerService:
                 )
                 if transcription.recordings and transcription.recordings[0].captured_offline:
                     offline_sync_total.labels(stage="sync_completed").inc()
+                    context = build_context(
+                        tenant=str(transcription.organisation_id),
+                        service_domain=str(transcription.service_domain_id) if transcription.service_domain_id else None,
+                        role="system",
+                    )
+                    record_offline_stage(context, "sync_completed")
 
         except Exception as e:
             msg = f"Transcription failed: {e!s}"

@@ -534,6 +534,173 @@ Exit: Successful pilot sign-off; backlog of tweaks captured; Adults rollout sche
   3. Add E2E tests ensuring unauthorized roles cannot access admin routes; ensure concurrency safety by limiting file writes to config storage only.
 - **Exit:** Admin UI allows controlled config changes with audit; unauthorized access blocked; E2E passes.
 
+### Phase 20 — Universal Multilingual Support
+
+#### Phase 20A — Backend translation services & config
+- **Objective:** Enable multi-language support via config and backend services without touching frontend UI.
+- **Write scope:** `common/config/models.py`, `common/services/transcription_services/translator.py`, `worker/translation_worker.py`, `backend/api/routes/transcriptions.py`. Frontend is **read-only**.
+- **Dependencies:** Phase 16A schema.
+- **Actions:**
+  1. Update `TenantConfig` schema to include `languages` (default, allowed list) and `translation_service` config.
+  2. Implement `AzureTranslatorService` adapter in `common/services/` to handle text translation.
+  3. Add `translation_worker.py` to process transcriptions asynchronously; store results in `Transcription` model (add `translations` JSONB column via migration).
+  4. Add API endpoints `POST /transcriptions/{id}/translate` and `GET /transcriptions/{id}/translations`.
+- **Exit:** Backend can translate transcripts on demand; config controls allowed languages; API exposes results.
+
+#### Phase 20B — Frontend translation UI
+- **Objective:** Expose translation capabilities to users.
+- **Write scope:** `frontend/app/transcriptions/`, `frontend/components/transcription/`. Backend is **read-only**.
+- **Dependencies:** Phase 20A API available.
+- **Actions:**
+  1. Add language selector to Transcription view header.
+  2. Implement side-by-side view (Original vs Translated) or toggle.
+  3. Update `useTranscription` hook to fetch available translations.
+- **Exit:** Users can view transcripts in configured languages; UI handles loading/error states for translation.
+
+### Phase 21 — Task Management Module
+
+#### Phase 21A — Backend task extraction & Planner integration
+- **Objective:** Structured task extraction and management with Planner sync.
+- **Write scope:** `common/database/postgres_models.py`, `backend/api/routes/tasks.py`, `worker/task_extractor.py`, `common/services/msgraph_client.py`. Frontend is **read-only**.
+- **Dependencies:** Phase 16B module flags.
+- **Actions:**
+  1. Add `tasks` JSONB column to `Minute` model (or new `Task` table if complex queries needed) via migration.
+  2. Implement LLM task extraction step in `worker/` to parse actions into structured data (owner, due date, description).
+  3. Enhance `MSGraphClient` to support creating Planner tasks with rich metadata and returning IDs.
+  4. Add API `GET /minutes/{id}/tasks` and `PATCH /minutes/{id}/tasks` to update task status/details.
+- **Exit:** Tasks are extracted as structured data; API supports CRUD; Planner integration handles rich tasks.
+
+#### Phase 21B — Frontend task UI & module
+- **Objective:** Dedicated task management UI and Planner export interactions.
+- **Write scope:** `frontend/lib/modules.ts`, `frontend/app/tasks/`, `frontend/components/minutes/`. Backend is **read-only**.
+- **Dependencies:** Phase 21A API.
+- **Actions:**
+  1. Register "Tasks" module in `frontend/lib/modules.ts`.
+  2. Build "Tasks" tab in Minute view to list/edit extracted tasks.
+  3. Implement "Push to Planner" button that sends structured tasks and updates UI with Planner links.
+  4. (Optional) Global "My Tasks" page if `Task` table was chosen in 21A.
+- **Exit:** Users can review/edit tasks before export; Planner export is granular; Tasks module appears in nav if enabled.
+
+### Phase 22 — Cross-Platform Mobile Maturity
+
+#### Phase 22A — Shared offline state logic
+- **Objective:** Abstract offline queue logic to be usable by both Web (Dexie) and Mobile (AsyncStorage/MMKV).
+- **Write scope:** Refactor `frontend/lib/offline-queue.ts` into a shared adapter pattern; move core types to `common/types.ts` (if shared package exists) or ensure portability. UI components **read-only**.
+- **Dependencies:** Phase 18A shared UI.
+- **Actions:**
+  1. Define `OfflineStorage` interface.
+  2. Implement `WebOfflineStorage` (wrapping existing Dexie logic) and `MobileOfflineStorage` (stub for RN).
+  3. Refactor `useOfflineQueue` hook to use the injected storage adapter.
+- **Exit:** Offline logic is decoupled from browser-specific APIs; web app functions unchanged.
+
+#### Phase 22B — Mobile UI implementation
+- **Objective:** Build functional Capture and Transcription screens in RN shell.
+- **Write scope:** `apps/mobile/`. Web app **read-only**.
+- **Dependencies:** Phase 22A shared logic, Phase 18B shell.
+- **Actions:**
+  1. Implement `CaptureScreen` using `expo-av` and shared UI tokens.
+  2. Implement `TranscriptionListScreen` fetching from API.
+  3. Wire up `MobileOfflineStorage` to handle offline recordings.
+  4. Add background upload task (using `expo-background-fetch` or similar).
+- **Exit:** Mobile app can record, list transcriptions, and sync offline data; matches PWA feature set.
+
+### Phase 23 — Resilience & Error Handling
+
+#### Phase 23A — Frontend Resilience
+- **Objective:** Improve user experience during partial outages or network failures.
+- **Write scope:** `frontend/app/`, `frontend/components/ui/`, `frontend/lib/api/`. Backend is **read-only**.
+- **Dependencies:** Phase 16C module flags (to degrade gracefully).
+- **Actions:**
+  1. Implement global `ErrorBoundary` components wrapping main routes.
+  2. Add manual "Retry" buttons to `useQuery` error states (currently just shows text).
+  3. Add "Offline Mode" banner when `navigator.onLine` is false or API is unreachable.
+  4. Implement "Degraded Mode" UI where disabled/failing modules are hidden or grayed out instead of crashing the page.
+- **Exit:** UI handles 404/500 errors gracefully; users can retry actions; offline state is clear.
+
+#### Phase 23B — Backend Circuit Breakers
+- **Objective:** Prevent cascading failures and provide health status for dependencies.
+- **Write scope:** `backend/api/dependencies/`, `common/services/`. Frontend is **read-only**.
+- **Dependencies:** Phase 19A telemetry.
+- **Actions:**
+  1. Implement circuit breaker pattern for external calls (Azure Speech, LLM, Graph).
+  2. Add detailed health checks (`/health/detailed`) reporting status of downstream services.
+  3. Return "Degraded" status in config/health endpoints if non-critical services are down.
+- **Exit:** Backend fails fast on external outages; health endpoints reflect dependency status.
+
+### Phase 24 — Advanced Analytics & Insights
+
+#### Phase 24A — Backend Insights Aggregation
+- **Objective:** Calculate and serve usage insights (time saved, top topics).
+- **Write scope:** `worker/analytics.py`, `backend/api/routes/insights.py`, `common/database/postgres_models.py`. Frontend is **read-only**.
+- **Dependencies:** Phase 19A telemetry.
+- **Actions:**
+  1. Create aggregation jobs (SQL or Pandas in worker) to calculate "Time Saved" (audio duration vs manual typing est).
+  2. Implement "Topic Trends" extraction from minute summaries.
+  3. Add `/api/insights` endpoints to serve aggregated data per tenant/domain.
+- **Exit:** API serves calculated insights; aggregation jobs run on schedule.
+
+#### Phase 24B — Frontend Insights Module
+- **Objective:** Visualize insights for users/admins.
+- **Write scope:** `frontend/app/insights/`, `frontend/components/charts/`. Backend is **read-only`.
+```
+  1. Register "Insights" module.
+  2. Implement "Dashboard" view with charts (using Recharts or Visx) showing usage trends and time saved.
+  3. Add "My Impact" widget to Home page.
+- **Exit:** Users can see value metrics; Admins can see adoption trends.
+
+### Phase 25 — Design System 2.0 & Premium Shell
+
+#### Phase 25A — Core App Shell & Motion
+- **Objective:** Create a responsive, app-like shell with seamless transitions (inspired by Magic Notes).
+- **Write scope:** `frontend/components/layout/`, `frontend/app/template.tsx`, `next.config.js`. Backend is **read-only**.
+- **Dependencies:** Phase 14 (Next.js 15).
+- **Actions:**
+  1. Enable `experimental: { viewTransition: true }` in `next.config.js`.
+  2. Create `AppShell` component:
+     - **Desktop:** Collapsible Sidebar with "Glass" aesthetic.
+     - **Mobile:** Bottom Navigation Bar with floating "Record" action button.
+  3. Implement `template.tsx` using Framer Motion for smooth "push/pop" page transitions.
+  4. Refactor `Header` to be a transparent, blur-backed overlay.
+- **Exit:** App feels like a native mobile app; navigation is responsive; page transitions are smooth.
+
+#### Phase 25B — Premium UI Kit (Magic UI)
+- **Objective:** Elevate the visual design to match "Apple/Google" premium standards.
+- **Write scope:** `frontend/app/globals.css`, `frontend/components/ui/`. Backend is **read-only**.
+- **Dependencies:** Phase 25A.
+- **Actions:**
+  1. Upgrade `globals.css` with "Magic UI" tokens:
+     - **Cards:** Clean white/dark backgrounds, soft diffuse shadows (`box-shadow: 0 4px 24px rgba(0,0,0,0.06)`).
+     - **Typography:** Inter (Body) + Outfit (Headings), optimized for readability.
+  2. Create `RecordingCard` component: prominent status indicator, waveform visualization, and "Save/Pause" controls.
+  3. Create `SplitView` component for Desktop: Transcript on left, "Edit with AI" sidebar on right.
+  4. Style `Sonner` toasts to look like native OS notifications.
+- **Exit:** UI matches the "Magic Notes" aesthetic; interactions are fluid.
+
+### Phase 26 — Adaptive UX Engine
+
+#### Phase 26A — Context Engine & Tabs
+- **Objective:** Instantly adapt the UI based on user role and content type.
+- **Write scope:** `frontend/providers/UserPersonaProvider.tsx`, `frontend/components/layout/`. Backend is **read-only**.
+- **Dependencies:** Phase 25A.
+- **Actions:**
+  1. Create `UserPersonaProvider` to manage `currentPersona` (Social Worker, Manager).
+  2. Implement "Contextual Tabs" for Minute view (as seen in Magic Notes):
+     - **Tabs:** "General", "Care Assessment", "Supervision", "Care Review".
+  3. Implement "One-Tap Mode Switch": Toggle between "In-Person" and "Online" recording modes.
+- **Exit:** App adapts navigation and layout based on logged-in user role and task.
+
+#### Phase 26B — Role-Specific Dashboards
+- **Objective:** Provide tailored home screens for different user needs.
+- **Write scope:** `frontend/app/page.tsx`, `frontend/components/dashboards/`. Backend is **read-only**.
+- **Dependencies:** Phase 26A.
+- **Actions:**
+  1. Create `DashboardSocialWorker`:
+     - **Focus:** "Recent Meetings" (Card list), "Quick Record" (Floating button).
+  2. Create `DashboardManager`:
+     - **Focus:** "Team Activity" (Charts), "Flagged Reviews".
+  3. Update `app/page.tsx` to render the correct dashboard component.
+- **Exit:** Social workers see tools; Managers see insights; seamless switching.
+
 ## Cross-domain Reuse Strategy (future-proofing)
 
 ### Framework Upgrade Log (per AGENTS rule 32)

@@ -47,6 +47,27 @@
 - Phase 17: Design-system and accessibility enforcement. 17A introduces a token set and theming contract using current touchpoints (`frontend/app/globals.css`, `frontend/components/theme-provider.tsx`, `frontend/components/org-theme-setter.tsx`, shared primitives under `frontend/components/`). 17B adds accessibility lint/tests and CI gates (Pa11y/axe/Playwright additions, `.github/workflows/ci.yml`), treating UI code as read-only in that sub-phase to avoid conflicts with 17A.
 - Phase 18: Cross-platform shell & shared UI kit. 18A extracts shared primitives under `frontend/components/` (optionally new `frontend/components/ui/`) for RN-Web compatibility; web routes stay untouched. 18B stands up the `apps/mobile/` RN/Expo shell consuming the same module registry/config API; it only reads web code and writes inside the `apps/mobile/` folder.
 - Phase 19: Module telemetry, governance, and admin console. 19A emits structured events/metrics per module/config change (backend instrumentation + worker). 19B delivers admin UI for config/versioning/audit (frontend admin routes; relies on 16A schema; avoids files touched in 18A/18B).
+- Phase 20: Universal Multilingual Support. 20A (Backend/Worker) adds language config schema, Azure Translator integration, and translation worker jobs; read-only frontend. 20B (Frontend) adds language selector, side-by-side transcript view, and EAL phrase list UI; read-only backend.
+- Phase 21: Task Management Module. 21A (Backend) adds structured task extraction (LLM), Minute.tasks JSONB field, and MS Graph Planner write-back; read-only frontend. 21B (Frontend) adds Task List UI, "Push to Planner" interactions, and global task view; read-only backend.
+- Phase 22: Cross-Platform Mobile Maturity. 22A (Core/State) abstracts offline queue logic from Dexie to shared adapter (RN-compatible); read-only UI. 22B (Mobile UI) implements full Capture/Transcription screens in `apps/mobile` using shared UI kit; read-only web app.
+- Phase 23: Resilience & Error Handling. 23A (Frontend) implements global error boundaries, manual retry UI for failed queries, and "Offline/Degraded" mode indicators; read-only backend. 23B (Backend) adds health-check dependencies for critical services (STT, LLM) and circuit breakers; read-only frontend.
+- Phase 24: Advanced Analytics & Insights. 24A (Backend) implements aggregation jobs for "Time Saved" and "Topic Trends" (SQL/Pandas); adds `/api/insights` endpoints; read-only frontend. 24B (Frontend) adds "Insights" module with charts/graphs using Recharts/Visx; read-only backend.
+- Phase 25: Design System 2.0 & Premium Shell. 25A (Core/Shell) implements responsive `AppShell` (Sidebar/BottomNav) and View Transitions; read-only backend. 25B (Premium UI Kit) implements "Magic UI" tokens, `RecordingCard`, `SplitView`, and native-like `Sonner` toasts; read-only backend.
+- Phase 26: Adaptive UX Engine. 26A (Context Engine) implements `UserPersonaProvider`, "Contextual Tabs" (Assessment/Supervision), and "One-Tap Mode Switch"; read-only backend. 26B (Role-Specific Views) creates distinct Dashboards for Social Workers (Quick Capture) vs Managers (Team Stats); read-only backend.
+- Phase 27: Recording Studio 2.0 (Magic Notes-inspired). 27A (Waveform) integrates real-time waveform visualization, live status indicators, and floating recording controls with glassmorphism; read-only backend. 27B (Modes) adds In-Person/Online mode selector, "Upload Audio" flow, and mobile Quick Record FAB; read-only backend.
+- Phase 28: AI Writing Assistant. 28A (Sidebar) creates floating AI editor with style suggestions, rewrite options, and free-form prompts using GPT-4o-mini; frontend/backend. 28B (Source Check) adds beta "Source Check" feature to verify claims against transcript segments; worker + frontend.
+- Phase 29: Content Organization. 29A (Contextual Tabs) implements dynamic tab system (Summary, Recording, domain-specific sections like Care Assessment) driven by `ServiceDomainTemplate`; read-only backend. 29B (Tags) adds tagging system with autocomplete, filter UI, and database schema (`tags` JSONB column); frontend/backend.
+- Phase 30: Config System & Module Registry (Universal App Foundation). 30A (Schema) extends `tenant.schema.json` with modules/navigation/featureFlags, adds versioning, and CI validation; backend-only. 30B (Module Manifests) creates `ModuleManifest` type with routes/permissions/dependencies, exposes `/api/modules`; backend-only. 30C (Config Nav) replaces hardcoded navigation with config-driven rendering filtered by role/domain/modules; frontend-only.
+- Phase 31: Design Tokens & Theme Engine. 31A (Tokens) defines core token set (`tokens.json`) with accessibility guarantees (WCAG 2.2 AA contrast validation), generates CSS variables; frontend-only. 31B (Multi-Tenant) adds tenant theme overrides (logo, accent color) via `/api/theme?tenant=wcc` with contrast enforcement; frontend/backend.
+- Phase 32: Advanced Offline & Sync. 32A (Unified Engine) abstracts offline queue to support multiple operation types (recordings, notes, tasks) with conflict resolution UI; frontend-only. 32B (Background Sync) implements service worker `sync` event handler and push notifications for sync completion; frontend/backend.
+- Phase 33: Cross-Platform UI Kit (RN Web Prep). 33A (Shared Primitives) extracts zero-dependency components (`Button`, `Card`, `Badge`) to `frontend/components/primitives/` with RN Web aliases; frontend-only. 33B (Unified Icons) replaces `lucide-react` with cross-platform icon solution using registry pattern; frontend-only.
+- Phase 34: Mobile Shell (React Native/Expo). 34A (Expo Shell) initializes RN app consuming `/api/modules` for navigation, implements auth flow (MSAL for RN); new `apps/mobile/` folder. 34B (Capture Screens) creates `CaptureScreen` using `expo-av`, `TranscriptionListScreen`, and `MobileOfflineStorage` (SQLite) with background upload; `apps/mobile/` only.
+- Phase 35: Admin Console. 35A (Config Management) creates JSON Schema-driven config editor with diff view, version history, and rollback; frontend/backend. 35B (Module Dashboard) implements module/feature flag enablement matrix with real-time navigation preview; frontend-only.
+- Phase 36: Telemetry & Adoption Dashboards. 36A (Structured Events) emits telemetry per module/action (`TelemetryEvent` schema) stored in TimeSeries DB; backend/worker-only. 36B (Adoption Dashboard) visualizes usage trends (recordings/day, top modules, offline queue health) for admins; frontend-only.
+- Phase 37: Collaboration & Real-Time. 37A (Shared Editing) integrates `yjs` CRDT for conflict-free minute editing with WebSocket sync and presence indicators; frontend/backend. 37B (Comments) adds threaded comments on minute sections with email/push notifications; frontend/backend.
+- Phase 38: Advanced Search. 38A (Full-Text) indexes transcripts/minutes in Azure Cognitive Search with global search bar (⌘K) and highlighted results; frontend/backend. 38B (Semantic) generates embeddings for `Minute.summary` using `text-embedding-3-small`, stores in vector DB (pgvector), adds `/api/search/semantic`; backend/worker.
+- Phase 39: Compliance Tools. 39A (Audit Log Viewer) displays `AuditEvent` timeline with filters (user, resource, date) and CSV/JSON export; frontend-only. 39B (Retention Automation) implements cron job for auto-deletion per retention rules with grace period and admin summary emails; backend/worker.
+- Phase 40: Performance Optimization. 40A (Code Splitting) analyzes bundle with `@next/bundle-analyzer`, lazy-loads heavy modules, achieves <200KB initial load; frontend-only. 40B (Asset Optimization) converts images to WebP/AVIF, enables `next/image` optimization with blur placeholders; frontend-only.
 
 ## Concrete Steps & Commands (per phase, repeatable)
 
@@ -99,6 +120,20 @@
 - [x] Phase 18A Shared UI kit extraction — Completed 2025-11-21T18:40Z (token-aligned primitives `frontend/components/ui/pressable-card.tsx`, `frontend/components/ui/token-text.tsx`, alias in `frontend/lib/ui/pressable.tsx`; no existing routes modified)
 - [x] Phase 18B RN/Expo shell stub — Completed 2025-11-21T18:40Z (new `mobile/` folder with README, Expo `package.json`, stub `App.tsx` fetching tenant config and rendering module list; isolated from web)
 - [x] Phase 19B Admin console — Completed 2025-11-21T22:22Z (admin routes `frontend/app/(admin)/admin/configs/**`, backend routes `backend/api/routes/admin.py`, role-based access checks, config listing/detail/history/audit endpoints, audit logging to `audit_event` table, telemetry events, tests in `tests/test_admin_routes.py`)
+- [ ] Phase 20A Multilingual Backend — pending
+- [ ] Phase 20B Multilingual Frontend — pending
+- [ ] Phase 21A Task Management Backend — pending
+- [ ] Phase 21B Task Management Frontend — pending
+- [ ] Phase 22A Mobile Core/State — pending
+- [ ] Phase 22B Mobile UI Implementation — pending
+- [ ] Phase 23A Frontend Resilience — pending
+- [ ] Phase 23B Backend Circuit Breakers — pending
+- [ ] Phase 24A Insights Backend — pending
+- [ ] Phase 24B Insights Frontend — pending
+- [ ] Phase 25A Premium App Shell — pending
+- [ ] Phase 25B Premium UI Kit — pending
+- [ ] Phase 26A Adaptive UX Engine — pending
+- [ ] Phase 26B Role-Specific Dashboards — pending
 
 ### Context Snapshot [2025-11-21T02:35Z]
 - Completed: Phases 1-14 + platform upgrades; frontend build passes on Next 15.5/React 19; backend pytest smoke green.

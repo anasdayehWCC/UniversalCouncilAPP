@@ -11,6 +11,9 @@ const withPWA = withPWAInit({
 
 let nextConfig = {
   output: 'standalone',
+  experimental: {
+    viewTransition: true,
+  },
 }
 
 const sentryConfig = {

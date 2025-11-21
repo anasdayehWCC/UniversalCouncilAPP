@@ -1,12 +1,10 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
-import { Toaster } from 'sonner'
+import { Toaster } from '@/components/ui/sonner'
 import { OfflineIndicator } from '@/components/offline-indicator'
-import { Footer } from '@/components/layout/footer'
-import { Header } from '@/components/layout/header'
 import { ProviderShell } from '@/components/provider-shell'
 import { AuthProvider } from '@/providers/AuthProvider'
-import { ServiceWorkerRegistration } from '@/components/service-worker-registration'
+import { AppShell } from '@/components/layout/app-shell'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -35,28 +33,21 @@ export const viewport: Viewport = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="en" className={`${inter.className} theme-wcc`}>
-      <body>
-        <AuthProvider>
-          <ProviderShell>
-            <div className="flex min-h-screen flex-col justify-between bg-page">
-              <div>
-                <Header userTemplatesEnabled={true} />
-                <main className="px-4 pb-8 sm:px-8">
-                  {children}
-                </main>
-              </div>
-              <Footer />
-            </div>
-            <ServiceWorkerRegistration />
+      <body className="min-h-screen bg-background font-sans antialiased">
+        <ProviderShell>
+          <AuthProvider>
+            <AppShell>
+              {children}
+            </AppShell>
             <OfflineIndicator />
             <Toaster />
-          </ProviderShell>
-        </AuthProvider>
+          </AuthProvider>
+        </ProviderShell>
       </body>
     </html>
   )

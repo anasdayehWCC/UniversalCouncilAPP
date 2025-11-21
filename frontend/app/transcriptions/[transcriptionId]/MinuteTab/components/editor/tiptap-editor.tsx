@@ -35,12 +35,14 @@ function SimpleEditor({
   isEditing,
   currentTranscription,
   hideCitations,
+  onCitationJump,
 }: {
   initialContent: string
   onContentChange: (newContent: string) => void
   isEditing: boolean
   currentTranscription: Transcription
   hideCitations: boolean
+  onCitationJump?: (citationIndex: number) => void
 }) {
   const {
     citationPopover,
@@ -102,6 +104,9 @@ function SimpleEditor({
                       citationIndex: index,
                     })
                     handleCitationClick(index, rect)
+                    if (onCitationJump) {
+                      onCitationJump(index)
+                    }
                     return true
                   }
                 }

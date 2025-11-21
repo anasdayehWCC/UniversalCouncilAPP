@@ -19,7 +19,7 @@ export const TranscriptionListItem = ({
   const [renameOpen, setRenameOpen] = useState(false)
   return (
     <>
-      <Card className="group shadow-md hover:shadow-xl hover:scale-[1.01] hover:border-accent/50 transition-all duration-300 border border-border/50 rounded-xl mb-4">
+      <Card className="group glass-panel-premium hover:scale-[1.01] hover:border-accent/50 transition-all duration-300 rounded-xl mb-4 border-0">
         <Link
           className="block p-6"
           href={`/transcriptions/${transcription.id}`}

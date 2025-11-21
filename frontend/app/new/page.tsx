@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { ChevronLeft, Mic, MonitorPlay, Upload } from 'lucide-react'
+import { ChevronLeft, Mic, MonitorPlay, Upload, type LucideIcon } from 'lucide-react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 
@@ -28,7 +28,7 @@ const OptionCard = ({
   helper
 }: {
   href: string
-  icon: any
+  icon: LucideIcon
   title: string
   description: string
   color?: 'primary' | 'secondary' | 'accent' | 'accent-alt'
@@ -52,7 +52,7 @@ const OptionCard = ({
       <Link
         href={href}
         aria-label={`${title} — ${description}`}
-        className="group flex items-center gap-4 rounded-2xl border border-border/50 p-6 shadow-md hover:shadow-xl hover:scale-[1.02] hover:border-accent/50 transition-all duration-300 bg-card focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        className="group flex items-center gap-4 rounded-2xl p-6 glass-panel-premium hover:scale-[1.02] hover:border-accent/50 transition-all duration-300 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         <div className={`rounded-xl p-3 transition-colors ${colorClasses[color]}`}>
           <Icon size={28} className="shrink-0" />
@@ -94,50 +94,52 @@ export default function NewTranscriptPage() {
       >
         <h1 className="text-4xl font-bold mb-3 text-foreground">Start New Recording</h1>
         <p className="text-lg text-muted-foreground">
-          Choose how you'd like to capture your meeting or session
+          Choose how you&apos;d like to capture your meeting or session
         </p>
       </motion.div>
 
-      <div className="flex flex-col gap-4">
-        <OptionCard
-          href="/new/upload"
-          icon={Upload}
-          title="Upload File"
-          description="Upload a recording from your computer"
-          color="primary"
-          helper="Best when you already have local audio"
-          index={0}
-        />
+      <div className="@container">
+        <div className="grid grid-cols-1 @md:grid-cols-2 @lg:grid-cols-4 gap-4">
+          <OptionCard
+            href="/new/upload"
+            icon={Upload}
+            title="Upload File"
+            description="Upload a recording from your computer"
+            color="primary"
+            helper="Best when you already have local audio"
+            index={0}
+          />
 
-        <OptionCard
-          href="/new/record-virtual"
-          icon={MonitorPlay}
-          title="Record Virtual Meeting"
-          description="Record a virtual meeting in another tab"
-          color="accent"
-          helper="Capture tabs/meetings running now"
-          index={1}
-        />
+          <OptionCard
+            href="/new/record-virtual"
+            icon={MonitorPlay}
+            title="Record Virtual Meeting"
+            description="Record a virtual meeting in another tab"
+            color="accent"
+            helper="Capture tabs/meetings running now"
+            index={1}
+          />
 
-        <OptionCard
-          href="/new/record-audio"
-          icon={Mic}
-          title="Record Audio"
-          description="Record audio using your microphone"
-          color="secondary"
-          helper="For in-person quick notes"
-          index={2}
-        />
+          <OptionCard
+            href="/new/record-audio"
+            icon={Mic}
+            title="Record Audio"
+            description="Record audio using your microphone"
+            color="secondary"
+            helper="For in-person quick notes"
+            index={2}
+          />
 
-        <OptionCard
-          href="/capture"
-          icon={Mic}
-          title="Offline Capture (Mobile)"
-          description="Use in low-signal areas and auto-sync later"
-          color="accent-alt"
-          helper="Queues safely; syncs when online"
-          index={3}
-        />
+          <OptionCard
+            href="/capture"
+            icon={Mic}
+            title="Offline Capture (Mobile)"
+            description="Use in low-signal areas and auto-sync later"
+            color="accent-alt"
+            helper="Queues safely; syncs when online"
+            index={3}
+          />
+        </div>
       </div>
     </div>
   )

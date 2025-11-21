@@ -15,3 +15,12 @@ planner:
 roles:
   - social_worker
   - manager
+modules:
+  - id: transcription
+    enabled: true
+    departments:
+      - "Children"
+  - id: minutes
+    enabled: true
+    departments:
+      - "Children"

@@ -401,6 +401,139 @@ Actions
 
 Exit: Successful pilot sign-off; backlog of tweaks captured; Adults rollout scheduled.
 
+### Phase 15 — Architecture Documentation & Foundations Crosswalk (split for concurrency)
+
+**Concurrent-safe grouping:** 15A and 15B run in parallel; they write to different docs.
+
+#### Phase 15A — Architecture doc (new docs/architecture.md)
+
+- **Objective:** Produce the first full `docs/architecture.md` (target defined in CHANGELOG) covering exec summary, assumptions, capability map, plugin/nav/tenant model, accessibility, testing, delivery, and migration plan.
+- **Write scope:** new `docs/architecture.md` file plus optional refreshed `minute_architecture_diagram.png` and a short pointer in `README.md`. All code is **read-only**.
+- **Dependencies:** None; uses current repo state and universal foundations as inputs.
+- **Actions:**
+  1. Capture current architecture from code (backend/worker paths, queues, storage, offline queue, module registry) and note deviations from `docs/universal_council_app_foundations.md`.
+  2. Draft sections per CHANGELOG spec; embed ASCII diagram or reference `minute_architecture_diagram.png`; list open questions and risks.
+  3. Add crosswalk to roadmap phases (15–19) and how they deliver the target architecture.
+- **Exit:** `docs/architecture.md` exists with all required sections, cross-links to universal foundations doc, and dated open-questions list.
+
+#### Phase 15B — Universal foundations gap map (`docs/universal_council_app_foundations.md`)
+
+- **Objective:** Update the foundations doc with present-state evidence, gaps vs target architecture, and a phase-to-gap crosswalk.
+- **Write scope:** `docs/universal_council_app_foundations.md` only. Code and configs are **read-only**.
+- **Dependencies:** None; can run in parallel with 15A because it only edits this doc; align terminology during handoff review.
+- **Actions:**
+  1. Inventory what already exists (config loader, module registry, offline queue, templates, audit/retention) with code pointers.
+  2. Record gaps that require Phases 16–19 (plugin shell, config schema/versioning, tokenised design system, RN shell, module telemetry).
+  3. Add “landing zone” checklist for when architecture doc is published (links, owners, review cadence).
+- **Exit:** Foundations doc now has a gap list + crosswalk to phases 16–19 and a review cadence note; no code touched.
+
+### Phase 16 — Config + Module Platformisation
+
+#### Phase 16A — Tenant/service-domain schema hardening (backend + configs)
+
+- **Objective:** Turn tenant/service-domain config into a schema-validated, versioned contract consumed by all services.
+- **Write scope:** existing config loader/validator surfaces: `common/config/models.py`, `common/config/loader.py`, `scripts/validate_configs.py`, `tests/test_config_loader.py`, `tests/test_config_all.py`, `config/*.yaml`. Frontend is **read-only** in this sub-phase.
+- **Dependencies:** Needs 15A/15B outputs only for terminology; otherwise none.
+- **Actions:**
+  1. Extend config schema with nav/module metadata, feature flags, design tokens reference, SharePoint/Planner targets, retention defaults, and version tag.
+  2. Emit JSON Schema (under `common/config/`) and wire CI (`config-validate.yml`) to enforce it; add fixture for Adults/Housing domains without touching frontend.
+  3. Add migration/loader shim to populate DB tables or cached registry from the configs; keep API backward compatible.
+- **Exit:** Schema + validator enforce new fields; configs carry versions; CI fails on drift; backend can serve expanded config without changing frontend.
+
+#### Phase 16B — Backend module/flag surfacing
+
+- **Objective:** Expose module/feature entitlements from config through API and service layer without touching web UI.
+- **Write scope:** `backend/api/routes/config.py`, request context/dependencies, and service-layer guards in `common/services/*`; backend tests in `tests/`. Frontend is **read-only**; config files only adjusted if needed for fixtures from 16A.
+- **Dependencies:** 16A schema finalized.
+- **Actions:**
+  1. Add module/flag fields to config response models; ensure per-request context carries module/feature entitlements.
+  2. Gate sensitive routes (exports, admin, offline queue controls) by module flags; add audit events on flag-controlled paths.
+  3. Add contract tests ensuring disabled modules return 403/404 and enabled paths behave unchanged.
+- **Exit:** Backend enforces module/flag contracts; API docs/OpenAPI regenerated; tests cover enable/disable behavior.
+
+#### Phase 16C — Frontend shell plugs into module registry
+
+- **Objective:** Drive navigation and route mounting purely from module registry + service domain/role, matching backend config.
+- **Write scope:** `frontend/lib/modules.ts`, `frontend/lib/config/*`, and nav/layout components under `frontend/app/**`. Backend/config files are **read-only**.
+- **Dependencies:** 16A schema + 16B API fields available.
+- **Actions:**
+  1. Update module registry to consume new config fields (nav labels, icons, permissions, domains); add loading/error states.
+  2. Refactor sidebar/header/tab navigation to render from registry; prevent routes for disabled modules from rendering or prefetching.
+  3. Add Playwright smoke ensuring module enable/disable changes nav without backend write conflicts; keep exports/sync flows untouched.
+- **Exit:** Navigation/route exposure is config-driven; disabled modules disappear without code edits; frontend tests cover enable/disable.
+
+### Phase 17 — Design System & Accessibility Enforcement
+
+#### Phase 17A — Token set + theming contract
+
+- **Objective:** Introduce an accessibility-first token set and migrate shared primitives to use it.
+- **Write scope:** existing theming touchpoints `frontend/app/globals.css`, `frontend/components/theme-provider.tsx`, `frontend/components/org-theme-setter.tsx`, and shared primitives under `frontend/components/` (buttons, cards, chips, typography). Tests/CI are **read-only** in this sub-phase to avoid clashes with 17B.
+- **Dependencies:** 16C nav refactor complete (to avoid double-touching layouts).
+- **Actions:**
+  1. Define core tokens (color, spacing, typography, motion) with WCAG 2.2 AA pairs; allow tenant/domain overrides via config references only (no inline colors).
+  2. Migrate primitives to tokens; remove stray Tailwind inline hex codes; keep domain branding via token overrides.
+  3. Document token usage in `frontend/theme/README.md` and map tokens to config fields for future RN/Web reuse.
+- **Exit:** Core UI uses tokenized variables; no hard-coded colors remain in shared primitives; docs describe override rules.
+
+#### Phase 17B — Accessibility lint/tests & CI gate
+
+- **Objective:** Add automated AA enforcement.
+- **Write scope:** Accessibility tooling config (`package.json` scripts, Playwright/Pa11y/axe configs), `.github/workflows/ci.yml` additions, new tests under `frontend/tests/` or `frontend/__tests__/`. UI components stay **read-only** in this sub-phase to avoid conflicts with 17A.
+- **Dependencies:** 17A tokens landed; uses their contrast map.
+- **Actions:**
+  1. Add automated a11y run for core pages (capture, transcriptions, minutes, exports) in CI; store baseline snapshots.
+  2. Add lint rule to block non-token colors and low-contrast pairs; enforce minimum tap target sizes.
+  3. Document remediation workflow (when failing snapshot -> file issue -> token tweak vs component tweak).
+- **Exit:** CI fails on contrast/tap-target regressions; a11y report artifacts generated; remediation guidance recorded.
+
+### Phase 18 — Cross-Platform Shell & Shared UI Kit
+
+#### Phase 18A — Shared UI kit extraction (web-first, RN-Web compatible)
+
+- **Objective:** Extract reusable, platform-neutral primitives to prepare for RN shell without regressing web.
+- **Write scope:** shared primitives under `frontend/components/` (optionally moved into a new `frontend/components/ui/`), plus supporting styles in `frontend/app/globals.css`. Mobile/RN files are **read-only**.
+- **Dependencies:** Tokens (17A) complete; nav refactor (16C) in place.
+- **Actions:**
+  1. Identify primitives used across capture/transcription/minute pages; refactor to platform-neutral props (no DOM-only APIs).
+  2. Add RN-Web compatibility shims where needed (e.g., pressable abstraction); keep current Next.js routes intact.
+  3. Add Storybook/Chromatic (or local equivalent) stories for shared components to catch regressions.
+- **Exit:** Shared primitives live in one place, tokenised, and free of browser-only dependencies; web builds still pass.
+
+#### Phase 18B — React Native/Expo shell (mobile)
+
+- **Objective:** Stand up a minimal RN/Expo shell consuming the same module registry + config API.
+- **Write scope:** new `mobile/` (or `apps/mobile/`) directory, RN/Expo app bootstrap, module registry adapter. Web/frontend files are **read-only** to avoid conflicts with 18A.
+- **Dependencies:** 16C registry contract stable; 18A shared kit available for reuse.
+- **Actions:**
+  1. Scaffold RN/Expo app with auth + config fetch + module list view; reuse shared tokens; stub screens for transcription/minute modules.
+  2. Add offline queue adapter mapping to mobile storage (e.g., MMKV/AsyncStorage) without touching web Dexie code.
+  3. Add minimal detox/E2E smoke to ensure config loads and nav renders per module.
+- **Exit:** RN shell builds and renders module-driven nav; shares tokens/config; no changes to web app required.
+
+### Phase 19 — Module Telemetry, Governance, and Admin Console
+
+#### Phase 19A — Telemetry + governance for modules/config
+
+- **Objective:** Instrument module usage and config changes with auditability.
+- **Write scope:** Backend/worker instrumentation (`common/services/*`, `worker/*`), audit/metrics models, dashboards described in `infra/README.md`. Frontend/admin UI is **read-only** here.
+- **Dependencies:** 16B backend module surfacing complete.
+- **Actions:**
+  1. Emit structured events for module loads, feature-flag checks, config version served, and offline queue outcomes tagged by tenant/domain/role.
+  2. Extend audit log to capture config publishes and admin actions; add Prom metrics for module adoption and failure rates.
+  3. Document dashboard/alert targets for SLOs per module in `infra/README.md`.
+- **Exit:** Metrics and audit events exist for module/config operations; dashboards/alerts documented; no frontend changes yet.
+
+#### Phase 19B — Admin console for config/versioning/audit
+
+- **Objective:** Provide a guarded UI for config changes with audit trails.
+- **Write scope:** Frontend admin routes/components (e.g., `frontend/app/(admin)/**`), and any paired admin API endpoints if required. Telemetry/backends from 19A are **read-only**.
+- **Dependencies:** 19A events available; 16A schema and 16B API fields in place.
+- **Actions:**
+  1. Build admin surfaces to view config versions, diff, and promote between environments; respect module/role-based access.
+  2. Wire approvals/audit logging to 19A events; ensure edits write back to repo or storage bucket (decide mechanism, not both).
+  3. Add E2E tests ensuring unauthorized roles cannot access admin routes; ensure concurrency safety by limiting file writes to config storage only.
+- **Exit:** Admin UI allows controlled config changes with audit; unauthorized access blocked; E2E passes.
+
 ## Cross-domain Reuse Strategy (future-proofing)
 
 ### Framework Upgrade Log (per AGENTS rule 32)

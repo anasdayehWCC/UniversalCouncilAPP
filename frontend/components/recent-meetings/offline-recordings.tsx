@@ -33,7 +33,7 @@ export const OfflineRecordings = () => {
     return null
   }
   return (
-    <div className="mb-4 w-full rounded-md border p-4">
+    <div className="mb-4 w-full rounded-xl glass-panel-premium p-4">
       <Collapsible open={open} onOpenChange={setOpen}>
         <CollapsibleTrigger className="flex w-full items-center justify-between">
           <h4 className="flex items-center gap-1 font-bold">
@@ -72,7 +72,7 @@ const OfflineRecording = ({ recording }: { recording: RecordingDbItem }) => {
     [recording.blob]
   )
   return (
-    <li className="flex w-full flex-col gap-2 rounded border bg-slate-50 p-3">
+    <li className="flex w-full flex-col gap-2 rounded-xl glass-panel-premium p-3">
       <div className="flex items-center justify-between gap-2">
         <div className="text-muted-foreground flex items-center gap-1 text-sm">
           <Clock size="0.8rem" /> {recording.updated_at.toDateString()} at{' '}

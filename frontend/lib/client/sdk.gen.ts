@@ -105,6 +105,10 @@ import type {
   GetChatTranscriptionsTranscriptionIdChatChatIdGetData,
   GetChatTranscriptionsTranscriptionIdChatChatIdGetResponses,
   GetChatTranscriptionsTranscriptionIdChatChatIdGetErrors,
+  GetSignedRecordingRangeData,
+  GetSignedRecordingRangeResponses,
+  PostEvidenceClickData,
+  PostEvidenceClickResponses,
 } from './types.gen'
 import { client as _heyApiClient } from './client.gen'
 
@@ -832,5 +836,35 @@ export const getChatTranscriptionsTranscriptionIdChatChatIdGet = <
   >({
     url: '/transcriptions/{transcription_id}/chat/{chat_id}',
     ...options,
+  })
+}
+
+export const getSignedRecordingRange = <ThrowOnError extends boolean = false>(
+  options: Options<GetSignedRecordingRangeData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).get<
+    GetSignedRecordingRangeResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: '/transcriptions/{transcription_id}/recordings/{recording_id}/signed-url-range',
+    ...options,
+  })
+}
+
+export const postEvidenceClick = <ThrowOnError extends boolean = false>(
+  options: Options<PostEvidenceClickData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).post<
+    PostEvidenceClickResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: '/transcriptions/{transcription_id}/evidence-click',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   })
 }

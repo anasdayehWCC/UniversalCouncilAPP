@@ -132,7 +132,7 @@ function SettingsForm({ user }: { user: GetUserResponse }) {
             <TriangleAlert className="text-amber-600" />
             <AlertTitle className="text-amber-900">Your retention period cannot be changed</AlertTitle>
             <AlertDescription className="text-amber-800">
-              Due to your organisation's retention policy you cannot adjust
+              Due to your organisation&apos;s retention policy you cannot adjust
               your data retention preferences. Transcripts and summaries will be
               kept for 24 hours.
             </AlertDescription>

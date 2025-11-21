@@ -10,6 +10,7 @@ import { RecordingDbProvider } from '@/providers/transcription-db-provider'
 import { CaseCacheProvider } from '@/providers/case-cache-provider'
 import { ApiProvider } from '@/providers/ApiProvider'
 import { useAccessToken } from '@/hooks/use-access-token'
+import { DevPreviewProvider } from '@/lib/dev-preview-provider'
 
 export const ProviderShell = ({ children }: { children: ReactNode }) => {
   const { accessToken } = useAccessToken()
@@ -22,7 +23,11 @@ export const ProviderShell = ({ children }: { children: ReactNode }) => {
           <PosthogProvider>
             <LockNavigationProvider>
               <RecordingDbProvider>
-                <CaseCacheProvider>{children}</CaseCacheProvider>
+                <CaseCacheProvider>
+                  <DevPreviewProvider>
+                    {children}
+                  </DevPreviewProvider>
+                </CaseCacheProvider>
               </RecordingDbProvider>
             </LockNavigationProvider>
           </PosthogProvider>

@@ -32,6 +32,7 @@ These rules govern AI-assisted changes. They balance safety, cost, and velocity.
 14. UI changes must remain mobile-usable and meet basic accessibility (labels, focus, contrast); avoid desktop-only layouts for capture/review flows.
 15. Preview-only UX (mock data, dummy recorder) must be gated by `DEV_PREVIEW_MODE` and disabled in prod builds.
 16. **Premium UI/Theming**: All UI components must support dynamic theming via CSS variables (Tailwind v4 `@theme` directive) for WCC/RBKC branding. Avoid generic styles; use glassmorphism, subtle gradients, and high-quality transitions (framer-motion) to ensure a "premium app" feel.
+17. **Config-first navigation**: When adding or modifying navigation, prefer module/tenant-aware rendering driven by the config API and module registry instead of hardcoded role switch statements.
 
 ## 6) Testing & Quality
 
@@ -45,7 +46,7 @@ These rules govern AI-assisted changes. They balance safety, cost, and velocity.
 
 ## 8) AI/LLM & Cost Controls
 
-20. Prefer batch/“economy” paths and lighter models (`gpt-4o-mini`, Speech batch) for non-urgent work; document SLA/price trade-offs and provide a fallback to “fast” when needed.
+20. Prefer batch/“economy” paths and lighter models (`gpt-5-mini`, Speech batch) for non-urgent work; document SLA/price trade-offs and provide a fallback to “fast” when needed.
 21. For non-urgent LLM flows, prefer Azure OpenAI Batch API; justify premium model use for urgent paths in code comments/PR.
 22. Avoid logging prompts/responses; if temporarily required for debugging, redact PII and keep disabled in production.
 

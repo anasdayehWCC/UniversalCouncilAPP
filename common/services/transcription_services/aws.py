@@ -24,7 +24,9 @@ class AWSTranscribeAdapter(TranscriptionAdapter):
     adapter_type = AdapterType.ASYNC
 
     @classmethod
-    async def start(cls, audio_file_path_or_recording: Path | Recording) -> TranscriptionJobMessageData:
+    async def start(
+        cls, audio_file_path_or_recording: Path | Recording, *, context: dict | None = None
+    ) -> TranscriptionJobMessageData:
         """
         Async version of transcribe audio using Azure Speech-to-Text API
         """

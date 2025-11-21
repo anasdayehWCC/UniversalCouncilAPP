@@ -77,6 +77,8 @@ Minute was developed to run on AWS and/or Azure, with abstractions available for
 
 <img src="minute_architecture_diagram.png" height="800" alt="Minute architecture diagram"/>
 
+See `docs/architecture.md` for the current target architecture and roadmap crosswalk.
+
 #### Database Schema
 
 <img src="minute_database_schema.png" height="800" alt="Minute database schema" />

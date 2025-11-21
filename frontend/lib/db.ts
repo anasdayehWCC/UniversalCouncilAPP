@@ -39,6 +39,7 @@ export class CareMinutesDB extends Dexie {
         this.version(2).stores({
             recordings: '++id, status, createdAt, case_reference'
         }).upgrade((tx) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             return tx.table('recordings').toCollection().modify((recording: any) => {
                 recording.metadata = recording.metadata || {};
                 recording.case_reference = recording.case_reference || recording.metadata?.case_reference;

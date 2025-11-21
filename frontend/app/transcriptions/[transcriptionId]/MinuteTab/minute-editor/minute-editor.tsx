@@ -16,6 +16,9 @@ import {
   MinuteVersionResponse,
   ExportResponse,
   Transcription,
+  SingleRecording,
+  getSignedRecordingRange,
+  postEvidenceClick,
 } from '@/lib/client'
 import {
   createMinuteVersionMinutesMinuteIdVersionsPostMutation,
@@ -61,10 +64,10 @@ export function MinuteEditor({
     }),
     refetchInterval: (query) =>
       query.state.data &&
-      query.state.data.length > 0 &&
-      ['awaiting_start', 'in_progress'].includes(
-        query.state.data[version].status
-      )
+        query.state.data.length > 0 &&
+        ['awaiting_start', 'in_progress'].includes(
+          query.state.data[version].status
+        )
         ? 1000
         : false,
   })
@@ -98,7 +101,7 @@ export function MinuteEditor({
   const hasCitations = useMemo(() => {
     return !!htmlContent?.match(citationRegex)
   }, [htmlContent])
-  useEffect(() => {}, [htmlContent])
+  useEffect(() => { }, [htmlContent])
   const { mutate: saveEdit } = useMutation({
     ...createMinuteVersionMinutesMinuteIdVersionsPostMutation(),
   })
@@ -112,7 +115,70 @@ export function MinuteEditor({
       { path: { transcription_id: transcription.id! } }
     ),
   })
+
+  const { mutateAsync: logEvidenceClick } = useMutation({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mutationFn: (options: any) => postEvidenceClick(options),
+  })
+
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const [isJumping, setIsJumping] = useState(false)
+
+  const playCitation = useCallback(
+    async (citationNumber: number) => {
+      if (!recordings || recordings.length === 0) {
+        toast.error('No recording available for this citation')
+        return
+      }
+      const entry = transcription.dialogue_entries?.[citationNumber - 1]
+      if (!entry) {
+        toast.error('Transcript segment not available for this citation')
+        return
+      }
+      const recording: SingleRecording = recordings[0]
+      try {
+        setIsJumping(true)
+        const { data } = await getSignedRecordingRange({
+          path: {
+            transcription_id: transcription.id!,
+            recording_id: recording.id!,
+          },
+          query: {
+            start_seconds: entry.start_time ?? 0,
+            end_seconds: entry.end_time,
+          },
+        })
+        const targetUrl = data?.url || recording.url
+        if (audioRef.current) {
+          const wasPaused = audioRef.current.paused
+          audioRef.current.src = targetUrl
+          audioRef.current.currentTime = entry.start_time ?? 0
+          await audioRef.current.play()
+          if (wasPaused === true && audioRef.current.paused) {
+            // fallback if play is blocked
+            audioRef.current.play().catch(() => { })
+          }
+        }
+        await logEvidenceClick({
+          path: { transcription_id: transcription.id! },
+          body: {
+            recording_id: recording.id!,
+            start_time: entry.start_time ?? 0,
+            end_time: entry.end_time,
+            citation_number: citationNumber,
+          },
+        })
+        posthog.capture('evidence_jump', {
+          citationIndex: citationNumber,
+        })
+      } catch {
+        toast.error('Unable to play evidence clip')
+      } finally {
+        setIsJumping(false)
+      }
+    },
+    [logEvidenceClick, recordings, transcription.dialogue_entries, transcription.id]
+  )
   const uniqueCitations = useMemo(() => {
     if (!htmlContent) return []
     const matches = htmlContent.match(citationRegex)
@@ -362,6 +428,7 @@ export function MinuteEditor({
                 isEditing={isEditable}
                 onContentChange={onChange}
                 hideCitations={hideCitations && !isEditable}
+                onCitationJump={playCitation}
               />
             )}
           />
@@ -385,14 +452,9 @@ export function MinuteEditor({
                       <button
                         key={c}
                         aria-label={disabled ? `Citation ${c} unavailable` : `Jump to citation ${c} at ${label}`}
-                        disabled={disabled}
+                        disabled={disabled || isJumping}
                         className="mb-2 flex w-full items-center gap-2 rounded-lg bg-slate-50 px-3 py-2 text-left transition hover:-translate-y-0.5 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
-                        onClick={() => {
-                          if (audioRef.current && entry) {
-                            audioRef.current.currentTime = entry.start_time
-                            audioRef.current.play()
-                          }
-                        }}
+                        onClick={() => playCitation(c)}
                         title={disabled ? 'Transcript segment not available' : `Jump to ${label}`}
                       >
                         <span className="h-2 w-2 rounded-full bg-primary" />

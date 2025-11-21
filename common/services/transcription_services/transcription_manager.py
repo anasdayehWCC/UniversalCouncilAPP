@@ -16,6 +16,7 @@ from common.services.transcription_services.adapter import AdapterType, Transcri
 from common.services.transcription_services.aws import AWSTranscribeAdapter
 from common.services.transcription_services.azure import AzureSpeechAdapter
 from common.services.transcription_services.azure_async import AzureBatchTranscriptionAdapter
+from common.services.transcription_services.lexicon import build_phrase_list
 from common.settings import get_settings
 from common.types import TranscriptionJobMessageData
 from common.metrics import transcription_latency_seconds, transcription_mode_total
@@ -93,7 +94,7 @@ class TranscriptionServiceManager:
         with tempfile.TemporaryDirectory() as tempdir:
             temp_file_path = Path(tempdir) / Path(recording.s3_file_key).name
             await storage_service.download(recording.s3_file_key, temp_file_path)
-            recording, file_path, duration_seconds = await self.get_recording_to_process(
+            recording, file_path, duration_seconds, channel_count = await self.get_recording_to_process(
                 recording=recording, temp_file_path=temp_file_path, file_extension=file_extension
             )
             with sentry_sdk.start_transaction(
@@ -103,11 +104,18 @@ class TranscriptionServiceManager:
                 transaction.set_data("file_type", file_path.suffix.lower())
 
             adapter = self.select_adaptor(int(duration_seconds), preferred_adapter=preferred_adapter)
+            context = {
+                "channel_count": channel_count,
+                "service_domain_id": str(transcription.service_domain_id) if transcription.service_domain_id else None,
+            }
+            phrase_list = build_phrase_list(service_domain_id=transcription.service_domain_id)
+            if phrase_list:
+                context["phrase_list"] = phrase_list
             match adapter.adapter_type:
                 case AdapterType.SYNCHRONOUS:
-                    transcription_job = await adapter.start(audio_file_path_or_recording=file_path)
+                    transcription_job = await adapter.start(audio_file_path_or_recording=file_path, context=context)
                 case AdapterType.ASYNC:
-                    transcription_job = await adapter.start(audio_file_path_or_recording=recording)
+                    transcription_job = await adapter.start(audio_file_path_or_recording=recording, context=context)
                 case _:
                     msg = "adapter not recognised"
                     raise RuntimeError(msg)
@@ -123,15 +131,15 @@ class TranscriptionServiceManager:
     @classmethod
     async def get_recording_to_process(
         cls, recording: Recording, temp_file_path: Path, file_extension: str
-    ) -> tuple[Recording, Path, float]:
+    ) -> tuple[Recording, Path, float, int]:
         num_channels = get_num_audio_channels(temp_file_path)
         if file_extension in SUPPORTED_FORMATS and num_channels == 1:
             duration = get_duration(temp_file_path)
-            return recording, temp_file_path, duration
+            return recording, temp_file_path, duration, num_channels
 
         with sentry_sdk.start_transaction(op="process", name="convert_mp3") as transaction:
             transaction.set_data("file_extension", file_extension)
-            new_file_path = convert_to_mp3(temp_file_path)
+            new_file_path = convert_to_mp3(temp_file_path, channels=num_channels or 1)
 
         duration = get_duration(new_file_path)
 
@@ -148,4 +156,4 @@ class TranscriptionServiceManager:
             session.add(new_recording)
             session.commit()
             session.refresh(new_recording)
-        return new_recording, new_file_path, duration
+        return new_recording, new_file_path, duration, num_channels

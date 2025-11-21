@@ -12,13 +12,16 @@ import {
 } from '@/lib/client/@tanstack/react-query.gen'
 import { FeatureFlags } from '@/lib/feature-flags'
 import { useQuery } from '@tanstack/react-query'
-import { Clock, Frown, LoaderCircle, SearchX } from 'lucide-react'
+import { Clock, Frown, SearchX } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useFeatureFlagEnabled } from 'posthog-js/react'
 
 export default function TranscriptionPage({
   params,
-}: any) {
+}: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  params: any
+}) {
   const transcriptionId = params.transcriptionId as string
   const isChatEnabled = useFeatureFlagEnabled(FeatureFlags.ChatEnabled)
 
@@ -28,7 +31,7 @@ export default function TranscriptionPage({
     }),
     refetchInterval: (query) =>
       query.state.data?.status &&
-      ['awaiting_start', 'in_progress'].includes(query.state.data.status)
+        ['awaiting_start', 'in_progress'].includes(query.state.data.status)
         ? 2000
         : false,
   })
@@ -62,22 +65,21 @@ export default function TranscriptionPage({
   }
 
   // Casting to shared Transcription shape used by editor components
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const typedTranscription: any = transcription
 
   const date = new Date(transcription.created_datetime)
   const dateLabel = `${date.toDateString()} at ${date.toLocaleTimeString()}`
   const caseLabel = transcription.case_reference
-    ? `Case ${transcription.case_reference}${
-        transcription.worker_team ? ` • ${transcription.worker_team}` : ''
-      }`
+    ? `Case ${transcription.case_reference}${transcription.worker_team ? ` • ${transcription.worker_team}` : ''
+    }`
     : null
   const subjectLabel =
     transcription.subject_initials || transcription.subject_dob
-      ? `${transcription.subject_initials || 'Subject'}${
-          transcription.subject_dob
-            ? ` • DOB ${new Date(transcription.subject_dob).toLocaleDateString()}`
-            : ''
-        }`
+      ? `${transcription.subject_initials || 'Subject'}${transcription.subject_dob
+        ? ` • DOB ${new Date(transcription.subject_dob).toLocaleDateString()}`
+        : ''
+      }`
       : null
 
   if (

@@ -1,0 +1,13 @@
+[2025-11-21T12:49:00.730Z] Error: 🚫 client needs to be set to generate SDKs - which HTTP client do you want to use?
+Stack:
+Error: 🚫 client needs to be set to generate SDKs - which HTTP client do you want to use?
+    at Object.pluginByTag (/Users/anasdayeh/Downloads/CareMinutes/minute-main/frontend/node_modules/@hey-api/openapi-ts/dist/index.cjs:42:74455)
+    at Object._infer (/Users/anasdayeh/Downloads/CareMinutes/minute-main/frontend/node_modules/@hey-api/openapi-ts/dist/index.cjs:42:2358)
+    at a (/Users/anasdayeh/Downloads/CareMinutes/minute-main/frontend/node_modules/@hey-api/openapi-ts/dist/index.cjs:42:74524)
+    at ag (/Users/anasdayeh/Downloads/CareMinutes/minute-main/frontend/node_modules/@hey-api/openapi-ts/dist/index.cjs:42:74617)
+    at mg (/Users/anasdayeh/Downloads/CareMinutes/minute-main/frontend/node_modules/@hey-api/openapi-ts/dist/index.cjs:42:75296)
+    at /Users/anasdayeh/Downloads/CareMinutes/minute-main/frontend/node_modules/@hey-api/openapi-ts/dist/index.cjs:42:76633
+    at Array.map (<anonymous>)
+    at Rm (/Users/anasdayeh/Downloads/CareMinutes/minute-main/frontend/node_modules/@hey-api/openapi-ts/dist/index.cjs:42:75941)
+    at async Iw (/Users/anasdayeh/Downloads/CareMinutes/minute-main/frontend/node_modules/@hey-api/openapi-ts/dist/index.cjs:1338:4474)
+    at async start (/Users/anasdayeh/Downloads/CareMinutes/minute-main/frontend/node_modules/@hey-api/openapi-ts/bin/index.cjs:131:21)

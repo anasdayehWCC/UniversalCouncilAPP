@@ -18,7 +18,7 @@ export const StartTranscriptionSection = ({
   const selectedTemplate = form.watch('template')
   const caseReference = form.watch('case_reference')
   const processingMode = form.watch('processing_mode') || 'fast'
-  const visitType = form.watch('visit_type')
+
   const { recentCases } = useCaseCache()
   // Fetch templates from API
 
@@ -27,7 +27,7 @@ export const StartTranscriptionSection = ({
   }
   return (
     <div className="mt-4 flex flex-col gap-2">
-      <div className="rounded-2xl border border-slate-200 bg-white/70 p-4 shadow-sm backdrop-blur">
+      <div className="rounded-2xl glass-panel-premium p-4">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold text-slate-700">
             Case context (required)
@@ -82,7 +82,7 @@ export const StartTranscriptionSection = ({
           </div>
         </div>
       </div>
-      <div className="grid gap-3 rounded-2xl border border-slate-200 bg-white/70 p-4 shadow-sm backdrop-blur sm:grid-cols-2">
+      <div className="grid gap-3 rounded-2xl glass-panel-premium p-4 sm:grid-cols-2">
         <div>
           <label className="text-xs font-medium text-slate-600">
             Visit type (optional)
@@ -142,7 +142,7 @@ export const StartTranscriptionSection = ({
           <TemplateSelect value={value} onChange={onChange} />
         )}
       />
-          {selectedTemplate.agenda_usage != 'not_used' && (
+      {selectedTemplate.agenda_usage != 'not_used' && (
         <div className="mb-4 rounded">
           <h3 className="text-semibold m">
             Agenda (
@@ -167,7 +167,7 @@ Agenda item 3
           />
         </div>
       )}
-      <div className="mt-2 grid grid-cols-1 gap-2 rounded-2xl border border-slate-200 bg-white/70 p-4 shadow-sm backdrop-blur sm:grid-cols-2">
+      <div className="mt-2 grid grid-cols-1 gap-2 rounded-2xl glass-panel-premium p-4 sm:grid-cols-2">
         <div className="space-y-1">
           <p className="text-xs font-semibold text-slate-600">
             Processing mode

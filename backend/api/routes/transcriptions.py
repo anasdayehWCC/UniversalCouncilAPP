@@ -3,7 +3,7 @@ import math
 import uuid
 from pathlib import Path
 
-from fastapi import APIRouter, HTTPException, Query, Request
+from fastapi import APIRouter, HTTPException, Query, Request, Response, Depends
 from sqlmodel import col, func, select
 
 from backend.api.dependencies import SQLSessionDep, UserDep
@@ -20,6 +20,7 @@ from common.types import (
     RecordingCreateRequest,
     RecordingCreateResponse,
     SingleRecording,
+    SingleRecordingSegment,
     TaskType,
     TranscriptionCreateRequest,
     TranscriptionCreateResponse,
@@ -29,6 +30,7 @@ from common.types import (
     TranscriptionDialogueUpdate,
     TranscriptionFeedbackRequest,
     TranscriptionJobMessageData,
+    EvidenceClickRequest,
     WorkerMessage,
 )
 
@@ -307,6 +309,78 @@ async def get_signed_recording(
     filename = Path(recording.s3_file_key).name
     url = await storage_service.generate_presigned_url_get_object(recording.s3_file_key, filename, 60 * 60)
     return SingleRecording(id=recording.id, url=url, extension=Path(recording.s3_file_key).suffix)
+
+
+@transcriptions_router.get(
+    "/transcriptions/{transcription_id}/recordings/{recording_id}/signed-url-range",
+    response_model=SingleRecordingSegment,
+)
+async def get_signed_recording_range(
+    transcription_id: uuid.UUID,
+    recording_id: uuid.UUID,
+    session: SQLSessionDep,
+    user: UserDep,
+    start_seconds: float = 0,
+    end_seconds: float | None = None,
+) -> SingleRecordingSegment:
+    transcription = await session.get(Transcription, transcription_id)
+    if (
+        not transcription
+        or transcription.user_id != user.id
+        or transcription.organisation_id != user.organisation_id
+        or (user.service_domain_id and transcription.service_domain_id != user.service_domain_id)
+    ):
+        raise HTTPException(404)
+
+    recording = await session.get(Recording, recording_id)
+    if not recording or recording.transcription_id != transcription.id:
+        raise HTTPException(404)
+    if not await storage_service.check_object_exists(recording.s3_file_key):
+        raise HTTPException(404, "Recording not found")
+
+    filename = Path(recording.s3_file_key).name
+    base_url = await storage_service.generate_presigned_url_get_object(
+        recording.s3_file_key, filename, 60 * 60
+    )
+    fragment = None
+    if start_seconds or end_seconds is not None:
+        if end_seconds is not None:
+            fragment = f"#t={max(0, start_seconds):.2f},{max(0, end_seconds):.2f}"
+        else:
+            fragment = f"#t={max(0, start_seconds):.2f}"
+    ranged_url = f"{base_url}{fragment}" if fragment else base_url
+    return SingleRecordingSegment(
+        id=recording.id,
+        url=ranged_url,
+        extension=Path(recording.s3_file_key).suffix,
+        start_seconds=start_seconds,
+        end_seconds=end_seconds,
+    )
+
+
+@transcriptions_router.post(
+    "/transcriptions/{transcription_id}/evidence-click",
+    status_code=204,
+)
+async def record_evidence_click(
+    transcription_id: uuid.UUID,
+    payload: EvidenceClickRequest,
+    session: SQLSessionDep,
+    user: UserDep,
+):
+    transcription = await session.get(Transcription, transcription_id)
+    if (
+        not transcription
+        or transcription.user_id != user.id
+        or transcription.organisation_id != user.organisation_id
+        or (user.service_domain_id and transcription.service_domain_id != user.service_domain_id)
+    ):
+        raise HTTPException(404)
+    recording = await session.get(Recording, payload.recording_id)
+    if not recording or recording.transcription_id != transcription.id:
+        raise HTTPException(404)
+    # Audit middleware handles logging; avoid storing payload to reduce PII exposure
+    return Response(status_code=204)
 
 
 @transcriptions_router.patch("/transcriptions/{transcription_id}", response_model=Transcription)

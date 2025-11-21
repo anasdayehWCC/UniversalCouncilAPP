@@ -2,6 +2,9 @@
 
 ## 2025-11-21
 
+- Phase 15A/15B documentation: added `docs/architecture.md` (exec summary, capability map, architecture overview, phase 15–19 crosswalk, open questions) and refreshed `docs/universal_council_app_foundations.md` with evidence-based gap map, phase crosswalk, and landing-zone checklist; linked architecture doc from README; marked progress in PLANS.
+- Phase 5 refinement: Added domain-aware Azure Speech phrase list builder with bias weight (`common/services/transcription_services/lexicon.py`, new settings/env + `.env.example`), enabled dual-channel handling for stereo via `channels=[0,1]` while keeping diarization for mono, and surfaced channel labels in dialogue entries. Azure batch adapter indentation bug fixed and supports optional custom model id; adapters now accept context (channel/domain/phrases) via `TranscriptionServiceManager`. Added regression tests in `tests/test_azure_speech_helpers.py`; smoke pytest suite still green.
+- Evidence UX: Added time-ranged signed URL endpoint and evidence click logger (`backend/api/routes/transcriptions.py`, new schemas in `common/types.py`), regenerated OpenAPI client. Minute editor citations now jump playback using signed segment URLs with media fragments; evidence list buttons reuse the same handler and log clicks; citation links in Tiptap trigger playback while respecting PII logging rules. Frontend regenerated client and wired to new endpoints.
 - Phase 8 (Exports + M365): Added docx/pdf exporters (`worker/exporters/docx_exporter.py`, `worker/exporters/pdf_exporter.py`) and orchestrator (`common/services/export_handler_service.py`) that runs in worker, uploads to storage, and optionally to SharePoint/Planner via new `MSGraphClient`. Minute schema now stores export paths, SharePoint item ids, planner task ids, status/error/timestamps (migration `0c8e5f0daddb_phase_8_exports.py`). New settings/env for Graph, export prefixes, SAS expiry; pyproject gains `python-docx` and `weasyprint`. Added API endpoint `POST /minutes/{minute_id}/export` returning SAS URL and wired to storage+Graph. Minute generation/edit now triggers exports in worker; manual edits enqueue export task. Frontend Minute editor now offers Export DOCX/PDF buttons using generated OpenAPI client; shows SharePoint status. OpenAPI regenerated from `openapi-temp.json` using noop queues. `tests/test_health.py` still passes.
 - Phase 9 (Security/Privacy/Governance): Added audit trail middleware and `audit_event` table (migration `1a2b3c4d5e9a_phase9_audit_retention.py`), recording user/path/outcome/IP/UA for all API calls. Introduced `retention_policy` table and enhanced cleanup scheduler to purge recordings/transcriptions/minutes per org/domain policy plus storage deletes. Security hardening: strict security headers + HSTS, origin checks for state-changing requests, per-path rate limiter, service worker skips caching `/api/*`, and idle MSAL re-auth timer in `AuthProvider`. Added PII avoidance hints in capture + minute editor. `tests/test_health.py` passes with noop queues.
 - Phase 10 (Observability/SLOs): Enabled JSON logging with trace IDs (tracing middleware + logging filter), Prometheus metrics via `/metrics` and worker server, custom metrics for transcription/minute/export/offline/LLM usage, health live/ready endpoints, trace propagation into Ray workers. Settings gains SLO targets and metrics toggles. Infra README documents dashboards/alerts; `tests/test_health.py` green.
@@ -9,6 +12,80 @@
 - Runtime hardening: bumped FastAPI to ^0.120 and pydantic to 2.11 (in-line with roadmap Phase 11 upgrade ask) and reinstalled in `.venv`.
 - Phase 12 (Testing gates): Added unit tests for export action parsing, cost-guard budgets, and security headers (`tests/test_export_handler_service.py`, `tests/test_cost_guard.py`, `tests/test_security_headers.py`); Playwright smoke stub for export buttons; CI workflow (`.github/workflows/ci.yml`) runs pytest + frontend lint/build + terraform fmt/validate. All new tests pass locally under noop queues.
 - Phase 13 (IaC/Pipelines): Added GitHub Actions deploy workflow for ACA blue/green (`.github/workflows/deploy.yml`) aligned with revision traffic splitting; Terraform guardrail still enforced; KEDA autoscale manifest and load test steps documented.
+
+### Role
+
+Act as an experienced Full-Stack Principal Engineer (TypeScript/Node.js, React Native + React Native Web, modular monorepos with Nx/Turborepo) specializing in configurable, multi-tenant government services.
+
+### Task
+
+Produce a research-backed, high-level architecture and development plan for a **universal council app** that is lightweight, reusable, and configuration-driven so different departments/teams and users can tailor behavior **without spawning sub-apps** or bloating the codebase.
+
+### Context
+
+- Repository scope: whole project.
+- Organisations: City of Westminster and Royal Borough of Kensington and Chelsea (bi-borough); solution must generalize to other councils.
+- Objectives:
+  - Focus on **core foundations** (not verification/backend specifics yet): domain model, tenancy model, extensibility, performance, accessibility, governance, and delivery approach.
+  - **Not about “branding per council”**; visual layer must prioritize accessibility/readability and consistent design tokens over arbitrary color swaps.
+  - Must be **reusable**, cost/time efficient, and scalable across departments (no “mini-apps” proliferation).
+- Constraints & considerations:
+  - UK context (accessibility ≥ WCAG 2.2 AA; UK GDPR/privacy by design; service reliability/observability).
+  - Multi-tenant/multi-department configuration, role-based access control, feature flags, and policy/config-as-code.
+  - Offline/low-connectivity tolerance on mobile where feasible; performance budgets.
+  - “Move away from prior ‘Minit’ approach” to a council-first platform (don’t clone central gov patterns blindly; justify choices).
+- Unknowns: Use **semantic search thinking** to surface what’s missing; propose how to resolve gaps (e.g., discovery questions, data you’d need, experiments/proofs).
+
+### Expected Output
+
+- Deliver a **single, comprehensive Markdown document**: `docs/architecture.md`, that includes:
+  1. **Executive Summary**: goals, non-goals, success criteria.
+  2. **Assumptions & Open Questions**: unknowns discovered via semantic-search framing; list clarifying questions to the stakeholder.
+  3. **Problem Decomposition & Capability Map**: core domains and cross-cutting concerns.
+  4. **Architecture Overview**: target state (diagrams in Markdown syntax/ASCII if needed) covering:
+     - Multi-tenant model (council → department/team → user); isolation strategy.
+     - **Configuration-driven extensibility**: plugin/module system; feature flags; policy-as-code.
+     - UI composition (RN + RN-Web), navigation, and **design-token system** enforcing accessibility (contrast, typography, spacing).
+     - Data access layer abstraction (API-agnostic; REST/GraphQL compatible) without locking into one backend.
+     - AuthN/AuthZ & RBAC, auditing, PII boundaries, and data residency.
+     - Performance & offline strategy; caching; background sync.
+     - Observability: logging, metrics, tracing; SLOs.
+  5. **Tenancy & Config**: schemas for tenant/department config (YAML/JSON), feature toggles, permissions, content taxonomies, i18n.
+  6. **Plugin Interface**: minimal spec for feature modules (capabilities, routes, permissions, config hooks, telemetry).
+  7. **Accessibility Plan**: how accessibility is enforced at build & runtime; linting/tests; token constraints (≥ WCAG 2.2 AA).
+  8. **Security & Privacy**: threat model overview; least-privilege; secure storage on device; secrets handling; UK GDPR DPIA hooks.
+  9. **Delivery & Governance**: monorepo layout, CI rules, codeowners, versioning, release trains, env promotion.
+  10. **Testing Strategy**: unit, contract, e2e; **include sample tests** that assert plugin loading, config validation, and accessibility tokens.
+  11. **Migration/Roadmap**: phased plan (0→1 prototype, pilot with Westminster/RBKC, scale-out), risks & mitigations.
+  12. **References**: cite any standards/prior art used (no runtime web calls required to render output).
+- Provide **new files** in a minimal scaffold (≤ 500 lines total across all code/fixtures):
+  - `packages/core/config/schema/tenant.schema.json` (example).
+  - `packages/core/plugins/registry.ts` (plugin loader interface).
+  - `packages/ui/tokens/tokens.json` (accessibility-safe defaults + rules).
+  - `apps/mobile/App.tsx` and `apps/web/App.tsx` (shells wiring registry + config).
+  - `packages/core/flags/flags.example.yml` (feature flags).
+  - Tests:
+    - `packages/core/config/__tests__/tenant.schema.test.ts`
+    - `packages/core/plugins/__tests__/registry.spec.ts`
+    - `packages/ui/__tests__/tokens.a11y.spec.ts`
+- If code changes are made relative to an implied empty repo, output **new files** with content; if modifying existing snippets, use a **unified diff**.
+- No external network calls after `setup script`. Include citations as plain links/text in the Markdown doc (not fetched at runtime).
+
+### Guidance for Codex
+
+1. **Structured CoT**: Plan → Design → Files → Tests.
+2. **Semantic-search pass**: enumerate unknowns + propose how to discover them; do not invent fake facts.
+3. **Self-critique loop**: generate → review against goals/constraints → refine once; document the refinements succinctly in an “Appendix: Review Notes”.
+4. Keep total new content **≤ 500 lines**. Favor clarity over breadth; show just-enough scaffolding.
+5. Do not include secrets/PII. Avoid hard-coding council-specific branding; focus on accessibility tokens and configuration.
+
+### Setup Script (if needed)
+
+```bash
+# (Optional) Initialize a minimal TypeScript monorepo skeleton for illustration only (no network after this).
+npm init -y
+npm pkg set type=module
+mkdir -p packages/core/{config,plugins,flags}/__tests__ packages/ui/__tests__ apps/{web,mobile} docs
 - Phase 14 (Pilot/Rollout): Seeded pilot config `config/pilot_children.yaml` (Children domain templates, SharePoint path, Planner placeholders); documentation notes for rollout paths.
 - Platform upgrades: Frontend bumped to Next.js 15.1 / React 19 (npm install, peer overrides noted), backend on FastAPI 0.120.x + Pydantic 2.11; Ray init hardened with namespace + worker register timeout env; settings/.env updated. Re-ran backend smoke tests (passing). Package-lock refreshed.
 - Platform upgrades follow-up: Resolved Next.js 15.5 app router layout/params typings, updated layouts to ReactNode, fixed rename dialog prop, replaced unsupported `bg-white/10` utilities, regen package-lock with React 19; frontend build now succeeds (warnings only re cache/sourcemap size). Smoke pytest suite still green.
@@ -34,3 +111,16 @@
 - Phase 5 progress: Azure STT adapters moved to api-version `2025-10-15`, added phrase list + multilingual EAL candidates, diarization-enabled batch; new `transcription_feedback` table (migration `e5f1a0c5a9ab`), dialogue endpoints for relabel/feedback, canonical speaker selection UI, and speaker role tagging. Processing_mode now used to prefer batch adapter. OpenAPI regenerated; health test still green.
 - Phase 6 (complete): Added social care template suite (`home_visit`, `supervision`, `strategy_discussion`, `lac_review`, `adult_safeguarding`, `chronology_update`, `actions_only`, `manager_summary`, `child_protection_conference`) under `common/templates/social_care/` with domain tags; TemplateMetadata now includes service_domains; new `service_domain_template` mapping table (migration `f6c1d2e4ea11`) and filtering in `/templates`; minute fields `visit_type`, `intended_outcomes`, `risk_flags` wired through API/UI/start forms; Simple/Section templates inject contextual case/visit/risk info.
 - Phase 7 (complete): Evidence UX — citation playback sidebar in Minute editor with timestamp jumps, signed recording URL endpoint, DialogueEntry carries `canonical_speaker`; adapters ensure start/end timestamps preserved; continued timestamp citations in templates. OpenAPI regenerated; `tests/test_health.py` passes.
+
+## 2025-11-21 (universal app foundations for Minute)
+- Add `docs/universal_council_app_foundations.md` under `minute-main/docs/` describing how the existing Minute-based solution can evolve into a universal, config-driven council app for WCC/RBKC (multi-tenant model, plugin modules, design tokens, role/domain-aware navigation, and RN/RN-Web convergence path).
+- Implement config systemisation groundwork: add Pydantic tenant config models/loader (`common/config/models.py`, `common/config/loader.py`), expose read-only config API (`backend/api/routes/config.py`) and register in router. Frontend gains typed tenant config fetcher (`frontend/lib/config/types.ts`, `frontend/lib/config/client.ts`).
+- Add frontend module declarations for Transcription/Minutes and helper to filter by tenant/domain (`frontend/lib/modules.ts`).
+- Navigation now renders from tenant config (modules filtered by service domain) with loading/error states; templates button only if minutes module enabled. Added `useTenantConfig` hook and updated pilot config with module list.
+- Added config validation tests and script (`tests/test_config_loader.py`, `tests/test_config_all.py`, `scripts/validate_configs.py`); module map expanded with admin/notes placeholders; GIthub Actions workflow `config-validate.yml` runs validation on push/PR.
+- Wire nav to module/tenant config: Header now renders navigation from enabled modules per tenant/service domain; includes loading/error states; defaults to `NEXT_PUBLIC_TENANT_ID` or westminster. Added `useTenantConfig` hook. Updated pilot config with module list.
+- Enforcement docs: AGENTS adds rule for config-first navigation; PLANS marks Phase 3a tasks as done. Added `tests/test_config_loader.py` for loader. 
+
+## 2025-11-21 (universal app foundations for Minute)
+- Add `docs/universal_council_app_foundations.md` under `minute-main/docs/` describing how the existing Minute-based solution can evolve into a universal, config-driven council app for WCC/RBKC (multi-tenant model, plugin modules, design tokens, role/domain-aware navigation, and RN/RN-Web convergence path).
+```

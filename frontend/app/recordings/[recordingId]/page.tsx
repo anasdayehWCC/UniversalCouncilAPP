@@ -12,7 +12,10 @@ import { Loader2, TriangleAlert } from 'lucide-react'
 import { FormProvider } from 'react-hook-form'
 export default function RecordingPage({
   params,
-}: any) {
+}: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  params: any
+}) {
   const recordingId = params.recordingId as string
   const { getRecording } = useRecordingDb()
   const {

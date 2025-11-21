@@ -19,12 +19,31 @@ export default function Home() {
           Social Care Recording & Minutes
         </h1>
         <p className="text-lg text-foreground/80 leading-relaxed max-w-4xl">
-          Secure AI-powered transcription and minute-taking for children's and adults' social care.
+          Secure AI-powered transcription and minute-taking for children&apos;s and adults&apos; social care.
           Capture home visits, supervisions, and strategy discussions with automatic speaker identification.
           <span className="ml-2 inline-block rounded-full bg-accent-alt/15 px-4 py-1.5 text-sm font-semibold text-accent-alt border border-accent-alt/40 shadow-sm">
             OFFICIAL SENSITIVE
           </span>
         </p>
+      </div>
+
+      {/* Quick Start Section - NEW */}
+      <div className="mb-8">
+        <h2 className="text-lg font-semibold text-muted-foreground mb-4">Quick Start</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { name: 'Home Visit', color: 'bg-blue-500/10 text-blue-600 border-blue-200' },
+            { name: 'Initial Assessment', color: 'bg-green-500/10 text-green-600 border-green-200' },
+            { name: 'Strategy Discussion', color: 'bg-purple-500/10 text-purple-600 border-purple-200' },
+            { name: 'Supervision', color: 'bg-orange-500/10 text-orange-600 border-orange-200' },
+          ].map((template) => (
+            <Link href={`/new?template=${template.name}`} key={template.name}>
+              <div className={`glass-panel-premium p-4 rounded-xl hover:scale-105 transition-transform cursor-pointer border ${template.color}`}>
+                <div className="font-medium text-sm">{template.name}</div>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
 
       {/* CTA Button - MASSIVELY IMPROVED */}

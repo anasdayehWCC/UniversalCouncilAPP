@@ -12,6 +12,8 @@ from common.database.postgres_models import Recording
 from common.services.exceptions import TranscriptionFailedError
 from common.services.transcription_services.adapter import AdapterType, TranscriptionAdapter
 from common.services.transcription_services.azure_common import TOO_MANY_REQUESTS, convert_to_dialogue_entries
+from common.services.transcription_services.lexicon import build_phrase_list
+from common.audio.ffmpeg import get_num_audio_channels
 from common.settings import get_settings
 from common.types import TranscriptionJobMessageData
 
@@ -38,24 +40,41 @@ class AzureSpeechAdapter(TranscriptionAdapter):
         wait=wait_exponential(multiplier=1, min=4, max=10),
         stop=stop_after_attempt(5),
     )
-    async def start(cls, audio_file_path_or_recording: Path | Recording) -> TranscriptionJobMessageData:
+    async def start(
+        cls, audio_file_path_or_recording: Path | Recording, *, context: dict | None = None
+    ) -> TranscriptionJobMessageData:
         """Transcribe using Azure Speech-to-Text API."""
         # Use your existing Azure transcription function
         """
         Async version of transcribe audio using Azure Speech-to-Text API
         """
 
+        context = context or {}
+
         with sentry_sdk.start_transaction(op="process", name="read_file_before_azure_transcribe") as transaction:
             async with aiofiles.open(audio_file_path_or_recording, "rb") as audio_file:
                 audio_content = await audio_file.read()
                 locales = ["en-GB"] + settings.AZURE_SPEECH_ADDITIONAL_LOCALES
-                definition = {
+                channel_count = context.get("channel_count") or get_num_audio_channels(audio_file_path_or_recording)
+                phrase_list = context.get("phrase_list") or build_phrase_list(context.get("service_domain_id"))
+
+                definition: dict[str, Any] = {
                     "locales": locales,
-                    "diarization": {"enabled": True},
                     "profanityFilterMode": "None",
                 }
-                if settings.AZURE_SPEECH_PHRASE_LIST:
-                    definition["phraseList"] = settings.AZURE_SPEECH_PHRASE_LIST
+
+                use_dual_channel = bool(channel_count and channel_count >= 2 and settings.AZURE_SPEECH_DUAL_CHANNEL_ENABLED)
+                if use_dual_channel:
+                    # Azure Speech v2025-10-15 recommends channel-based processing for stereo instead of diarization
+                    definition["channels"] = [0, 1]
+                else:
+                    definition["diarization"] = {
+                        "enabled": True,
+                        "maxSpeakers": settings.AZURE_SPEECH_MAX_SPEAKERS,
+                    }
+
+                if phrase_list:
+                    definition["phraseList"] = phrase_list
                 files: Any = {
                     "audio": ("audio.wav", audio_content),
                     "definition": (

@@ -2556,6 +2556,91 @@
           }
         }
       }
+    },
+    "/transcriptions/{transcription_id}/recordings/{recording_id}/signed-url-range": {
+      "get": {
+        "operationId": "getSignedRecordingRange",
+        "parameters": [
+          {
+            "name": "transcription_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "recording_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "start_seconds",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "required": false,
+            "default": 0
+          },
+          {
+            "name": "end_seconds",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SingleRecordingSegment"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/transcriptions/{transcription_id}/evidence-click": {
+      "post": {
+        "operationId": "postEvidenceClick",
+        "parameters": [
+          {
+            "name": "transcription_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvidenceClickRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -4464,6 +4549,58 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "SingleRecordingSegment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "url": {
+            "type": "string"
+          },
+          "extension": {
+            "type": "string"
+          },
+          "start_seconds": {
+            "type": "number",
+            "nullable": true
+          },
+          "end_seconds": {
+            "type": "number",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "url",
+          "extension"
+        ]
+      },
+      "EvidenceClickRequest": {
+        "type": "object",
+        "properties": {
+          "recording_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "start_time": {
+            "type": "number"
+          },
+          "end_time": {
+            "type": "number",
+            "nullable": true
+          },
+          "citation_number": {
+            "type": "integer",
+            "nullable": true
+          }
+        },
+        "required": [
+          "recording_id",
+          "start_time"
+        ]
       }
     }
   }

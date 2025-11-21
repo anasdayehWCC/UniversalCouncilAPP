@@ -136,6 +136,21 @@ class SingleRecording(BaseModel):
     extension: str
 
 
+class SingleRecordingSegment(BaseModel):
+    id: uuid.UUID
+    url: str
+    extension: str
+    start_seconds: float | None = None
+    end_seconds: float | None = None
+
+
+class EvidenceClickRequest(BaseModel):
+    recording_id: uuid.UUID
+    start_time: float
+    end_time: float | None = None
+    citation_number: int | None = None
+
+
 class MinuteListItem(BaseModel):
     id: uuid.UUID
     created_datetime: datetime

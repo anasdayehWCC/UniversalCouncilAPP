@@ -79,7 +79,7 @@ export const PaginatedTranscriptions = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col items-center justify-center py-16 rounded-2xl bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5 border border-border/50"
+          className="flex flex-col items-center justify-center py-16 rounded-2xl glass-panel-premium"
         >
           <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
           <div className="text-lg font-medium text-foreground">Loading transcriptions...</div>
@@ -99,7 +99,7 @@ export const PaginatedTranscriptions = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col items-center justify-center py-20 rounded-2xl bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5 border-2 border-dashed border-border"
+          className="flex flex-col items-center justify-center py-20 rounded-2xl glass-panel-premium border-dashed"
         >
           <FileText className="h-16 w-16 text-muted-foreground/50 mb-4" />
           <div className="text-xl font-semibold text-foreground mb-2">No transcriptions yet</div>
@@ -152,8 +152,8 @@ export const PaginatedTranscriptions = () => {
                   size="sm"
                   onClick={() => setCurrentPage(page)}
                   className={`min-w-10 ${currentPage === page
-                      ? 'bg-primary text-white shadow-md'
-                      : 'hover:bg-primary/10 hover:text-primary hover:border-primary/50'
+                    ? 'bg-primary text-white shadow-md'
+                    : 'hover:bg-primary/10 hover:text-primary hover:border-primary/50'
                     } transition-all`}
                 >
                   {page}

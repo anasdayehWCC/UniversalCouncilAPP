@@ -51,7 +51,7 @@ class TranscriptionAdapter(ABC):
 
     @classmethod
     @overload
-    async def start(cls, audio_file_path_or_recording: Path) -> TranscriptionJobMessageData:
+    async def start(cls, audio_file_path_or_recording: Path, *, context: dict | None = None) -> TranscriptionJobMessageData:
         """Starts a transcription job asynchronously.
 
         This method begins the transcription process for the given audio file path
@@ -70,7 +70,7 @@ class TranscriptionAdapter(ABC):
 
     @classmethod
     @overload
-    async def start(cls, audio_file_path_or_recording: Recording) -> TranscriptionJobMessageData:
+    async def start(cls, audio_file_path_or_recording: Recording, *, context: dict | None = None) -> TranscriptionJobMessageData:
         """Starts a transcription job asynchronously.
 
         This method begins the transcription process for the given audio file path
@@ -89,7 +89,9 @@ class TranscriptionAdapter(ABC):
 
     @classmethod
     @abstractmethod
-    async def start(cls, audio_file_path_or_recording: Path | Recording) -> TranscriptionJobMessageData: ...
+    async def start(
+        cls, audio_file_path_or_recording: Path | Recording, *, context: dict | None = None
+    ) -> TranscriptionJobMessageData: ...
 
     @classmethod
     @abstractmethod

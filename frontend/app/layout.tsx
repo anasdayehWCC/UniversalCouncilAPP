@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import { Toaster } from 'sonner'
 import { OfflineIndicator } from '@/components/offline-indicator'
@@ -12,8 +12,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Minute',
-  description: 'Minutes and transcriptions',
+  title: 'CareMinutes',
+  description: 'Social Care Transcription & Minutes',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
@@ -22,10 +22,21 @@ export const metadata: Metadata = {
   },
 }
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+  themeColor: '#004B65',
+}
+
+
+
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
     <html lang="en" className={inter.className}>
@@ -35,7 +46,9 @@ export default function RootLayout({
             <div className="flex min-h-screen flex-col justify-between bg-page">
               <div>
                 <Header userTemplatesEnabled={true} />
-                <main className="px-4 pb-8 sm:px-8">{children}</main>
+                <main className="px-4 pb-8 sm:px-8">
+                  {children}
+                </main>
               </div>
               <Footer />
             </div>

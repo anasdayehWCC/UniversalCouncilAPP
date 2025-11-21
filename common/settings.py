@@ -71,6 +71,25 @@ class Settings(BaseSettings):
         description="Optional phrase list to boost recognition (comma-separated)",
         default_factory=list,
     )
+    AZURE_SPEECH_PHRASE_LIST_BY_DOMAIN: dict[str, list[str]] = Field(
+        description="Optional per-domain phrase lists to boost recognition (JSON map of domain_id -> list[str])",
+        default_factory=dict,
+    )
+    AZURE_SPEECH_PHRASE_LIST_BIAS: float = Field(
+        description="Biasing weight for Azure phrase lists (1.0-2.0; higher = stronger)", default=1.2
+    )
+    AZURE_SPEECH_DUAL_CHANNEL_ENABLED: bool = Field(
+        description="If true, stereo recordings are sent as dual-channel (channels=[0,1]) instead of diarization",
+        default=True,
+    )
+    AZURE_SPEECH_MAX_SPEAKERS: int = Field(
+        description="Max speaker count when diarization is used for mono files",
+        default=6,
+    )
+    AZURE_SPEECH_BATCH_CUSTOM_MODEL_ID: str | None = Field(
+        description="Optional Speech custom model ID to use for batch transcription when phrase lists are unavailable",
+        default=None,
+    )
     AZURE_SPEECH_ADDITIONAL_LOCALES: list[str] = Field(
         description="Comma-separated extra locales for language ID (EAL support)",
         default_factory=list,

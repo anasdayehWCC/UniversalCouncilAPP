@@ -35,12 +35,15 @@ import {
   createChatTranscriptionsTranscriptionIdChatPost,
   deleteChatTranscriptionsTranscriptionIdChatChatIdDelete,
   getChatTranscriptionsTranscriptionIdChatChatIdGet,
+  getSignedRecordingRange,
+  postEvidenceClick,
 } from '../sdk.gen'
 import {
   queryOptions,
   infiniteQueryOptions,
   type InfiniteData,
   type UseMutationOptions,
+  type DefaultError,
 } from '@tanstack/react-query'
 import type {
   ListTranscriptionsTranscriptionsGetData,
@@ -108,6 +111,9 @@ import type {
   DeleteChatTranscriptionsTranscriptionIdChatChatIdDeleteError,
   DeleteChatTranscriptionsTranscriptionIdChatChatIdDeleteResponse,
   GetChatTranscriptionsTranscriptionIdChatChatIdGetData,
+  GetSignedRecordingRangeData,
+  PostEvidenceClickData,
+  PostEvidenceClickResponse,
 } from '../types.gen'
 import { client as _heyApiClient } from '../client.gen'
 
@@ -1391,4 +1397,70 @@ export const getChatTranscriptionsTranscriptionIdChatChatIdGetOptions = (
     queryKey:
       getChatTranscriptionsTranscriptionIdChatChatIdGetQueryKey(options),
   })
+}
+
+export const getSignedRecordingRangeQueryKey = (
+  options: Options<GetSignedRecordingRangeData>
+) => createQueryKey('getSignedRecordingRange', options)
+
+export const getSignedRecordingRangeOptions = (
+  options: Options<GetSignedRecordingRangeData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getSignedRecordingRange({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getSignedRecordingRangeQueryKey(options),
+  })
+}
+
+export const postEvidenceClickQueryKey = (
+  options: Options<PostEvidenceClickData>
+) => createQueryKey('postEvidenceClick', options)
+
+export const postEvidenceClickOptions = (
+  options: Options<PostEvidenceClickData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await postEvidenceClick({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: postEvidenceClickQueryKey(options),
+  })
+}
+
+export const postEvidenceClickMutation = (
+  options?: Partial<Options<PostEvidenceClickData>>
+): UseMutationOptions<
+  PostEvidenceClickResponse,
+  DefaultError,
+  Options<PostEvidenceClickData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    PostEvidenceClickResponse,
+    DefaultError,
+    Options<PostEvidenceClickData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await postEvidenceClick({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
 }

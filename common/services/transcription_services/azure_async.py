@@ -15,6 +15,7 @@ from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_ex
 from common.database.postgres_models import DialogueEntry, Recording
 from common.services.storage_services import get_storage_service
 from common.services.transcription_services.adapter import AdapterType, TranscriptionAdapter
+from common.services.transcription_services.azure_common import speaker_from_entry
 from common.settings import get_settings
 from common.types import TranscriptionJobMessageData
 
@@ -45,7 +46,7 @@ params = {"api-version": settings.AZURE_SPEECH_API_VERSION}
 
 
 class AzureBatchTranscriptionAdapter(TranscriptionAdapter):
-    """Adapter for AWS Transcribe service. Note, no tenacity is configured as boto3 does this automagically"""
+    """Adapter for Azure Speech batch transcription."""
 
     max_audio_length = 14400
     name = "azure_stt_batch"
@@ -57,10 +58,13 @@ class AzureBatchTranscriptionAdapter(TranscriptionAdapter):
         wait=wait_exponential(multiplier=1, min=4, max=10),
         stop=stop_after_attempt(5),
     )
-    async def start(cls, audio_file_path_or_recording: Path | Recording) -> TranscriptionJobMessageData:
+    async def start(
+        cls, audio_file_path_or_recording: Path | Recording, *, context: dict | None = None
+    ) -> TranscriptionJobMessageData:
         """
         Async version of transcribe audio using Azure Speech-to-Text API
         """
+        context = context or {}
         file_name = uuid.uuid4()
         job_name = f"minute-{settings.ENVIRONMENT}-transcription-job-{file_name}"
         presigned_url = await storage_service.generate_presigned_url_get_object(
@@ -73,30 +77,45 @@ class AzureBatchTranscriptionAdapter(TranscriptionAdapter):
             sas_token = cls.get_azure_container_sas(
                 container_client, ContainerSasPermissions(read=True, write=True, list=True)
             )
+            channel_count = context.get("channel_count")
+            use_dual_channel = bool(channel_count and channel_count >= 2 and settings.AZURE_SPEECH_DUAL_CHANNEL_ENABLED)
+
+            properties: dict[str, Any] = {
+                "timeToLiveHours": 48,
+                "profanityFilterMode": "None",
+                "destinationContainerUrl": f"{container_client.url}?{sas_token}",
+            }
+
+            if use_dual_channel:
+                properties["channels"] = [0, 1]
+            else:
+                properties["diarization"] = {
+                    "enabled": True,
+                    "maxSpeakers": settings.AZURE_SPEECH_MAX_SPEAKERS,
+                }
+
+            model = settings.AZURE_SPEECH_BATCH_CUSTOM_MODEL_ID
 
             data = {
-                "contentUrls": [
-                    presigned_url,
-                ],
+                "contentUrls": [presigned_url],
                 "locale": "en-GB",
                 "displayName": job_name,
-                "model": None,
-                "properties": {
-                    "timeToLiveHours": 48,
-                    "diarization": {
-                        "enabled": True,
-                    },
-                    "profanityFilterMode": "None",
-                    "destinationContainerUrl": f"{container_client.url}?{sas_token}",
-                },
+                "properties": properties,
             }
+
+            if model:
+                data["model"] = model
+
             if settings.AZURE_SPEECH_ADDITIONAL_LOCALES:
                 data["languageIdentification"] = {
                     "enabled": True,
                     "candidateLocales": ["en-GB", *settings.AZURE_SPEECH_ADDITIONAL_LOCALES],
                 }
-            if settings.AZURE_SPEECH_PHRASE_LIST:
-                data["properties"]["phraseList"] = settings.AZURE_SPEECH_PHRASE_LIST
+
+            if context.get("phrase_list"):
+                logger.info(
+                    "Skipping phrase list for batch transcription (not supported); set custom model for domain instead",
+                )
 
         async with httpx.AsyncClient(timeout=timeout_settings) as client:
             response = await client.post(submit_url, headers=headers, json=data, params=params)
@@ -130,7 +149,7 @@ class AzureBatchTranscriptionAdapter(TranscriptionAdapter):
                     if entry["kind"] == "Transcription":
                         #   if we want details from the report, they can be accessed via:
                         # elif entry['kind'] == 'TranscriptionReport':
-                        #     transcription_report_url = entry.get('links', {}).get('contentUrls', [None])[0]
+                #     transcription_report_url = entry.get('links', {}).get('contentUrls', [None])[0]
 
                         with get_client() as container_client:
                             blob = BlobClient.from_blob_url(url, credential=container_client.credential)
@@ -166,7 +185,7 @@ class AzureBatchTranscriptionAdapter(TranscriptionAdapter):
     def get_dialogue_entries(cls, phrases: dict[str, Any]) -> list[DialogueEntry]:
         return [
             DialogueEntry(
-                speaker=str(entry["speaker"]),
+                speaker=speaker_from_entry(entry),
                 text=entry["nBest"][0]["display"],
                 start_time=float(entry["offsetMilliseconds"]) / 1000,
                 end_time=(float(entry["offsetMilliseconds"]) + float(entry["durationMilliseconds"])) / 1000,

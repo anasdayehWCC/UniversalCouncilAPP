@@ -7,7 +7,7 @@ import ffmpeg
 logger = logging.getLogger(__name__)
 
 
-def convert_to_mp3(input_file_path: Path) -> Path:
+def convert_to_mp3(input_file_path: Path, channels: int = 1) -> Path:
     if not Path(input_file_path).is_file():
         msg = f"Input file not found: {input_file_path}"
         logger.error(msg)
@@ -32,7 +32,7 @@ def convert_to_mp3(input_file_path: Path) -> Path:
             "acodec": "libmp3lame",  # Use LAME MP3 encoder
             "loglevel": "warning",  # Show warnings and errors
             "audio_bitrate": "192k",
-            "ac": 1,
+            "ac": channels,
         }
 
         output_stream = ffmpeg.output(input_stream, output_file.as_posix(), **output_args)

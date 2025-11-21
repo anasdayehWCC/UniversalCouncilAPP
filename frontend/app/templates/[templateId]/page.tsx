@@ -21,7 +21,10 @@ import { toast } from 'sonner'
 
 export default function EditTemplatePage({
   params,
-}: any) {
+}: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  params: any
+}) {
   const templateId = params.templateId as string
   const { data: template } = useQuery({
     ...getUserTemplateUserTemplatesTemplateIdGetOptions({

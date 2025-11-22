@@ -17,8 +17,8 @@ import {
   ExportResponse,
   Transcription,
   SingleRecording,
-  getSignedRecordingRange,
-  postEvidenceClick,
+  getSignedRecordingRangeTranscriptionsTranscriptionIdRecordingsRecordingIdSignedUrlRangeGet as getSignedRecordingRange,
+  recordEvidenceClickTranscriptionsTranscriptionIdEvidenceClickPost as postEvidenceClick,
 } from '@/lib/client'
 import {
   createMinuteVersionMinutesMinuteIdVersionsPostMutation,

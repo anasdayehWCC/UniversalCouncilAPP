@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -25,7 +25,8 @@ type AuditEntry = {
     outcome: string
 }
 
-export default function ConfigDetailPage({ params }: { params: { id: string } }) {
+export default function ConfigDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = use(params)
     const router = useRouter()
     const [config, setConfig] = useState<ConfigDetail | null>(null)
     const [auditLog, setAuditLog] = useState<AuditEntry[]>([])
@@ -33,38 +34,36 @@ export default function ConfigDetailPage({ params }: { params: { id: string } })
     const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
-        loadConfigDetail()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [params.id, loadConfigDetail])
+        async function loadConfigDetail() {
+            try {
+                setLoading(true)
+                const [configRes, auditRes] = await Promise.all([
+                    fetch(`/api/admin/configs/${id}`),
+                    fetch(`/api/admin/configs/${id}/audit`),
+                ])
 
-    async function loadConfigDetail() {
-        try {
-            setLoading(true)
-            const [configRes, auditRes] = await Promise.all([
-                fetch(`/api/admin/configs/${params.id}`),
-                fetch(`/api/admin/configs/${params.id}/audit`),
-            ])
-
-            if (!configRes.ok) {
-                if (configRes.status === 403) {
-                    router.push('/unauthorised')
-                    return
+                if (!configRes.ok) {
+                    if (configRes.status === 403) {
+                        router.push('/unauthorised')
+                        return
+                    }
+                    throw new Error('Failed to load configuration')
                 }
-                throw new Error('Failed to load configuration')
+
+                const configData = await configRes.json()
+                const auditData = auditRes.ok ? await auditRes.json() : { entries: [] }
+
+                setConfig(configData)
+                setAuditLog(auditData.entries || [])
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'Failed to load configuration details')
+                console.error(err)
+            } finally {
+                setLoading(false)
             }
-
-            const configData = await configRes.json()
-            const auditData = auditRes.ok ? await auditRes.json() : { entries: [] }
-
-            setConfig(configData)
-            setAuditLog(auditData.entries || [])
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to load configuration details')
-            console.error(err)
-        } finally {
-            setLoading(false)
         }
-    }
+        loadConfigDetail()
+    }, [id, router])
 
     if (loading) {
         return (

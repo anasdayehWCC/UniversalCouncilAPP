@@ -269,6 +269,6 @@ This section ties journeys to concrete delivery phases, so we can see how UX int
 This document should be kept in sync with:
 
 - `minute-main/ROADMAP_social_care.md` (phases 1–40).
-- `minute-main/PLANS.md` (exec plan and progress).
+- `PLANS.md` (exec plan and progress).
 - `minute-main/docs/architecture.md` and `minute-main/docs/universal_council_architecture.md` (structural architecture).
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -14,7 +14,8 @@ type ConfigVersion = {
     changes: string[]
 }
 
-export default function ConfigHistoryPage({ params }: { params: { id: string } }) {
+export default function ConfigHistoryPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = use(params)
     const router = useRouter()
     const [versions, setVersions] = useState<ConfigVersion[]>([])
     const [configName, setConfigName] = useState('')
@@ -22,33 +23,31 @@ export default function ConfigHistoryPage({ params }: { params: { id: string } }
     const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
-        loadHistory()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [params.id, loadHistory])
+        async function loadHistory() {
+            try {
+                setLoading(true)
+                const response = await fetch(`/api/admin/configs/${id}/history`)
 
-    async function loadHistory() {
-        try {
-            setLoading(true)
-            const response = await fetch(`/api/admin/configs/${params.id}/history`)
-
-            if (!response.ok) {
-                if (response.status === 403) {
-                    router.push('/unauthorised')
-                    return
+                if (!response.ok) {
+                    if (response.status === 403) {
+                        router.push('/unauthorised')
+                        return
+                    }
+                    throw new Error('Failed to load configuration history')
                 }
-                throw new Error('Failed to load configuration history')
-            }
 
-            const data = await response.json()
-            setVersions(data.versions || [])
-            setConfigName(data.configName || params.id)
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to load history')
-            console.error(err)
-        } finally {
-            setLoading(false)
+                const data = await response.json()
+                setVersions(data.versions || [])
+                setConfigName(data.configName || id)
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'Failed to load history')
+                console.error(err)
+            } finally {
+                setLoading(false)
+            }
         }
-    }
+        loadHistory()
+    }, [id, router])
 
     if (loading) {
         return (

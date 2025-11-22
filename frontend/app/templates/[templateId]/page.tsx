@@ -19,13 +19,14 @@ import { useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
+import { use } from 'react'
+
 export default function EditTemplatePage({
   params,
 }: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  params: any
+  params: Promise<{ templateId: string }>
 }) {
-  const templateId = params.templateId as string
+  const { templateId } = use(params)
   const { data: template } = useQuery({
     ...getUserTemplateUserTemplatesTemplateIdGetOptions({
       path: { template_id: templateId },

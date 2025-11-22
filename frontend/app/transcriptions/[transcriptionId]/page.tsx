@@ -17,13 +17,14 @@ import { Clock, Frown, SearchX } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useFeatureFlagEnabled } from 'posthog-js/react'
 
+import { use } from 'react'
+
 export default function TranscriptionPage({
   params,
 }: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  params: any
+  params: Promise<{ transcriptionId: string }>
 }) {
-  const transcriptionId = params.transcriptionId as string
+  const { transcriptionId } = use(params)
   const isChatEnabled = useFeatureFlagEnabled(FeatureFlags.ChatEnabled)
 
   const { data: transcription, isLoading } = useQuery({

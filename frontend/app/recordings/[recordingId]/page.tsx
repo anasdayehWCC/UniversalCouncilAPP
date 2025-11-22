@@ -10,13 +10,14 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import { Loader2, TriangleAlert } from 'lucide-react'
 import { FormProvider } from 'react-hook-form'
+import { use } from 'react'
+
 export default function RecordingPage({
   params,
 }: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  params: any
+  params: Promise<{ recordingId: string }>
 }) {
-  const recordingId = params.recordingId as string
+  const { recordingId } = use(params)
   const { getRecording } = useRecordingDb()
   const {
     data: recording,

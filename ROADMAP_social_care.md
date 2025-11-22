@@ -537,25 +537,31 @@ Exit: Successful pilot sign-off; backlog of tweaks captured; Adults rollout sche
 ### Phase 20 — Universal Multilingual Support
 
 #### Phase 20A — Backend translation services & config
-- **Objective:** Enable multi-language support via config and backend services without touching frontend UI.
-- **Write scope:** `common/config/models.py`, `common/services/transcription_services/translator.py`, `worker/translation_worker.py`, `backend/api/routes/transcriptions.py`. Frontend is **read-only**.
-- **Dependencies:** Phase 16A schema.
-- **Actions:**
-  1. Update `TenantConfig` schema to include `languages` (default, allowed list) and `translation_service` config.
-  2. Implement `AzureTranslatorService` adapter in `common/services/` to handle text translation.
-  3. Add `translation_worker.py` to process transcriptions asynchronously; store results in `Transcription` model (add `translations` JSONB column via migration).
-  4. Add API endpoints `POST /transcriptions/{id}/translate` and `GET /transcriptions/{id}/translations`.
-- **Exit:** Backend can translate transcripts on demand; config controls allowed languages; API exposes results.
+- **Status:** ✅ Completed 2025-11-22.
+- **What shipped:**
+  - `TenantConfig.languages` now captures `default`, `available`, and `autoTranslate` flags (schema + docs updated, pilot config set to auto-translate English→Polish/Arabic/Ukrainian).
+  - Added `TranslationService` (Azure Translator client with retry + graceful fallback) and `TranslationHandlerService` to create/track translation jobs per language.
+  - `Transcription` model stores a `translations` JSONB map; Alembic revision `20a0f2c1d3ab_phase20_translations.py` backfills column.
+  - Worker queue gained new `TaskType.TRANSLATION`; Ray LLM actor now processes translation jobs alongside minutes/edits, with auto-queue triggered after successful transcription when `autoTranslate=true`.
+  - Backend exposes `POST /transcriptions/{id}/translate` (manual request, multi-language payload, optional force) and `GET /transcriptions/{id}/translations` (status list). Access control matches transcription ownership, telemetry + audit wired.
+  - Settings + `.env.example` gained `AZURE_TRANSLATOR_KEY/REGION/ENDPOINT`; defaults keep behaviour no-op if credentials absent (we return source text and warn).
+  - Tests: lightweight serializer coverage (`tests/test_translation_handler_service.py`) to guarantee JobStatus parsing + ISO handling; worker/unit smoke tests rerun locally.
+- **Next checks:** add queue depth metrics + Azure Translator credential rotation, wire admin UI so tenant owners can update allowed languages without code change.
 
 #### Phase 20B — Frontend translation UI
-- **Objective:** Expose translation capabilities to users.
-- **Write scope:** `frontend/app/transcriptions/`, `frontend/components/transcription/`. Backend is **read-only**.
-- **Dependencies:** Phase 20A API available.
-- **Actions:**
-  1. Add language selector to Transcription view header.
-  2. Implement side-by-side view (Original vs Translated) or toggle.
-  3. Update `useTranscription` hook to fetch available translations.
-- **Exit:** Users can view transcripts in configured languages; UI handles loading/error states for translation.
+- **Status:** ✅ Completed 2025-11-22.
+- **What shipped:**
+  - Added `Translations` tab to the transcription page with a hero card riffing on the Magic Notes “Record → Keep safe → Use later” storyline (glassmorphism + gradient) so social workers immediately understand the flow.
+  - Built `TranslationsTab` client component using the generated TanStack query hooks. It:
+    - Fetches translation statuses with polling while jobs are queued/in progress.
+    - Reads tenant language config (via `useTenantConfig`) so the selector + status cards are entirely config-driven.
+    - Shows premium status chips (Queued/Translating/Ready/Needs attention), error messaging, and autop badges per language.
+    - Provides a dropdown + CTA to request/regenerate translations; handles optimistic states and surfaces mutation errors inline.
+    - Displays completed translations in an accessible textarea ready for copy/paste or export.
+  - UI primitives come from the shared `@ui/*` kit so RN/Web shells share the design tokens; skeleton + badges preserve AA contrast.
+  - `DEFAULT_TENANT_CONFIG_ID` env fallback added for client config fetches so white-labelling remains config-first.
+  - Frontend lint + build rerun (existing admin hook warnings noted); ensures React Query + MSAL contexts unaffected.
+- **Next checks:** extend translation view into the capture flow (e.g., quick share as PDF/email), add Playwright smoke to cover translation polling.
 
 ### Phase 21 — Task Management Module
 
@@ -700,6 +706,237 @@ Exit: Successful pilot sign-off; backlog of tweaks captured; Adults rollout sche
      - **Focus:** "Team Activity" (Charts), "Flagged Reviews".
   3. Update `app/page.tsx` to render the correct dashboard component.
 - **Exit:** Social workers see tools; Managers see insights; seamless switching.
+
+### Phase 27 — Recording Studio 2.0 (Magic Notes–inspired)
+
+**Objective:** Upgrade capture UX on web and mobile to match (and exceed) the simplicity of the Magic Notes recording experience while keeping the offline‑first guarantees we already have.
+
+Actions
+
+1. **Waveform & status indicators**
+   - Add real‑time waveform visualisation and clear “Recording / Paused / Saved” states to `/capture` and the main web recording flows.
+   - Ensure offline/online badges are consistent with the journeys in `docs/user_journeys.md` (Record → Keep safe → Use later).
+2. **Mode selector & consent**
+   - Introduce an explicit “In person” vs “Online or hybrid” chooser before recording (modal style), with a short “Get permission before recording” note and optional consent capture.
+   - Persist chosen mode on the recording/minute so templates and analytics can distinguish in‑person vs virtual contacts.
+3. **Quick actions on home**
+   - On the dashboard, add prominent cards for “Create report”, “Record”, and “Upload audio” that mirror the Magic Notes layout but use our premium theming.
+   - On mobile, add a floating “Quick record” button or bottom‑nav primary action.
+4. **Upload flow**
+   - Refine the “Upload audio” journey to feel as integrated as live recording (same metadata form, status chips, and outcomes).
+
+Exit: A social worker can see at a glance whether the app is recording, paused, or saved; the capture flows feel deliberate and calm on both phone and laptop; in‑person vs virtual meetings are clearly labelled throughout.
+
+### Phase 28 — AI Writing Assistant & Source Check
+
+**Objective:** Provide an inline AI assistant that helps practitioners tidy and adapt text while keeping a strong link back to evidence in the transcript.
+
+Actions
+
+1. **Edit with AI sidebar**
+   - Add a persistent “Edit with AI” sidebar to the minute editor with quick actions (change writing style, fix spelling, shorten/expand, simplify language).
+   - Use a cost‑aware model mix (gpt‑4o‑mini by default, with a fast vs premium option) and enforce token budgets per tenant/domain.
+2. **Free‑form prompt box**
+   - Allow the worker to describe a change (“Make this section more strengths‑based”, “Rewrite in plain English”), with responses previewed before being applied to the document.
+3. **Source check (beta)**
+   - Implement an optional “Source check” button for a paragraph or section that:
+     - Retrieves candidate transcript segments by timestamp/template anchors.
+     - Asks a verification model to confirm whether the statement is supported, partially supported, or unsupported.
+     - Surfaces results inline with clear, non‑legalistic language.
+4. **Governance controls**
+   - Log all AI edits and source checks in the audit trail; allow tenants to enable/disable or limit these features by role/domain.
+
+Exit: Practitioners can safely lean on AI to tidy and adapt text without losing sight of the underlying conversation; QA can quickly check the evidencing quality of key sections.
+
+### Phase 29 — Content Organisation (Tabs & Tags)
+
+**Objective:** Organise content so long notes stay navigable, and cross‑meeting retrieval (by tag, template, or topic) becomes effortless.
+
+Actions
+
+1. **Contextual tabs**
+   - Drive the tab structure in the minute editor (e.g., Summary, Recording & transcript, Care assessment, Supervision, Care review) from `ServiceDomainTemplate` metadata.
+   - Allow templates to declare their own domain‑specific tabs and default landing tab per role (worker vs manager).
+2. **Tagging system**
+   - Add a `tags` JSONB field to `Minute` (or a dedicated `Tag` table if needed) and UI for adding/removing tags with autocomplete (e.g., “transition”, “placement breakdown”, “domestic abuse”).
+   - Expose filters by tag, template, and domain on the “My notes” and manager review screens.
+3. **List and search integration**
+   - Ensure tags appear in the note list chips and search facets; allow combining tag filters with date, case, and domain filters.
+
+Exit: Long notes are split into meaningful sections; social workers and managers can quickly jump to relevant parts and retrieve notes by topic or tag.
+
+### Phase 30 — Config System & Module Registry (Universal App Foundation)
+
+**Objective:** Finalise the universal module/tenant configuration system so Minute becomes one set of feature modules within a reusable council app platform.
+
+Actions
+
+1. **Tenant schema and versioning**
+   - Extend `tenant.schema.json` with module/navigation/feature flag definitions and a version field.
+   - Add CI validation that checks all tenant configs against the schema and blocks merges on breaking changes.
+2. **Module manifests & API**
+   - Introduce a `ModuleManifest` type describing routes, permissions, icons, and dependencies for each module (Transcription, Minutes, Tasks, Insights, Admin).
+   - Expose `/api/modules` so both the existing Next app and the universal shells (`apps/web`, `apps/mobile`) can render nav from the same source of truth.
+3. **Config‑driven navigation**
+   - Replace hard‑coded navigation (e.g., in Sidebar) with a config‑driven renderer that filters modules by tenant, domain, and role.
+   - Ensure tests cover module enable/disable, per‑role nav differences, and backwards compatibility with existing routes.
+
+Exit: Adding a new department or module is primarily a config/schema change plus templates, not a series of hard‑coded nav and routing edits; both Minute and the universal app shells consume the same module registry.
+
+### Phase 31 — Design Tokens & Theme Engine
+
+**Objective:** Strengthen the design system so multiple councils and departments can share accessible tokens and lightweight branding, and the universal shells inherit the same look‑and‑feel.
+
+Actions
+
+1. **Token source of truth**
+   - Consolidate color, typography, spacing, and motion tokens into a `tokens.json` (or equivalent) and generate CSS variables (and RN equivalents) from it.
+   - Add tests to guarantee WCAG 2.2 AA contrast for core token pairs and minimum font sizes.
+2. **Tenant theme overrides**
+   - Allow tenant configs to specify logos and limited accent choices, with automatic contrast checking.
+   - Provide a preview mode for admins to test a new theme before promoting it.
+3. **Docs and examples**
+   - Update design system documentation to show how tokens map to council branding, with examples for WCC/RBKC and a “vanilla” council.
+
+Exit: All UI surfaces (Minute web app, universal web shell, mobile shell) share the same accessible token base, making it cheap to support new councils or adjust branding without redesigning entire flows.
+
+### Phase 32 — Advanced Offline & Sync
+
+**Objective:** Generalise offline support so it covers recordings, notes, tasks, and other future operations, with clear conflict handling and user feedback.
+
+Actions
+
+1. **Unified offline engine**
+   - Evolve the offline queue into a generic engine that can handle multiple operation types (recordings, note edits, task updates), with per‑operation retry and backoff policies.
+   - Provide a small, consistent status component (e.g., “1 item pending”, “Sync complete”) reusable across pages.
+2. **Background sync & notifications**
+   - Use service worker `sync` where supported to resume uploads in the background.
+   - Optionally send push notifications (or email) when long‑running jobs complete (“Your note is ready to review”).
+3. **Conflict resolution**
+   - Design simple flows for conflict scenarios (e.g., edits made both offline and online), starting with “pick latest” and moving to merge strategies where safe.
+
+Exit: Offline behaviour feels predictable and robust; social workers trust that “Record → Keep safe → Use later” always holds, even during device restarts or network flakiness.
+
+### Phase 33 — Cross‑Platform UI Kit (RN Web Preparation)
+
+**Objective:** Extract a shared UI kit that can power both Next (web) and React Native (mobile) without duplicating styling or behaviour.
+
+Actions
+
+1. **Shared primitives**
+   - Move low‑level components (`Button`, `Card`, `Badge`, layout primitives) into a cross‑platform‑friendly location (e.g., `frontend/components/primitives/` or `packages/ui`), using token‑based styles only.
+   - Avoid DOM‑only APIs in shared primitives; provide RN‑Web shims where needed.
+2. **Icon strategy**
+   - Introduce a small icon registry abstraction instead of importing `lucide-react` directly everywhere; provide a compatible RN implementation.
+3. **Stories & visual tests**
+   - Add stories or a simple demo page to exercise shared primitives, catching regressions in CI.
+
+Exit: Most UI work happens on reusable primitives that function across web and RN‑Web; adding new screens does not require re‑implementing components per platform.
+
+### Phase 34 — Mobile Shell (React Native / Expo)
+
+**Objective:** Deliver a first‑class mobile app that consumes the same module registry and config as the web app, giving social workers a high‑quality, native‑feeling experience.
+
+Actions
+
+1. **Expo shell based on modules**
+   - Extend the existing `apps/mobile` shell to authenticate against Entra, fetch tenant config and module manifests, and render a bottom‑nav layout with module‑driven screens.
+2. **Core screens**
+   - Implement `CaptureScreen`, `TranscriptionListScreen`, and a lightweight `NoteDetailScreen` aligned with journeys SW1–SW3.
+   - Reuse shared primitives and tokens from Phase 33; avoid mobile‑only styles where possible.
+3. **Mobile offline storage**
+   - Use SQLite/AsyncStorage (or MMKV) for the offline queue on mobile, reusing the unified offline engine behaviour and statuses.
+
+Exit: Social workers can live primarily in the mobile app while keeping the laptop for deep editing and exports; the same module registry and config drive both.
+
+### Phase 35 — Admin Console (Config & Modules)
+
+**Objective:** Give councils a safe, auditable way to configure tenants, departments, templates, and modules without requiring code changes.
+
+Actions
+
+1. **Config management UI**
+   - Extend the admin console to present tenant configs as JSON Schema–driven forms with diff views and version history.
+   - Support draft, review, and approval flows before changes go live.
+2. **Module dashboard**
+   - Provide a matrix view of modules vs tenants/departments, with toggle controls gated by appropriate permissions.
+   - Show real‑time preview of nav changes for the selected role/domain.
+
+Exit: Digital and IT teams can manage configuration and modules through a web UI layered on top of the same schema and registry, with full audit coverage.
+
+### Phase 36 — Telemetry & Adoption Dashboards
+
+**Objective:** Make it easy to see whether the app is delivering value (time saved, adoption, offline health) and guide future roadmap decisions.
+
+Actions
+
+1. **Structured telemetry events**
+   - Emit events per module/action (e.g., `recording_started`, `note_approved`, `export_sharepoint_success`) with tenant/domain/role context.
+   - Store in a time‑series store or warehouse suitable for dashboarding.
+2. **Adoption dashboards**
+   - Build dashboards for admins and product leads showing usage patterns, offline queue health, task completion rates, and feature adoption by role/domain.
+   - Link from admin console and provide export options (CSV/PDF).
+
+Exit: Councils and the product team can see where the app is used heavily, which features land well, and where training or UX changes are needed.
+
+### Phase 37 — Collaboration & Real‑Time
+
+**Objective:** Support collaborative editing and discussion around notes without losing auditability or simplicity.
+
+Actions
+
+1. **Shared editing**
+   - Add optional real‑time co‑editing to the minute editor using CRDTs (e.g., yjs) and WebSocket sync, with presence indicators for who is viewing/editing.
+2. **Comments and discussions**
+   - Introduce threaded comments at paragraph or section level, with email/push notifications for mentions or replies.
+   - Ensure comments are included in the audit trail and can be exported for QA.
+
+Exit: Multiple practitioners can safely work on the same note without overwriting each other; managers and QA can leave targeted feedback inside the context of the note.
+
+### Phase 38 — Advanced Search (Full‑Text + Semantic)
+
+**Objective:** Make it effortless to find the right note, snippet, or topic across many meetings, while respecting tenancy and domain boundaries.
+
+Actions
+
+1. **Full‑text search**
+   - Index transcripts and minutes in a search engine (e.g., Azure Cognitive Search) with filters for tenant, domain, case, template, and tags.
+   - Add a global search bar (keyboard shortcut friendly) and search results view with highlighted matches.
+2. **Semantic search**
+   - Generate embeddings for `Minute.summary` and key transcript segments; store in a vector index scoped by tenant/domain.
+   - Provide semantic search endpoints and UI that suggest related notes or similar cases while keeping PII boundaries intact.
+
+Exit: Social workers, managers, and QA can quickly retrieve relevant notes and evidence even in large deployments; search remains safe and tenant‑scoped.
+
+### Phase 39 — Compliance Tools
+
+**Objective:** Provide tooling that helps councils meet DPIA and audit requirements without manual spreadsheet work.
+
+Actions
+
+1. **Audit log viewer**
+   - Surface a UI over the existing `AuditEvent` table with filters by user, resource, action, and date range.
+   - Allow exports to CSV/JSON for DPIA reviews and investigations.
+2. **Retention automation reporting**
+   - Extend retention jobs to produce periodic summary reports (e.g., “N recordings aged out this week”) and send to admins.
+   - Provide dry‑run and grace‑period modes where deletions are queued for review.
+
+Exit: Councils can demonstrate compliance and respond to investigations using built‑in tools rather than ad‑hoc queries and manual collation.
+
+### Phase 40 — Performance & Perceived Speed
+
+**Objective:** Keep the app feeling fast and responsive even as we add modules, councils, and features.
+
+Actions
+
+1. **Bundle optimisation**
+   - Use bundle analysis to identify heavy modules; implement route‑level code splitting and lazy‑loading where appropriate.
+   - Ensure the initial load for key flows (home, new recording, note detail) stays within agreed budgets.
+2. **Asset optimisation**
+   - Optimise images and static assets (e.g., use WebP/AVIF and `next/image` equivalents where applicable).
+   - Tune loading skeletons and transitions so perceived performance stays high, especially on low‑spec council devices.
+
+Exit: The universal council app continues to feel “Apple/Google‑grade” even as it grows; social workers on older devices are not penalised by new features.
 
 ## Cross-domain Reuse Strategy (future-proofing)
 

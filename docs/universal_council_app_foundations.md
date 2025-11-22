@@ -42,7 +42,7 @@
 ### 2.2 Gaps vs universal‑app vision
 - **Front‑end composition**:
   - Current Next.js app is largely built as a single monolith; routes are specific to transcription/minutes rather than generic “modules” mounted via config.
-  - There is no pluggable module/registry concept in the live app (we only scaffolded one at repo root).
+  - There is no pluggable module/registry concept in the live app (we only scaffolded one at repo root); the goal is to treat Minute as the **first feature pack** running inside the universal shell, not a separate product.
 - **Role/domain‑aware IA**:
   - Navigation doesn’t yet adapt strongly by `service_domain` or `role`; we rely mostly on data scoping, not UX scoping.
 - **Cross‑platform story**:
@@ -62,6 +62,60 @@
 4. **Accessibility as a hard constraint**: Design tokens and components must be provably at least WCAG 2.2 AA; we embrace token guardrails and linting, not “design by exception”. citeturn0search0turn0search2turn0search11
 5. **Cross‑platform mindset**: Any new UI primitive must be expressible both in web (Next/RN Web) and mobile (React Native), to avoid divergence between “web version” and “mobile app”.
 6. **Observability everywhere**: Modules and config changes must emit structured events/metrics so we can understand adoption and safety per tenant/domain.
+7. **Avoid the twin pitfalls**: We must not (a) build a beautiful but **social‑care‑only** app that is hard to adapt for other departments, nor (b) build a purely **generic universal shell** that fails to meet social workers’ real needs; every feature should be both **social‑care‑tailored** and **config/module‑driven** so it can be reused.
+
+---
+
+## 8. Repository Layout & Consolidation Plan
+
+### 8.1 Current state
+
+- Root of repo:
+  - `apps/web`, `apps/mobile` – thin shells that read from `packages/core/plugins/registry` and list modules.
+  - `packages/core`, `packages/ui` – universal config/flags/plugins and UI tokens/components.
+  - `docs/architecture.md` – canonical universal council app architecture.
+- `minute-main/`:
+  - Production **backend, worker, and Next.js frontend** for social care.
+  - `minute-main/packages/core` and `minute-main/packages/ui` – legacy placeholders (now empty) kept only to avoid churn while we wire everything to the shared `packages/*` tree.
+  - `minute-main/docs/*` – Minute-specific architecture, foundations, and journeys.
+
+This means the “universal shell” scaffolding and the “real” app coexist; to avoid drift or copy‑pasting per department, we need a clear consolidation path.
+
+### 8.2 Guiding decisions
+
+1. **Minute-main is the canonical product codebase** (backend + social-care-first web UI).  
+2. **Root `apps/*` and `packages/*` are universal-shell packages**, not a separate app to fork; they should eventually be consumed by `minute-main` rather than duplicated.  
+3. **There must be exactly one architecture doc for the universal shell** (`docs/architecture.md`), with this file and `minute-main/docs/architecture.md` describing how Minute plugs into it.
+
+### 8.3 Structural refactors (phased)
+
+- **R1 — Package de-duplication**
+  - Treat `packages/core` and `packages/ui` as the **single source of truth** for:
+    - Tenant schema, flags, and plugin registry.
+    - UI tokens and primitive components.
+  - Update the Next.js frontend under `minute-main/frontend` to import from `packages/core` and `packages/ui` (via workspace aliases) instead of its own copies.
+  - Once the imports are switched and tests pass, remove or reduce `minute-main/packages/core` and `minute-main/packages/ui` to thin re-exports or delete them entirely.
+
+- **R2 — One module registry, many shells**
+  - Ensure both:
+    - `minute-main/frontend` (social-care app), and
+    - `apps/web` / `apps/mobile` (universal shells)
+    consume the same `packages/core/plugins/registry` and `TenantConfig` schema.
+  - Keep `apps/web` and `apps/mobile` as minimal shells used for experiments and, later, for RN Web/native deployments; they should **never** reimplement business logic that already lives in `minute-main`.
+
+- **R3 — Naming and docs alignment**
+  - Keep the `minute-main` directory name for now (to avoid churn), but treat it in docs as **“Minute platform (social-care-first)”** rather than something that can never support other departments.
+  - Rely on `TenantConfig` (org/service_domain/role) and module flags to switch from “Children’s social care” to future departments, instead of creating new top-level apps per domain.
+  - If we later decide to rename `minute-main` (e.g., to `platform/`), capture that as a dedicated migration phase with CI and deploy checks.
+
+### 8.4 How this supports our goals
+
+- Social workers remain the first users: all concrete flows (capture, review, exports) are implemented in `minute-main` against real back-end services.  
+- The universal shell packages (`packages/*`, `apps/*`, `docs/architecture.md`) stay **ahead of the curve** as design/architecture guides, while `minute-main` converges toward them instead of diverging.  
+- Adding a new department later is primarily:
+  - a new config file + templates,  
+  - optional new feature modules,  
+  - and UI copy changes driven by `TenantConfig` and the module registry—**not** a new app folder or a forked codebase.
 
 ---
 
@@ -193,6 +247,15 @@ The **current Minute backend and worker** already align reasonably with `domain/
 - Owners + review cadence recorded (monthly or per release) with PR label `area:architecture`.
 - Track CI signals: config validation pass rate, nav/module toggle E2E status, a11y CI status, RN shell smoke once added.
 - Changes touching config/module/nav/design-system add a short note back to this section.
+
+## 8. Multilingual shell snapshot (Phase 20)
+- **Config-first languages.** `TenantConfig.languages` now captures the default locale, allowed target languages, and an `autoTranslate` flag; schema + docs updated, and `config/pilot_children.yaml` enables EN→PL/AR/UK auto-translation so we can trial EAL support without forking code.
+- **Service abstraction.** `TranslationService` (Azure Translator wrapper) plus `TranslationHandlerService` manage translation jobs, store results in `Transcription.translations` JSONB, and publish new `TaskType.TRANSLATION` jobs to the existing LLM queue—no new infrastructure required.
+- **Queue + worker wiring.** Ray transcription actors auto-enqueue translations post-transcription when `autoTranslate=true`, ensuring “Record → Keep safe → Use Later” stays true even if staff never click a button.
+- **API + settings.** `GET/POST /transcriptions/{id}/translations` expose translation status/results with the same org/role scoping, and `.env.example` documents `AZURE_TRANSLATOR_*` so councils can plug their own credentials or stay in pass-through mode.
+- **Shell UX.** The new `Translations` tab mirrors the Magic Notes cards shown in the discovery screenshots: gradient hero reminding users of the flow, config-driven selector/status cards, inline retry CTA, accessible textarea for ready translations, and shared `@ui/*` primitives so RN/Web shells stay in sync.
+- **Platform guardrails.** The translation service follows Microsoft’s request limits (≤50k characters per call, multiple languages per request) and multi-target guidance so we stay within Azure Translator SLA/cost envelopes.【turn0search0】 The same service can scale to 100+ languages as described in Azure’s Translator overview, so other departments/councils can light up EAL support without touching code.【turn0search1】
+- **Next tasks.** Fold translation surfacing into capture/export flows, add per-language telemetry, and let admins manage language packs from the config console rather than editing YAML by hand.
 
 ---
 

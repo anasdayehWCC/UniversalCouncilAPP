@@ -24,12 +24,24 @@ import type {
   SaveTranscriptionTranscriptionsTranscriptionIdPatchData,
   SaveTranscriptionTranscriptionsTranscriptionIdPatchResponses,
   SaveTranscriptionTranscriptionsTranscriptionIdPatchErrors,
+  GetTranscriptionTranslationsTranscriptionsTranscriptionIdTranslationsGetData,
+  GetTranscriptionTranslationsTranscriptionsTranscriptionIdTranslationsGetResponses,
+  GetTranscriptionTranslationsTranscriptionsTranscriptionIdTranslationsGetErrors,
+  RequestTranscriptionTranslationTranscriptionsTranscriptionIdTranslatePostData,
+  RequestTranscriptionTranslationTranscriptionsTranscriptionIdTranslatePostResponses,
+  RequestTranscriptionTranslationTranscriptionsTranscriptionIdTranslatePostErrors,
   GetRecordingsForTranscriptionTranscriptionsTranscriptionIdRecordingsGetData,
   GetRecordingsForTranscriptionTranscriptionsTranscriptionIdRecordingsGetResponses,
   GetRecordingsForTranscriptionTranscriptionsTranscriptionIdRecordingsGetErrors,
   GetSignedRecordingRecordingsRecordingIdSignedUrlGetData,
   GetSignedRecordingRecordingsRecordingIdSignedUrlGetResponses,
   GetSignedRecordingRecordingsRecordingIdSignedUrlGetErrors,
+  GetSignedRecordingRangeTranscriptionsTranscriptionIdRecordingsRecordingIdSignedUrlRangeGetData,
+  GetSignedRecordingRangeTranscriptionsTranscriptionIdRecordingsRecordingIdSignedUrlRangeGetResponses,
+  GetSignedRecordingRangeTranscriptionsTranscriptionIdRecordingsRecordingIdSignedUrlRangeGetErrors,
+  RecordEvidenceClickTranscriptionsTranscriptionIdEvidenceClickPostData,
+  RecordEvidenceClickTranscriptionsTranscriptionIdEvidenceClickPostResponses,
+  RecordEvidenceClickTranscriptionsTranscriptionIdEvidenceClickPostErrors,
   GetDialogueTranscriptionsTranscriptionIdDialogueGetData,
   GetDialogueTranscriptionsTranscriptionIdDialogueGetResponses,
   GetDialogueTranscriptionsTranscriptionIdDialogueGetErrors,
@@ -90,6 +102,24 @@ import type {
   DuplicateUserTemplateUserTemplatesTemplateIdDuplicatePostData,
   DuplicateUserTemplateUserTemplatesTemplateIdDuplicatePostResponses,
   DuplicateUserTemplateUserTemplatesTemplateIdDuplicatePostErrors,
+  GetTenantConfigConfigTenantIdGetData,
+  GetTenantConfigConfigTenantIdGetResponses,
+  GetTenantConfigConfigTenantIdGetErrors,
+  CheckAdminAccessAdminCheckAccessGetData,
+  CheckAdminAccessAdminCheckAccessGetResponses,
+  CheckAdminAccessAdminCheckAccessGetErrors,
+  ListConfigsAdminConfigsGetData,
+  ListConfigsAdminConfigsGetResponses,
+  ListConfigsAdminConfigsGetErrors,
+  GetConfigDetailAdminConfigsTenantIdGetData,
+  GetConfigDetailAdminConfigsTenantIdGetResponses,
+  GetConfigDetailAdminConfigsTenantIdGetErrors,
+  GetConfigAuditAdminConfigsTenantIdAuditGetData,
+  GetConfigAuditAdminConfigsTenantIdAuditGetResponses,
+  GetConfigAuditAdminConfigsTenantIdAuditGetErrors,
+  GetConfigHistoryAdminConfigsTenantIdHistoryGetData,
+  GetConfigHistoryAdminConfigsTenantIdHistoryGetResponses,
+  GetConfigHistoryAdminConfigsTenantIdHistoryGetErrors,
   DeleteChatsTranscriptionsTranscriptionIdChatDeleteData,
   DeleteChatsTranscriptionsTranscriptionIdChatDeleteResponses,
   DeleteChatsTranscriptionsTranscriptionIdChatDeleteErrors,
@@ -105,10 +135,6 @@ import type {
   GetChatTranscriptionsTranscriptionIdChatChatIdGetData,
   GetChatTranscriptionsTranscriptionIdChatChatIdGetResponses,
   GetChatTranscriptionsTranscriptionIdChatChatIdGetErrors,
-  GetSignedRecordingRangeData,
-  GetSignedRecordingRangeResponses,
-  PostEvidenceClickData,
-  PostEvidenceClickResponses,
 } from './types.gen'
 import { client as _heyApiClient } from './client.gen'
 
@@ -264,6 +290,50 @@ export const saveTranscriptionTranscriptionsTranscriptionIdPatch = <
 }
 
 /**
+ * Get Transcription Translations
+ */
+export const getTranscriptionTranslationsTranscriptionsTranscriptionIdTranslationsGet =
+  <ThrowOnError extends boolean = false>(
+    options: Options<
+      GetTranscriptionTranslationsTranscriptionsTranscriptionIdTranslationsGetData,
+      ThrowOnError
+    >
+  ) => {
+    return (options.client ?? _heyApiClient).get<
+      GetTranscriptionTranslationsTranscriptionsTranscriptionIdTranslationsGetResponses,
+      GetTranscriptionTranslationsTranscriptionsTranscriptionIdTranslationsGetErrors,
+      ThrowOnError
+    >({
+      url: '/transcriptions/{transcription_id}/translations',
+      ...options,
+    })
+  }
+
+/**
+ * Request Transcription Translation
+ */
+export const requestTranscriptionTranslationTranscriptionsTranscriptionIdTranslatePost =
+  <ThrowOnError extends boolean = false>(
+    options: Options<
+      RequestTranscriptionTranslationTranscriptionsTranscriptionIdTranslatePostData,
+      ThrowOnError
+    >
+  ) => {
+    return (options.client ?? _heyApiClient).post<
+      RequestTranscriptionTranslationTranscriptionsTranscriptionIdTranslatePostResponses,
+      RequestTranscriptionTranslationTranscriptionsTranscriptionIdTranslatePostErrors,
+      ThrowOnError
+    >({
+      url: '/transcriptions/{transcription_id}/translate',
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+    })
+  }
+
+/**
  * Get Recordings For Transcription
  */
 export const getRecordingsForTranscriptionTranscriptionsTranscriptionIdRecordingsGet =
@@ -303,6 +373,50 @@ export const getSignedRecordingRecordingsRecordingIdSignedUrlGet = <
     ...options,
   })
 }
+
+/**
+ * Get Signed Recording Range
+ */
+export const getSignedRecordingRangeTranscriptionsTranscriptionIdRecordingsRecordingIdSignedUrlRangeGet =
+  <ThrowOnError extends boolean = false>(
+    options: Options<
+      GetSignedRecordingRangeTranscriptionsTranscriptionIdRecordingsRecordingIdSignedUrlRangeGetData,
+      ThrowOnError
+    >
+  ) => {
+    return (options.client ?? _heyApiClient).get<
+      GetSignedRecordingRangeTranscriptionsTranscriptionIdRecordingsRecordingIdSignedUrlRangeGetResponses,
+      GetSignedRecordingRangeTranscriptionsTranscriptionIdRecordingsRecordingIdSignedUrlRangeGetErrors,
+      ThrowOnError
+    >({
+      url: '/transcriptions/{transcription_id}/recordings/{recording_id}/signed-url-range',
+      ...options,
+    })
+  }
+
+/**
+ * Record Evidence Click
+ */
+export const recordEvidenceClickTranscriptionsTranscriptionIdEvidenceClickPost =
+  <ThrowOnError extends boolean = false>(
+    options: Options<
+      RecordEvidenceClickTranscriptionsTranscriptionIdEvidenceClickPostData,
+      ThrowOnError
+    >
+  ) => {
+    return (options.client ?? _heyApiClient).post<
+      RecordEvidenceClickTranscriptionsTranscriptionIdEvidenceClickPostResponses,
+      RecordEvidenceClickTranscriptionsTranscriptionIdEvidenceClickPostErrors,
+      ThrowOnError
+    >({
+      url: '/transcriptions/{transcription_id}/evidence-click',
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+    })
+  }
 
 /**
  * Get Dialogue
@@ -730,6 +844,122 @@ export const duplicateUserTemplateUserTemplatesTemplateIdDuplicatePost = <
 }
 
 /**
+ * Get Tenant Config
+ */
+export const getTenantConfigConfigTenantIdGet = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetTenantConfigConfigTenantIdGetData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).get<
+    GetTenantConfigConfigTenantIdGetResponses,
+    GetTenantConfigConfigTenantIdGetErrors,
+    ThrowOnError
+  >({
+    url: '/config/{tenant_id}',
+    ...options,
+  })
+}
+
+/**
+ * Check Admin Access
+ * Check if current user has admin access.
+ */
+export const checkAdminAccessAdminCheckAccessGet = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<CheckAdminAccessAdminCheckAccessGetData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).get<
+    CheckAdminAccessAdminCheckAccessGetResponses,
+    CheckAdminAccessAdminCheckAccessGetErrors,
+    ThrowOnError
+  >({
+    url: '/admin/check-access',
+    ...options,
+  })
+}
+
+/**
+ * List Configs
+ * List all available tenant configurations.
+ */
+export const listConfigsAdminConfigsGet = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ListConfigsAdminConfigsGetData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).get<
+    ListConfigsAdminConfigsGetResponses,
+    ListConfigsAdminConfigsGetErrors,
+    ThrowOnError
+  >({
+    url: '/admin/configs',
+    ...options,
+  })
+}
+
+/**
+ * Get Config Detail
+ * Get detailed configuration for a specific tenant.
+ */
+export const getConfigDetailAdminConfigsTenantIdGet = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetConfigDetailAdminConfigsTenantIdGetData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).get<
+    GetConfigDetailAdminConfigsTenantIdGetResponses,
+    GetConfigDetailAdminConfigsTenantIdGetErrors,
+    ThrowOnError
+  >({
+    url: '/admin/configs/{tenant_id}',
+    ...options,
+  })
+}
+
+/**
+ * Get Config Audit
+ * Get audit trail for a specific tenant configuration.
+ */
+export const getConfigAuditAdminConfigsTenantIdAuditGet = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetConfigAuditAdminConfigsTenantIdAuditGetData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).get<
+    GetConfigAuditAdminConfigsTenantIdAuditGetResponses,
+    GetConfigAuditAdminConfigsTenantIdAuditGetErrors,
+    ThrowOnError
+  >({
+    url: '/admin/configs/{tenant_id}/audit',
+    ...options,
+  })
+}
+
+/**
+ * Get Config History
+ * Get version history for a specific tenant configuration.
+ */
+export const getConfigHistoryAdminConfigsTenantIdHistoryGet = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    GetConfigHistoryAdminConfigsTenantIdHistoryGetData,
+    ThrowOnError
+  >
+) => {
+  return (options.client ?? _heyApiClient).get<
+    GetConfigHistoryAdminConfigsTenantIdHistoryGetResponses,
+    GetConfigHistoryAdminConfigsTenantIdHistoryGetErrors,
+    ThrowOnError
+  >({
+    url: '/admin/configs/{tenant_id}/history',
+    ...options,
+  })
+}
+
+/**
  * Delete Chats
  */
 export const deleteChatsTranscriptionsTranscriptionIdChatDelete = <
@@ -836,35 +1066,5 @@ export const getChatTranscriptionsTranscriptionIdChatChatIdGet = <
   >({
     url: '/transcriptions/{transcription_id}/chat/{chat_id}',
     ...options,
-  })
-}
-
-export const getSignedRecordingRange = <ThrowOnError extends boolean = false>(
-  options: Options<GetSignedRecordingRangeData, ThrowOnError>
-) => {
-  return (options.client ?? _heyApiClient).get<
-    GetSignedRecordingRangeResponses,
-    unknown,
-    ThrowOnError
-  >({
-    url: '/transcriptions/{transcription_id}/recordings/{recording_id}/signed-url-range',
-    ...options,
-  })
-}
-
-export const postEvidenceClick = <ThrowOnError extends boolean = false>(
-  options: Options<PostEvidenceClickData, ThrowOnError>
-) => {
-  return (options.client ?? _heyApiClient).post<
-    PostEvidenceClickResponses,
-    unknown,
-    ThrowOnError
-  >({
-    url: '/transcriptions/{transcription_id}/evidence-click',
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
   })
 }

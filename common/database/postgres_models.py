@@ -308,6 +308,11 @@ class Transcription(BaseTableMixin, table=True):
 
     # Kept old minute versions so we can migrate them
     legacy_minute_versions: list[dict] | None = Field(sa_column=Column(name="minute_versions", type_=JSONB), default=[])
+    translations: dict | None = Field(
+        default_factory=dict,
+        sa_column=Column(JSONB, nullable=False, server_default="'{}'::jsonb"),
+        description="Map of language code to translation metadata",
+    )
 
     recordings: List[Recording] = Relationship(
         back_populates="transcription",

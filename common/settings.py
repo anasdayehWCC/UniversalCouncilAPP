@@ -99,6 +99,19 @@ class Settings(BaseSettings):
         default_factory=list,
     )
 
+    AZURE_TRANSLATOR_KEY: str | None = Field(
+        description="Azure Translator subscription key for multilingual support",
+        default=None,
+    )
+    AZURE_TRANSLATOR_REGION: str | None = Field(
+        description="Azure region for the Translator resource",
+        default=None,
+    )
+    AZURE_TRANSLATOR_ENDPOINT: str | None = Field(
+        description="Optional override for Azure Translator endpoint URL",
+        default=None,
+    )
+
     MAX_TRANSCRIPTION_PROCESSES: int = Field(description="the number of transcription workers per node", default=1)
     MAX_LLM_PROCESSES: int = Field(description="the number of LLM workers per node", default=1)
 

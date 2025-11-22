@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025-11-22
+
+- Phase 20A (backend multilingual) delivered `TenantConfig.languages` (default/available/autoTranslate) with schema + pilot config updates, `.env.example` + settings for `AZURE_TRANSLATOR_*`, `Transcription.translations` JSONB (migration `20a0f2c1d3ab_phase20_translations.py`), Azure Translator client + handler with serializer unit test, and new queue + API plumbing (`TaskType.TRANSLATION`, worker auto-enqueue after transcription, `GET /transcriptions/{id}/translations`, `POST /transcriptions/{id}/translate`). Pilot auto-translates EN→PL/AR/UK when Azure credentials exist; graceful fallback logs when creds absent.
+- Phase 20B (frontend multilingual) added a config-driven `Translations` tab on the transcription page (Magic Notes–style hero, selector/status cards, autop badges, accessible textarea, inline retry CTA) powered by the generated TanStack hooks and shared `@ui/*` primitives so RN/Web consume the same kit; tenant config fetch fallback introduced for client bundles.
+- Documentation + governance refreshed: `ROADMAP_social_care.md` and `PLANS.md` mark Phase 20 completion with concrete highlights; `docs/universal_council_app_foundations.md` now records the multilingual shell approach; `config/pilot_children.yaml` enables autoTranslate to mirror the new workflow; `.env.example` documents translator env vars.
+- Tests & lint: `poetry run pytest tests/test_translation_handler_service.py` (serialiser coverage) and `npm run lint` (existing admin hook warnings remain; no new issues).
+
 ## 2025-11-21
 
 - Phase 16A/16B: Expanded tenant config schema (version tag, nav metadata fields, retention defaults, planner/sharepoint passthrough, module feature flags), generated `common/config/tenant.schema.json`, aligned `config/pilot_children.yaml`, added TENANT_CONFIG_ID setting, module gating helper (`common/config/access.py`), guarded minutes routes by module enablement, and added config/module flag tests.
@@ -136,4 +143,12 @@ mkdir -p packages/core/{config,plugins,flags}/__tests__ packages/ui/__tests__ ap
 
 ## 2025-11-21 (universal app foundations for Minute)
 - Add `docs/universal_council_app_foundations.md` under `minute-main/docs/` describing how the existing Minute-based solution can evolve into a universal, config-driven council app for WCC/RBKC (multi-tenant model, plugin modules, design tokens, role/domain-aware navigation, and RN/RN-Web convergence path).
-```
+
+## 2025-11-21 (user journeys, roadmap & repo structure)
+- Added `minute-main/docs/user_journeys.md` capturing persona-based journeys (social worker, manager, admin, QA, digital) across web and mobile, including offline/online flows, Magic Notes–style capture/edit patterns, and mapping to roadmap phases.
+- Consolidated universal architecture documentation by treating the root `docs/architecture.md` as the single canonical “Universal Council App – Architecture & Development Plan” and removing the duplicate `minute-main/docs/universal_council_architecture.md`; all crosswalk content now lives in the root doc.
+- Extended `minute-main/ROADMAP_social_care.md` with phases 27–40 (Recording Studio 2.0, AI writing assistant, content organisation, universal config & module registry, design tokens, advanced offline/sync, cross-platform UI kit, RN mobile shell, admin console, telemetry, collaboration, advanced search, compliance tools, performance), aligned to the universal council architecture and using `minute-main/docs/user_journeys.md` as UX input.
+- Updated `minute-main/docs/universal_council_app_foundations.md` with a repository layout & consolidation plan (canonical product in `minute-main`, shared universal packages in root `packages/*`, and a phased plan to dedupe `packages/core` and `packages/ui`), so structural refactors are explicitly tracked.
+- Noted in `minute-main/PLANS.md` that Phase 27 (Recording Studio 2.0) must stay aligned with the journeys defined in `minute-main/docs/user_journeys.md`.
+- **R2 module/tokens consolidation:** Added shared `packages/core/config/types.ts` and `packages/core/modules/index.ts` (module manifest + role permissions + helper), updated `minute-main/frontend` to import via `@core/*` aliases with Next.js `externalDir` enabled, removed the duplicate `minute-main/packages/*` files, re-exported permissions/types locally for compatibility, and moved theme tokens into `packages/ui/tokens/index.mjs` with the frontend and a11y tests consuming the shared file.
+- **R2 UI primitives consolidation (batch 2):** Added shared primitives to `packages/ui` (`button`, `card`, `input`, `tabs`, `select`, `skeleton`, `pressable-card`, `token-text`, `utils`, barrel `index.ts`) and switched `minute-main/frontend/components/ui/{button,card,input,tabs,select,skeleton,pressable-card,token-text}.tsx` to re-export from `@ui/*` using the existing aliases. This keeps RN/Web and the social-care app on the same UI kit.

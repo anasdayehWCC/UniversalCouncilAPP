@@ -8,8 +8,12 @@ import {
   deleteTranscriptionTranscriptionsTranscriptionIdDelete,
   getTranscriptionTranscriptionsTranscriptionIdGet,
   saveTranscriptionTranscriptionsTranscriptionIdPatch,
+  getTranscriptionTranslationsTranscriptionsTranscriptionIdTranslationsGet,
+  requestTranscriptionTranslationTranscriptionsTranscriptionIdTranslatePost,
   getRecordingsForTranscriptionTranscriptionsTranscriptionIdRecordingsGet,
   getSignedRecordingRecordingsRecordingIdSignedUrlGet,
+  getSignedRecordingRangeTranscriptionsTranscriptionIdRecordingsRecordingIdSignedUrlRangeGet,
+  recordEvidenceClickTranscriptionsTranscriptionIdEvidenceClickPost,
   getDialogueTranscriptionsTranscriptionIdDialogueGet,
   updateDialogueTranscriptionsTranscriptionIdDialoguePatch,
   submitFeedbackTranscriptionsTranscriptionIdFeedbackPost,
@@ -30,20 +34,23 @@ import {
   getUserTemplateUserTemplatesTemplateIdGet,
   editUserTemplateUserTemplatesTemplateIdPatch,
   duplicateUserTemplateUserTemplatesTemplateIdDuplicatePost,
+  getTenantConfigConfigTenantIdGet,
+  checkAdminAccessAdminCheckAccessGet,
+  listConfigsAdminConfigsGet,
+  getConfigDetailAdminConfigsTenantIdGet,
+  getConfigAuditAdminConfigsTenantIdAuditGet,
+  getConfigHistoryAdminConfigsTenantIdHistoryGet,
   deleteChatsTranscriptionsTranscriptionIdChatDelete,
   listChatTranscriptionsTranscriptionIdChatGet,
   createChatTranscriptionsTranscriptionIdChatPost,
   deleteChatTranscriptionsTranscriptionIdChatChatIdDelete,
   getChatTranscriptionsTranscriptionIdChatChatIdGet,
-  getSignedRecordingRange,
-  postEvidenceClick,
 } from '../sdk.gen'
 import {
   queryOptions,
   infiniteQueryOptions,
   type InfiniteData,
   type UseMutationOptions,
-  type DefaultError,
 } from '@tanstack/react-query'
 import type {
   ListTranscriptionsTranscriptionsGetData,
@@ -62,8 +69,16 @@ import type {
   SaveTranscriptionTranscriptionsTranscriptionIdPatchData,
   SaveTranscriptionTranscriptionsTranscriptionIdPatchError,
   SaveTranscriptionTranscriptionsTranscriptionIdPatchResponse,
+  GetTranscriptionTranslationsTranscriptionsTranscriptionIdTranslationsGetData,
+  RequestTranscriptionTranslationTranscriptionsTranscriptionIdTranslatePostData,
+  RequestTranscriptionTranslationTranscriptionsTranscriptionIdTranslatePostError,
+  RequestTranscriptionTranslationTranscriptionsTranscriptionIdTranslatePostResponse,
   GetRecordingsForTranscriptionTranscriptionsTranscriptionIdRecordingsGetData,
   GetSignedRecordingRecordingsRecordingIdSignedUrlGetData,
+  GetSignedRecordingRangeTranscriptionsTranscriptionIdRecordingsRecordingIdSignedUrlRangeGetData,
+  RecordEvidenceClickTranscriptionsTranscriptionIdEvidenceClickPostData,
+  RecordEvidenceClickTranscriptionsTranscriptionIdEvidenceClickPostError,
+  RecordEvidenceClickTranscriptionsTranscriptionIdEvidenceClickPostResponse,
   GetDialogueTranscriptionsTranscriptionIdDialogueGetData,
   UpdateDialogueTranscriptionsTranscriptionIdDialoguePatchData,
   UpdateDialogueTranscriptionsTranscriptionIdDialoguePatchError,
@@ -100,6 +115,12 @@ import type {
   EditUserTemplateUserTemplatesTemplateIdPatchError,
   DuplicateUserTemplateUserTemplatesTemplateIdDuplicatePostData,
   DuplicateUserTemplateUserTemplatesTemplateIdDuplicatePostError,
+  GetTenantConfigConfigTenantIdGetData,
+  CheckAdminAccessAdminCheckAccessGetData,
+  ListConfigsAdminConfigsGetData,
+  GetConfigDetailAdminConfigsTenantIdGetData,
+  GetConfigAuditAdminConfigsTenantIdAuditGetData,
+  GetConfigHistoryAdminConfigsTenantIdHistoryGetData,
   DeleteChatsTranscriptionsTranscriptionIdChatDeleteData,
   DeleteChatsTranscriptionsTranscriptionIdChatDeleteError,
   DeleteChatsTranscriptionsTranscriptionIdChatDeleteResponse,
@@ -111,9 +132,6 @@ import type {
   DeleteChatTranscriptionsTranscriptionIdChatChatIdDeleteError,
   DeleteChatTranscriptionsTranscriptionIdChatChatIdDeleteResponse,
   GetChatTranscriptionsTranscriptionIdChatChatIdGetData,
-  GetSignedRecordingRangeData,
-  PostEvidenceClickData,
-  PostEvidenceClickResponse,
 } from '../types.gen'
 import { client as _heyApiClient } from '../client.gen'
 
@@ -455,6 +473,111 @@ export const saveTranscriptionTranscriptionsTranscriptionIdPatchMutation = (
   return mutationOptions
 }
 
+export const getTranscriptionTranslationsTranscriptionsTranscriptionIdTranslationsGetQueryKey =
+  (
+    options: Options<GetTranscriptionTranslationsTranscriptionsTranscriptionIdTranslationsGetData>
+  ) =>
+    createQueryKey(
+      'getTranscriptionTranslationsTranscriptionsTranscriptionIdTranslationsGet',
+      options
+    )
+
+/**
+ * Get Transcription Translations
+ */
+export const getTranscriptionTranslationsTranscriptionsTranscriptionIdTranslationsGetOptions =
+  (
+    options: Options<GetTranscriptionTranslationsTranscriptionsTranscriptionIdTranslationsGetData>
+  ) => {
+    return queryOptions({
+      queryFn: async ({ queryKey, signal }) => {
+        const { data } =
+          await getTranscriptionTranslationsTranscriptionsTranscriptionIdTranslationsGet(
+            {
+              ...options,
+              ...queryKey[0],
+              signal,
+              throwOnError: true,
+            }
+          )
+        return data
+      },
+      queryKey:
+        getTranscriptionTranslationsTranscriptionsTranscriptionIdTranslationsGetQueryKey(
+          options
+        ),
+    })
+  }
+
+export const requestTranscriptionTranslationTranscriptionsTranscriptionIdTranslatePostQueryKey =
+  (
+    options: Options<RequestTranscriptionTranslationTranscriptionsTranscriptionIdTranslatePostData>
+  ) =>
+    createQueryKey(
+      'requestTranscriptionTranslationTranscriptionsTranscriptionIdTranslatePost',
+      options
+    )
+
+/**
+ * Request Transcription Translation
+ */
+export const requestTranscriptionTranslationTranscriptionsTranscriptionIdTranslatePostOptions =
+  (
+    options: Options<RequestTranscriptionTranslationTranscriptionsTranscriptionIdTranslatePostData>
+  ) => {
+    return queryOptions({
+      queryFn: async ({ queryKey, signal }) => {
+        const { data } =
+          await requestTranscriptionTranslationTranscriptionsTranscriptionIdTranslatePost(
+            {
+              ...options,
+              ...queryKey[0],
+              signal,
+              throwOnError: true,
+            }
+          )
+        return data
+      },
+      queryKey:
+        requestTranscriptionTranslationTranscriptionsTranscriptionIdTranslatePostQueryKey(
+          options
+        ),
+    })
+  }
+
+/**
+ * Request Transcription Translation
+ */
+export const requestTranscriptionTranslationTranscriptionsTranscriptionIdTranslatePostMutation =
+  (
+    options?: Partial<
+      Options<RequestTranscriptionTranslationTranscriptionsTranscriptionIdTranslatePostData>
+    >
+  ): UseMutationOptions<
+    RequestTranscriptionTranslationTranscriptionsTranscriptionIdTranslatePostResponse,
+    RequestTranscriptionTranslationTranscriptionsTranscriptionIdTranslatePostError,
+    Options<RequestTranscriptionTranslationTranscriptionsTranscriptionIdTranslatePostData>
+  > => {
+    const mutationOptions: UseMutationOptions<
+      RequestTranscriptionTranslationTranscriptionsTranscriptionIdTranslatePostResponse,
+      RequestTranscriptionTranslationTranscriptionsTranscriptionIdTranslatePostError,
+      Options<RequestTranscriptionTranslationTranscriptionsTranscriptionIdTranslatePostData>
+    > = {
+      mutationFn: async (localOptions) => {
+        const { data } =
+          await requestTranscriptionTranslationTranscriptionsTranscriptionIdTranslatePost(
+            {
+              ...options,
+              ...localOptions,
+              throwOnError: true,
+            }
+          )
+        return data
+      },
+    }
+    return mutationOptions
+  }
+
 export const getRecordingsForTranscriptionTranscriptionsTranscriptionIdRecordingsGetQueryKey =
   (
     options: Options<GetRecordingsForTranscriptionTranscriptionsTranscriptionIdRecordingsGetData>
@@ -517,6 +640,111 @@ export const getSignedRecordingRecordingsRecordingIdSignedUrlGetOptions = (
       getSignedRecordingRecordingsRecordingIdSignedUrlGetQueryKey(options),
   })
 }
+
+export const getSignedRecordingRangeTranscriptionsTranscriptionIdRecordingsRecordingIdSignedUrlRangeGetQueryKey =
+  (
+    options: Options<GetSignedRecordingRangeTranscriptionsTranscriptionIdRecordingsRecordingIdSignedUrlRangeGetData>
+  ) =>
+    createQueryKey(
+      'getSignedRecordingRangeTranscriptionsTranscriptionIdRecordingsRecordingIdSignedUrlRangeGet',
+      options
+    )
+
+/**
+ * Get Signed Recording Range
+ */
+export const getSignedRecordingRangeTranscriptionsTranscriptionIdRecordingsRecordingIdSignedUrlRangeGetOptions =
+  (
+    options: Options<GetSignedRecordingRangeTranscriptionsTranscriptionIdRecordingsRecordingIdSignedUrlRangeGetData>
+  ) => {
+    return queryOptions({
+      queryFn: async ({ queryKey, signal }) => {
+        const { data } =
+          await getSignedRecordingRangeTranscriptionsTranscriptionIdRecordingsRecordingIdSignedUrlRangeGet(
+            {
+              ...options,
+              ...queryKey[0],
+              signal,
+              throwOnError: true,
+            }
+          )
+        return data
+      },
+      queryKey:
+        getSignedRecordingRangeTranscriptionsTranscriptionIdRecordingsRecordingIdSignedUrlRangeGetQueryKey(
+          options
+        ),
+    })
+  }
+
+export const recordEvidenceClickTranscriptionsTranscriptionIdEvidenceClickPostQueryKey =
+  (
+    options: Options<RecordEvidenceClickTranscriptionsTranscriptionIdEvidenceClickPostData>
+  ) =>
+    createQueryKey(
+      'recordEvidenceClickTranscriptionsTranscriptionIdEvidenceClickPost',
+      options
+    )
+
+/**
+ * Record Evidence Click
+ */
+export const recordEvidenceClickTranscriptionsTranscriptionIdEvidenceClickPostOptions =
+  (
+    options: Options<RecordEvidenceClickTranscriptionsTranscriptionIdEvidenceClickPostData>
+  ) => {
+    return queryOptions({
+      queryFn: async ({ queryKey, signal }) => {
+        const { data } =
+          await recordEvidenceClickTranscriptionsTranscriptionIdEvidenceClickPost(
+            {
+              ...options,
+              ...queryKey[0],
+              signal,
+              throwOnError: true,
+            }
+          )
+        return data
+      },
+      queryKey:
+        recordEvidenceClickTranscriptionsTranscriptionIdEvidenceClickPostQueryKey(
+          options
+        ),
+    })
+  }
+
+/**
+ * Record Evidence Click
+ */
+export const recordEvidenceClickTranscriptionsTranscriptionIdEvidenceClickPostMutation =
+  (
+    options?: Partial<
+      Options<RecordEvidenceClickTranscriptionsTranscriptionIdEvidenceClickPostData>
+    >
+  ): UseMutationOptions<
+    RecordEvidenceClickTranscriptionsTranscriptionIdEvidenceClickPostResponse,
+    RecordEvidenceClickTranscriptionsTranscriptionIdEvidenceClickPostError,
+    Options<RecordEvidenceClickTranscriptionsTranscriptionIdEvidenceClickPostData>
+  > => {
+    const mutationOptions: UseMutationOptions<
+      RecordEvidenceClickTranscriptionsTranscriptionIdEvidenceClickPostResponse,
+      RecordEvidenceClickTranscriptionsTranscriptionIdEvidenceClickPostError,
+      Options<RecordEvidenceClickTranscriptionsTranscriptionIdEvidenceClickPostData>
+    > = {
+      mutationFn: async (localOptions) => {
+        const { data } =
+          await recordEvidenceClickTranscriptionsTranscriptionIdEvidenceClickPost(
+            {
+              ...options,
+              ...localOptions,
+              throwOnError: true,
+            }
+          )
+        return data
+      },
+    }
+    return mutationOptions
+  }
 
 export const getDialogueTranscriptionsTranscriptionIdDialogueGetQueryKey = (
   options: Options<GetDialogueTranscriptionsTranscriptionIdDialogueGetData>
@@ -1234,6 +1462,155 @@ export const duplicateUserTemplateUserTemplatesTemplateIdDuplicatePostMutation =
     return mutationOptions
   }
 
+export const getTenantConfigConfigTenantIdGetQueryKey = (
+  options: Options<GetTenantConfigConfigTenantIdGetData>
+) => createQueryKey('getTenantConfigConfigTenantIdGet', options)
+
+/**
+ * Get Tenant Config
+ */
+export const getTenantConfigConfigTenantIdGetOptions = (
+  options: Options<GetTenantConfigConfigTenantIdGetData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTenantConfigConfigTenantIdGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getTenantConfigConfigTenantIdGetQueryKey(options),
+  })
+}
+
+export const checkAdminAccessAdminCheckAccessGetQueryKey = (
+  options: Options<CheckAdminAccessAdminCheckAccessGetData>
+) => createQueryKey('checkAdminAccessAdminCheckAccessGet', options)
+
+/**
+ * Check Admin Access
+ * Check if current user has admin access.
+ */
+export const checkAdminAccessAdminCheckAccessGetOptions = (
+  options: Options<CheckAdminAccessAdminCheckAccessGetData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await checkAdminAccessAdminCheckAccessGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: checkAdminAccessAdminCheckAccessGetQueryKey(options),
+  })
+}
+
+export const listConfigsAdminConfigsGetQueryKey = (
+  options: Options<ListConfigsAdminConfigsGetData>
+) => createQueryKey('listConfigsAdminConfigsGet', options)
+
+/**
+ * List Configs
+ * List all available tenant configurations.
+ */
+export const listConfigsAdminConfigsGetOptions = (
+  options: Options<ListConfigsAdminConfigsGetData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listConfigsAdminConfigsGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: listConfigsAdminConfigsGetQueryKey(options),
+  })
+}
+
+export const getConfigDetailAdminConfigsTenantIdGetQueryKey = (
+  options: Options<GetConfigDetailAdminConfigsTenantIdGetData>
+) => createQueryKey('getConfigDetailAdminConfigsTenantIdGet', options)
+
+/**
+ * Get Config Detail
+ * Get detailed configuration for a specific tenant.
+ */
+export const getConfigDetailAdminConfigsTenantIdGetOptions = (
+  options: Options<GetConfigDetailAdminConfigsTenantIdGetData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getConfigDetailAdminConfigsTenantIdGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getConfigDetailAdminConfigsTenantIdGetQueryKey(options),
+  })
+}
+
+export const getConfigAuditAdminConfigsTenantIdAuditGetQueryKey = (
+  options: Options<GetConfigAuditAdminConfigsTenantIdAuditGetData>
+) => createQueryKey('getConfigAuditAdminConfigsTenantIdAuditGet', options)
+
+/**
+ * Get Config Audit
+ * Get audit trail for a specific tenant configuration.
+ */
+export const getConfigAuditAdminConfigsTenantIdAuditGetOptions = (
+  options: Options<GetConfigAuditAdminConfigsTenantIdAuditGetData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getConfigAuditAdminConfigsTenantIdAuditGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getConfigAuditAdminConfigsTenantIdAuditGetQueryKey(options),
+  })
+}
+
+export const getConfigHistoryAdminConfigsTenantIdHistoryGetQueryKey = (
+  options: Options<GetConfigHistoryAdminConfigsTenantIdHistoryGetData>
+) => createQueryKey('getConfigHistoryAdminConfigsTenantIdHistoryGet', options)
+
+/**
+ * Get Config History
+ * Get version history for a specific tenant configuration.
+ */
+export const getConfigHistoryAdminConfigsTenantIdHistoryGetOptions = (
+  options: Options<GetConfigHistoryAdminConfigsTenantIdHistoryGetData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getConfigHistoryAdminConfigsTenantIdHistoryGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getConfigHistoryAdminConfigsTenantIdHistoryGetQueryKey(options),
+  })
+}
+
 /**
  * Delete Chats
  */
@@ -1397,70 +1774,4 @@ export const getChatTranscriptionsTranscriptionIdChatChatIdGetOptions = (
     queryKey:
       getChatTranscriptionsTranscriptionIdChatChatIdGetQueryKey(options),
   })
-}
-
-export const getSignedRecordingRangeQueryKey = (
-  options: Options<GetSignedRecordingRangeData>
-) => createQueryKey('getSignedRecordingRange', options)
-
-export const getSignedRecordingRangeOptions = (
-  options: Options<GetSignedRecordingRangeData>
-) => {
-  return queryOptions({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getSignedRecordingRange({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      })
-      return data
-    },
-    queryKey: getSignedRecordingRangeQueryKey(options),
-  })
-}
-
-export const postEvidenceClickQueryKey = (
-  options: Options<PostEvidenceClickData>
-) => createQueryKey('postEvidenceClick', options)
-
-export const postEvidenceClickOptions = (
-  options: Options<PostEvidenceClickData>
-) => {
-  return queryOptions({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await postEvidenceClick({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      })
-      return data
-    },
-    queryKey: postEvidenceClickQueryKey(options),
-  })
-}
-
-export const postEvidenceClickMutation = (
-  options?: Partial<Options<PostEvidenceClickData>>
-): UseMutationOptions<
-  PostEvidenceClickResponse,
-  DefaultError,
-  Options<PostEvidenceClickData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    PostEvidenceClickResponse,
-    DefaultError,
-    Options<PostEvidenceClickData>
-  > = {
-    mutationFn: async (localOptions) => {
-      const { data } = await postEvidenceClick({
-        ...options,
-        ...localOptions,
-        throwOnError: true,
-      })
-      return data
-    },
-  }
-  return mutationOptions
 }

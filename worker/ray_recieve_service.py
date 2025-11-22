@@ -1,16 +1,18 @@
 import asyncio
 import logging
-from typing import Any
+from typing import Any, List
 
 import ray
 
+from common.config.loader import load_tenant_config
 from common.services.exceptions import InteractionFailedError, TranscriptionFailedError
 from common.services.export_handler_service import ExportHandlerService
 from common.services.minute_handler_service import MinuteGenerationFailedError, MinuteHandlerService
 from common.services.queue_services.base import QueueService
+from common.services.translation_handler_service import TranslationHandlerService
 from common.services.transcription_handler_service import TranscriptionHandlerService
 from common.settings import get_settings
-from common.types import TaskType, WorkerMessage
+from common.types import TaskType, TranslationJobData, WorkerMessage
 from common.tracing import set_trace_id
 from worker.healthcheck import HEARTBEAT_DIR
 
@@ -18,6 +20,28 @@ logger = logging.getLogger(__name__)
 ray_logger = logging.getLogger("ray")
 ray_logger.setLevel(logging.WARNING)
 settings = get_settings()
+
+
+def _auto_translation_languages() -> List[str]:
+    try:
+        tenant_config = load_tenant_config(settings.TENANT_CONFIG_ID)
+    except Exception:
+        logger.exception("Unable to load tenant config for translation targets")
+        return []
+
+    languages_cfg = getattr(tenant_config, "languages", None)
+    if not languages_cfg or not getattr(languages_cfg, "autoTranslate", False):
+        return []
+
+    default_lang = (languages_cfg.default or "en").split("-")[0].lower()
+    targets: List[str] = []
+    for candidate in languages_cfg.available:
+        if not candidate:
+            continue
+        if candidate.lower() == default_lang:
+            continue
+        targets.append(candidate)
+    return targets
 
 
 @ray.remote
@@ -70,6 +94,7 @@ class RayTranscriptionService:
                         self.llm_queue_service.publish_message(
                             WorkerMessage(id=minute_version.id, type=TaskType.MINUTE)
                         )
+                        self._auto_request_translations(message.id)
                     else:
                         logger.info("Async transcription job not ready yet. Re-queueing minute id: %s", message.id)
                         self.transcription_queue_service.publish_message(
@@ -83,6 +108,26 @@ class RayTranscriptionService:
                 # Delete the message to prevent repeated processing
                 self.transcription_queue_service.complete_message(receipt_handle)
             self.heartbeat_path.touch()
+
+    def _auto_request_translations(self, minute_id):
+        languages = _auto_translation_languages()
+        if not languages:
+            return
+        try:
+            transcription = TranscriptionHandlerService.get_transcription_from_minute_id(minute_id)
+        except Exception:
+            logger.exception("Unable to fetch transcription for auto translation %s", minute_id)
+            return
+        try:
+            TranslationHandlerService.request_translations(
+                queue_service=self.llm_queue_service,
+                transcription_id=transcription.id,
+                languages=languages,
+                requested_by=transcription.user_id,
+                auto_requested=True,
+            )
+        except Exception:
+            logger.exception("Failed to queue translations for transcription %s", transcription.id)
 
 
 @ray.remote(max_restarts=-1, max_task_retries=0)
@@ -112,6 +157,8 @@ class RayLlmService:
                         tasks.append(asyncio.create_task(self.process_interactive_task(message, receipt_handle)))
                     case TaskType.EXPORT:
                         tasks.append(asyncio.create_task(self.process_export_task(message, receipt_handle)))
+                    case TaskType.TRANSLATION:
+                        tasks.append(asyncio.create_task(self.process_translation_task(message, receipt_handle)))
                     case _:
                         logger.warning("Unknown task type: %s", message.type)
                         self.queue_service.deadletter_message(message, receipt_handle)
@@ -175,3 +222,19 @@ class RayLlmService:
             self.queue_service.complete_message(receipt_handle=receipt_handle)
         else:
             self.queue_service.complete_message(receipt_handle=receipt_handle)
+
+    async def process_translation_task(self, message: WorkerMessage, receipt_handle: Any) -> None:
+        try:
+            if not message.data or not isinstance(message.data, TranslationJobData):
+                raise ValueError("Translation task missing payload")
+            logger.info(
+                "Received translation message for transcription %s (%s)",
+                message.data.transcription_id,
+                message.data.language,
+            )
+            await TranslationHandlerService.process_translation_message(message.data)
+        except Exception:
+            logger.exception("Translation job failed for transcription %s", getattr(message.data, "transcription_id", message.id))
+            self.queue_service.deadletter_message(message, receipt_handle)
+        else:
+            self.queue_service.complete_message(receipt_handle)

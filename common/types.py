@@ -227,6 +227,7 @@ class TaskType(IntEnum):
     EDIT = 3
     INTERACTIVE = 4
     EXPORT = 5
+    TRANSLATION = 6
 
 
 class EditMessageData(BaseModel):
@@ -243,10 +244,17 @@ class TranscriptionJobMessageData(BaseModel):
     processing_mode: str | None = Field(default="fast")
 
 
+class TranslationJobData(BaseModel):
+    transcription_id: uuid.UUID
+    language: str
+    requested_by: uuid.UUID | None = None
+    auto: bool = False
+
+
 class WorkerMessage(BaseModel):
     id: uuid.UUID
     type: TaskType
-    data: EditMessageData | TranscriptionJobMessageData | None = Field(default=None)
+    data: EditMessageData | TranscriptionJobMessageData | TranslationJobData | None = Field(default=None)
     trace_id: str | None = Field(default=None)
 
 
@@ -319,3 +327,22 @@ class CreateUserTemplateRequest(BaseModel):
     description: str
     type: TemplateType
     questions: list[CreateQuestion] | None = None
+
+
+class TranslationRequest(BaseModel):
+    languages: list[str]
+    force: bool = False
+
+
+class TranslationStatusEntry(BaseModel):
+    language: str
+    status: JobStatus
+    text: str | None = None
+    updated_at: datetime | None = None
+    error: str | None = None
+    requested_by: uuid.UUID | None = None
+    auto_requested: bool = False
+
+
+class TranslationListResponse(BaseModel):
+    translations: list[TranslationStatusEntry]

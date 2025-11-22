@@ -4,11 +4,11 @@ _Phase 15A deliverable — authored 2025-11-21_
 
 ## 1. Executive Summary
 
-- Single codebase for bi-borough social care (extends to other councils/domains) running **Next.js (App Router) frontend**, **FastAPI backend**, and **Ray-based worker**.
+- Single codebase for bi-borough social care (extends to other councils/domains) running **Next.js (App Router) frontend**, **FastAPI backend**, and **Ray-based worker**, feeding into a universal council app shell (web + mobile) described in `docs/universal_council_architecture.md`.
 - Core flows: offline/online audio capture → queue → STT (Azure/AWS) → dialogue with diarization → LLM minute generation via domain templates → exports (docx/pdf, SharePoint/Planner hooks) with audit, retention, and observability baked in.
-- Configuration-first: tenant + service-domain configs (`config/*.yaml` via `common/config/loader.py`) inform module/navigation selection (`frontend/lib/modules.ts`) and domain assets/templates.
+- Configuration-first: tenant + service-domain configs (`config/*.yaml` via `common/config/loader.py`) inform module/navigation selection (`frontend/lib/modules.ts`) and domain assets/templates; the same config and module registry will power the universal shells in `apps/web` and `apps/mobile`.
 - Governance: audit trail, retention jobs, security headers/HSTS, rate limits, org/domain scoping enforced in API; metrics via Prometheus endpoints; KEDA autoscale manifests available.
-- Roadmap alignment: Phases 15–19 focus on documentation alignment, config/schema hardening, module surfacing, design-system accessibility, cross-platform shell, and governance/admin.
+- Roadmap alignment: Phases 15–40 in `minute-main/ROADMAP_social_care.md` cover documentation alignment, config/schema hardening, module surfacing, design-system accessibility, cross-platform shell, premium recording/editing UX, collaboration, analytics, search, and governance/admin.
 
 ## 2. Assumptions & Open Questions
 
@@ -96,4 +96,5 @@ Web/PWA (capture/offline) ──► API (/recordings, /transcriptions, /minutes)
 - `docs/universal_council_app_foundations.md` (foundations/gaps)
 - `minute_architecture_diagram.png` (to refresh when infra changes)
 - `minute-main/ROADMAP_social_care.md` (phase detail) and `PLANS.md` (exec plan)
+- `minute-main/docs/user_journeys.md` (persona journeys and UX flows driving capture/review UX)
 - Key code paths: `frontend/lib/modules.ts`, `frontend/lib/config/*`, `frontend/lib/db.ts`, `frontend/public/sw.js`, `backend/api/routes/config.py`, `common/services/*`, `worker/`

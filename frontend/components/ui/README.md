@@ -8,3 +8,5 @@
   - Avoid `window/document` usage inside components; lift that to callers.
   - Prefer flexbox/layout classes without absolute pixel assumptions; ensure min tap target 44px.
   - For touch + keyboard, keep `role="button"` and `tabIndex={0}` when using div-like pressables; mirror `onPress` to `onClick` for web.
+
+**Important:** Canonical implementations now live in `packages/ui`. Components in this folder should re-export from `@ui/*` (via the path aliases) to prevent divergence and to keep RN/Web compatibility in one place.

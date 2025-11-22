@@ -2,6 +2,7 @@
 import ChatTab from '@/app/transcriptions/[transcriptionId]/ChatTab/ChatTab'
 import { MinuteTab } from '@/app/transcriptions/[transcriptionId]/MinuteTab/MinuteTab'
 import { TranscriptionTab } from '@/app/transcriptions/[transcriptionId]/TranscriptionTab/TranscriptionTab'
+import { TranslationsTab } from '@/app/transcriptions/[transcriptionId]/TranslationsTab/TranslationsTab'
 import { DownloadButton } from '@/components/download-button'
 import { AudioWav } from '@/components/icons/AudioWav'
 import { TranscriptionTitleEditor } from '@/components/transcription-title-editor'
@@ -168,6 +169,12 @@ export default function TranscriptionPage({
           >
             Transcript
           </TabsTrigger>
+          <TabsTrigger
+            value="translations"
+            className="border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:shadow-lg focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          >
+            Translations
+          </TabsTrigger>
           {isChatEnabled && (
             <TabsTrigger
               value="chat"
@@ -182,6 +189,9 @@ export default function TranscriptionPage({
         </TabsContent>
         <TabsContent value="transcript">
           <TranscriptionTab transcription={typedTranscription} />
+        </TabsContent>
+        <TabsContent value="translations">
+          <TranslationsTab transcriptionId={transcription.id} />
         </TabsContent>
         {isChatEnabled && (
           <TabsContent value="chat">

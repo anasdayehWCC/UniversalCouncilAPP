@@ -13,6 +13,7 @@ let nextConfig = {
   output: 'standalone',
   experimental: {
     viewTransition: true,
+    externalDir: true,
   },
 }
 

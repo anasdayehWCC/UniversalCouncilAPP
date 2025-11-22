@@ -24,6 +24,44 @@
         }
       }
     },
+    "/health/live": {
+      "get": {
+        "tags": [
+          "Healthcheck"
+        ],
+        "summary": "Health Live",
+        "operationId": "health_live_health_live_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "tags": [
+          "Healthcheck"
+        ],
+        "summary": "Health Ready",
+        "operationId": "health_ready_health_ready_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/transcriptions": {
       "get": {
         "tags": [
@@ -493,6 +531,166 @@
         }
       }
     },
+    "/transcriptions/{transcription_id}/translations": {
+      "get": {
+        "tags": [
+          "Transcriptions"
+        ],
+        "summary": "Get Transcription Translations",
+        "operationId": "get_transcription_translations_transcriptions__transcription_id__translations_get",
+        "parameters": [
+          {
+            "name": "transcription_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Transcription Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "name": "x-amzn-oidc-accesstoken",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Amzn-Oidc-Accesstoken"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranslationListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/transcriptions/{transcription_id}/translate": {
+      "post": {
+        "tags": [
+          "Transcriptions"
+        ],
+        "summary": "Request Transcription Translation",
+        "operationId": "request_transcription_translation_transcriptions__transcription_id__translate_post",
+        "parameters": [
+          {
+            "name": "transcription_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Transcription Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "name": "x-amzn-oidc-accesstoken",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Amzn-Oidc-Accesstoken"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TranslationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranslationListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/transcriptions/{transcription_id}/recordings": {
       "get": {
         "tags": [
@@ -633,6 +831,195 @@
                 }
               }
             }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/transcriptions/{transcription_id}/recordings/{recording_id}/signed-url-range": {
+      "get": {
+        "tags": [
+          "Transcriptions"
+        ],
+        "summary": "Get Signed Recording Range",
+        "operationId": "get_signed_recording_range_transcriptions__transcription_id__recordings__recording_id__signed_url_range_get",
+        "parameters": [
+          {
+            "name": "transcription_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Transcription Id"
+            }
+          },
+          {
+            "name": "recording_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Recording Id"
+            }
+          },
+          {
+            "name": "start_seconds",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 0,
+              "title": "Start Seconds"
+            }
+          },
+          {
+            "name": "end_seconds",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "End Seconds"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "name": "x-amzn-oidc-accesstoken",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Amzn-Oidc-Accesstoken"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SingleRecordingSegment"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/transcriptions/{transcription_id}/evidence-click": {
+      "post": {
+        "tags": [
+          "Transcriptions"
+        ],
+        "summary": "Record Evidence Click",
+        "operationId": "record_evidence_click_transcriptions__transcription_id__evidence_click_post",
+        "parameters": [
+          {
+            "name": "transcription_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Transcription Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "name": "x-amzn-oidc-accesstoken",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Amzn-Oidc-Accesstoken"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvidenceClickRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
           },
           "422": {
             "description": "Validation Error",
@@ -2171,6 +2558,325 @@
         }
       }
     },
+    "/config/{tenant_id}": {
+      "get": {
+        "tags": [
+          "Config"
+        ],
+        "summary": "Get Tenant Config",
+        "operationId": "get_tenant_config_config__tenant_id__get",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantConfig"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/check-access": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Check Admin Access",
+        "description": "Check if current user has admin access.",
+        "operationId": "check_admin_access_admin_check_access_get",
+        "parameters": [
+          {
+            "name": "args",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "title": "Args"
+            }
+          },
+          {
+            "name": "kwargs",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "title": "Kwargs"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessCheckResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/configs": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List Configs",
+        "description": "List all available tenant configurations.",
+        "operationId": "list_configs_admin_configs_get",
+        "parameters": [
+          {
+            "name": "args",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "title": "Args"
+            }
+          },
+          {
+            "name": "kwargs",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "title": "Kwargs"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/configs/{tenant_id}": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Get Config Detail",
+        "description": "Get detailed configuration for a specific tenant.",
+        "operationId": "get_config_detail_admin_configs__tenant_id__get",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tenant Id"
+            }
+          },
+          {
+            "name": "args",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "title": "Args"
+            }
+          },
+          {
+            "name": "kwargs",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "title": "Kwargs"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantConfig"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/configs/{tenant_id}/audit": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Get Config Audit",
+        "description": "Get audit trail for a specific tenant configuration.",
+        "operationId": "get_config_audit_admin_configs__tenant_id__audit_get",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tenant Id"
+            }
+          },
+          {
+            "name": "args",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "title": "Args"
+            }
+          },
+          {
+            "name": "kwargs",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "title": "Kwargs"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigAuditResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/configs/{tenant_id}/history": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Get Config History",
+        "description": "Get version history for a specific tenant configuration.",
+        "operationId": "get_config_history_admin_configs__tenant_id__history_get",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tenant Id"
+            }
+          },
+          {
+            "name": "args",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "title": "Args"
+            }
+          },
+          {
+            "name": "kwargs",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "title": "Kwargs"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigHistoryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/transcriptions/{transcription_id}/chat": {
       "get": {
         "tags": [
@@ -2556,95 +3262,34 @@
           }
         }
       }
-    },
-    "/transcriptions/{transcription_id}/recordings/{recording_id}/signed-url-range": {
-      "get": {
-        "operationId": "getSignedRecordingRange",
-        "parameters": [
-          {
-            "name": "transcription_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "recording_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "start_seconds",
-            "in": "query",
-            "schema": {
-              "type": "number"
-            },
-            "required": false,
-            "default": 0
-          },
-          {
-            "name": "end_seconds",
-            "in": "query",
-            "schema": {
-              "type": "number"
-            },
-            "required": false
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SingleRecordingSegment"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/transcriptions/{transcription_id}/evidence-click": {
-      "post": {
-        "operationId": "postEvidenceClick",
-        "parameters": [
-          {
-            "name": "transcription_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EvidenceClickRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "204": {
-            "description": "Successful Response"
-          }
-        }
-      }
     }
   },
   "components": {
     "schemas": {
+      "AccessCheckResponse": {
+        "properties": {
+          "hasAccess": {
+            "type": "boolean",
+            "title": "Hasaccess"
+          },
+          "role": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Role"
+          }
+        },
+        "type": "object",
+        "required": [
+          "hasAccess"
+        ],
+        "title": "AccessCheckResponse"
+      },
       "AgendaUsage": {
         "type": "string",
         "enum": [
@@ -2672,6 +3317,39 @@
           "source_id"
         ],
         "title": "AiEdit"
+      },
+      "AuditEntryResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "title": "Timestamp"
+          },
+          "user": {
+            "type": "string",
+            "title": "User"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "outcome": {
+            "type": "string",
+            "title": "Outcome"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "timestamp",
+          "user",
+          "action",
+          "outcome"
+        ],
+        "title": "AuditEntryResponse"
       },
       "ChatCreateRequest": {
         "properties": {
@@ -2762,6 +3440,118 @@
           "status"
         ],
         "title": "ChatGetResponse"
+      },
+      "ConfigAuditResponse": {
+        "properties": {
+          "entries": {
+            "items": {
+              "$ref": "#/components/schemas/AuditEntryResponse"
+            },
+            "type": "array",
+            "title": "Entries"
+          }
+        },
+        "type": "object",
+        "required": [
+          "entries"
+        ],
+        "title": "ConfigAuditResponse"
+      },
+      "ConfigHistoryResponse": {
+        "properties": {
+          "configName": {
+            "type": "string",
+            "title": "Configname"
+          },
+          "versions": {
+            "items": {
+              "$ref": "#/components/schemas/ConfigVersionItem"
+            },
+            "type": "array",
+            "title": "Versions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "configName",
+          "versions"
+        ],
+        "title": "ConfigHistoryResponse"
+      },
+      "ConfigListItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "lastModified": {
+            "type": "string",
+            "title": "Lastmodified"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "version",
+          "lastModified"
+        ],
+        "title": "ConfigListItem"
+      },
+      "ConfigListResponse": {
+        "properties": {
+          "configs": {
+            "items": {
+              "$ref": "#/components/schemas/ConfigListItem"
+            },
+            "type": "array",
+            "title": "Configs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "configs"
+        ],
+        "title": "ConfigListResponse"
+      },
+      "ConfigVersionItem": {
+        "properties": {
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "timestamp": {
+            "type": "string",
+            "title": "Timestamp"
+          },
+          "author": {
+            "type": "string",
+            "title": "Author"
+          },
+          "changes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Changes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "timestamp",
+          "author",
+          "changes"
+        ],
+        "title": "ConfigVersionItem"
       },
       "ContentSource": {
         "type": "string",
@@ -2896,6 +3686,47 @@
         ],
         "title": "DialogueEntry"
       },
+      "EvidenceClickRequest": {
+        "properties": {
+          "recording_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Recording Id"
+          },
+          "start_time": {
+            "type": "number",
+            "title": "Start Time"
+          },
+          "end_time": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Time"
+          },
+          "citation_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Citation Number"
+          }
+        },
+        "type": "object",
+        "required": [
+          "recording_id",
+          "start_time"
+        ],
+        "title": "EvidenceClickRequest"
+      },
       "ExportResponse": {
         "properties": {
           "url": {
@@ -3019,6 +3850,34 @@
           "failed"
         ],
         "title": "JobStatus"
+      },
+      "LanguageConfig": {
+        "properties": {
+          "default": {
+            "type": "string",
+            "title": "Default",
+            "description": "Default language code (e.g. en)"
+          },
+          "available": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Available",
+            "description": "List of languages that can be requested"
+          },
+          "autoTranslate": {
+            "type": "boolean",
+            "title": "Autotranslate",
+            "description": "When true, automatically request translations after transcription completes",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "default"
+        ],
+        "title": "LanguageConfig"
       },
       "Minute": {
         "properties": {
@@ -3491,6 +4350,79 @@
         ],
         "title": "MinutesCreateRequest"
       },
+      "ModuleConfig": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Module identifier, e.g. transcription, minutes"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "default": true
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label",
+            "description": "Display label for navigation"
+          },
+          "icon": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Icon",
+            "description": "Optional icon name for navigation"
+          },
+          "feature_flags": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feature Flags",
+            "description": "Optional feature flag identifiers required for this module"
+          },
+          "departments": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Departments",
+            "description": "Optional list of service_domain ids this module applies to"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "title": "ModuleConfig"
+      },
       "PaginatedTranscriptionsResponse": {
         "properties": {
           "items": {
@@ -3685,6 +4617,52 @@
         ],
         "title": "SingleRecording"
       },
+      "SingleRecordingSegment": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "extension": {
+            "type": "string",
+            "title": "Extension"
+          },
+          "start_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Seconds"
+          },
+          "end_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Seconds"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "url",
+          "extension"
+        ],
+        "title": "SingleRecordingSegment"
+      },
       "TemplateMetadata": {
         "properties": {
           "name": {
@@ -3787,6 +4765,105 @@
           "form"
         ],
         "title": "TemplateType"
+      },
+      "TenantConfig": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Stable tenant/council identifier"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version",
+            "description": "Config version tag, e.g. 1.0.0"
+          },
+          "defaultLocale": {
+            "type": "string",
+            "pattern": "^[a-z]{2}-[A-Z]{2}$",
+            "title": "Defaultlocale"
+          },
+          "designTokens": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Designtokens"
+          },
+          "retentionDaysDefault": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retentiondaysdefault",
+            "description": "Default retention in days for recordings/transcriptions/minutes"
+          },
+          "sharepoint_library_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sharepoint Library Path",
+            "description": "Default SharePoint library path"
+          },
+          "planner": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planner",
+            "description": "Optional Planner plan/bucket ids"
+          },
+          "languages": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LanguageConfig"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Language/translation configuration for the tenant"
+          },
+          "modules": {
+            "items": {
+              "$ref": "#/components/schemas/ModuleConfig"
+            },
+            "type": "array",
+            "title": "Modules"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "version",
+          "defaultLocale",
+          "modules"
+        ],
+        "title": "TenantConfig"
       },
       "Transcription": {
         "properties": {
@@ -4074,6 +5151,19 @@
             ],
             "title": "Legacy Minute Versions",
             "default": []
+          },
+          "translations": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Translations",
+            "description": "Map of language code to translation metadata"
           }
         },
         "type": "object",
@@ -4517,6 +5607,111 @@
         "type": "object",
         "title": "TranscriptionPatchRequest"
       },
+      "TranslationListResponse": {
+        "properties": {
+          "translations": {
+            "items": {
+              "$ref": "#/components/schemas/TranslationStatusEntry"
+            },
+            "type": "array",
+            "title": "Translations"
+          }
+        },
+        "type": "object",
+        "required": [
+          "translations"
+        ],
+        "title": "TranslationListResponse"
+      },
+      "TranslationRequest": {
+        "properties": {
+          "languages": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Languages"
+          },
+          "force": {
+            "type": "boolean",
+            "title": "Force",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "languages"
+        ],
+        "title": "TranslationRequest"
+      },
+      "TranslationStatusEntry": {
+        "properties": {
+          "language": {
+            "type": "string",
+            "title": "Language"
+          },
+          "status": {
+            "$ref": "#/components/schemas/JobStatus"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "requested_by": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requested By"
+          },
+          "auto_requested": {
+            "type": "boolean",
+            "title": "Auto Requested",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "language",
+          "status"
+        ],
+        "title": "TranslationStatusEntry"
+      },
       "ValidationError": {
         "properties": {
           "loc": {
@@ -4549,58 +5744,6 @@
           "type"
         ],
         "title": "ValidationError"
-      },
-      "SingleRecordingSegment": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "url": {
-            "type": "string"
-          },
-          "extension": {
-            "type": "string"
-          },
-          "start_seconds": {
-            "type": "number",
-            "nullable": true
-          },
-          "end_seconds": {
-            "type": "number",
-            "nullable": true
-          }
-        },
-        "required": [
-          "id",
-          "url",
-          "extension"
-        ]
-      },
-      "EvidenceClickRequest": {
-        "type": "object",
-        "properties": {
-          "recording_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "start_time": {
-            "type": "number"
-          },
-          "end_time": {
-            "type": "number",
-            "nullable": true
-          },
-          "citation_number": {
-            "type": "integer",
-            "nullable": true
-          }
-        },
-        "required": [
-          "recording_id",
-          "start_time"
-        ]
       }
     }
   }

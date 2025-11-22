@@ -8,11 +8,13 @@ from sqlmodel import col, func, select
 
 from backend.api.dependencies import SQLSessionDep, UserDep
 from backend.utils.get_file_s3_key import get_file_s3_key
+from common.config.loader import load_tenant_config
 from common.database.postgres_models import Case, Minute, MinuteVersion, Recording, Transcription, TranscriptionFeedback
 from common.security.encryption import decrypt_date, encrypt_date
 from common.metrics import offline_sync_total
 from common.services.queue_services import get_queue_service
 from common.services.storage_services import get_storage_service
+from common.services.translation_handler_service import TranslationHandlerService
 from common.settings import get_settings
 from common.telemetry.events import TelemetryContext, build_context, record_module_access, record_offline_stage
 from common.types import (
@@ -31,6 +33,8 @@ from common.types import (
     TranscriptionDialogueUpdate,
     TranscriptionFeedbackRequest,
     TranscriptionJobMessageData,
+    TranslationListResponse,
+    TranslationRequest,
     EvidenceClickRequest,
     WorkerMessage,
 )
@@ -44,6 +48,9 @@ transcriptions_router = APIRouter(tags=["Transcriptions"])
 transcription_queue_service = get_queue_service(
     settings.QUEUE_SERVICE_NAME, settings.TRANSCRIPTION_QUEUE_NAME, settings.TRANSCRIPTION_DEADLETTER_QUEUE_NAME
 )
+llm_queue_service = get_queue_service(
+    settings.QUEUE_SERVICE_NAME, settings.LLM_QUEUE_NAME, settings.LLM_DEADLETTER_QUEUE_NAME
+)
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +60,33 @@ def _context_from_user(user: UserDep) -> TelemetryContext:
     service_domain_label = str(user.service_domain_id) if user.service_domain_id else None
     role_label = getattr(user.role, "name", None)
     return build_context(tenant=tenant_label, service_domain=service_domain_label, role=role_label)
+
+
+async def _get_transcription_for_user(
+    session: SQLSessionDep, current_user: UserDep, transcription_id: uuid.UUID
+) -> Transcription:
+    transcription = await session.get(Transcription, transcription_id)
+    if (
+        not transcription
+        or transcription.user_id != current_user.id
+        or transcription.organisation_id != current_user.organisation_id
+        or (current_user.service_domain_id and transcription.service_domain_id != current_user.service_domain_id)
+    ):
+        raise HTTPException(status_code=404, detail="Transcription not found")
+    return transcription
+
+
+def _allowed_translation_languages() -> set[str]:
+    try:
+        tenant_config = load_tenant_config(settings.TENANT_CONFIG_ID)
+    except Exception:
+        logger.exception("Unable to load tenant config for translation request validation")
+        return set()
+
+    languages_cfg = getattr(tenant_config, "languages", None)
+    if not languages_cfg:
+        return set()
+    return {language.lower() for language in languages_cfg.available if language}
 
 
 @transcriptions_router.get("/transcriptions", response_model=PaginatedTranscriptionsResponse)
@@ -269,6 +303,70 @@ async def get_transcription(
         subject_initials=transcription.subject_initials,
         subject_dob=decrypt_date(transcription.subject_dob_ciphertext),
         processing_mode=transcription.processing_mode,
+    )
+
+
+@transcriptions_router.get(
+    "/transcriptions/{transcription_id}/translations",
+    response_model=TranslationListResponse,
+)
+async def get_transcription_translations(
+    transcription_id: uuid.UUID,
+    session: SQLSessionDep,
+    current_user: UserDep,
+) -> TranslationListResponse:
+    record_module_access(_context_from_user(current_user), "transcription", True)
+    transcription = await _get_transcription_for_user(session, current_user, transcription_id)
+    return TranslationListResponse(
+        translations=TranslationHandlerService.serialize_translations(transcription.translations)
+    )
+
+
+@transcriptions_router.post(
+    "/transcriptions/{transcription_id}/translate",
+    response_model=TranslationListResponse,
+)
+async def request_transcription_translation(
+    transcription_id: uuid.UUID,
+    payload: TranslationRequest,
+    session: SQLSessionDep,
+    current_user: UserDep,
+) -> TranslationListResponse:
+    record_module_access(_context_from_user(current_user), "transcription", True)
+    if not payload.languages:
+        raise HTTPException(status_code=400, detail="languages list is required")
+    transcription = await _get_transcription_for_user(session, current_user, transcription_id)
+    allowed_languages = _allowed_translation_languages()
+    if not allowed_languages:
+        raise HTTPException(status_code=400, detail="Translations are not enabled for this tenant")
+
+    deduped_languages: list[str] = []
+    invalid_languages: list[str] = []
+    seen: set[str] = set()
+    for language in payload.languages:
+        normalised = language.lower()
+        if normalised not in allowed_languages:
+            invalid_languages.append(language)
+            continue
+        if normalised in seen:
+            continue
+        deduped_languages.append(language)
+        seen.add(normalised)
+
+    if invalid_languages:
+        raise HTTPException(status_code=400, detail=f"Invalid translation languages: {', '.join(invalid_languages)}")
+
+    TranslationHandlerService.request_translations(
+        queue_service=llm_queue_service,
+        transcription_id=transcription.id,
+        languages=deduped_languages,
+        requested_by=current_user.id,
+        auto_requested=False,
+        force=payload.force,
+    )
+    await session.refresh(transcription)
+    return TranslationListResponse(
+        translations=TranslationHandlerService.serialize_translations(transcription.translations)
     )
 
 

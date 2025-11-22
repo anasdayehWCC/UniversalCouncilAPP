@@ -17,6 +17,14 @@ class ModuleConfig(BaseModel):
     )
 
 
+class LanguageConfig(BaseModel):
+    default: str = Field(..., description="Default language code (e.g. en)")
+    available: List[str] = Field(default_factory=list, description="List of languages that can be requested")
+    autoTranslate: bool = Field(
+        default=False, description="When true, automatically request translations after transcription completes"
+    )
+
+
 class TenantConfig(BaseModel):
     id: str = Field(..., description="Stable tenant/council identifier")
     name: str
@@ -28,6 +36,9 @@ class TenantConfig(BaseModel):
     )
     sharepoint_library_path: Optional[str] = Field(default=None, description="Default SharePoint library path")
     planner: dict | None = Field(default=None, description="Optional Planner plan/bucket ids")
+    languages: LanguageConfig | None = Field(
+        default=None, description="Language/translation configuration for the tenant"
+    )
     modules: List[ModuleConfig]
 
     @validator("modules", pre=True)

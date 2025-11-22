@@ -76,6 +76,35 @@
       ],
       "title": "ModuleConfig",
       "type": "object"
+    },
+    "LanguageConfig": {
+      "properties": {
+        "default": {
+          "description": "Default language code (e.g. en)",
+          "title": "Default",
+          "type": "string"
+        },
+        "available": {
+          "default": [],
+          "description": "List of languages that can be requested",
+          "items": {
+            "type": "string"
+          },
+          "title": "Available",
+          "type": "array"
+        },
+        "autoTranslate": {
+          "default": false,
+          "description": "When true, automatically request translations after transcription completes",
+          "title": "Autotranslate",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "default"
+      ],
+      "title": "LanguageConfig",
+      "type": "object"
     }
   },
   "properties": {
@@ -150,6 +179,19 @@
       "default": null,
       "description": "Optional Planner plan/bucket ids",
       "title": "Planner"
+    },
+    "languages": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/LanguageConfig"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Language/translation configuration for the tenant",
+      "title": "Languages"
     },
     "modules": {
       "items": {

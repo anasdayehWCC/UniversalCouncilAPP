@@ -3,7 +3,7 @@
 import { DataRetentionNotice } from '@/components/layout/DataRententionNotice'
 import { PosthogBanner } from '@/components/posthog-banner'
 import { PaginatedTranscriptions } from '@/components/recent-meetings/paginated-transcriptions'
-import { Button } from '@/components/ui/button'
+import { Button } from '@careminutes/ui'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { DialogueEntryForm } from '@/app/transcriptions/[transcriptionId]/TranscriptionTab/TranscriptionTab'
-import { Button } from '@/components/ui/button'
+import { Button } from '@careminutes/ui'
 import {
   Dialog,
   DialogClose,
@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
+import { Input } from '@careminutes/ui'
 import { useSaveTranscription } from '@/hooks/use-save-transcription'
 import { DialogueEntry, Transcription } from '@/lib/client'
 import { Edit2, Pause, Play } from 'lucide-react'

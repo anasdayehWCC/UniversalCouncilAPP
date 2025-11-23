@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button'
+import { Button } from '@careminutes/ui'
 import { getFileExtensionFromBlob } from '@/lib/getFileExtension'
 import { Pause, Play } from 'lucide-react'
 import { ChangeEventHandler, useEffect, useMemo, useRef, useState } from 'react'

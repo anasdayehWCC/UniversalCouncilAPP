@@ -1,6 +1,6 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@careminutes/ui'
 import {
   Dialog,
   DialogContent,
@@ -17,7 +17,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from '@careminutes/ui'
 import { GetUserResponse } from '@/lib/client'
 import {
   getUserUsersMeGetOptions,

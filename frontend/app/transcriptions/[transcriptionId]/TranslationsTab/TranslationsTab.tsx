@@ -7,11 +7,11 @@ import {
   requestTranscriptionTranslationTranscriptionsTranscriptionIdTranslatePostMutation,
 } from '@/lib/client/@tanstack/react-query.gen'
 import type { TranslationStatusEntry } from '@/lib/client/types.gen'
-import { Button } from '@/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { PressableCard } from '@/components/ui/pressable-card'
-import { Skeleton } from '@/components/ui/skeleton'
-import { TokenText } from '@/components/ui/token-text'
+import { Button } from '@careminutes/ui'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@careminutes/ui'
+import { PressableCard } from '@careminutes/ui'
+import { Skeleton } from '@careminutes/ui'
+import { TokenText } from '@careminutes/ui'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
 import { useTenantConfig } from '@/lib/config/useTenantConfig'
@@ -24,13 +24,13 @@ const DEFAULT_TENANT_ID =
   process.env.NEXT_PUBLIC_TENANT_ID ||
   'pilot_children'
 
-const ACTIVE_STATUSES = new Set(['AWAITING_START', 'IN_PROGRESS'])
+const ACTIVE_STATUSES = new Set(['awaiting_start', 'in_progress'])
 
 const statusMeta: Record<TranslationStatusEntry['status'], { label: string; tone: string }> = {
-  AWAITING_START: { label: 'Queued', tone: 'bg-amber-100 text-amber-800' },
-  IN_PROGRESS: { label: 'Translating…', tone: 'bg-blue-100 text-blue-700' },
-  COMPLETED: { label: 'Ready', tone: 'bg-emerald-100 text-emerald-800' },
-  FAILED: { label: 'Needs attention', tone: 'bg-rose-100 text-rose-700' },
+  awaiting_start: { label: 'Queued', tone: 'bg-amber-100 text-amber-800' },
+  in_progress: { label: 'Translating…', tone: 'bg-blue-100 text-blue-700' },
+  completed: { label: 'Ready', tone: 'bg-emerald-100 text-emerald-800' },
+  failed: { label: 'Needs attention', tone: 'bg-rose-100 text-rose-700' },
 }
 
 export function TranslationsTab({ transcriptionId }: { transcriptionId: string }) {
@@ -41,7 +41,7 @@ export function TranslationsTab({ transcriptionId }: { transcriptionId: string }
     }),
     refetchInterval: (query) => {
       const hasActive = query.state.data?.translations?.some((entry) =>
-        ACTIVE_STATUSES.has(entry.status ?? 'COMPLETED'),
+        ACTIVE_STATUSES.has(entry.status ?? 'completed'),
       )
       return hasActive ? 4000 : false
     },
@@ -102,7 +102,7 @@ export function TranslationsTab({ transcriptionId }: { transcriptionId: string }
       path: { transcription_id: transcriptionId },
       body: {
         languages: [selectedLanguage],
-        force: focusedEntry?.status === 'COMPLETED',
+        force: focusedEntry?.status === 'completed',
       },
     })
   }
@@ -114,10 +114,10 @@ export function TranslationsTab({ transcriptionId }: { transcriptionId: string }
 
   const buttonLabel = (() => {
     if (!focusedEntry) return 'Request translation'
-    if (focusedEntry.status === 'FAILED') return 'Retry translation'
-    if (focusedEntry.status === 'COMPLETED') return 'Regenerate translation'
-    if (focusedEntry.status === 'AWAITING_START') return 'Queued'
-    if (focusedEntry.status === 'IN_PROGRESS') return 'Translating…'
+    if (focusedEntry.status === 'failed') return 'Retry translation'
+    if (focusedEntry.status === 'completed') return 'Regenerate translation'
+    if (focusedEntry.status === 'awaiting_start') return 'Queued'
+    if (focusedEntry.status === 'in_progress') return 'Translating…'
     return 'Request translation'
   })()
 
@@ -209,7 +209,7 @@ export function TranslationsTab({ transcriptionId }: { transcriptionId: string }
                 <Skeleton className="h-6 w-32" />
                 <Skeleton className="h-48 w-full" />
               </div>
-            ) : focusedEntry && focusedEntry.status === 'COMPLETED' && focusedEntry.text ? (
+            ) : focusedEntry && focusedEntry.status === 'completed' && focusedEntry.text ? (
               <Textarea
                 className="h-56 resize-none border-0 bg-transparent text-base shadow-none"
                 value={focusedEntry.text}
@@ -253,7 +253,7 @@ export function TranslationsTab({ transcriptionId }: { transcriptionId: string }
           )}
           {availableLanguages.map((language) => {
             const entry = translationMap[language.toLowerCase()]
-            const meta = entry ? statusMeta[entry.status] : statusMeta.AWAITING_START
+            const meta = entry ? statusMeta[entry.status] : statusMeta.awaiting_start
             return (
               <PressableCard key={language} className="w-full text-left">
                 <div className="flex items-center justify-between">

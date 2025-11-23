@@ -13,6 +13,8 @@
     "prettier:fix": "prettier --write ."
   },
   "dependencies": {
+    "@careminutes/ui": "*",
+    "@careminutes/core": "*",
     "@azure/msal-browser": "^4.26.2",
     "@azure/msal-react": "^3.0.22",
     "@hey-api/client-next": "^0.5.1",

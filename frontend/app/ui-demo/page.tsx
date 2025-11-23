@@ -1,9 +1,9 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { PressableCard } from '@/components/ui/pressable-card'
-import { Skeleton } from '@/components/ui/skeleton'
+import { Button } from '@careminutes/ui'
+import { Card } from '@careminutes/ui'
+import { PressableCard } from '@careminutes/ui'
+import { Skeleton } from '@careminutes/ui'
 
 export default function UIDemoPage() {
   return (

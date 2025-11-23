@@ -11,6 +11,7 @@ const withPWA = withPWAInit({
 
 let nextConfig = {
   output: 'standalone',
+  transpilePackages: ['@careminutes/ui', '@careminutes/core'],
   experimental: {
     viewTransition: true,
     externalDir: true,

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 import { Pause, Play, Square } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Button } from '@careminutes/ui'
 import {
   AlertDialog,
   AlertDialogAction,

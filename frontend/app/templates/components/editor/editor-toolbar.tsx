@@ -1,7 +1,7 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
+import { Button } from '@careminutes/ui'
+import { Card } from '@careminutes/ui'
 import { Editor } from '@tiptap/core'
 import {
   Bold,

@@ -8,7 +8,7 @@ import {
   exampleFormTemplates,
 } from '@/app/templates/data/example-templates'
 import { TemplateTypeSelect } from '@/app/templates/new/template-type-select'
-import { Button } from '@/components/ui/button'
+import { Button } from '@careminutes/ui'
 import { TemplateType } from '@/lib/client'
 import { createUserTemplateUserTemplatesPostMutation } from '@/lib/client/@tanstack/react-query.gen'
 import { TemplateData } from '@/types/templates'

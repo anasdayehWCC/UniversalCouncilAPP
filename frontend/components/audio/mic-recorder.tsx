@@ -16,7 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
+import { Button } from '@careminutes/ui'
 
 import {
   Select,
@@ -24,7 +24,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from '@careminutes/ui'
 
 import { DiscardConfirmDialog } from '@/components/audio/discard-dialog'
 import { StartTranscriptionSection } from '@/components/audio/start-transcription-section'

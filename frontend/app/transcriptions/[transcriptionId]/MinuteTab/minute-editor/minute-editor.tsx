@@ -5,7 +5,7 @@ import { RatingButton } from '@/app/transcriptions/[transcriptionId]/MinuteTab/c
 import { AiEditPopover } from '@/app/transcriptions/[transcriptionId]/MinuteTab/minute-editor/ai-edit-popover'
 import { MinuteVersionSelect } from '@/app/transcriptions/[transcriptionId]/MinuteTab/minute-editor/minute-version-select'
 import { NewMinuteDialog } from '@/app/transcriptions/[transcriptionId]/MinuteTab/NewMinuteDialog'
-import { Button } from '@/components/ui/button'
+import { Button } from '@careminutes/ui'
 import CopyButton from '@/components/ui/copy-button'
 import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'

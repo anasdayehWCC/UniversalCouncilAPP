@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { PressableCard } from "@/components/ui/pressable-card"
+import { PressableCard } from "@careminutes/ui"
 
 type Props = React.ComponentProps<typeof PressableCard>
 

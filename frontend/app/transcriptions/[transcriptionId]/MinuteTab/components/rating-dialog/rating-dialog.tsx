@@ -1,7 +1,7 @@
 'use client'
 
 import { Rating } from '@/app/transcriptions/[transcriptionId]/MinuteTab/components/rating-dialog/rating'
-import { Button } from '@/components/ui/button'
+import { Button } from '@careminutes/ui'
 import {
   Dialog,
   DialogContent,

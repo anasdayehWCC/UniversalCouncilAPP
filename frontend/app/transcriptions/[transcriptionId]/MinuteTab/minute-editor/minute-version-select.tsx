@@ -5,7 +5,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-} from '@/components/ui/select'
+} from '@careminutes/ui'
 import { ContentSource, MinuteVersionResponse } from '@/lib/client'
 import { Edit, Wand2 } from 'lucide-react'
 import { Dispatch, SetStateAction } from 'react'

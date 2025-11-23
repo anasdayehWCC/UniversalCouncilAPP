@@ -16,7 +16,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
+import { Button } from '@careminutes/ui'
 import {
   Card,
   CardContent,
@@ -24,7 +24,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from '@careminutes/ui'
 import { TemplateResponse } from '@/lib/client'
 import {
   deleteUserTemplateUserTemplatesTemplateIdDeleteMutation,

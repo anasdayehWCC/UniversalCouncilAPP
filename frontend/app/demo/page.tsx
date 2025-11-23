@@ -2,7 +2,7 @@
 
 import { RecordingCard } from "@/components/recording/recording-card"
 import { SplitView } from "@/components/layout/split-view"
-import { Button } from "@/components/ui/button"
+import { Button } from "@careminutes/ui"
 import { Wand2, Sparkles } from "lucide-react"
 
 export default function DemoPage() {

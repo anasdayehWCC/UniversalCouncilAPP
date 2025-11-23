@@ -1,7 +1,7 @@
 'use client'
 
 import { TranscriptionCard } from '@/components/recent-meetings/transcription-card'
-import { Button } from '@/components/ui/button'
+import { Button } from '@careminutes/ui'
 import {
   Dialog,
   DialogClose,

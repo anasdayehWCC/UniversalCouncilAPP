@@ -563,9 +563,134 @@ Exit: Successful pilot sign-off; backlog of tweaks captured; Adults rollout sche
   - Frontend lint + build rerun (existing admin hook warnings noted); ensures React Query + MSAL contexts unaffected.
 - **Next checks:** extend translation view into the capture flow (e.g., quick share as PDF/email), add Playwright smoke to cover translation polling.
 
-### Phase 21 — Task Management Module
+### Phase 21 — Platform & Repo Alignment (Universal Council App)
 
-#### Phase 21A — Backend task extraction & Planner integration
+**Objective:** Align the repository structure with the "Universal Council App" vision, treating `minute-main` as the Social Care bounded context and root `packages/*` as the shared platform.
+
+**Actions:**
+
+1. **Documentation Consolidation:**
+   - Merge `minute-main/docs/universal_council_app_foundations.md` and any root docs into a single canonical `docs/architecture.md` (or `docs/universal_foundation.md`).
+   - Create an ADR (`docs/adr/001_platform_alignment.md`) formalizing the "Modular Monolith" structure: Root = Platform, `minute-main` = Social Care Product.
+
+2. **Package De-duplication:**
+   - Verify root `packages/core` and `packages/ui` contain the latest shared logic/components.
+   - Update `minute-main/frontend` to consume root `packages/*` (via workspace aliases or relative paths) instead of localized copies.
+   - Delete/deprecate `minute-main/packages/*` placeholders.
+
+3. **Boundary Enforcement:**
+   - Ensure `TenantConfig` and Module Registry types live in `packages/core`.
+   - Ensure UI tokens and primitives live in `packages/ui`.
+   - `minute-main` should only contain social-care specific logic, templates, and routes.
+
+**Exit:** Repo structure matches the architecture diagram; `minute-main` imports from root packages; no duplicate "core" or "ui" folders inside `minute-main`.
+
+#### Phase 21C — Config-Driven Navigation (Domain-Scoped UI)
+
+**Objective:** Implement role and domain-scoped navigation where users see ONLY the modules and templates relevant to their `service_domain` and `role`, not a combined view across all domains.
+
+**Vision Clarification:**
+- A children's social worker logs in → sees ONLY children's templates ("LAC Review", "Strategy Discussion") and children-specific navigation.
+- An adult social worker logs in → sees ONLY adult templates ("Adult Safeguarding", "Care Review") and adult-specific navigation.
+- A housing officer (future) logs in → sees ONLY housing templates and housing-specific navigation ("Properties", "Inspections").
+- Users NEVER see navigation for other domains. Navigation is filtered server-side before being returned to the frontend.
+
+**Current Problem:**
+- Navigation is hardcoded in `frontend/components/layout/bottom-nav.tsx` and `sidebar.tsx` with fixed menu items.
+- All users see the same navigation regardless of their domain or role.
+- Templates are not filtered by `service_domain_id` before display.
+- A children's social worker can currently see "Adult Safeguarding" templates (incorrect!).
+
+**Actions:**
+
+1. **Backend: Module Registry API**
+   - **File:** `backend/api/routes/modules.py` (NEW)
+   - Create `GET /api/modules` endpoint that:
+     - Queries `UserOrgRole` table to get user's `service_domain_id` and `role`.
+     - Loads domain-specific config from `config/{tenant}_{domain}.yaml`.
+     - Returns filtered `modules` list and `nav_items` array based on user's domain + role.
+   - **Response Example (Children's Worker):**
+     ```json
+     {
+       "service_domain": "children",
+       "role": "social_worker",
+       "modules": ["recordings", "minutes", "templates", "tasks"],
+       "nav_items": [
+         { "label": "Home", "href": "/", "icon": "LayoutDashboard" },
+         { "label": "Cases", "href": "/cases", "icon": "Users" },
+         { "label": "Record", "href": "/record", "icon": "Mic", "fab": true },
+         { "label": "Notes", "href": "/transcriptions", "icon": "FileText" }
+       ]
+     }
+     ```
+
+2. **Backend: Domain-Filtered Templates**
+   - **File:** `backend/api/routes/templates.py` (MODIFY)
+   - Update `GET /templates` to filter by user's `service_domain_id` using existing `ServiceDomainTemplate` table.
+   - Children's workers should NOT see adult templates and vice versa.
+
+3. **Frontend: Dynamic Navigation**
+   - **Files:** `frontend/components/layout/bottom-nav.tsx`, `frontend/components/layout/sidebar.tsx` (MODIFY)
+   - Replace hardcoded `navItems` arrays with `useQuery` fetching from `/api/modules`.
+   - Add loading skeleton and error states.
+   - Create `frontend/lib/icon-registry.ts` to map icon strings to Lucide components.
+   - **Before (Hardcoded):**
+     ```typescript
+     const navItems = [
+       { label: 'Home', href: '/', icon: LayoutDashboard },
+       // ... fixed list
+     ];
+     ```
+   - **After (Dynamic):**
+     ```typescript
+     const { data } = useQuery({ ...getUserModulesModulesGetOptions() });
+     const navItems = data?.nav_items || [];
+     ```
+
+4. **Config: Domain-Specific Module Definitions**
+   - **Files:** `config/wcc_children.yaml`, `config/wcc_adults.yaml` (NEW)
+   - Define modules, navigation, and templates per domain.
+   - **Example `config/wcc_children.yaml`:**
+     ```yaml
+     tenant_id: "wcc"
+     service_domain: "children"
+     modules:
+       - id: "recordings"
+       - id: "minutes"
+     navigation:
+       - label: "Cases"
+         href: "/cases"
+         icon: "Users"
+         roles: ["social_worker", "manager"]
+     templates:
+       - "home_visit"
+       - "lac_review"
+       - "strategy_discussion"
+     ```
+
+5. **Testing:**
+   - **Backend:** Test that children's workers get children's nav, adults get adult nav.
+   - **Frontend:** E2E test verifying domain-scoped navigation rendering.
+   - **Templates:** Test that template list is filtered by domain.
+
+**Dependencies:**
+- Existing `UserOrgRole` table (Phase 1)
+- Existing `ServiceDomainTemplate` table (Phase 6)
+- Existing config loader (`common/config/loader.py`)
+
+**Exit Criteria:**
+- [ ] `/api/modules` endpoint returns domain-scoped navigation.
+- [ ] `/templates` filters by `service_domain_id`.
+- [ ] `bottom-nav.tsx` and `sidebar.tsx` render dynamically from API.
+- [ ] Config files created for `wcc_children` and `wcc_adults`.
+- [ ] Backend tests pass for module filtering.
+- [ ] Frontend E2E test passes for navigation rendering.
+- [ ] Children's workers see ONLY children's templates.
+- [ ] Production build succeeds.
+
+### Phase 22 — Task Management Module
+
+#### Phase 22A — Backend task extraction & Planner integration
 - **Objective:** Structured task extraction and management with Planner sync.
 - **Write scope:** `common/database/postgres_models.py`, `backend/api/routes/tasks.py`, `worker/task_extractor.py`, `common/services/msgraph_client.py`. Frontend is **read-only**.
 - **Dependencies:** Phase 16B module flags.
@@ -576,20 +701,20 @@ Exit: Successful pilot sign-off; backlog of tweaks captured; Adults rollout sche
   4. Add API `GET /minutes/{id}/tasks` and `PATCH /minutes/{id}/tasks` to update task status/details.
 - **Exit:** Tasks are extracted as structured data; API supports CRUD; Planner integration handles rich tasks.
 
-#### Phase 21B — Frontend task UI & module
+#### Phase 22B — Frontend task UI & module
 - **Objective:** Dedicated task management UI and Planner export interactions.
 - **Write scope:** `frontend/lib/modules.ts`, `frontend/app/tasks/`, `frontend/components/minutes/`. Backend is **read-only**.
-- **Dependencies:** Phase 21A API.
+- **Dependencies:** Phase 22A API.
 - **Actions:**
   1. Register "Tasks" module in `frontend/lib/modules.ts`.
   2. Build "Tasks" tab in Minute view to list/edit extracted tasks.
   3. Implement "Push to Planner" button that sends structured tasks and updates UI with Planner links.
-  4. (Optional) Global "My Tasks" page if `Task` table was chosen in 21A.
+  4. (Optional) Global "My Tasks" page if `Task` table was chosen in 22A.
 - **Exit:** Users can review/edit tasks before export; Planner export is granular; Tasks module appears in nav if enabled.
 
-### Phase 22 — Cross-Platform Mobile Maturity
+### Phase 23 — Cross-Platform Mobile Maturity
 
-#### Phase 22A — Shared offline state logic
+#### Phase 23A — Shared offline state logic
 - **Objective:** Abstract offline queue logic to be usable by both Web (Dexie) and Mobile (AsyncStorage/MMKV).
 - **Write scope:** Refactor `frontend/lib/offline-queue.ts` into a shared adapter pattern; move core types to `common/types.ts` (if shared package exists) or ensure portability. UI components **read-only**.
 - **Dependencies:** Phase 18A shared UI.
@@ -599,10 +724,10 @@ Exit: Successful pilot sign-off; backlog of tweaks captured; Adults rollout sche
   3. Refactor `useOfflineQueue` hook to use the injected storage adapter.
 - **Exit:** Offline logic is decoupled from browser-specific APIs; web app functions unchanged.
 
-#### Phase 22B — Mobile UI implementation
+#### Phase 23B — Mobile UI implementation
 - **Objective:** Build functional Capture and Transcription screens in RN shell.
 - **Write scope:** `apps/mobile/`. Web app **read-only**.
-- **Dependencies:** Phase 22A shared logic, Phase 18B shell.
+- **Dependencies:** Phase 23A shared logic, Phase 18B shell.
 - **Actions:**
   1. Implement `CaptureScreen` using `expo-av` and shared UI tokens.
   2. Implement `TranscriptionListScreen` fetching from API.
@@ -610,9 +735,9 @@ Exit: Successful pilot sign-off; backlog of tweaks captured; Adults rollout sche
   4. Add background upload task (using `expo-background-fetch` or similar).
 - **Exit:** Mobile app can record, list transcriptions, and sync offline data; matches PWA feature set.
 
-### Phase 23 — Resilience & Error Handling
+### Phase 24 — Resilience & Error Handling
 
-#### Phase 23A — Frontend Resilience
+#### Phase 24A — Frontend Resilience
 - **Objective:** Improve user experience during partial outages or network failures.
 - **Write scope:** `frontend/app/`, `frontend/components/ui/`, `frontend/lib/api/`. Backend is **read-only**.
 - **Dependencies:** Phase 16C module flags (to degrade gracefully).
@@ -623,7 +748,7 @@ Exit: Successful pilot sign-off; backlog of tweaks captured; Adults rollout sche
   4. Implement "Degraded Mode" UI where disabled/failing modules are hidden or grayed out instead of crashing the page.
 - **Exit:** UI handles 404/500 errors gracefully; users can retry actions; offline state is clear.
 
-#### Phase 23B — Backend Circuit Breakers
+#### Phase 24B — Backend Circuit Breakers
 - **Objective:** Prevent cascading failures and provide health status for dependencies.
 - **Write scope:** `backend/api/dependencies/`, `common/services/`. Frontend is **read-only**.
 - **Dependencies:** Phase 19A telemetry.
@@ -633,9 +758,9 @@ Exit: Successful pilot sign-off; backlog of tweaks captured; Adults rollout sche
   3. Return "Degraded" status in config/health endpoints if non-critical services are down.
 - **Exit:** Backend fails fast on external outages; health endpoints reflect dependency status.
 
-### Phase 24 — Advanced Analytics & Insights
+### Phase 25 — Advanced Analytics & Insights
 
-#### Phase 24A — Backend Insights Aggregation
+#### Phase 25A — Backend Insights Aggregation
 - **Objective:** Calculate and serve usage insights (time saved, top topics).
 - **Write scope:** `worker/analytics.py`, `backend/api/routes/insights.py`, `common/database/postgres_models.py`. Frontend is **read-only**.
 - **Dependencies:** Phase 19A telemetry.
@@ -645,7 +770,7 @@ Exit: Successful pilot sign-off; backlog of tweaks captured; Adults rollout sche
   3. Add `/api/insights` endpoints to serve aggregated data per tenant/domain.
 - **Exit:** API serves calculated insights; aggregation jobs run on schedule.
 
-#### Phase 24B — Frontend Insights Module
+#### Phase 25B — Frontend Insights Module
 - **Objective:** Visualize insights for users/admins.
 - **Write scope:** `frontend/app/insights/`, `frontend/components/charts/`. Backend is **read-only`.
 ```
@@ -654,9 +779,9 @@ Exit: Successful pilot sign-off; backlog of tweaks captured; Adults rollout sche
   3. Add "My Impact" widget to Home page.
 - **Exit:** Users can see value metrics; Admins can see adoption trends.
 
-### Phase 25 — Design System 2.0 & Premium Shell
+### Phase 26 — Design System 2.0 & Premium Shell
 
-#### Phase 25A — Core App Shell & Motion
+#### Phase 26A — Core App Shell & Motion
 - **Objective:** Create a responsive, app-like shell with seamless transitions (inspired by Magic Notes).
 - **Write scope:** `frontend/components/layout/`, `frontend/app/template.tsx`, `next.config.js`. Backend is **read-only**.
 - **Dependencies:** Phase 14 (Next.js 15).
@@ -669,10 +794,10 @@ Exit: Successful pilot sign-off; backlog of tweaks captured; Adults rollout sche
   4. Refactor `Header` to be a transparent, blur-backed overlay.
 - **Exit:** App feels like a native mobile app; navigation is responsive; page transitions are smooth.
 
-#### Phase 25B — Premium UI Kit (Magic UI)
+#### Phase 26B — Premium UI Kit (Magic UI)
 - **Objective:** Elevate the visual design to match "Apple/Google" premium standards.
 - **Write scope:** `frontend/app/globals.css`, `frontend/components/ui/`. Backend is **read-only**.
-- **Dependencies:** Phase 25A.
+- **Dependencies:** Phase 26A.
 - **Actions:**
   1. Upgrade `globals.css` with "Magic UI" tokens:
      - **Cards:** Clean white/dark backgrounds, soft diffuse shadows (`box-shadow: 0 4px 24px rgba(0,0,0,0.06)`).
@@ -682,12 +807,12 @@ Exit: Successful pilot sign-off; backlog of tweaks captured; Adults rollout sche
   4. Style `Sonner` toasts to look like native OS notifications.
 - **Exit:** UI matches the "Magic Notes" aesthetic; interactions are fluid.
 
-### Phase 26 — Adaptive UX Engine
+### Phase 27 — Adaptive UX Engine
 
-#### Phase 26A — Context Engine & Tabs
+#### Phase 27A — Context Engine & Tabs
 - **Objective:** Instantly adapt the UI based on user role and content type.
 - **Write scope:** `frontend/providers/UserPersonaProvider.tsx`, `frontend/components/layout/`. Backend is **read-only**.
-- **Dependencies:** Phase 25A.
+- **Dependencies:** Phase 26A.
 - **Actions:**
   1. Create `UserPersonaProvider` to manage `currentPersona` (Social Worker, Manager).
   2. Implement "Contextual Tabs" for Minute view (as seen in Magic Notes):
@@ -695,10 +820,10 @@ Exit: Successful pilot sign-off; backlog of tweaks captured; Adults rollout sche
   3. Implement "One-Tap Mode Switch": Toggle between "In-Person" and "Online" recording modes.
 - **Exit:** App adapts navigation and layout based on logged-in user role and task.
 
-#### Phase 26B — Role-Specific Dashboards
+#### Phase 27B — Role-Specific Dashboards
 - **Objective:** Provide tailored home screens for different user needs.
 - **Write scope:** `frontend/app/page.tsx`, `frontend/components/dashboards/`. Backend is **read-only**.
-- **Dependencies:** Phase 26A.
+- **Dependencies:** Phase 27A.
 - **Actions:**
   1. Create `DashboardSocialWorker`:
      - **Focus:** "Recent Meetings" (Card list), "Quick Record" (Floating button).
@@ -707,7 +832,7 @@ Exit: Successful pilot sign-off; backlog of tweaks captured; Adults rollout sche
   3. Update `app/page.tsx` to render the correct dashboard component.
 - **Exit:** Social workers see tools; Managers see insights; seamless switching.
 
-### Phase 27 — Recording Studio 2.0 (Magic Notes–inspired)
+### Phase 28 — Recording Studio 2.0 (Magic Notes–inspired)
 
 **Objective:** Upgrade capture UX on web and mobile to match (and exceed) the simplicity of the Magic Notes recording experience while keeping the offline‑first guarantees we already have.
 
@@ -727,7 +852,7 @@ Actions
 
 Exit: A social worker can see at a glance whether the app is recording, paused, or saved; the capture flows feel deliberate and calm on both phone and laptop; in‑person vs virtual meetings are clearly labelled throughout.
 
-### Phase 28 — AI Writing Assistant & Source Check
+### Phase 29 — AI Writing Assistant & Source Check
 
 **Objective:** Provide an inline AI assistant that helps practitioners tidy and adapt text while keeping a strong link back to evidence in the transcript.
 
@@ -748,7 +873,7 @@ Actions
 
 Exit: Practitioners can safely lean on AI to tidy and adapt text without losing sight of the underlying conversation; QA can quickly check the evidencing quality of key sections.
 
-### Phase 29 — Content Organisation (Tabs & Tags)
+### Phase 30 — Content Organisation (Tabs & Tags)
 
 **Objective:** Organise content so long notes stay navigable, and cross‑meeting retrieval (by tag, template, or topic) becomes effortless.
 
@@ -765,7 +890,7 @@ Actions
 
 Exit: Long notes are split into meaningful sections; social workers and managers can quickly jump to relevant parts and retrieve notes by topic or tag.
 
-### Phase 30 — Config System & Module Registry (Universal App Foundation)
+### Phase 31 — Config System & Module Registry (Universal App Foundation)
 
 **Objective:** Finalise the universal module/tenant configuration system so Minute becomes one set of feature modules within a reusable council app platform.
 
@@ -783,7 +908,7 @@ Actions
 
 Exit: Adding a new department or module is primarily a config/schema change plus templates, not a series of hard‑coded nav and routing edits; both Minute and the universal app shells consume the same module registry.
 
-### Phase 31 — Design Tokens & Theme Engine
+### Phase 32 — Design Tokens & Theme Engine
 
 **Objective:** Strengthen the design system so multiple councils and departments can share accessible tokens and lightweight branding, and the universal shells inherit the same look‑and‑feel.
 
@@ -800,7 +925,7 @@ Actions
 
 Exit: All UI surfaces (Minute web app, universal web shell, mobile shell) share the same accessible token base, making it cheap to support new councils or adjust branding without redesigning entire flows.
 
-### Phase 32 — Advanced Offline & Sync
+### Phase 33 — Advanced Offline & Sync
 
 **Objective:** Generalise offline support so it covers recordings, notes, tasks, and other future operations, with clear conflict handling and user feedback.
 
@@ -817,7 +942,7 @@ Actions
 
 Exit: Offline behaviour feels predictable and robust; social workers trust that “Record → Keep safe → Use later” always holds, even during device restarts or network flakiness.
 
-### Phase 33 — Cross‑Platform UI Kit (RN Web Preparation)
+### Phase 34 — Cross‑Platform UI Kit (RN Web Preparation)
 
 **Objective:** Extract a shared UI kit that can power both Next (web) and React Native (mobile) without duplicating styling or behaviour.
 
@@ -833,7 +958,7 @@ Actions
 
 Exit: Most UI work happens on reusable primitives that function across web and RN‑Web; adding new screens does not require re‑implementing components per platform.
 
-### Phase 34 — Mobile Shell (React Native / Expo)
+### Phase 35 — Mobile Shell (React Native / Expo)
 
 **Objective:** Deliver a first‑class mobile app that consumes the same module registry and config as the web app, giving social workers a high‑quality, native‑feeling experience.
 
@@ -843,13 +968,13 @@ Actions
    - Extend the existing `apps/mobile` shell to authenticate against Entra, fetch tenant config and module manifests, and render a bottom‑nav layout with module‑driven screens.
 2. **Core screens**
    - Implement `CaptureScreen`, `TranscriptionListScreen`, and a lightweight `NoteDetailScreen` aligned with journeys SW1–SW3.
-   - Reuse shared primitives and tokens from Phase 33; avoid mobile‑only styles where possible.
+   - Reuse shared primitives and tokens from Phase 34; avoid mobile‑only styles where possible.
 3. **Mobile offline storage**
    - Use SQLite/AsyncStorage (or MMKV) for the offline queue on mobile, reusing the unified offline engine behaviour and statuses.
 
 Exit: Social workers can live primarily in the mobile app while keeping the laptop for deep editing and exports; the same module registry and config drive both.
 
-### Phase 35 — Admin Console (Config & Modules)
+### Phase 36 — Admin Console (Config & Modules)
 
 **Objective:** Give councils a safe, auditable way to configure tenants, departments, templates, and modules without requiring code changes.
 
@@ -864,7 +989,7 @@ Actions
 
 Exit: Digital and IT teams can manage configuration and modules through a web UI layered on top of the same schema and registry, with full audit coverage.
 
-### Phase 36 — Telemetry & Adoption Dashboards
+### Phase 37 — Telemetry & Adoption Dashboards
 
 **Objective:** Make it easy to see whether the app is delivering value (time saved, adoption, offline health) and guide future roadmap decisions.
 
@@ -879,7 +1004,7 @@ Actions
 
 Exit: Councils and the product team can see where the app is used heavily, which features land well, and where training or UX changes are needed.
 
-### Phase 37 — Collaboration & Real‑Time
+### Phase 38 — Collaboration & Real‑Time
 
 **Objective:** Support collaborative editing and discussion around notes without losing auditability or simplicity.
 
@@ -893,7 +1018,7 @@ Actions
 
 Exit: Multiple practitioners can safely work on the same note without overwriting each other; managers and QA can leave targeted feedback inside the context of the note.
 
-### Phase 38 — Advanced Search (Full‑Text + Semantic)
+### Phase 39 — Advanced Search (Full‑Text + Semantic)
 
 **Objective:** Make it effortless to find the right note, snippet, or topic across many meetings, while respecting tenancy and domain boundaries.
 
@@ -908,7 +1033,7 @@ Actions
 
 Exit: Social workers, managers, and QA can quickly retrieve relevant notes and evidence even in large deployments; search remains safe and tenant‑scoped.
 
-### Phase 39 — Compliance Tools
+### Phase 40 — Compliance Tools
 
 **Objective:** Provide tooling that helps councils meet DPIA and audit requirements without manual spreadsheet work.
 
@@ -923,7 +1048,7 @@ Actions
 
 Exit: Councils can demonstrate compliance and respond to investigations using built‑in tools rather than ad‑hoc queries and manual collation.
 
-### Phase 40 — Performance & Perceived Speed
+### Phase 41 — Performance & Perceived Speed
 
 **Objective:** Keep the app feeling fast and responsive even as we add modules, councils, and features.
 

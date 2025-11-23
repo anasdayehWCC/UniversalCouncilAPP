@@ -1,8 +1,8 @@
 'use client'
 
 import { TemplateEditorToolbar } from '@/app/templates/components/editor/editor-toolbar'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Button } from '@careminutes/ui'
+import { Input } from '@careminutes/ui'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { TemplateData } from '@/types/templates'

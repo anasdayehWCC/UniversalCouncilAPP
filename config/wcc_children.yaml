@@ -1,0 +1,60 @@
+id: "wcc_children"
+name: "Westminster Children's Services"
+version: "1.0.0"
+defaultLocale: "en-GB"
+languages:
+  default: "en"
+  available:
+    - "en"
+    - "pl"
+    - "ar"
+    - "uk"
+  autoTranslate: true
+organisation: "Westminster"
+service_domain: "children"
+templates:
+  - home_visit
+  - strategy_discussion
+  - lac_review
+  - child_protection_conference
+sharepoint_library_path: "Shared Documents/Children/Visits/2025/"
+lexicon:
+  - "WCC"
+  - "LAC"
+  - "CP"
+  - "child protection"
+planner:
+  plan_id: "<planner-plan-id>"
+  bucket_id: "<planner-bucket-id>"
+roles:
+  - social_worker
+  - manager
+  - admin
+modules:
+  - id: "recordings"
+    enabled: true
+  - id: "minutes"
+    enabled: true
+  - id: "templates"
+    enabled: true
+  - id: "tasks"
+    enabled: true
+navigation:
+  - label: "Home"
+    href: "/"
+    icon: "LayoutDashboard"
+    roles: ["social_worker", "manager", "admin"]
+  - label: "Cases"
+    href: "/cases"
+    icon: "Users"
+    roles: ["social_worker", "manager"]
+  - label: "Record"
+    href: "/record"
+    icon: "Mic"
+    fab: true
+    roles: ["social_worker"]
+  - label: "Notes"
+    href: "/transcriptions"
+    icon: "FileText"
+    roles: ["social_worker", "manager"]
+retentionDaysDefault: 365

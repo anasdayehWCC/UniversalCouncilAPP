@@ -1,7 +1,7 @@
 "use client"
 
 import { PressableSurface } from "@/lib/ui/pressable"
-import { TokenText } from "@/components/ui/token-text"
+import { TokenText } from "@careminutes/ui"
 
 export default function UIPlaygroundPage() {
   return (

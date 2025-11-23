@@ -1,5 +1,5 @@
 import { TabRecorderForm } from '@/components/audio/tab-recorder/tab-recorder'
-import { Button } from '@/components/ui/button'
+import { Button } from '@careminutes/ui'
 import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 

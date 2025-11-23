@@ -11,7 +11,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
+import { Button } from '@careminutes/ui'
 import { CitationPopoverWrapper } from '@/components/ui/citation-popover-wrapper'
 import { Textarea } from '@/components/ui/textarea'
 import { useCitationPopover } from '@/hooks/use-citation-popover'

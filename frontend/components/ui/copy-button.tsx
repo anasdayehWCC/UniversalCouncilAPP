@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button'
+import { Button } from '@careminutes/ui'
 import { Copy as CopyIcon } from 'lucide-react'
 import posthog from 'posthog-js'
 import { useState } from 'react'

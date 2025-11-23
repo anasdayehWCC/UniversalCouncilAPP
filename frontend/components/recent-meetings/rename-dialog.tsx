@@ -1,6 +1,6 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@careminutes/ui'
 import {
   Dialog,
   DialogClose,
@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
+import { Input } from '@careminutes/ui'
 import { TranscriptionMetadata } from '@/lib/client'
 import {
   listTranscriptionsTranscriptionsGetQueryKey,

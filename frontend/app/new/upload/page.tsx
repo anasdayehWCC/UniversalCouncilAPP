@@ -1,5 +1,5 @@
 import { AudioUploadForm } from '@/components/audio/AudioUploadForm'
-import { Button } from '@/components/ui/button'
+import { Button } from '@careminutes/ui'
 import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 

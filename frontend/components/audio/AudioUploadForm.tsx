@@ -1,7 +1,7 @@
 'use client'
 
 import { StartTranscriptionSection } from '@/components/audio/start-transcription-section'
-import { Button } from '@/components/ui/button'
+import { Button } from '@careminutes/ui'
 import { useStartTranscription } from '@/hooks/useStartTranscription'
 import { cn } from '@/lib/utils'
 import { CheckCircle, CloudUpload, FileX, Info } from 'lucide-react'

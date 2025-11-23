@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button'
+import { Button } from '@careminutes/ui'
 import { JobStatus } from '@/lib/client'
 import {
   getTranscriptionTranscriptionsTranscriptionIdGetQueryKey,

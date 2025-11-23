@@ -2,6 +2,78 @@
 
 > Source-of-truth for how real people move through the Minute-based universal council app across web and mobile. Social care is the first vertical, but these journeys are designed to stay valid as we add other departments (housing, SEND, etc.) via config and modules.
 
+# User Journeys & Personas
+
+## Personas
+
+### 1. Sarah — The Social Worker
+- **Role:** Frontline practitioner in Children’s Services.
+- **Context:** Always on the move (home visits, schools, court). Uses a laptop in the office/car and a mobile phone for quick checks.
+- **Goals:** Spend less time typing notes, more time with families. Needs accurate records but hates "admin".
+- **Pain Points:** Double entry (notebook -> system), fear of losing data, complex forms.
+- **Emotions:** Stressed by caseload, anxious about compliance, relieved when tech "just works".
+
+### 2. David — The Team Manager
+- **Role:** Manages a team of 6-8 social workers.
+- **Context:** Office-based but often in meetings.
+- **Goals:** Ensure team compliance, quality assurance of notes, quick approvals.
+- **Pain Points:** Chasing overdue notes, reading poorly written records, lack of visibility.
+- **Emotions:** Protective of team, frustrated by bottlenecks.
+
+### 3. Priya — The Digital Admin
+- **Role:** IT/Digital lead for the Council.
+- **Context:** Manages software configuration and user access.
+- **Goals:** Enable new departments without code changes, ensure security/governance.
+- **Pain Points:** Vendor lock-in, hard-coded changes, managing multiple disparate apps.
+
+---
+
+## Journeys
+
+### SW1: Capture & Triage (The "Magic Note" Flow)
+**Goal:** Capture a conversation securely and offload the mental burden of remembering details.
+
+1.  **Start:** Sarah finishes a home visit. She opens the app on her phone (or laptop in the car).
+2.  **Action:** Taps the big "Record" button.
+3.  **Context:** She selects "In-Person Visit" (vs Online).
+4.  **Capture:** The app records audio. She sees a reassuring waveform.
+5.  **Finish:** She taps "Stop". The app immediately says "Safe & Uploaded".
+6.  **Triage:** She can add a quick title (e.g., "Visit to Smith Family") or tag it "Urgent".
+7.  **Outcome:** She closes the app, knowing the data is safe. The backend starts transcription and diarization.
+
+### SW2: Deep Work (Minute Editor)
+**Goal:** Turn the raw recording into a professional case note.
+
+1.  **Start:** Sarah is back at her desk. She opens the "Minutes" tab.
+2.  **Selection:** She sees the "Smith Family" recording is "Ready". She clicks it.
+3.  **Template:** She selects the "Statutory Visit" template.
+4.  **Drafting:** The AI pre-fills the template sections (Purpose, Observations, Analysis, Plan) based on the transcript.
+5.  **Refining:**
+    - She reads the "Analysis" section. It's good but misses a nuance.
+    - She highlights a sentence and clicks "Edit with AI" -> "Make more strengths-based".
+    - She verifies a quote by clicking the timestamp; the audio plays from that exact moment.
+6.  **Finalize:** She marks it as "Complete" and clicks "Export to Case System" (or "Push to Planner").
+
+### TM1: Supervision & Review
+**Goal:** Review and approve team notes efficiently.
+
+1.  **Start:** David logs in. His dashboard shows "3 Notes Awaiting Approval".
+2.  **Review:** He opens Sarah's "Smith Family" note.
+3.  **Comment:** He highlights a section in the "Plan" and adds a comment: "Please clarify the timeline for the referral."
+4.  **Action:** He marks the note as "Changes Requested".
+5.  **Outcome:** Sarah gets a notification. She fixes it, and David approves it later.
+
+### Admin1: Config & Onboarding
+**Goal:** Enable a new "Housing" department pilot.
+
+1.  **Start:** Priya opens the Admin Console.
+2.  **Config:** She creates a new Tenant Config for "Housing Pilot".
+3.  **Modules:** She enables "Transcription", "Minutes", and "Tasks". She disables "Care Assessment" templates.
+4.  **Theming:** She uploads the Housing department logo and sets the accent color to Teal.
+5.  **Deploy:** She saves the config.
+6.  **Outcome:** Housing staff log in and see a Teal-themed app with only the relevant modules and templates. No code was deployed.
+
+
 ## 1. Personas & Channels
 
 ### 1.1 Core personas

@@ -1,7 +1,7 @@
 'use client'
 
 import { DiscardConfirmDialog } from '@/components/audio/discard-dialog'
-import { Button } from '@/components/ui/button'
+import { Button } from '@careminutes/ui'
 import { Collapsible, CollapsibleTrigger } from '@/components/ui/collapsible'
 import {
   RecordingDbItem,

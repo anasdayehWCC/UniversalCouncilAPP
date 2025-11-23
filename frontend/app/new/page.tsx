@@ -1,6 +1,6 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@careminutes/ui'
 import { ChevronLeft, Mic, MonitorPlay, Upload, type LucideIcon } from 'lucide-react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'

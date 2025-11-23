@@ -1,0 +1,59 @@
+id: "wcc_adults"
+name: "Westminster Adult Social Care"
+version: "1.0.0"
+defaultLocale: "en-GB"
+languages:
+  default: "en"
+  available:
+    - "en"
+    - "pl"
+    - "ar"
+    - "uk"
+  autoTranslate: true
+organisation: "Westminster"
+service_domain: "adults"
+templates:
+  - home_visit
+  - adult_safeguarding
+  - supervision
+  - manager_summary
+sharepoint_library_path: "Shared Documents/Adults/Visits/2025/"
+lexicon:
+  - "WCC"
+  - "adult safeguarding"
+  - "care plan"
+planner:
+  plan_id: "<planner-plan-id-adults>"
+  bucket_id: "<planner-bucket-id-adults>"
+roles:
+  - social_worker
+  -manager
+  - admin
+modules:
+  - id: "recordings"
+    enabled: true
+  - id: "minutes"
+    enabled: true
+  - id: "templates"
+    enabled: true
+  - id: "tasks"
+    enabled: true
+navigation:
+  - label: "Home"
+    href: "/"
+    icon: "LayoutDashboard"
+    roles: ["social_worker", "manager", "admin"]
+  - label: "Cases"
+    href: "/cases"
+    icon: "Users"
+    roles: ["social_worker", "manager"]
+  - label: "Record"
+    href: "/record"
+    icon: "Mic"
+    fab: true
+    roles: ["social_worker"]
+  - label: "Notes"
+    href: "/transcriptions"
+    icon: "FileText"
+    roles: ["social_worker", "manager"]
+retentionDaysDefault: 730

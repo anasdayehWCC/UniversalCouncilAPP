@@ -6,7 +6,7 @@ import { TranslationsTab } from '@/app/transcriptions/[transcriptionId]/Translat
 import { DownloadButton } from '@/components/download-button'
 import { AudioWav } from '@/components/icons/AudioWav'
 import { TranscriptionTitleEditor } from '@/components/transcription-title-editor'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@careminutes/ui'
 import {
   getRecordingsForTranscriptionTranscriptionsTranscriptionIdRecordingsGetOptions,
   getTranscriptionTranscriptionsTranscriptionIdGetOptions,
@@ -14,7 +14,7 @@ import {
 import { FeatureFlags } from '@/lib/feature-flags'
 import { useQuery } from '@tanstack/react-query'
 import { Clock, Frown, SearchX } from 'lucide-react'
-import { Skeleton } from '@/components/ui/skeleton'
+import { Skeleton } from '@careminutes/ui'
 import { useFeatureFlagEnabled } from 'posthog-js/react'
 
 import { use } from 'react'

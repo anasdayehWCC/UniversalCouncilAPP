@@ -1,4 +1,4 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@careminutes/ui'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 

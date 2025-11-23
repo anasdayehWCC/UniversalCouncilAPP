@@ -6,9 +6,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { queueRecording } from '@/lib/offline-queue';
 import { useDevPreview } from '@/lib/dev-preview-provider';
-import { Button } from '@/components/ui/button';
+import { Button } from '@careminutes/ui';
 import { PressableSurface } from '@/lib/ui/pressable';
-import { TokenText } from '@/components/ui/token-text';
+import { TokenText } from '@careminutes/ui';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
@@ -183,7 +183,7 @@ export default function CapturePage() {
               {/* Processing Mode Toggle */}
               <div className="flex gap-2 w-full">
                 <PressableSurface
-                  onPress={() => setProcessingMode('fast')}
+                  onClick={() => setProcessingMode('fast')}
                   className={cn(
                     "flex-1 py-3 px-4",
                     processingMode === 'fast'
@@ -196,7 +196,7 @@ export default function CapturePage() {
                   <TokenText emphasis="muted" className="text-xs">Low latency</TokenText>
                 </PressableSurface>
                 <PressableSurface
-                  onPress={() => setProcessingMode('economy')}
+                  onClick={() => setProcessingMode('economy')}
                   className={cn(
                     "flex-1 py-3 px-4",
                     processingMode === 'economy'

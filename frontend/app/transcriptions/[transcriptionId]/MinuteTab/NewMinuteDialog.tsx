@@ -1,7 +1,7 @@
 'use client'
 
 import { TemplateSelect } from '@/components/template-select/template-select'
-import { Button } from '@/components/ui/button'
+import { Button } from '@careminutes/ui'
 import {
   Dialog,
   DialogContent,

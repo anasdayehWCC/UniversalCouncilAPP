@@ -1,7 +1,7 @@
 // frontend/components/audio/microphone-permission.tsx
 import React, { useCallback, useEffect, useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
+import { Button } from '@careminutes/ui'
 import { Loader2 } from 'lucide-react'
 
 interface MicrophonePermissionProps {

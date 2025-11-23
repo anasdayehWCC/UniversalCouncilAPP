@@ -151,7 +151,8 @@ The **current Minute backend and worker** already align reasonably with `domain/
   - A set of routes (path + component) and menu items.
   - Required permissions (e.g., `transcription:read`, `minute:approve`).
   - Any DAL contracts it needs (e.g., `TranscriptionGateway`).
-- The web shell reads the tenant config, determines which modules should be active for the current `(tenant, service_domain, role)`, and mounts only those routes.
+- The web shell reads the tenant config, determines which modules should be active for the current `(tenant, service_domain, role)`, and **returns ONLY those modules to the user** via `/api/modules` endpoint.
+- **Domain Scoping (Phase 21C):** A children's social worker receives ONLY children's modules; an adult worker ONLY adult modules. They NEVER see each other's navigation or templates.
 - For existing features:
   - **Transcription module** wraps current flows: upload, capture, offline queue, transcript review, speaker relabel, feedback.
   - **Minutes module** wraps template selection, minute authoring, evidence views, and exports.
@@ -160,7 +161,9 @@ The **current Minute backend and worker** already align reasonably with `domain/
 ### 4.4 UI & navigation model
 - Replace ad‑hoc sidebar/header nav with a **navigation model derived from config**:
   - `NavigationItem = { path, label, moduleId, roles, serviceDomains }`.
-  - In code, we filter by the current user’s roles + service_domain and by module enablement flags to render the final nav.
+  - Backend `/api/modules` endpoint filters by user's `service_domain_id` + `role` **BEFORE** returning nav items to frontend.
+  - Frontend renders ONLY the returned items; **no client-side filtering** or module switcher UI.
+  - **Anti-pattern:** Do NOT create a "switch domain" dropdown or show greyed-out modules for other domains. Users should only see their world.
 - Use a consistent layout skeleton for both desktop and mobile:
   - **Desktop**: persistent sidebar + top header; content area; “case context” chips.
   - **Mobile**: tab bar for primary modules, with stacked screens and large touch targets (44×44+). citeturn0search3turn0search9

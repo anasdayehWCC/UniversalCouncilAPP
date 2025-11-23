@@ -58,7 +58,11 @@ Web/PWA (capture/offline) ──► API (/recordings, /transcriptions, /minutes)
 
 - Current registry: transcription, minutes, notes, admin declared in `frontend/lib/modules.ts`.
 - Modules expose routes and optional permissions; filtering by service domain already supported.
-- Gaps: no backend module contracts; nav/routes not fully config-driven; need module metadata (labels/icons/permissions) and flag enforcement (Phase 16B/16C).
+- Gaps (being addressed in Phase 21C): 
+  - Navigation is hardcoded in `bottom-nav.tsx`/`sidebar.tsx` instead of being domain-scoped.
+  - Need `/api/modules` endpoint that returns user-scoped modules/nav based on `service_domain_id` + `role`.
+  - Templates not filtered by user's domain before display (children's workers currently see adult templates).
+  - Module metadata (labels/icons/permissions) and flag enforcement needed (Phase 16B/16C).
 
 ## 7. Accessibility & Design System
 
@@ -97,4 +101,11 @@ Web/PWA (capture/offline) ──► API (/recordings, /transcriptions, /minutes)
 - `minute_architecture_diagram.png` (to refresh when infra changes)
 - `minute-main/ROADMAP_social_care.md` (phase detail) and `PLANS.md` (exec plan)
 - `minute-main/docs/user_journeys.md` (persona journeys and UX flows driving capture/review UX)
+- `minute-main/docs/adr/001_platform_alignment.md` (ADR defining Modular Monolith structure)
 - Key code paths: `frontend/lib/modules.ts`, `frontend/lib/config/*`, `frontend/lib/db.ts`, `frontend/public/sw.js`, `backend/api/routes/config.py`, `common/services/*`, `worker/`
+
+## 13. Architectural Decisions (ADRs)
+
+- **ADR 001: Platform & Repo Alignment (Modular Monolith)**
+  - **Decision:** Root `packages/*` is the Platform (shared code). `minute-main` is the Social Care Product Module.
+  - **Implication:** `minute-main` must import from root `packages/` and remove local placeholders. Root `apps/*` are universal shells.

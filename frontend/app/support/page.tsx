@@ -11,7 +11,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from '@careminutes/ui'
 
 export default function SupportPage() {
   return (

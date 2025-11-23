@@ -2,7 +2,7 @@
 
 import { OfflineRecordings } from '@/components/recent-meetings/offline-recordings'
 import { TranscriptionListItem } from '@/components/recent-meetings/transcription-list-item'
-import { Button } from '@/components/ui/button'
+import { Button } from '@careminutes/ui'
 import { listTranscriptionsTranscriptionsGetOptions } from '@/lib/client/@tanstack/react-query.gen'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { ChevronLeft, ChevronRight, FileText, Loader2 } from 'lucide-react'

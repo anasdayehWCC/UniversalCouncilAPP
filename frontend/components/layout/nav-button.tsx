@@ -11,7 +11,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
+import { Button } from '@careminutes/ui'
 import { useLockNavigationContext } from '@/hooks/use-lock-navigation-context'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -29,7 +29,8 @@ export const NavButton = ({
     return (
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button variant="ghost">{children}</Button>
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          <Button variant="ghost" type="button">{children as any}</Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>

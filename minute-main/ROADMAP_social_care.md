@@ -537,7 +537,6 @@ Exit: Successful pilot sign-off; backlog of tweaks captured; Adults rollout sche
 ### Phase 20 — Universal Multilingual Support
 
 #### Phase 20A — Backend translation services & config
-
 - **Status:** ✅ Completed 2025-11-22.
 - **What shipped:**
   - `TenantConfig.languages` now captures `default`, `available`, and `autoTranslate` flags (schema + docs updated, pilot config set to auto-translate English→Polish/Arabic/Ukrainian).
@@ -550,7 +549,6 @@ Exit: Successful pilot sign-off; backlog of tweaks captured; Adults rollout sche
 - **Next checks:** add queue depth metrics + Azure Translator credential rotation, wire admin UI so tenant owners can update allowed languages without code change.
 
 #### Phase 20B — Frontend translation UI
-
 - **Status:** ✅ Completed 2025-11-22.
 - **What shipped:**
   - Added `Translations` tab to the transcription page with a hero card riffing on the Magic Notes “Record → Keep safe → Use later” storyline (glassmorphism + gradient) so social workers immediately understand the flow.
@@ -572,12 +570,10 @@ Exit: Successful pilot sign-off; backlog of tweaks captured; Adults rollout sche
 **Actions:**
 
 1. **Documentation Consolidation:**
-
    - Merge `minute-main/docs/universal_council_app_foundations.md` and any root docs into a single canonical `docs/architecture.md` (or `docs/universal_foundation.md`).
    - Create an ADR (`docs/adr/001_platform_alignment.md`) formalizing the "Modular Monolith" structure: Root = Platform, `minute-main` = Social Care Product.
 
 2. **Package De-duplication:**
-
    - Verify root `packages/core` and `packages/ui` contain the latest shared logic/components.
    - Update `minute-main/frontend` to consume root `packages/*` (via workspace aliases or relative paths) instead of localized copies.
    - Delete/deprecate `minute-main/packages/*` placeholders.
@@ -589,10 +585,112 @@ Exit: Successful pilot sign-off; backlog of tweaks captured; Adults rollout sche
 
 **Exit:** Repo structure matches the architecture diagram; `minute-main` imports from root packages; no duplicate "core" or "ui" folders inside `minute-main`.
 
+#### Phase 21C — Config-Driven Navigation (Domain-Scoped UI)
+
+**Objective:** Implement role and domain-scoped navigation where users see ONLY the modules and templates relevant to their `service_domain` and `role`, not a combined view across all domains.
+
+**Vision Clarification:**
+- A children's social worker logs in → sees ONLY children's templates ("LAC Review", "Strategy Discussion") and children-specific navigation.
+- An adult social worker logs in → sees ONLY adult templates ("Adult Safeguarding", "Care Review") and adult-specific navigation.
+- A housing officer (future) logs in → sees ONLY housing templates and housing-specific navigation ("Properties", "Inspections").
+- Users NEVER see navigation for other domains. Navigation is filtered server-side before being returned to the frontend.
+
+**Current Problem:**
+- Navigation is hardcoded in `frontend/components/layout/bottom-nav.tsx` and `sidebar.tsx` with fixed menu items.
+- All users see the same navigation regardless of their domain or role.
+- Templates are not filtered by `service_domain_id` before display.
+- A children's social worker can currently see "Adult Safeguarding" templates (incorrect!).
+
+**Actions:**
+
+1. **Backend: Module Registry API**
+   - **File:** `backend/api/routes/modules.py` (NEW)
+   - Create `GET /api/modules` endpoint that:
+     - Queries `UserOrgRole` table to get user's `service_domain_id` and `role`.
+     - Loads domain-specific config from `config/{tenant}_{domain}.yaml`.
+     - Returns filtered `modules` list and `nav_items` array based on user's domain + role.
+   - **Response Example (Children's Worker):**
+     ```json
+     {
+       "service_domain": "children",
+       "role": "social_worker",
+       "modules": ["recordings", "minutes", "templates", "tasks"],
+       "nav_items": [
+         { "label": "Home", "href": "/", "icon": "LayoutDashboard" },
+         { "label": "Cases", "href": "/cases", "icon": "Users" },
+         { "label": "Record", "href": "/record", "icon": "Mic", "fab": true },
+         { "label": "Notes", "href": "/transcriptions", "icon": "FileText" }
+       ]
+     }
+     ```
+
+2. **Backend: Domain-Filtered Templates**
+   - **File:** `backend/api/routes/templates.py` (MODIFY)
+   - Update `GET /templates` to filter by user's `service_domain_id` using existing `ServiceDomainTemplate` table.
+   - Children's workers should NOT see adult templates and vice versa.
+
+3. **Frontend: Dynamic Navigation**
+   - **Files:** `frontend/components/layout/bottom-nav.tsx`, `frontend/components/layout/sidebar.tsx` (MODIFY)
+   - Replace hardcoded `navItems` arrays with `useQuery` fetching from `/api/modules`.
+   - Add loading skeleton and error states.
+   - Create `frontend/lib/icon-registry.ts` to map icon strings to Lucide components.
+   - **Before (Hardcoded):**
+     ```typescript
+     const navItems = [
+       { label: 'Home', href: '/', icon: LayoutDashboard },
+       // ... fixed list
+     ];
+     ```
+   - **After (Dynamic):**
+     ```typescript
+     const { data } = useQuery({ ...getUserModulesModulesGetOptions() });
+     const navItems = data?.nav_items || [];
+     ```
+
+4. **Config: Domain-Specific Module Definitions**
+   - **Files:** `config/wcc_children.yaml`, `config/wcc_adults.yaml` (NEW)
+   - Define modules, navigation, and templates per domain.
+   - **Example `config/wcc_children.yaml`:**
+     ```yaml
+     tenant_id: "wcc"
+     service_domain: "children"
+     modules:
+       - id: "recordings"
+       - id: "minutes"
+     navigation:
+       - label: "Cases"
+         href: "/cases"
+         icon: "Users"
+         roles: ["social_worker", "manager"]
+     templates:
+       - "home_visit"
+       - "lac_review"
+       - "strategy_discussion"
+     ```
+
+5. **Testing:**
+   - **Backend:** Test that children's workers get children's nav, adults get adult nav.
+   - **Frontend:** E2E test verifying domain-scoped navigation rendering.
+   - **Templates:** Test that template list is filtered by domain.
+
+**Dependencies:**
+- Existing `UserOrgRole` table (Phase 1)
+- Existing `ServiceDomainTemplate` table (Phase 6)
+- Existing config loader (`common/config/loader.py`)
+
+**Exit Criteria:**
+- [ ] `/api/modules` endpoint returns domain-scoped navigation.
+- [ ] `/templates` filters by `service_domain_id`.
+- [ ] `bottom-nav.tsx` and `sidebar.tsx` render dynamically from API.
+- [ ] Config files created for `wcc_children` and `wcc_adults`.
+- [ ] Backend tests pass for module filtering.
+- [ ] Frontend E2E test passes for navigation rendering.
+- [ ] Children's workers see ONLY children's templates.
+- [ ] Production build succeeds.
+
 ### Phase 22 — Task Management Module
 
 #### Phase 22A — Backend task extraction & Planner integration
-
 - **Objective:** Structured task extraction and management with Planner sync.
 - **Write scope:** `common/database/postgres_models.py`, `backend/api/routes/tasks.py`, `worker/task_extractor.py`, `common/services/msgraph_client.py`. Frontend is **read-only**.
 - **Dependencies:** Phase 16B module flags.
@@ -603,10 +701,9 @@ Exit: Successful pilot sign-off; backlog of tweaks captured; Adults rollout sche
   4. Add API `GET /minutes/{id}/tasks` and `PATCH /minutes/{id}/tasks` to update task status/details.
 - **Exit:** Tasks are extracted as structured data; API supports CRUD; Planner integration handles rich tasks.
 
-_Status 23 Nov 2025:_ `minute_task` table, SQLModel, and `/minutes/{id}/tasks` API endpoints are live. Worker exports now call `TaskExtractionService` to persist structured tasks and fan-out to Microsoft Planner using the tenant's Planner config. Remaining work: upgrade extraction from regex heuristics to the planned LLM prompt set, enrich owner/due-date inference with case metadata, and expose Planner sync state/overrides.
+_Status 23 Nov 2025:_ Backend + frontend ✅. `minute_task` table + Alembic migration, async LLM-backed `TaskExtractionService`, Planner attach helpers, `/minutes/{id}/tasks` CRUD + push endpoints, and `/tasks` collection API are live. Worker exports persist structured actions, de-duplicate previous AI rows, and fan-out to Planner. The Minute editor now ships a “Tasks” panel with inline status updates, Push-to-Planner CTA, and manual add dialog, and a new `/tasks` workspace lists cross-minute actions with filters.
 
 #### Phase 22B — Frontend task UI & module
-
 - **Objective:** Dedicated task management UI and Planner export interactions.
 - **Write scope:** `frontend/lib/modules.ts`, `frontend/app/tasks/`, `frontend/components/minutes/`. Backend is **read-only**.
 - **Dependencies:** Phase 22A API.
@@ -619,7 +716,8 @@ _Status 23 Nov 2025:_ `minute_task` table, SQLModel, and `/minutes/{id}/tasks` A
 
 ### Phase 23 — Cross-Platform Mobile Maturity
 
-- [x] **Phase 23A: Mobile Core/State** (Abstract offline queue logic from Dexie to shared adapter; support RN-compatible storage) and Mobile (AsyncStorage/MMKV).
+#### Phase 23A — Shared offline state logic
+- **Objective:** Abstract offline queue logic to be usable by both Web (Dexie) and Mobile (AsyncStorage/MMKV).
 - **Write scope:** Refactor `frontend/lib/offline-queue.ts` into a shared adapter pattern; move core types to `common/types.ts` (if shared package exists) or ensure portability. UI components **read-only**.
 - **Dependencies:** Phase 18A shared UI.
 - **Actions:**
@@ -629,9 +727,6 @@ _Status 23 Nov 2025:_ `minute_task` table, SQLModel, and `/minutes/{id}/tasks` A
 - **Exit:** Offline logic is decoupled from browser-specific APIs; web app functions unchanged.
 
 #### Phase 23B — Mobile UI implementation
-
-- [x] **Phase 23B: Mobile UI Implementation** (Expo app, Capture screen, Offline Sync)
-
 - **Objective:** Build functional Capture and Transcription screens in RN shell.
 - **Write scope:** `apps/mobile/`. Web app **read-only**.
 - **Dependencies:** Phase 23A shared logic, Phase 18B shell.
@@ -645,7 +740,6 @@ _Status 23 Nov 2025:_ `minute_task` table, SQLModel, and `/minutes/{id}/tasks` A
 ### Phase 24 — Resilience & Error Handling
 
 #### Phase 24A — Frontend Resilience
-
 - **Objective:** Improve user experience during partial outages or network failures.
 - **Write scope:** `frontend/app/`, `frontend/components/ui/`, `frontend/lib/api/`. Backend is **read-only**.
 - **Dependencies:** Phase 16C module flags (to degrade gracefully).
@@ -657,7 +751,6 @@ _Status 23 Nov 2025:_ `minute_task` table, SQLModel, and `/minutes/{id}/tasks` A
 - **Exit:** UI handles 404/500 errors gracefully; users can retry actions; offline state is clear.
 
 #### Phase 24B — Backend Circuit Breakers
-
 - **Objective:** Prevent cascading failures and provide health status for dependencies.
 - **Write scope:** `backend/api/dependencies/`, `common/services/`. Frontend is **read-only**.
 - **Dependencies:** Phase 19A telemetry.
@@ -670,7 +763,6 @@ _Status 23 Nov 2025:_ `minute_task` table, SQLModel, and `/minutes/{id}/tasks` A
 ### Phase 25 — Advanced Analytics & Insights
 
 #### Phase 25A — Backend Insights Aggregation
-
 - **Objective:** Calculate and serve usage insights (time saved, top topics).
 - **Write scope:** `worker/analytics.py`, `backend/api/routes/insights.py`, `common/database/postgres_models.py`. Frontend is **read-only**.
 - **Dependencies:** Phase 19A telemetry.
@@ -681,10 +773,8 @@ _Status 23 Nov 2025:_ `minute_task` table, SQLModel, and `/minutes/{id}/tasks` A
 - **Exit:** API serves calculated insights; aggregation jobs run on schedule.
 
 #### Phase 25B — Frontend Insights Module
-
 - **Objective:** Visualize insights for users/admins.
-- **Write scope:** `frontend/app/insights/`, `frontend/components/charts/`. Backend is \*\*read-only`.
-
+- **Write scope:** `frontend/app/insights/`, `frontend/components/charts/`. Backend is **read-only`.
 ```
   1. Register "Insights" module.
   2. Implement "Dashboard" view with charts (using Recharts or Visx) showing usage trends and time saved.
@@ -1005,4 +1095,3 @@ Exit: The universal council app continues to feel “Apple/Google‑grade” eve
 ---
 
 Maintain this file as the single source roadmap; update per phase completion with links to PRs, test evidence, and open risks.
-```

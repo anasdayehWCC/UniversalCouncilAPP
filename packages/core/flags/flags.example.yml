@@ -1,0 +1,25 @@
+tenants:
+  westminster:
+    env:
+      dev:
+        modules:
+          transcription: true
+          notes: true
+        features:
+          offline_capture: true
+          batch_processing: false
+      prod:
+        modules:
+          transcription: true
+          notes: true
+        features:
+          offline_capture: true
+          batch_processing: true
+  rbkc:
+    env:
+      dev:
+        modules:
+          transcription: true
+        features:
+          offline_capture: true
+          batch_processing: false

@@ -1,5 +1,5 @@
 import React from 'react';
-import { getModules } from '../packages/core/plugins/registry';
+import { getModules } from '../../packages/core/plugins/registry';
 
 export default function WebApp() {
   const modules = getModules();

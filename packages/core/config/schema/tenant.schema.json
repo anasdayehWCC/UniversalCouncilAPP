@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.gov.uk/schemas/tenant.schema.json",
+  "title": "TenantConfig",
+  "type": "object",
+  "required": ["id", "name", "defaultLocale", "modules"],
+  "properties": {
+    "id": { "type": "string", "description": "Stable tenant/council identifier" },
+    "name": { "type": "string" },
+    "defaultLocale": { "type": "string", "pattern": "^[a-z]{2}-[A-Z]{2}$" },
+    "designTokens": {
+      "type": "object",
+      "description": "Optional overrides referencing tokens.json keys",
+      "additionalProperties": { "type": ["string", "number"] }
+    },
+    "languages": {
+      "type": ["object", "null"],
+      "description": "Language/translation configuration for the tenant",
+      "properties": {
+        "default": { "type": "string", "description": "Default language code (e.g. en)" },
+        "available": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of languages that can be requested"
+        },
+        "autoTranslate": {
+          "type": "boolean",
+          "description": "When true, automatically request translations after transcription completes",
+          "default": false
+        }
+      },
+      "required": ["default"],
+      "additionalProperties": false
+    },
+    "modules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string" },
+          "enabled": { "type": "boolean", "default": true },
+          "departments": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Department IDs this module is available in"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

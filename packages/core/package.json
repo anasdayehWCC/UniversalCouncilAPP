@@ -1,0 +1,10 @@
+{
+    "name": "@careminutes/core",
+    "version": "0.0.1",
+    "private": true,
+    "main": "index.ts",
+    "dependencies": {
+        "dexie": "^4.2.1",
+        "expo-sqlite": "^16.0.9"
+    }
+}

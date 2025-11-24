@@ -44,6 +44,7 @@ import {
 import posthog from 'posthog-js'
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import { MinuteTasksPanel } from '@/app/transcriptions/[transcriptionId]/MinuteTab/MinuteTasksPanel'
 
 type MinuteEditorForm = {
   html: string
@@ -433,48 +434,51 @@ export function MinuteEditor({
             )}
           />
         </form>
-        <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
-          <h4 className="mb-2 text-sm font-semibold text-slate-700">
-            Evidence playback
-          </h4>
-          {recordings && recordings.length > 0 ? (
-            <>
-              <audio ref={audioRef} controls className="w-full" src={recordings[0].url} />
-              {uniqueCitations.length > 0 ? (
-                <div className="mt-3 relative pl-4 text-xs">
-                  <div className="absolute left-1 top-1 h-full w-px bg-slate-200" />
-                  {uniqueCitations.map((c) => {
-                    const entry = transcription.dialogue_entries?.[c - 1]
-                    const start = entry?.start_time ?? 0
-                    const label = new Date(start * 1000).toISOString().substring(11, 19)
-                    const disabled = !entry
-                    return (
-                      <button
-                        key={c}
-                        aria-label={disabled ? `Citation ${c} unavailable` : `Jump to citation ${c} at ${label}`}
-                        disabled={disabled || isJumping}
-                        className="mb-2 flex w-full items-center gap-2 rounded-lg bg-slate-50 px-3 py-2 text-left transition hover:-translate-y-0.5 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
-                        onClick={() => playCitation(c)}
-                        title={disabled ? 'Transcript segment not available' : `Jump to ${label}`}
-                      >
-                        <span className="h-2 w-2 rounded-full bg-primary" />
-                        <span className="font-medium">[{c}]</span>
-                        <Separator orientation="vertical" className="h-5" />
-                        <span className="text-sm font-medium text-slate-700" title={label}>{label}</span>
-                        <span className="text-slate-500 line-clamp-1" title={entry?.text || 'Transcript segment'}>
-                          {entry?.text || 'Transcript segment'}
-                        </span>
-                      </button>
-                    )
-                  })}
-                </div>
-              ) : (
-                <p className="text-xs text-slate-500">No citations detected.</p>
-              )}
-            </>
-          ) : (
-            <p className="text-xs text-slate-500">No recording available.</p>
-          )}
+        <div className="space-y-4">
+          <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+            <h4 className="mb-2 text-sm font-semibold text-slate-700">
+              Evidence playback
+            </h4>
+            {recordings && recordings.length > 0 ? (
+              <>
+                <audio ref={audioRef} controls className="w-full" src={recordings[0].url} />
+                {uniqueCitations.length > 0 ? (
+                  <div className="mt-3 relative pl-4 text-xs">
+                    <div className="absolute left-1 top-1 h-full w-px bg-slate-200" />
+                    {uniqueCitations.map((c) => {
+                      const entry = transcription.dialogue_entries?.[c - 1]
+                      const start = entry?.start_time ?? 0
+                      const label = new Date(start * 1000).toISOString().substring(11, 19)
+                      const disabled = !entry
+                      return (
+                        <button
+                          key={c}
+                          aria-label={disabled ? `Citation ${c} unavailable` : `Jump to citation ${c} at ${label}`}
+                          disabled={disabled || isJumping}
+                          className="mb-2 flex w-full items-center gap-2 rounded-lg bg-slate-50 px-3 py-2 text-left transition hover:-translate-y-0.5 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+                          onClick={() => playCitation(c)}
+                          title={disabled ? 'Transcript segment not available' : `Jump to ${label}`}
+                        >
+                          <span className="h-2 w-2 rounded-full bg-primary" />
+                          <span className="font-medium">[{c}]</span>
+                          <Separator orientation="vertical" className="h-5" />
+                          <span className="text-sm font-medium text-slate-700" title={label}>{label}</span>
+                          <span className="text-slate-500 line-clamp-1" title={entry?.text || 'Transcript segment'}>
+                            {entry?.text || 'Transcript segment'}
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-500">No citations detected.</p>
+                )}
+              </>
+            ) : (
+              <p className="text-xs text-slate-500">No recording available.</p>
+            )}
+          </div>
+          <MinuteTasksPanel minuteId={minute.id!} />
         </div>
       </div>
     </div>

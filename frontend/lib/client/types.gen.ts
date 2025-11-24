@@ -488,6 +488,11 @@ export type TenantConfig = {
    */
   languages?: LanguageConfig | null
   /**
+   * Navigation
+   * Optional navigation overrides
+   */
+  navigation?: Array<NavigationItem> | null
+  /**
    * Modules
    */
   modules: Array<ModuleConfig>
@@ -526,6 +531,37 @@ export type ModuleConfig = {
    * Optional list of service_domain ids this module applies to
    */
   departments?: Array<string> | null
+}
+
+/**
+ * NavigationItem
+ */
+export type NavigationItem = {
+  /**
+   * Label
+   * Navigation label
+   */
+  label: string
+  /**
+   * Href
+   * Target href for the navigation item
+   */
+  href: string
+  /**
+   * Icon
+   * Optional icon name for navigation
+   */
+  icon?: string | null
+  /**
+   * Fab
+   * Whether to render as a floating action button on mobile
+   */
+  fab?: boolean
+  /**
+   * Roles
+   * Optional list of roles allowed to see this navigation item
+   */
+  roles?: Array<string> | null
 }
 
 /**
@@ -634,6 +670,16 @@ export type TemplateMetadata = {
  * AgendaUsage
  */
 export type AgendaUsage = 'not_used' | 'optional' | 'required'
+
+/**
+ * TaskStatus
+ */
+export type TaskStatus = 'pending' | 'in_progress' | 'done'
+
+/**
+ * TaskSource
+ */
+export type TaskSource = 'ai_generated' | 'manual'
 
 /**
  * SingleRecordingSegment
@@ -775,6 +821,54 @@ export type PaginatedTranscriptionsResponse = {
 }
 
 /**
+ * NavItem
+ */
+export type NavItem = {
+  /**
+   * Label
+   */
+  label: string
+  /**
+   * Href
+   */
+  href: string
+  /**
+   * Icon
+   */
+  icon: string
+  /**
+   * Fab
+   */
+  fab?: boolean | null
+  /**
+   * Roles
+   */
+  roles?: Array<string> | null
+}
+
+/**
+ * ModuleResponse
+ */
+export type ModuleResponse = {
+  /**
+   * Service Domain
+   */
+  service_domain: string
+  /**
+   * Role
+   */
+  role: string
+  /**
+   * Modules
+   */
+  modules: Array<string>
+  /**
+   * Nav Items
+   */
+  nav_items: Array<NavItem>
+}
+
+/**
  * MinutesCreateRequest
  */
 export type MinutesCreateRequest = {
@@ -832,17 +926,7 @@ export type MinuteVersionResponse = {
    * Error
    */
   error: string | null
-  /**
-   * Ai Edit Instructions
-   */
-  ai_edit_instructions: string | null
-  content_source: ContentSource
 }
-
-/**
- * ContentSource
- */
-export type ContentSource = 'manual_edit' | 'ai_edit' | 'initial_generation'
 
 /**
  * MinuteVersionCreateRequest
@@ -858,6 +942,11 @@ export type MinuteVersionCreateRequest = {
    */
   html_content?: string
 }
+
+/**
+ * ContentSource
+ */
+export type ContentSource = 'manual_edit' | 'ai_edit' | 'initial_generation'
 
 /**
  * AiEdit
@@ -908,6 +997,193 @@ export type MinuteVersion = {
    */
   ai_edit_instructions?: string | null
   content_source?: ContentSource
+}
+
+/**
+ * MinuteTaskResponse
+ */
+export type MinuteTaskResponse = {
+  /**
+   * Id
+   */
+  id: string
+  /**
+   * Minute Id
+   */
+  minute_id: string
+  /**
+   * Description
+   */
+  description: string
+  status: TaskStatus
+  /**
+   * Owner
+   */
+  owner?: string | null
+  /**
+   * Owner Role
+   */
+  owner_role?: string | null
+  /**
+   * Due Date
+   */
+  due_date?: string | null
+  /**
+   * Notes
+   */
+  notes?: string | null
+  source: TaskSource
+  /**
+   * Planner Task Id
+   */
+  planner_task_id?: string | null
+  /**
+   * Last Synced At
+   */
+  last_synced_at?: string | null
+  /**
+   * Created Datetime
+   */
+  created_datetime?: string | null
+  /**
+   * Updated Datetime
+   */
+  updated_datetime?: string | null
+}
+
+/**
+ * MinuteTaskPushResponse
+ */
+export type MinuteTaskPushResponse = {
+  /**
+   * Pushed
+   */
+  pushed: number
+  /**
+   * Planner Task Ids
+   */
+  planner_task_ids: Array<string>
+}
+
+/**
+ * MinuteTaskPatchRequest
+ */
+export type MinuteTaskPatchRequest = {
+  /**
+   * Description
+   */
+  description?: string | null
+  /**
+   * Owner
+   */
+  owner?: string | null
+  /**
+   * Owner Role
+   */
+  owner_role?: string | null
+  /**
+   * Due Date
+   */
+  due_date?: string | null
+  /**
+   * Notes
+   */
+  notes?: string | null
+  status?: TaskStatus | null
+}
+
+/**
+ * MinuteTaskListItemResponse
+ */
+export type MinuteTaskListItemResponse = {
+  /**
+   * Id
+   */
+  id: string
+  /**
+   * Minute Id
+   */
+  minute_id: string
+  /**
+   * Description
+   */
+  description: string
+  status: TaskStatus
+  /**
+   * Owner
+   */
+  owner?: string | null
+  /**
+   * Owner Role
+   */
+  owner_role?: string | null
+  /**
+   * Due Date
+   */
+  due_date?: string | null
+  /**
+   * Notes
+   */
+  notes?: string | null
+  source: TaskSource
+  /**
+   * Planner Task Id
+   */
+  planner_task_id?: string | null
+  /**
+   * Last Synced At
+   */
+  last_synced_at?: string | null
+  /**
+   * Created Datetime
+   */
+  created_datetime?: string | null
+  /**
+   * Updated Datetime
+   */
+  updated_datetime?: string | null
+  /**
+   * Case Reference
+   */
+  case_reference?: string | null
+  /**
+   * Template Name
+   */
+  template_name?: string | null
+  /**
+   * Transcription Id
+   */
+  transcription_id?: string | null
+  /**
+   * Minute Updated Datetime
+   */
+  minute_updated_datetime?: string | null
+}
+
+/**
+ * MinuteTaskCreateRequest
+ */
+export type MinuteTaskCreateRequest = {
+  /**
+   * Description
+   */
+  description: string
+  /**
+   * Owner
+   */
+  owner?: string | null
+  /**
+   * Owner Role
+   */
+  owner_role?: string | null
+  /**
+   * Due Date
+   */
+  due_date?: string | null
+  /**
+   * Notes
+   */
+  notes?: string | null
 }
 
 /**
@@ -1020,6 +1296,47 @@ export type Minute = {
    * Subject Dob Ciphertext
    */
   subject_dob_ciphertext?: string | null
+  /**
+   * Visit Type
+   */
+  visit_type?: string | null
+  /**
+   * Intended Outcomes
+   */
+  intended_outcomes?: string | null
+  /**
+   * Risk Flags
+   */
+  risk_flags?: string | null
+  /**
+   * Docx Blob Path
+   */
+  docx_blob_path?: string | null
+  /**
+   * Pdf Blob Path
+   */
+  pdf_blob_path?: string | null
+  /**
+   * Sharepoint Docx Item Id
+   */
+  sharepoint_docx_item_id?: string | null
+  /**
+   * Sharepoint Pdf Item Id
+   */
+  sharepoint_pdf_item_id?: string | null
+  /**
+   * Planner Task Ids
+   */
+  planner_task_ids?: Array<string>
+  export_status?: ExportStatus | null
+  /**
+   * Export Error
+   */
+  export_error?: string | null
+  /**
+   * Last Exported At
+   */
+  last_exported_at?: string | null
 }
 
 /**
@@ -2339,6 +2656,179 @@ export type GetMinuteVersionMinuteVersionsMinuteVersionIdGetResponses = {
 export type GetMinuteVersionMinuteVersionsMinuteVersionIdGetResponse =
   GetMinuteVersionMinuteVersionsMinuteVersionIdGetResponses[keyof GetMinuteVersionMinuteVersionsMinuteVersionIdGetResponses]
 
+export type ListMinuteTasksMinutesMinuteIdTasksGetData = {
+  body?: never
+  headers?: {
+    /**
+     * Authorization
+     */
+    authorization?: string | null
+    /**
+     * X-Amzn-Oidc-Accesstoken
+     */
+    'x-amzn-oidc-accesstoken'?: string | null
+  }
+  path: {
+    /**
+     * Minute Id
+     */
+    minute_id: string
+  }
+  query?: never
+  url: '/minutes/{minute_id}/tasks'
+}
+
+export type ListMinuteTasksMinutesMinuteIdTasksGetErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type ListMinuteTasksMinutesMinuteIdTasksGetError =
+  ListMinuteTasksMinutesMinuteIdTasksGetErrors[keyof ListMinuteTasksMinutesMinuteIdTasksGetErrors]
+
+export type ListMinuteTasksMinutesMinuteIdTasksGetResponses = {
+  /**
+   * Response List Minute Tasks Minutes  Minute Id  Tasks Get
+   * Successful Response
+   */
+  200: Array<MinuteTaskResponse>
+}
+
+export type ListMinuteTasksMinutesMinuteIdTasksGetResponse =
+  ListMinuteTasksMinutesMinuteIdTasksGetResponses[keyof ListMinuteTasksMinutesMinuteIdTasksGetResponses]
+
+export type CreateMinuteTaskMinutesMinuteIdTasksPostData = {
+  body: MinuteTaskCreateRequest
+  headers?: {
+    /**
+     * Authorization
+     */
+    authorization?: string | null
+    /**
+     * X-Amzn-Oidc-Accesstoken
+     */
+    'x-amzn-oidc-accesstoken'?: string | null
+  }
+  path: {
+    /**
+     * Minute Id
+     */
+    minute_id: string
+  }
+  query?: never
+  url: '/minutes/{minute_id}/tasks'
+}
+
+export type CreateMinuteTaskMinutesMinuteIdTasksPostErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type CreateMinuteTaskMinutesMinuteIdTasksPostError =
+  CreateMinuteTaskMinutesMinuteIdTasksPostErrors[keyof CreateMinuteTaskMinutesMinuteIdTasksPostErrors]
+
+export type CreateMinuteTaskMinutesMinuteIdTasksPostResponses = {
+  /**
+   * Successful Response
+   */
+  201: MinuteTaskResponse
+}
+
+export type CreateMinuteTaskMinutesMinuteIdTasksPostResponse =
+  CreateMinuteTaskMinutesMinuteIdTasksPostResponses[keyof CreateMinuteTaskMinutesMinuteIdTasksPostResponses]
+
+export type PatchMinuteTaskMinutesMinuteIdTasksTaskIdPatchData = {
+  body: MinuteTaskPatchRequest
+  headers?: {
+    /**
+     * Authorization
+     */
+    authorization?: string | null
+    /**
+     * X-Amzn-Oidc-Accesstoken
+     */
+    'x-amzn-oidc-accesstoken'?: string | null
+  }
+  path: {
+    /**
+     * Minute Id
+     */
+    minute_id: string
+    /**
+     * Task Id
+     */
+    task_id: string
+  }
+  query?: never
+  url: '/minutes/{minute_id}/tasks/{task_id}'
+}
+
+export type PatchMinuteTaskMinutesMinuteIdTasksTaskIdPatchErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type PatchMinuteTaskMinutesMinuteIdTasksTaskIdPatchError =
+  PatchMinuteTaskMinutesMinuteIdTasksTaskIdPatchErrors[keyof PatchMinuteTaskMinutesMinuteIdTasksTaskIdPatchErrors]
+
+export type PatchMinuteTaskMinutesMinuteIdTasksTaskIdPatchResponses = {
+  /**
+   * Successful Response
+   */
+  200: MinuteTaskResponse
+}
+
+export type PatchMinuteTaskMinutesMinuteIdTasksTaskIdPatchResponse =
+  PatchMinuteTaskMinutesMinuteIdTasksTaskIdPatchResponses[keyof PatchMinuteTaskMinutesMinuteIdTasksTaskIdPatchResponses]
+
+export type PushMinuteTasksMinutesMinuteIdTasksPushPostData = {
+  body?: never
+  headers?: {
+    /**
+     * Authorization
+     */
+    authorization?: string | null
+    /**
+     * X-Amzn-Oidc-Accesstoken
+     */
+    'x-amzn-oidc-accesstoken'?: string | null
+  }
+  path: {
+    /**
+     * Minute Id
+     */
+    minute_id: string
+  }
+  query?: never
+  url: '/minutes/{minute_id}/tasks/push'
+}
+
+export type PushMinuteTasksMinutesMinuteIdTasksPushPostErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type PushMinuteTasksMinutesMinuteIdTasksPushPostError =
+  PushMinuteTasksMinutesMinuteIdTasksPushPostErrors[keyof PushMinuteTasksMinutesMinuteIdTasksPushPostErrors]
+
+export type PushMinuteTasksMinutesMinuteIdTasksPushPostResponses = {
+  /**
+   * Successful Response
+   */
+  200: MinuteTaskPushResponse
+}
+
+export type PushMinuteTasksMinutesMinuteIdTasksPushPostResponse =
+  PushMinuteTasksMinutesMinuteIdTasksPushPostResponses[keyof PushMinuteTasksMinutesMinuteIdTasksPushPostResponses]
+
 export type ExportMinuteMinutesMinuteIdExportPostData = {
   body?: never
   headers?: {
@@ -2688,6 +3178,43 @@ export type GetTenantConfigConfigTenantIdGetResponses = {
 export type GetTenantConfigConfigTenantIdGetResponse =
   GetTenantConfigConfigTenantIdGetResponses[keyof GetTenantConfigConfigTenantIdGetResponses]
 
+export type GetUserModulesModulesGetData = {
+  body?: never
+  headers?: {
+    /**
+     * Authorization
+     */
+    authorization?: string | null
+    /**
+     * X-Amzn-Oidc-Accesstoken
+     */
+    'x-amzn-oidc-accesstoken'?: string | null
+  }
+  path?: never
+  query?: never
+  url: '/modules'
+}
+
+export type GetUserModulesModulesGetErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type GetUserModulesModulesGetError =
+  GetUserModulesModulesGetErrors[keyof GetUserModulesModulesGetErrors]
+
+export type GetUserModulesModulesGetResponses = {
+  /**
+   * Successful Response
+   */
+  200: ModuleResponse
+}
+
+export type GetUserModulesModulesGetResponse =
+  GetUserModulesModulesGetResponses[keyof GetUserModulesModulesGetResponses]
+
 export type CheckAdminAccessAdminCheckAccessGetData = {
   body?: never
   path?: never
@@ -2882,6 +3409,50 @@ export type GetConfigHistoryAdminConfigsTenantIdHistoryGetResponses = {
 
 export type GetConfigHistoryAdminConfigsTenantIdHistoryGetResponse =
   GetConfigHistoryAdminConfigsTenantIdHistoryGetResponses[keyof GetConfigHistoryAdminConfigsTenantIdHistoryGetResponses]
+
+export type ListMyTasksTasksGetData = {
+  body?: never
+  headers?: {
+    /**
+     * Authorization
+     */
+    authorization?: string | null
+    /**
+     * X-Amzn-Oidc-Accesstoken
+     */
+    'x-amzn-oidc-accesstoken'?: string | null
+  }
+  path?: never
+  query?: {
+    /**
+     * Status
+     * Optional status filter
+     */
+    status?: TaskStatus | null
+  }
+  url: '/tasks'
+}
+
+export type ListMyTasksTasksGetErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type ListMyTasksTasksGetError =
+  ListMyTasksTasksGetErrors[keyof ListMyTasksTasksGetErrors]
+
+export type ListMyTasksTasksGetResponses = {
+  /**
+   * Response List My Tasks Tasks Get
+   * Successful Response
+   */
+  200: Array<MinuteTaskListItemResponse>
+}
+
+export type ListMyTasksTasksGetResponse =
+  ListMyTasksTasksGetResponses[keyof ListMyTasksTasksGetResponses]
 
 export type DeleteChatsTranscriptionsTranscriptionIdChatDeleteData = {
   body?: never

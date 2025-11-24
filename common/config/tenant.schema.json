@@ -1,5 +1,33 @@
 {
   "$defs": {
+    "LanguageConfig": {
+      "properties": {
+        "default": {
+          "type": "string",
+          "description": "Default language code (e.g. en)",
+          "title": "Default"
+        },
+        "available": {
+          "description": "List of languages that can be requested",
+          "items": {
+            "type": "string"
+          },
+          "title": "Available",
+          "type": "array"
+        },
+        "autoTranslate": {
+          "default": false,
+          "description": "When true, automatically request translations after transcription completes",
+          "title": "Autotranslate",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "default"
+      ],
+      "title": "LanguageConfig",
+      "type": "object"
+    },
     "ModuleConfig": {
       "properties": {
         "id": {
@@ -77,33 +105,59 @@
       "title": "ModuleConfig",
       "type": "object"
     },
-    "LanguageConfig": {
+    "NavigationItem": {
       "properties": {
-        "default": {
-          "description": "Default language code (e.g. en)",
-          "title": "Default",
+        "label": {
+          "description": "Navigation label",
+          "title": "Label",
           "type": "string"
         },
-        "available": {
-          "default": [],
-          "description": "List of languages that can be requested",
-          "items": {
-            "type": "string"
-          },
-          "title": "Available",
-          "type": "array"
+        "href": {
+          "description": "Target href for the navigation item",
+          "title": "Href",
+          "type": "string"
         },
-        "autoTranslate": {
+        "icon": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional icon name for navigation",
+          "title": "Icon"
+        },
+        "fab": {
           "default": false,
-          "description": "When true, automatically request translations after transcription completes",
-          "title": "Autotranslate",
+          "description": "Whether to render as a floating action button on mobile",
+          "title": "Fab",
           "type": "boolean"
+        },
+        "roles": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional list of roles allowed to see this navigation item",
+          "title": "Roles"
         }
       },
       "required": [
-        "default"
+        "label",
+        "href"
       ],
-      "title": "LanguageConfig",
+      "title": "NavigationItem",
       "type": "object"
     }
   },
@@ -190,8 +244,23 @@
         }
       ],
       "default": null,
-      "description": "Language/translation configuration for the tenant",
-      "title": "Languages"
+      "description": "Language/translation configuration for the tenant"
+    },
+    "navigation": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/NavigationItem"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Optional navigation overrides",
+      "title": "Navigation"
     },
     "modules": {
       "items": {

@@ -27,7 +27,7 @@ planner:
   bucket_id: "<planner-bucket-id-adults>"
 roles:
   - social_worker
-  -manager
+  - manager
   - admin
 modules:
   - id: "recordings"
@@ -55,5 +55,9 @@ navigation:
   - label: "Notes"
     href: "/transcriptions"
     icon: "FileText"
+    roles: ["social_worker", "manager"]
+  - label: "Tasks"
+    href: "/tasks"
+    icon: "CheckSquare"
     roles: ["social_worker", "manager"]
 retentionDaysDefault: 730

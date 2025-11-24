@@ -4,7 +4,15 @@ from enum import IntEnum, StrEnum, auto
 
 from pydantic import BaseModel, Field
 
-from common.database.postgres_models import ContentSource, DialogueEntry, HallucinationType, JobStatus, TemplateType
+from common.database.postgres_models import (
+    ContentSource,
+    DialogueEntry,
+    HallucinationType,
+    JobStatus,
+    TaskSource,
+    TaskStatus,
+    TemplateType,
+)
 
 
 class TranscriptionMetadata(BaseModel):
@@ -198,6 +206,60 @@ class MinuteVersionResponse(BaseModel):
     created_datetime: datetime
     html_content: str
     error: str | None
+
+
+class MinuteTaskCreateRequest(BaseModel):
+    description: str
+    owner: str | None = None
+    owner_role: str | None = None
+    due_date: datetime | None = None
+    notes: str | None = None
+
+
+class MinuteTaskPatchRequest(BaseModel):
+    description: str | None = None
+    owner: str | None = None
+    owner_role: str | None = None
+    due_date: datetime | None = None
+    notes: str | None = None
+    status: TaskStatus | None = None
+
+
+class MinuteTaskResponse(BaseModel):
+    model_config = {"from_attributes": True}
+
+    id: uuid.UUID
+    minute_id: uuid.UUID
+    description: str
+    status: TaskStatus
+    owner: str | None = None
+    owner_role: str | None = None
+    due_date: datetime | None = None
+    notes: str | None = None
+    source: TaskSource
+    planner_task_id: str | None = None
+    last_synced_at: datetime | None = None
+    created_datetime: datetime | None = None
+    updated_datetime: datetime | None = None
+
+
+class MinuteTaskListItemResponse(MinuteTaskResponse):
+    case_reference: str | None = None
+    template_name: str | None = None
+    transcription_id: uuid.UUID | None = None
+    minute_updated_datetime: datetime | None = None
+
+
+class MinuteTaskPushResponse(BaseModel):
+    pushed: int
+    planner_task_ids: list[str]
+
+
+class TaskExtractionCandidate(BaseModel):
+    description: str
+    owner: str | None = None
+    owner_role: str | None = None
+    due_date: datetime | None = None
     ai_edit_instructions: str | None
     content_source: ContentSource
 

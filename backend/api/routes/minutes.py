@@ -6,8 +6,17 @@ from sqlalchemy.orm import selectinload
 from sqlmodel import col, select
 
 from backend.api.dependencies import SQLSessionDep, UserDep
-from common.database.postgres_models import ExportStatus, JobStatus, Minute, MinuteVersion, Transcription
+from common.database.postgres_models import (
+    ExportStatus,
+    JobStatus,
+    Minute,
+    MinuteTask,
+    MinuteVersion,
+    TaskSource,
+    Transcription,
+)
 from common.services.export_handler_service import ExportHandlerService
+from common.services.task_extraction_service import TaskExtractionService
 from common.services.storage_services import get_storage_service
 from common.services.queue_services import get_queue_service
 from common.settings import get_settings
@@ -20,6 +29,10 @@ from common.types import (
     MinutesCreateRequest,
     MinuteVersionCreateRequest,
     MinuteVersionResponse,
+    MinuteTaskCreateRequest,
+    MinuteTaskPatchRequest,
+    MinuteTaskResponse,
+    MinuteTaskPushResponse,
     TaskType,
     WorkerMessage,
 )
@@ -135,7 +148,11 @@ async def get_minute(minutes_id: uuid.UUID, session: SQLSessionDep, user: UserDe
     query = (
         select(Minute)
         .where(Minute.id == minutes_id)
-        .options(selectinload(Minute.transcription), selectinload(Minute.minute_versions))
+        .options(
+            selectinload(Minute.transcription),
+            selectinload(Minute.minute_versions),
+            selectinload(Minute.tasks),
+        )
     )
     result = await session.exec(query)
     minute = result.first()
@@ -256,6 +273,79 @@ async def get_minute_version(minute_version_id: uuid.UUID, session: SQLSessionDe
     return minute_version
 
 
+@minutes_router.get("/minutes/{minute_id}/tasks", response_model=list[MinuteTaskResponse])
+async def list_minute_tasks(minute_id: uuid.UUID, session: SQLSessionDep, user: UserDep) -> list[MinuteTaskResponse]:
+    minute = await get_minute(minute_id, session, user)
+    return [MinuteTaskResponse.model_validate(task) for task in minute.tasks]
+
+
+@minutes_router.post("/minutes/{minute_id}/tasks", response_model=MinuteTaskResponse, status_code=201)
+async def create_minute_task(
+    minute_id: uuid.UUID, request: MinuteTaskCreateRequest, session: SQLSessionDep, user: UserDep
+) -> MinuteTaskResponse:
+    minute = await get_minute(minute_id, session, user)
+    minute_task = MinuteTask(
+        minute_id=minute.id,
+        organisation_id=minute.organisation_id,
+        service_domain_id=minute.service_domain_id,
+        case_id=minute.case_id,
+        description=request.description,
+        owner=request.owner,
+        owner_role=request.owner_role,
+        due_date=request.due_date,
+        notes=request.notes,
+        source=TaskSource.MANUAL,
+    )
+    session.add(minute_task)
+    await session.commit()
+    await session.refresh(minute_task)
+    return MinuteTaskResponse.model_validate(minute_task)
+
+
+@minutes_router.patch("/minutes/{minute_id}/tasks/{task_id}", response_model=MinuteTaskResponse)
+async def patch_minute_task(
+    minute_id: uuid.UUID,
+    task_id: uuid.UUID,
+    request: MinuteTaskPatchRequest,
+    session: SQLSessionDep,
+    user: UserDep,
+) -> MinuteTaskResponse:
+    minute = await get_minute(minute_id, session, user)
+    task = await _get_task_for_minute(task_id, minute.id, session)
+    if request.description is not None:
+        task.description = request.description
+    if request.owner is not None:
+        task.owner = request.owner
+    if request.owner_role is not None:
+        task.owner_role = request.owner_role
+    if request.due_date is not None:
+        task.due_date = request.due_date
+    if request.notes is not None:
+        task.notes = request.notes
+    if request.status is not None:
+        task.status = request.status
+    session.add(task)
+    await session.commit()
+    await session.refresh(task)
+    return MinuteTaskResponse.model_validate(task)
+
+
+@minutes_router.post("/minutes/{minute_id}/tasks/push", response_model=MinuteTaskPushResponse)
+async def push_minute_tasks(
+    minute_id: uuid.UUID,
+    session: SQLSessionDep,
+    user: UserDep,
+) -> MinuteTaskPushResponse:
+    if not settings.MS_GRAPH_ENABLED:
+        raise HTTPException(status_code=503, detail="Planner integration is disabled")
+    minute = await get_minute(minute_id, session, user)
+    latest_version = minute.minute_versions[0] if minute.minute_versions else None
+    html_content = latest_version.html_content if latest_version else None
+    await TaskExtractionService.sync_generated_tasks(minute.id, html_content)
+    planner_ids = await TaskExtractionService.push_tasks_to_planner(minute.id, minute=minute)
+    return MinuteTaskPushResponse(pushed=len(planner_ids), planner_task_ids=planner_ids)
+
+
 @minutes_router.delete("/minute_versions/{minute_version_id}")
 async def delete_minute_version(minute_version_id: uuid.UUID, session: SQLSessionDep, user: UserDep):
     query = (
@@ -314,3 +404,13 @@ async def export_minute(  # noqa: PLR0913
         url=url, format=format, sharepoint_item_id=sharepoint_id, planner_task_ids=minute.planner_task_ids
     )
     await session.commit()
+
+
+async def _get_task_for_minute(task_id: uuid.UUID, minute_id: uuid.UUID, session: SQLSessionDep) -> MinuteTask:
+    result = await session.exec(
+        select(MinuteTask).where(MinuteTask.id == task_id, MinuteTask.minute_id == minute_id)
+    )
+    task = result.first()
+    if not task:
+        raise HTTPException(404, "Task not found")
+    return task

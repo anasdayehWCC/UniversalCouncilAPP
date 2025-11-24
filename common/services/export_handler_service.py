@@ -1,5 +1,4 @@
 import logging
-import re
 import tempfile
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -14,6 +13,7 @@ from common.database.postgres_models import ExportStatus, JobStatus, Minute, Min
 from common.metrics import export_latency_seconds, export_status_total
 from common.services.msgraph_client import MSGraphClient
 from common.services.storage_services import get_storage_service
+from common.services.task_extraction_service import TaskExtractionService
 from common.settings import get_settings
 from worker.exporters.docx_exporter import build_docx
 from worker.exporters.pdf_exporter import build_pdf
@@ -104,12 +104,21 @@ class ExportHandlerService:
                         case "pdf":
                             minute.pdf_blob_path = artifact.storage_key
                             minute.sharepoint_pdf_item_id = artifact.sharepoint_item_id
-                # Planner tasks
-                tasks = cls._extract_actions(html_content)
-                if settings.MS_GRAPH_ENABLED and tasks:
-                    planner_client = MSGraphClient()
-                    planner_ids = await planner_client.create_planner_tasks(tasks, minute)
-                    minute.planner_task_ids = planner_ids
+
+                generated_tasks = await TaskExtractionService.sync_generated_tasks(
+                    minute_id=minute.id,
+                    html_content=html_content,
+                )
+                planner_ids: list[str] = []
+                if settings.MS_GRAPH_ENABLED:
+                    planner_ids = await TaskExtractionService.push_tasks_to_planner(minute.id, minute=minute)
+                    if planner_ids:
+                        existing_ids = minute.planner_task_ids or []
+                        merged = existing_ids + planner_ids
+                        seen: set[str] = set()
+                        minute.planner_task_ids = [pid for pid in merged if not (pid in seen or seen.add(pid))]
+                elif not settings.MS_GRAPH_ENABLED:
+                    minute.planner_task_ids = []
                 minute.export_status = ExportStatus.COMPLETED
                 minute.export_error = None
                 minute.last_exported_at = datetime.now(tz=UTC)
@@ -143,18 +152,3 @@ class ExportHandlerService:
             remote_path = f"{base_path}/minute-{minute_version.minute.id}.{artifact.format}"
             item_id = await client.upload_file(artifact.local_path, remote_path)
             artifact.sharepoint_item_id = item_id
-
-    @staticmethod
-    def _extract_actions(html_content: str | None) -> list[str]:
-        if not html_content:
-            return []
-        actions: list[str] = []
-        for match in re.finditer(r"(?im)^[-*]?\s*(action[s]?:\s*)(.+)$", html_content):
-            actions.append(match.group(2).strip())
-        # fallback: capture bullet list items containing "to "
-        if not actions:
-            for match in re.finditer(r"<li>(.*?)</li>", html_content, flags=re.IGNORECASE | re.DOTALL):
-                text = re.sub("<[^<]+?>", " ", match.group(1)).strip()
-                if len(text) > 0:
-                    actions.append(text)
-        return actions[:10]

@@ -14,6 +14,7 @@ import {
     ClipboardCheck,
     Menu,
     Settings,
+    CheckSquare,
     type LucideIcon,
 } from 'lucide-react';
 
@@ -26,6 +27,7 @@ export const iconRegistry = {
     ClipboardCheck,
     Menu,
     Settings,
+    CheckSquare,
 } as const;
 
 export type IconName = keyof typeof iconRegistry;

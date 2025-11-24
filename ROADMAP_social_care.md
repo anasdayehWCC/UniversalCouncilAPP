@@ -701,6 +701,8 @@ Exit: Successful pilot sign-off; backlog of tweaks captured; Adults rollout sche
   4. Add API `GET /minutes/{id}/tasks` and `PATCH /minutes/{id}/tasks` to update task status/details.
 - **Exit:** Tasks are extracted as structured data; API supports CRUD; Planner integration handles rich tasks.
 
+_Status 23 Nov 2025:_ Backend + frontend ✅. `minute_task` table + Alembic migration, async LLM-backed `TaskExtractionService`, Planner attach helpers, `/minutes/{id}/tasks` CRUD + push endpoints, and `/tasks` collection API are live. Worker exports persist structured actions, de-duplicate previous AI rows, and fan-out to Planner. The Minute editor now ships a “Tasks” panel with inline status updates, Push-to-Planner CTA, and manual add dialog, and a new `/tasks` workspace lists cross-minute actions with filters.
+
 #### Phase 22B — Frontend task UI & module
 - **Objective:** Dedicated task management UI and Planner export interactions.
 - **Write scope:** `frontend/lib/modules.ts`, `frontend/app/tasks/`, `frontend/components/minutes/`. Backend is **read-only**.

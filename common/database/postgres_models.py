@@ -61,6 +61,17 @@ class ContentSource(StrEnum):
     INITIAL_GENERATION = auto()
 
 
+class TaskStatus(StrEnum):
+    PENDING = "pending"
+    IN_PROGRESS = "in_progress"
+    DONE = "done"
+
+
+class TaskSource(StrEnum):
+    AI_GENERATED = "ai_generated"
+    MANUAL = "manual"
+
+
 
 
 
@@ -412,6 +423,31 @@ class Minute(BaseTableMixin, table=True):
     worker_team: str | None = Field(default=None)
     subject_initials: str | None = Field(default=None)
     subject_dob_ciphertext: str | None = Field(default=None)
+    visit_type: str | None = Field(default=None)
+    intended_outcomes: str | None = Field(default=None)
+    risk_flags: str | None = Field(default=None)
+    docx_blob_path: str | None = Field(default=None)
+    pdf_blob_path: str | None = Field(default=None)
+    sharepoint_docx_item_id: str | None = Field(default=None)
+    sharepoint_pdf_item_id: str | None = Field(default=None)
+    planner_task_ids: List[str] = Field(
+        default_factory=list,
+        sa_column=Column(JSONB, nullable=False, server_default="'[]'::jsonb"),
+    )
+    export_status: ExportStatus | None = Field(default=None)
+    export_error: str | None = Field(default=None)
+    last_exported_at: datetime | None = Field(
+        default=None, sa_column=Column(TIMESTAMP(timezone=True), nullable=True)
+    )
+    tasks: List["MinuteTask"] = Relationship(
+        back_populates="minute",
+        sa_relationship=relationship(
+            "MinuteTask",
+            back_populates="minute",
+            cascade="all, delete-orphan",
+            order_by="MinuteTask.created_datetime.desc()",
+        ),
+    )
 
 
 class MinuteVersion(BaseTableMixin, table=True):
@@ -439,6 +475,39 @@ class MinuteVersion(BaseTableMixin, table=True):
     content_source: ContentSource = Field(
         default=ContentSource.INITIAL_GENERATION,
         sa_column_kwargs={"server_default": ContentSource.INITIAL_GENERATION.name},
+    )
+
+
+class MinuteTask(BaseTableMixin, table=True):
+    __tablename__ = "minute_task"
+    created_datetime: datetime = Field(sa_column=created_datetime_column(), default=None)
+    updated_datetime: datetime = Field(sa_column=updated_datetime_column(), default=None)
+    minute_id: UUID = Field(foreign_key="minute.id", ondelete="CASCADE")
+    minute: "Minute" = Relationship(
+        back_populates="tasks",
+        sa_relationship=relationship("Minute", back_populates="tasks"),
+    )
+    organisation_id: UUID | None = Field(default=None, foreign_key="organisation.id", ondelete="SET NULL")
+    service_domain_id: UUID | None = Field(default=None, foreign_key="service_domain.id", ondelete="SET NULL")
+    case_id: UUID | None = Field(default=None, foreign_key="case_record.id", ondelete="SET NULL")
+    description: str = Field(default="")
+    owner: str | None = Field(default=None)
+    owner_role: str | None = Field(default=None)
+    due_date: datetime | None = Field(
+        default=None, sa_column=Column(TIMESTAMP(timezone=True), nullable=True)
+    )
+    status: TaskStatus = Field(
+        default=TaskStatus.PENDING,
+        sa_column_kwargs={"server_default": TaskStatus.PENDING.value},
+    )
+    source: TaskSource = Field(
+        default=TaskSource.AI_GENERATED,
+        sa_column_kwargs={"server_default": TaskSource.AI_GENERATED.value},
+    )
+    notes: str | None = Field(default=None)
+    planner_task_id: str | None = Field(default=None)
+    last_synced_at: datetime | None = Field(
+        default=None, sa_column=Column(TIMESTAMP(timezone=True), nullable=True)
     )
 
 

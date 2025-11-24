@@ -153,6 +153,33 @@ Output the meeting summary unchanged except for the addition of citations.
     ]
 
 
+def get_task_extraction_prompt(minutes_html: str) -> list[dict[str, str]]:
+    return [
+        {
+            "role": "system",
+            "content": (
+                "You are an assistant for UK social-care practitioners. Read the provided minute "
+                "(HTML) and extract at most 10 concrete follow-up actions. Each action must be a "
+                "single sentence focused on observable work a practitioner or partner must do. "
+                "Prefer specific verbs (\"call guardian\", \"book GP appointment\") over general statements. "
+                "Return structured data matching the response schema with: description (plain text), "
+                "owner (friendly label such as 'Social worker', 'Parent / carer', 'Health professional'), "
+                "owner_role (machine-friendly slug like social_worker, parent, manager), and due_date "
+                "as an ISO 8601 date (YYYY-MM-DD) or null when not stated. Do not invent details, "
+                "and omit tasks that are merely observations."
+            ),
+        },
+        {
+            "role": "user",
+            "content": f"""
+<minutes>
+{minutes_html}
+</minutes>
+""",
+        },
+    ]
+
+
 def string_to_system_message(string: str) -> dict[str, str]:
     return {"role": "system", "content": string}
 

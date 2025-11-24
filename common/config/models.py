@@ -25,6 +25,16 @@ class LanguageConfig(BaseModel):
     )
 
 
+class NavigationItem(BaseModel):
+    label: str = Field(..., description="Navigation label")
+    href: str = Field(..., description="Target href for the navigation item")
+    icon: Optional[str] = Field(default=None, description="Optional icon name for navigation")
+    fab: bool = Field(default=False, description="Whether to render as a floating action button on mobile")
+    roles: Optional[List[str]] = Field(
+        default=None, description="Optional list of roles allowed to see this navigation item"
+    )
+
+
 class TenantConfig(BaseModel):
     id: str = Field(..., description="Stable tenant/council identifier")
     name: str
@@ -39,6 +49,7 @@ class TenantConfig(BaseModel):
     languages: LanguageConfig | None = Field(
         default=None, description="Language/translation configuration for the tenant"
     )
+    navigation: List[NavigationItem] | None = Field(default=None, description="Optional navigation overrides")
     modules: List[ModuleConfig]
 
     @validator("modules", pre=True)

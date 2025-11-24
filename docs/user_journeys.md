@@ -238,9 +238,9 @@ These journeys exist for every persona and are reused across departments via con
 
 **User flow — web**
 
-1. Inside a note, worker opens the **Tasks** tab (Phase 21) which lists extracted actions grouped by owner and due date.
-2. They confirm or edit each task; optional “Push to Planner / case system” button sends tasks downstream.
-3. From **My tasks**, worker sees cross-note tasks with filters (case, status, due date).
+1. Inside a note, worker opens the **Tasks** tab which now shows structured cards with owner chips (“Social worker”, “Manager”), due dates, and status pills (“To do”, “In progress”, “Done”).
+2. They confirm or edit each task inline (description, owner, due date). The “Push to Planner” CTA shows sync state per task (spinner, success tick, or retry) and inherits the tenant’s Planner plan/bucket from config.
+3. From **My tasks** (`/tasks`), worker sees cross-note tasks with filters (case, status, due date), inline “Mark done” controls, and planner-link badges when downstream sync has completed.
 
 ---
 
@@ -343,4 +343,3 @@ This document should be kept in sync with:
 - `minute-main/ROADMAP_social_care.md` (phases 1–40).
 - `PLANS.md` (exec plan and progress).
 - `minute-main/docs/architecture.md` and `minute-main/docs/universal_council_architecture.md` (structural architecture).
-

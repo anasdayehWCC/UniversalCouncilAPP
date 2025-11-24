@@ -2,8 +2,8 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
-from backend.api.dependencies import get_current_user, SQLSessionDep
-from common.auth import AuthContext
+from backend.api.dependencies import SQLSessionDep
+from backend.api.dependencies.get_current_user import AuthContext, get_current_user
 from common.config.loader import load_tenant_config, ConfigNotFoundError
 from common.database.postgres_models import UserOrgRole
 from sqlalchemy import select

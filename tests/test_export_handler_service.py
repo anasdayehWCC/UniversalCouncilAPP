@@ -1,37 +1,34 @@
-import asyncio
+from datetime import UTC
 
-import pytest
-
-from common.services.export_handler_service import ExportHandlerService
+from common.services.task_extraction_service import TaskExtractionService
 
 
-@pytest.mark.asyncio(loop_scope="session")
-async def test_extract_actions_basic():
+def test_extract_candidates_from_html_list():
     html = """
     <ul>
-      <li>Action: Call guardian</li>
-      <li>Action: Schedule follow-up</li>
+      <li>Action: Call guardian by 12/12/2025</li>
+      <li>Social worker to arrange school visit</li>
     </ul>
     """
-    actions = ExportHandlerService._extract_actions(html)
-    assert len(actions) == 2
-    assert "Call guardian" in actions[0]
+    candidates = TaskExtractionService.extract_candidates(html)
+    assert len(candidates) == 2
+    assert candidates[0].description == "Call guardian by 12/12/2025"
+    assert candidates[1].owner_role == "social_worker"
 
 
-@pytest.mark.asyncio(loop_scope="session")
-async def test_extract_actions_fallback_list():
+def test_extract_candidates_parses_due_dates():
+    html = "<li>Manager to submit report by 05/01/2026</li>"
+    candidates = TaskExtractionService.extract_candidates(html)
+    assert len(candidates) == 1
+    assert candidates[0].due_date is not None
+    assert candidates[0].due_date.tzinfo == UTC
+    assert candidates[0].due_date.year == 2026
+
+
+def test_extract_candidates_deduplicates_items():
     html = """
-    <ol>
-      <li>Complete consent form</li>
-      <li>Book GP slot</li>
-    </ol>
+    <li>Action: Follow up with GP</li>
+    <li>Action: Follow up with GP</li>
     """
-    actions = ExportHandlerService._extract_actions(html)
-    assert actions == ["Complete consent form", "Book GP slot"]
-
-
-@pytest.mark.asyncio(loop_scope="session")
-async def test_extract_actions_limits():
-    html = "".join([f"<li>Action: item {i}</li>" for i in range(20)])
-    actions = ExportHandlerService._extract_actions(html)
-    assert len(actions) == 10  # should cap to avoid huge Planner blasts
+    candidates = TaskExtractionService.extract_candidates(html)
+    assert len(candidates) == 1

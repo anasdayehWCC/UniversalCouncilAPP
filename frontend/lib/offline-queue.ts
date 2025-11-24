@@ -1,11 +1,9 @@
-import { db, OfflineRecording } from '@/lib/db'
+import { getStorage, OfflineRecording, QueueMeta } from '@careminutes/core/storage'
 
 const API_BASE =
   process.env.NEXT_PUBLIC_BACKEND_HOST ||
   process.env.BACKEND_HOST ||
   'http://localhost:8080'
-
-type QueueMeta = NonNullable<OfflineRecording['metadata']>
 
 export async function queueRecording(blob: Blob, meta: QueueMeta, fileName?: string) {
   const derivedName =
@@ -21,19 +19,19 @@ export async function queueRecording(blob: Blob, meta: QueueMeta, fileName?: str
     case_reference: meta.case_reference,
     metadata: meta,
   }
-  return db.recordings.add(record)
+  return getStorage().addRecording(record)
 }
 
 export async function listQueued() {
-  return db.recordings.orderBy('createdAt').toArray()
+  return getStorage().listRecordings()
 }
 
 export async function clearQueued(id: number) {
-  return db.recordings.delete(id)
+  return getStorage().removeRecording(id)
 }
 
 export async function markStatus(id: number, status: OfflineRecording['status'], error?: string) {
-  return db.recordings.update(id, { status, error })
+  return getStorage().updateRecordingStatus(id, status, error)
 }
 
 async function uploadBlob(uploadUrl: string, blob: Blob) {
@@ -122,7 +120,8 @@ export async function syncQueuedRecording(recording: OfflineRecording, token: st
 }
 
 export async function syncAllQueued(token: string) {
-  const queued = await db.recordings.where('status').equals('pending').toArray()
+  const all = await getStorage().listRecordings()
+  const queued = all.filter((r) => r.status === 'pending')
   for (const recording of queued) {
     try {
       await markStatus(recording.id!, 'syncing')

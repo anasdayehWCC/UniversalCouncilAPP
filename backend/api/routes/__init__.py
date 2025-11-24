@@ -7,6 +7,7 @@ from .health import health_router
 from .minutes import minutes_router
 from .modules import modules_router
 from .templates import templates_router
+from .tasks import tasks_router
 from .transcriptions import transcriptions_router
 from .users import users_router
 
@@ -20,5 +21,6 @@ router.include_router(templates_router)
 router.include_router(config_router)
 router.include_router(modules_router)
 router.include_router(admin_router)
+router.include_router(tasks_router)
 
 router.include_router(chat_router)

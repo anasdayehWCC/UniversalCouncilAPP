@@ -26,6 +26,10 @@ import {
   createMinuteVersionMinutesMinuteIdVersionsPost,
   deleteMinuteVersionMinuteVersionsMinuteVersionIdDelete,
   getMinuteVersionMinuteVersionsMinuteVersionIdGet,
+  listMinuteTasksMinutesMinuteIdTasksGet,
+  createMinuteTaskMinutesMinuteIdTasksPost,
+  patchMinuteTaskMinutesMinuteIdTasksTaskIdPatch,
+  pushMinuteTasksMinutesMinuteIdTasksPushPost,
   exportMinuteMinutesMinuteIdExportPost,
   getTemplatesTemplatesGet,
   getUserTemplatesUserTemplatesGet,
@@ -35,11 +39,13 @@ import {
   editUserTemplateUserTemplatesTemplateIdPatch,
   duplicateUserTemplateUserTemplatesTemplateIdDuplicatePost,
   getTenantConfigConfigTenantIdGet,
+  getUserModulesModulesGet,
   checkAdminAccessAdminCheckAccessGet,
   listConfigsAdminConfigsGet,
   getConfigDetailAdminConfigsTenantIdGet,
   getConfigAuditAdminConfigsTenantIdAuditGet,
   getConfigHistoryAdminConfigsTenantIdHistoryGet,
+  listMyTasksTasksGet,
   deleteChatsTranscriptionsTranscriptionIdChatDelete,
   listChatTranscriptionsTranscriptionIdChatGet,
   createChatTranscriptionsTranscriptionIdChatPost,
@@ -101,6 +107,16 @@ import type {
   DeleteMinuteVersionMinuteVersionsMinuteVersionIdDeleteData,
   DeleteMinuteVersionMinuteVersionsMinuteVersionIdDeleteError,
   GetMinuteVersionMinuteVersionsMinuteVersionIdGetData,
+  ListMinuteTasksMinutesMinuteIdTasksGetData,
+  CreateMinuteTaskMinutesMinuteIdTasksPostData,
+  CreateMinuteTaskMinutesMinuteIdTasksPostError,
+  CreateMinuteTaskMinutesMinuteIdTasksPostResponse,
+  PatchMinuteTaskMinutesMinuteIdTasksTaskIdPatchData,
+  PatchMinuteTaskMinutesMinuteIdTasksTaskIdPatchError,
+  PatchMinuteTaskMinutesMinuteIdTasksTaskIdPatchResponse,
+  PushMinuteTasksMinutesMinuteIdTasksPushPostData,
+  PushMinuteTasksMinutesMinuteIdTasksPushPostError,
+  PushMinuteTasksMinutesMinuteIdTasksPushPostResponse,
   ExportMinuteMinutesMinuteIdExportPostData,
   ExportMinuteMinutesMinuteIdExportPostError,
   ExportMinuteMinutesMinuteIdExportPostResponse,
@@ -116,11 +132,13 @@ import type {
   DuplicateUserTemplateUserTemplatesTemplateIdDuplicatePostData,
   DuplicateUserTemplateUserTemplatesTemplateIdDuplicatePostError,
   GetTenantConfigConfigTenantIdGetData,
+  GetUserModulesModulesGetData,
   CheckAdminAccessAdminCheckAccessGetData,
   ListConfigsAdminConfigsGetData,
   GetConfigDetailAdminConfigsTenantIdGetData,
   GetConfigAuditAdminConfigsTenantIdAuditGetData,
   GetConfigHistoryAdminConfigsTenantIdHistoryGetData,
+  ListMyTasksTasksGetData,
   DeleteChatsTranscriptionsTranscriptionIdChatDeleteData,
   DeleteChatsTranscriptionsTranscriptionIdChatDeleteError,
   DeleteChatsTranscriptionsTranscriptionIdChatDeleteResponse,
@@ -1166,6 +1184,159 @@ export const getMinuteVersionMinuteVersionsMinuteVersionIdGetOptions = (
   })
 }
 
+export const listMinuteTasksMinutesMinuteIdTasksGetQueryKey = (
+  options: Options<ListMinuteTasksMinutesMinuteIdTasksGetData>
+) => createQueryKey('listMinuteTasksMinutesMinuteIdTasksGet', options)
+
+/**
+ * List Minute Tasks
+ */
+export const listMinuteTasksMinutesMinuteIdTasksGetOptions = (
+  options: Options<ListMinuteTasksMinutesMinuteIdTasksGetData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listMinuteTasksMinutesMinuteIdTasksGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: listMinuteTasksMinutesMinuteIdTasksGetQueryKey(options),
+  })
+}
+
+export const createMinuteTaskMinutesMinuteIdTasksPostQueryKey = (
+  options: Options<CreateMinuteTaskMinutesMinuteIdTasksPostData>
+) => createQueryKey('createMinuteTaskMinutesMinuteIdTasksPost', options)
+
+/**
+ * Create Minute Task
+ */
+export const createMinuteTaskMinutesMinuteIdTasksPostOptions = (
+  options: Options<CreateMinuteTaskMinutesMinuteIdTasksPostData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await createMinuteTaskMinutesMinuteIdTasksPost({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: createMinuteTaskMinutesMinuteIdTasksPostQueryKey(options),
+  })
+}
+
+/**
+ * Create Minute Task
+ */
+export const createMinuteTaskMinutesMinuteIdTasksPostMutation = (
+  options?: Partial<Options<CreateMinuteTaskMinutesMinuteIdTasksPostData>>
+): UseMutationOptions<
+  CreateMinuteTaskMinutesMinuteIdTasksPostResponse,
+  CreateMinuteTaskMinutesMinuteIdTasksPostError,
+  Options<CreateMinuteTaskMinutesMinuteIdTasksPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreateMinuteTaskMinutesMinuteIdTasksPostResponse,
+    CreateMinuteTaskMinutesMinuteIdTasksPostError,
+    Options<CreateMinuteTaskMinutesMinuteIdTasksPostData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await createMinuteTaskMinutesMinuteIdTasksPost({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+/**
+ * Patch Minute Task
+ */
+export const patchMinuteTaskMinutesMinuteIdTasksTaskIdPatchMutation = (
+  options?: Partial<Options<PatchMinuteTaskMinutesMinuteIdTasksTaskIdPatchData>>
+): UseMutationOptions<
+  PatchMinuteTaskMinutesMinuteIdTasksTaskIdPatchResponse,
+  PatchMinuteTaskMinutesMinuteIdTasksTaskIdPatchError,
+  Options<PatchMinuteTaskMinutesMinuteIdTasksTaskIdPatchData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    PatchMinuteTaskMinutesMinuteIdTasksTaskIdPatchResponse,
+    PatchMinuteTaskMinutesMinuteIdTasksTaskIdPatchError,
+    Options<PatchMinuteTaskMinutesMinuteIdTasksTaskIdPatchData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await patchMinuteTaskMinutesMinuteIdTasksTaskIdPatch({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const pushMinuteTasksMinutesMinuteIdTasksPushPostQueryKey = (
+  options: Options<PushMinuteTasksMinutesMinuteIdTasksPushPostData>
+) => createQueryKey('pushMinuteTasksMinutesMinuteIdTasksPushPost', options)
+
+/**
+ * Push Minute Tasks
+ */
+export const pushMinuteTasksMinutesMinuteIdTasksPushPostOptions = (
+  options: Options<PushMinuteTasksMinutesMinuteIdTasksPushPostData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await pushMinuteTasksMinutesMinuteIdTasksPushPost({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: pushMinuteTasksMinutesMinuteIdTasksPushPostQueryKey(options),
+  })
+}
+
+/**
+ * Push Minute Tasks
+ */
+export const pushMinuteTasksMinutesMinuteIdTasksPushPostMutation = (
+  options?: Partial<Options<PushMinuteTasksMinutesMinuteIdTasksPushPostData>>
+): UseMutationOptions<
+  PushMinuteTasksMinutesMinuteIdTasksPushPostResponse,
+  PushMinuteTasksMinutesMinuteIdTasksPushPostError,
+  Options<PushMinuteTasksMinutesMinuteIdTasksPushPostData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    PushMinuteTasksMinutesMinuteIdTasksPushPostResponse,
+    PushMinuteTasksMinutesMinuteIdTasksPushPostError,
+    Options<PushMinuteTasksMinutesMinuteIdTasksPushPostData>
+  > = {
+    mutationFn: async (localOptions) => {
+      const { data } = await pushMinuteTasksMinutesMinuteIdTasksPushPost({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
 export const exportMinuteMinutesMinuteIdExportPostQueryKey = (
   options: Options<ExportMinuteMinutesMinuteIdExportPostData>
 ) => createQueryKey('exportMinuteMinutesMinuteIdExportPost', options)
@@ -1486,6 +1657,42 @@ export const getTenantConfigConfigTenantIdGetOptions = (
   })
 }
 
+export const getUserModulesModulesGetQueryKey = (
+  options?: Options<GetUserModulesModulesGetData>
+) => createQueryKey('getUserModulesModulesGet', options)
+
+/**
+ * Get User Modules
+ * Returns modules and navigation items for the current user's service_domain and role.
+ *
+ * Filters by:
+ * - user.service_domain_id (from UserOrgRole table)
+ * - user.role (from UserOrgRole table)
+ * - tenant config (from config/{tenant}_{domain}.yaml)
+ *
+ * Returns:
+ * - modules: List of enabled module IDs
+ * - nav_items: List of navigation items with labels, hrefs, icons
+ * - service_domain: Current user's domain
+ * - role: Current user's role
+ */
+export const getUserModulesModulesGetOptions = (
+  options?: Options<GetUserModulesModulesGetData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getUserModulesModulesGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getUserModulesModulesGetQueryKey(options),
+  })
+}
+
 export const checkAdminAccessAdminCheckAccessGetQueryKey = (
   options: Options<CheckAdminAccessAdminCheckAccessGetData>
 ) => createQueryKey('checkAdminAccessAdminCheckAccessGet', options)
@@ -1608,6 +1815,30 @@ export const getConfigHistoryAdminConfigsTenantIdHistoryGetOptions = (
       return data
     },
     queryKey: getConfigHistoryAdminConfigsTenantIdHistoryGetQueryKey(options),
+  })
+}
+
+export const listMyTasksTasksGetQueryKey = (
+  options?: Options<ListMyTasksTasksGetData>
+) => createQueryKey('listMyTasksTasksGet', options)
+
+/**
+ * List My Tasks
+ */
+export const listMyTasksTasksGetOptions = (
+  options?: Options<ListMyTasksTasksGetData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listMyTasksTasksGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: listMyTasksTasksGetQueryKey(options),
   })
 }
 

@@ -78,6 +78,18 @@ import type {
   GetMinuteVersionMinuteVersionsMinuteVersionIdGetData,
   GetMinuteVersionMinuteVersionsMinuteVersionIdGetResponses,
   GetMinuteVersionMinuteVersionsMinuteVersionIdGetErrors,
+  ListMinuteTasksMinutesMinuteIdTasksGetData,
+  ListMinuteTasksMinutesMinuteIdTasksGetResponses,
+  ListMinuteTasksMinutesMinuteIdTasksGetErrors,
+  CreateMinuteTaskMinutesMinuteIdTasksPostData,
+  CreateMinuteTaskMinutesMinuteIdTasksPostResponses,
+  CreateMinuteTaskMinutesMinuteIdTasksPostErrors,
+  PatchMinuteTaskMinutesMinuteIdTasksTaskIdPatchData,
+  PatchMinuteTaskMinutesMinuteIdTasksTaskIdPatchResponses,
+  PatchMinuteTaskMinutesMinuteIdTasksTaskIdPatchErrors,
+  PushMinuteTasksMinutesMinuteIdTasksPushPostData,
+  PushMinuteTasksMinutesMinuteIdTasksPushPostResponses,
+  PushMinuteTasksMinutesMinuteIdTasksPushPostErrors,
   ExportMinuteMinutesMinuteIdExportPostData,
   ExportMinuteMinutesMinuteIdExportPostResponses,
   ExportMinuteMinutesMinuteIdExportPostErrors,
@@ -105,6 +117,9 @@ import type {
   GetTenantConfigConfigTenantIdGetData,
   GetTenantConfigConfigTenantIdGetResponses,
   GetTenantConfigConfigTenantIdGetErrors,
+  GetUserModulesModulesGetData,
+  GetUserModulesModulesGetResponses,
+  GetUserModulesModulesGetErrors,
   CheckAdminAccessAdminCheckAccessGetData,
   CheckAdminAccessAdminCheckAccessGetResponses,
   CheckAdminAccessAdminCheckAccessGetErrors,
@@ -120,6 +135,9 @@ import type {
   GetConfigHistoryAdminConfigsTenantIdHistoryGetData,
   GetConfigHistoryAdminConfigsTenantIdHistoryGetResponses,
   GetConfigHistoryAdminConfigsTenantIdHistoryGetErrors,
+  ListMyTasksTasksGetData,
+  ListMyTasksTasksGetResponses,
+  ListMyTasksTasksGetErrors,
   DeleteChatsTranscriptionsTranscriptionIdChatDeleteData,
   DeleteChatsTranscriptionsTranscriptionIdChatDeleteResponses,
   DeleteChatsTranscriptionsTranscriptionIdChatDeleteErrors,
@@ -684,6 +702,92 @@ export const getMinuteVersionMinuteVersionsMinuteVersionIdGet = <
 }
 
 /**
+ * List Minute Tasks
+ */
+export const listMinuteTasksMinutesMinuteIdTasksGet = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ListMinuteTasksMinutesMinuteIdTasksGetData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).get<
+    ListMinuteTasksMinutesMinuteIdTasksGetResponses,
+    ListMinuteTasksMinutesMinuteIdTasksGetErrors,
+    ThrowOnError
+  >({
+    url: '/minutes/{minute_id}/tasks',
+    ...options,
+  })
+}
+
+/**
+ * Create Minute Task
+ */
+export const createMinuteTaskMinutesMinuteIdTasksPost = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<CreateMinuteTaskMinutesMinuteIdTasksPostData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).post<
+    CreateMinuteTaskMinutesMinuteIdTasksPostResponses,
+    CreateMinuteTaskMinutesMinuteIdTasksPostErrors,
+    ThrowOnError
+  >({
+    url: '/minutes/{minute_id}/tasks',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  })
+}
+
+/**
+ * Patch Minute Task
+ */
+export const patchMinuteTaskMinutesMinuteIdTasksTaskIdPatch = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    PatchMinuteTaskMinutesMinuteIdTasksTaskIdPatchData,
+    ThrowOnError
+  >
+) => {
+  return (options.client ?? _heyApiClient).patch<
+    PatchMinuteTaskMinutesMinuteIdTasksTaskIdPatchResponses,
+    PatchMinuteTaskMinutesMinuteIdTasksTaskIdPatchErrors,
+    ThrowOnError
+  >({
+    url: '/minutes/{minute_id}/tasks/{task_id}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  })
+}
+
+/**
+ * Push Minute Tasks
+ */
+export const pushMinuteTasksMinutesMinuteIdTasksPushPost = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    PushMinuteTasksMinutesMinuteIdTasksPushPostData,
+    ThrowOnError
+  >
+) => {
+  return (options.client ?? _heyApiClient).post<
+    PushMinuteTasksMinutesMinuteIdTasksPushPostResponses,
+    PushMinuteTasksMinutesMinuteIdTasksPushPostErrors,
+    ThrowOnError
+  >({
+    url: '/minutes/{minute_id}/tasks/push',
+    ...options,
+  })
+}
+
+/**
  * Export Minute
  */
 export const exportMinuteMinutesMinuteIdExportPost = <
@@ -862,6 +966,34 @@ export const getTenantConfigConfigTenantIdGet = <
 }
 
 /**
+ * Get User Modules
+ * Returns modules and navigation items for the current user's service_domain and role.
+ *
+ * Filters by:
+ * - user.service_domain_id (from UserOrgRole table)
+ * - user.role (from UserOrgRole table)
+ * - tenant config (from config/{tenant}_{domain}.yaml)
+ *
+ * Returns:
+ * - modules: List of enabled module IDs
+ * - nav_items: List of navigation items with labels, hrefs, icons
+ * - service_domain: Current user's domain
+ * - role: Current user's role
+ */
+export const getUserModulesModulesGet = <ThrowOnError extends boolean = false>(
+  options?: Options<GetUserModulesModulesGetData, ThrowOnError>
+) => {
+  return (options?.client ?? _heyApiClient).get<
+    GetUserModulesModulesGetResponses,
+    GetUserModulesModulesGetErrors,
+    ThrowOnError
+  >({
+    url: '/modules',
+    ...options,
+  })
+}
+
+/**
  * Check Admin Access
  * Check if current user has admin access.
  */
@@ -955,6 +1087,22 @@ export const getConfigHistoryAdminConfigsTenantIdHistoryGet = <
     ThrowOnError
   >({
     url: '/admin/configs/{tenant_id}/history',
+    ...options,
+  })
+}
+
+/**
+ * List My Tasks
+ */
+export const listMyTasksTasksGet = <ThrowOnError extends boolean = false>(
+  options?: Options<ListMyTasksTasksGetData, ThrowOnError>
+) => {
+  return (options?.client ?? _heyApiClient).get<
+    ListMyTasksTasksGetResponses,
+    ListMyTasksTasksGetErrors,
+    ThrowOnError
+  >({
+    url: '/tasks',
     ...options,
   })
 }

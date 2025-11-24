@@ -1,11 +1,13 @@
 import base64
 import logging
+from datetime import UTC
 from pathlib import Path
 from typing import Iterable
 
 import httpx
 from azure.identity.aio import DefaultAzureCredential
 
+from common.database.postgres_models import MinuteTask
 from common.settings import get_settings
 
 settings = get_settings()
@@ -39,7 +41,7 @@ class MSGraphClient:
             logger.error("Graph upload failed: %s", resp.text)
             return None
 
-    async def create_planner_tasks(self, actions: Iterable[str], minute) -> list[str]:
+    async def create_planner_tasks(self, tasks: Iterable[MinuteTask], minute) -> list[str]:
         if not settings.MS_GRAPH_ENABLED or not settings.MS_GRAPH_PLAN_ID or not settings.MS_GRAPH_BUCKET_ID:
             return []
         access_token = await self._get_token()
@@ -50,16 +52,28 @@ class MSGraphClient:
         assignee = settings.MS_GRAPH_ASSIGN_USER_ID
         created_ids: list[str] = []
         async with httpx.AsyncClient(timeout=20) as client:
-            for action in actions:
+            for task in tasks:
+                description = (task.description or "Action").strip()
                 payload = {
                     "planId": plan_id,
                     "bucketId": bucket_id,
-                    "title": action[:250],
+                    "title": description[:250],
                     "details": {
                         "previewType": "automatic",
                         "description": f"Minute {minute.id} action item",
                     },
                 }
+                if task.due_date:
+                    due_dt = task.due_date
+                    if due_dt.tzinfo is None:
+                        due_dt = due_dt.replace(tzinfo=UTC)
+                    iso_due = due_dt.astimezone(UTC).isoformat()
+                    payload["dueDateTime"] = {
+                        "dateTime": iso_due,
+                        "timeZone": "UTC",
+                    }
+                if task.owner:
+                    payload["details"]["description"] = f"Owner: {task.owner}\nSource minute: {minute.id}"
                 if assignee:
                     payload["assignments"] = {
                         assignee: {"@odata.type": "microsoft.graph.plannerAssignment", "orderHint": " !"}

@@ -1,5 +1,22 @@
 # Changelog
 
+## 2025-11-25
+
+- **Phase 24A (Frontend Resilience) COMPLETE:** Added shared `ResilienceProvider` + connectivity hook (navigator + `/api/proxy/health/ready`) powering a premium resilience banner, offline indicator reuse, and degraded-mode detection. Wrapped main routes in `AppErrorBoundary` with Sentry capture and reload/home CTAs. Sidebar and bottom nav now expose retry buttons and greyed fallback nav when API/nav fetch fails; user templates list error state also includes a retry affordance instead of dead text.
+- **Offline/Degraded UX polish:** Offline indicator now reuses shared sync state with quick retry; resilience banner surfaces pending sync counts and retry; nav items are aria-disabled when degraded to avoid crashes while keeping the UI stable.
+- **Phase 24B (Backend Circuit Breakers) COMPLETE:** Introduced lightweight circuit breaker (`common/services/circuit_breaker.py`) guarding Azure Speech (sync + batch), Azure Translator, and MS Graph calls. Health endpoints now report dependency state: `/health/ready` returns `"degraded"` when breakers are open and `/health/detailed` exposes per-service breaker snapshots without failing readiness. Graph/Speech/Translator calls now short-circuit when open, reducing cascading failures.
+- **Tests:** `npm run lint` (passes with existing admin effect warnings unchanged).
+
+## 2025-11-25
+
+- **Phase 25A (Backend Insights) COMPLETE:** Added insights service (`common/services/insights_service.py`) that computes audio minutes and time-saved (4x manual typing heuristic) plus top topics from latest minute versions. New `/api/insights` endpoint (org/domain scoped) returns aggregated metrics without schema changes; ready for future scheduled runs. Documentation updated in ROADMAP/PLANS. Tests: attempted `python -m pytest tests/test_insights_service.py -q` but pytest is not installed in the current environment (no tests executed).
+- **Phase 25B (Frontend Insights) COMPLETE:** Introduced `/insights` page rendering time-saved/audio/average-length cards and top-topic chips using TanStack query against `/api/proxy/insights`; fallback navs now include Insights for non-config environments. Lint rerun succeeded (pre-existing warnings unchanged).
+- **Phase 26A (Premium App Shell) COMPLETE:** Sidebar now collapses with animated glass styling, header gains blur overlay and toggle, keeping mobile FAB nav intact; viewTransition + Framer Motion template retained for smooth transitions.
+- **Phase 26B (Premium UI Kit) COMPLETE:** Added shared `RecordingCard` and `SplitView` primitives to `packages/ui`, and upgraded Sonner toasts to premium glass styling. These components are ready for reuse in capture/transcription flows; no backend changes required.
+- **Phase 27A (Adaptive UX Engine) COMPLETE:** Introduced `PersonaProvider` with role-aware defaults and local override; transcription page now includes one-tap persona switch and contextual tabs that adapt for managers (translations hidden, summary relabelled) vs social workers. Lint rerun succeeded (existing warnings in admin/dev-preview remain).
+- **Phase 27B (Role-Specific Dashboards) COMPLETE:** Home now renders persona-driven dashboards—social workers get quick templates, CTA, and recent meetings; managers get insights snapshot cards and flagged review placeholder—with a persona toggle on the home header. Lint rerun succeeded (same existing warnings).
+- **Phase 28A (Recording Studio 2.0 – Waveform/Controls) COMPLETE:** Capture page now includes animated waveform, live status chip with duration, floating pause/resume/stop controls, and consent-backed in-person vs online selector persisted into queued metadata; processing-mode toggle retained. Lint re-run (warnings unchanged).
+
 ## 2025-11-23
 
 - **Phase 22 (Task Management Module) COMPLETE**: Added `minute_task` table + Alembic migration, `TaskStatus/TaskSource` enums, async Gemini-backed `TaskExtractionService`, Planner sync helpers, `/minutes/{id}/tasks` CRUD + `/minutes/{id}/tasks/push`, and `/tasks` listing API. Worker exports persist structured actions, clear stale AI rows, and fan-out to Microsoft Planner with due dates/owners. Frontend now includes a Minute editor tasks panel (inline edits, Push-to-Planner CTA, manual add dialog) and a new `/tasks` workspace with filters and “Mark done” controls. Navigation consumes live `/api/modules` responses so Tasks only surface when enabled. Docs (PLANS, ROADMAP, user journeys) updated to mark Phase 22 done.

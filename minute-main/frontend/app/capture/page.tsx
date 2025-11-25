@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Mic, Square, Wifi, WifiOff, Settings2, ArrowLeft } from 'lucide-react';
+import { Mic, Square, Pause, Play, Wifi, WifiOff, Settings2, ArrowLeft, Activity, ShieldCheck, MonitorSmartphone, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { queueRecording } from '@/lib/offline-queue';
@@ -11,12 +11,20 @@ import { PressableSurface } from '@/lib/ui/pressable';
 import { TokenText } from '@careminutes/ui';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { RecordingWaveform } from '@/components/recording-waveform';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@careminutes/ui/dialog';
+import { Label } from '@careminutes/ui/label';
+import { Checkbox } from '@careminutes/ui/checkbox';
 
 export default function CapturePage() {
   const { isOffline } = useDevPreview();
   const [isRecording, setIsRecording] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [duration, setDuration] = useState(0);
   const [processingMode, setProcessingMode] = useState<'fast' | 'economy'>('fast');
+   const [meetingMode, setMeetingMode] = useState<'in_person' | 'online'>('in_person');
+  const [consentGiven, setConsentGiven] = useState(false);
+  const [modeModalOpen, setModeModalOpen] = useState(true);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -28,6 +36,10 @@ export default function CapturePage() {
   }, []);
 
   const startRecording = async () => {
+    if (!consentGiven) {
+      toast.error('Please confirm recording consent');
+      return;
+    }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mediaRecorder = new MediaRecorder(stream);
@@ -67,7 +79,26 @@ export default function CapturePage() {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
+      setIsPaused(false);
       if (timerRef.current) clearInterval(timerRef.current);
+    }
+  };
+
+  const pauseRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.pause();
+      setIsPaused(true);
+      if (timerRef.current) clearInterval(timerRef.current);
+    }
+  };
+
+  const resumeRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'paused') {
+      mediaRecorderRef.current.resume();
+      setIsPaused(false);
+      timerRef.current = setInterval(() => {
+        setDuration(prev => prev + 1);
+      }, 1000);
     }
   };
 
@@ -81,6 +112,8 @@ export default function CapturePage() {
         {
           case_reference: 'Quick Capture',
           processing_mode: processingMode,
+          meeting_mode: meetingMode,
+          consent_ack: consentGiven,
         },
         fileName
       );
@@ -138,25 +171,40 @@ export default function CapturePage() {
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
-              className="flex flex-col items-center gap-8"
+              className="flex flex-col items-center gap-8 w-full max-w-2xl"
             >
               <div className="text-6xl font-mono font-bold tracking-tighter text-foreground tabular-nums">
                 {formatDuration(duration)}
               </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span className="h-2 w-2 rounded-full bg-rose-500 animate-pulse" aria-hidden />
+                {isPaused ? 'Paused' : 'Recording live'}
+              </div>
+              <RecordingWaveform className="mt-2" />
+
               <div className="relative">
                 <motion.div
                   animate={{ scale: [1, 1.2, 1] }}
                   transition={{ repeat: Infinity, duration: 2 }}
                   className="absolute inset-0 bg-red-500/20 rounded-full blur-xl"
                 />
-                <Button
-                  size="lg"
-                  onClick={stopRecording}
-                  className="h-24 w-24 rounded-full bg-red-500 hover:bg-red-600 shadow-lg flex items-center justify-center transition-all hover:scale-105"
-                >
-                  <Square className="w-8 h-8 text-white fill-current" />
-                </Button>
-              </div>
+                <div className="flex items-center gap-3">
+                  <Button
+                    size="lg"
+                    onClick={isPaused ? resumeRecording : pauseRecording}
+                    className="h-20 w-20 rounded-full bg-white text-primary shadow-lg hover:bg-slate-100 transition-all hover:scale-105"
+                  >
+                    {isPaused ? <Play className="w-8 h-8" /> : <Pause className="w-8 h-8" />}
+                  </Button>
+                  <Button
+                    size="lg"
+                    onClick={stopRecording}
+                    className="h-24 w-24 rounded-full bg-red-500 hover:bg-red-600 shadow-lg flex items-center justify-center transition-all hover:scale-105"
+                  >
+                    <Square className="w-8 h-8 text-white fill-current" />
+                  </Button>
+        </div>
+      </div>
               <p className="text-sm text-muted-foreground animate-pulse">Recording in progress...</p>
             </motion.div>
           ) : (
@@ -219,6 +267,83 @@ export default function CapturePage() {
         <div className="absolute top-[-20%] left-[-20%] w-[80%] h-[80%] bg-primary/5 rounded-full blur-3xl" />
         <div className="absolute bottom-[-20%] right-[-20%] w-[80%] h-[80%] bg-accent/5 rounded-full blur-3xl" />
       </div>
+
+      {/* Floating controls/status */}
+      {isRecording && (
+        <div className="fixed bottom-6 inset-x-0 flex items-center justify-center pointer-events-none">
+          <div className="pointer-events-auto flex items-center gap-3 rounded-full bg-slate-900/80 px-4 py-2 text-white shadow-xl backdrop-blur">
+            <span className="flex items-center gap-2 text-sm">
+              <span className="h-2 w-2 rounded-full bg-rose-500 animate-pulse" aria-hidden />
+              Live • {formatDuration(duration)}
+            </span>
+            <span className="text-xs text-white/70">Mode: {processingMode === 'fast' ? 'Fast' : 'Economy'}</span>
+            <Activity className="h-4 w-4 text-white/70" />
+          </div>
+        </div>
+      )}
+
+      <Dialog open={modeModalOpen} onOpenChange={setModeModalOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5 text-primary" />
+              Choose recording mode
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Pick the context for this recording and confirm you have permission. This helps templates and audits label the session correctly.
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <PressableSurface
+                onClick={() => setMeetingMode('in_person')}
+                className={cn(
+                  'p-3 rounded-xl border',
+                  meetingMode === 'in_person' ? 'border-primary bg-primary/5' : 'border-muted'
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  <TokenText emphasis="strong">In person</TokenText>
+                </div>
+                <TokenText emphasis="muted" className="text-xs">Home visit or face-to-face meeting</TokenText>
+              </PressableSurface>
+              <PressableSurface
+                onClick={() => setMeetingMode('online')}
+                className={cn(
+                  'p-3 rounded-xl border',
+                  meetingMode === 'online' ? 'border-primary bg-primary/5' : 'border-muted'
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <MonitorSmartphone className="h-4 w-4" />
+                  <TokenText emphasis="strong">Online / hybrid</TokenText>
+                </div>
+                <TokenText emphasis="muted" className="text-xs">Teams/phone or mixed</TokenText>
+              </PressableSurface>
+            </div>
+            <div className="flex items-start gap-2">
+              <Checkbox
+                id="consent"
+                checked={consentGiven}
+                onCheckedChange={(v) => setConsentGiven(Boolean(v))}
+              />
+              <Label htmlFor="consent" className="text-sm leading-snug">
+                I have informed participants and obtained permission to record this session.
+              </Label>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              disabled={!consentGiven}
+              onClick={() => setModeModalOpen(false)}
+              className="w-full"
+            >
+              Continue
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

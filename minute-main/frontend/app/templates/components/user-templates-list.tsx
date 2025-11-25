@@ -41,6 +41,7 @@ import {
   FileWarning,
   Loader2,
   Plus,
+  RefreshCw,
   Trash2,
 } from 'lucide-react'
 import Link from 'next/link'
@@ -52,6 +53,7 @@ export const UserTemplatesList = () => {
     data: templates = [],
     isLoading,
     isError,
+    refetch,
   } = useQuery(getUserTemplatesUserTemplatesGetOptions())
   const [documentTemplates, formTemplates] = useMemo(() => {
     const docs = []
@@ -71,9 +73,20 @@ export const UserTemplatesList = () => {
   }
   if (isError) {
     return (
-      <div>
-        <FileWarning />
-        <p>Something went wrong fetching your templates</p>
+      <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
+        <div className="flex items-center gap-2 text-amber-700">
+          <FileWarning />
+          <p className="font-medium">Something went wrong fetching your templates</p>
+        </div>
+        <div className="mt-3 flex items-center gap-2">
+          <Button variant="outline" onClick={() => refetch()}>
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Retry
+          </Button>
+          <p className="text-sm text-amber-700">
+            Check your connection or try again in a moment.
+          </p>
+        </div>
       </div>
     )
   }

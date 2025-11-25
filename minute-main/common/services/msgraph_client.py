@@ -9,6 +9,7 @@ from azure.identity.aio import DefaultAzureCredential
 
 from common.database.postgres_models import MinuteTask
 from common.settings import get_settings
+from common.services.circuit_breaker import breaker
 
 settings = get_settings()
 logger = logging.getLogger(__name__)
@@ -33,13 +34,14 @@ class MSGraphClient:
             f"https://graph.microsoft.com/v1.0/drives/{settings.MS_GRAPH_DRIVE_ID}/root:/{remote_path}:/content"
         )
         headers = {"Authorization": f"Bearer {access_token}", "Content-Type": "application/octet-stream"}
-        async with httpx.AsyncClient(timeout=30) as client, local_path.open("rb") as f:
-            resp = await client.put(url, headers=headers, content=f)
-            if resp.is_success:
-                data = resp.json()
-                return data.get("id")
-            logger.error("Graph upload failed: %s", resp.text)
-            return None
+        async with breaker.guard("ms_graph"):
+            async with httpx.AsyncClient(timeout=30) as client, local_path.open("rb") as f:
+                resp = await client.put(url, headers=headers, content=f)
+                if resp.is_success:
+                    data = resp.json()
+                    return data.get("id")
+                logger.error("Graph upload failed: %s", resp.text)
+                return None
 
     async def create_planner_tasks(self, tasks: Iterable[MinuteTask], minute) -> list[str]:
         if not settings.MS_GRAPH_ENABLED or not settings.MS_GRAPH_PLAN_ID or not settings.MS_GRAPH_BUCKET_ID:
@@ -51,36 +53,37 @@ class MSGraphClient:
         bucket_id = settings.MS_GRAPH_BUCKET_ID
         assignee = settings.MS_GRAPH_ASSIGN_USER_ID
         created_ids: list[str] = []
-        async with httpx.AsyncClient(timeout=20) as client:
-            for task in tasks:
-                description = (task.description or "Action").strip()
-                payload = {
-                    "planId": plan_id,
-                    "bucketId": bucket_id,
-                    "title": description[:250],
-                    "details": {
-                        "previewType": "automatic",
-                        "description": f"Minute {minute.id} action item",
-                    },
-                }
-                if task.due_date:
-                    due_dt = task.due_date
-                    if due_dt.tzinfo is None:
-                        due_dt = due_dt.replace(tzinfo=UTC)
-                    iso_due = due_dt.astimezone(UTC).isoformat()
-                    payload["dueDateTime"] = {
-                        "dateTime": iso_due,
-                        "timeZone": "UTC",
+        async with breaker.guard("ms_graph"):
+            async with httpx.AsyncClient(timeout=20) as client:
+                for task in tasks:
+                    description = (task.description or "Action").strip()
+                    payload = {
+                        "planId": plan_id,
+                        "bucketId": bucket_id,
+                        "title": description[:250],
+                        "details": {
+                            "previewType": "automatic",
+                            "description": f"Minute {minute.id} action item",
+                        },
                     }
-                if task.owner:
-                    payload["details"]["description"] = f"Owner: {task.owner}\nSource minute: {minute.id}"
-                if assignee:
-                    payload["assignments"] = {
-                        assignee: {"@odata.type": "microsoft.graph.plannerAssignment", "orderHint": " !"}
-                    }
-                resp = await client.post(url, headers=headers, json=payload)
-                if resp.is_success:
-                    created_ids.append(resp.json().get("id"))
-                else:
-                    logger.warning("Planner task creation failed: %s", resp.text)
+                    if task.due_date:
+                        due_dt = task.due_date
+                        if due_dt.tzinfo is None:
+                            due_dt = due_dt.replace(tzinfo=UTC)
+                        iso_due = due_dt.astimezone(UTC).isoformat()
+                        payload["dueDateTime"] = {
+                            "dateTime": iso_due,
+                            "timeZone": "UTC",
+                        }
+                    if task.owner:
+                        payload["details"]["description"] = f"Owner: {task.owner}\nSource minute: {minute.id}"
+                    if assignee:
+                        payload["assignments"] = {
+                            assignee: {"@odata.type": "microsoft.graph.plannerAssignment", "orderHint": " !"}
+                        }
+                    resp = await client.post(url, headers=headers, json=payload)
+                    if resp.is_success:
+                        created_ids.append(resp.json().get("id"))
+                    else:
+                        logger.warning("Planner task creation failed: %s", resp.text)
         return created_ids

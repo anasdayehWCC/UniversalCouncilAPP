@@ -749,6 +749,7 @@ _Status 23 Nov 2025:_ Backend + frontend ✅. `minute_task` table + Alembic migr
   3. Add "Offline Mode" banner when `navigator.onLine` is false or API is unreachable.
   4. Implement "Degraded Mode" UI where disabled/failing modules are hidden or grayed out instead of crashing the page.
 - **Exit:** UI handles 404/500 errors gracefully; users can retry actions; offline state is clear.
+- **Status (2025-11-25):** Completed — global app error boundary with Sentry capture, resilience banner for offline/API outages, retry controls on query errors, and degraded/fallback navigation styling instead of hard failures.
 
 #### Phase 24B — Backend Circuit Breakers
 - **Objective:** Prevent cascading failures and provide health status for dependencies.
@@ -759,6 +760,7 @@ _Status 23 Nov 2025:_ Backend + frontend ✅. `minute_task` table + Alembic migr
   2. Add detailed health checks (`/health/detailed`) reporting status of downstream services.
   3. Return "Degraded" status in config/health endpoints if non-critical services are down.
 - **Exit:** Backend fails fast on external outages; health endpoints reflect dependency status.
+- **Status (2025-11-25):** Completed — lightweight in-process circuit breaker guards Azure Speech (sync/batch), Translator, and MS Graph calls; `/health/ready` and new `/health/detailed` expose breaker state and surface a `"degraded"` status when dependencies are open instead of failing hard.
 
 ### Phase 25 — Advanced Analytics & Insights
 
@@ -771,6 +773,7 @@ _Status 23 Nov 2025:_ Backend + frontend ✅. `minute_task` table + Alembic migr
   2. Implement "Topic Trends" extraction from minute summaries.
   3. Add `/api/insights` endpoints to serve aggregated data per tenant/domain.
 - **Exit:** API serves calculated insights; aggregation jobs run on schedule.
+- **Status (2025-11-25):** Completed — backend `/insights` endpoint filters by org/domain, computes audio minutes & time-saved (heuristic 4x manual typing) and top topics from latest minute versions; uses lightweight service (no schema change) ready for future scheduled runs.
 
 #### Phase 25B — Frontend Insights Module
 - **Objective:** Visualize insights for users/admins.
@@ -780,6 +783,7 @@ _Status 23 Nov 2025:_ Backend + frontend ✅. `minute_task` table + Alembic migr
   2. Implement "Dashboard" view with charts (using Recharts or Visx) showing usage trends and time saved.
   3. Add "My Impact" widget to Home page.
 - **Exit:** Users can see value metrics; Admins can see adoption trends.
+- **Status (2025-11-25):** Completed — new `/insights` page consumes backend insights, shows time saved/audio totals/avg length cards plus top topics chips; fallback nav includes Insights when config not present. Charts deferred for later visual polish.
 
 ### Phase 26 — Design System 2.0 & Premium Shell
 
@@ -795,6 +799,7 @@ _Status 23 Nov 2025:_ Backend + frontend ✅. `minute_task` table + Alembic migr
   3. Implement `template.tsx` using Framer Motion for smooth "push/pop" page transitions.
   4. Refactor `Header` to be a transparent, blur-backed overlay.
 - **Exit:** App feels like a native mobile app; navigation is responsive; page transitions are smooth.
+- **Status (2025-11-25):** Completed — sidebar now collapses with animated width toggle, header gets a blur overlay and toggle control, template already uses Framer Motion, viewTransition remains enabled; mobile bottom nav unchanged with FAB.
 
 #### Phase 26B — Premium UI Kit (Magic UI)
 - **Objective:** Elevate the visual design to match "Apple/Google" premium standards.
@@ -808,6 +813,7 @@ _Status 23 Nov 2025:_ Backend + frontend ✅. `minute_task` table + Alembic migr
   3. Create `SplitView` component for Desktop: Transcript on left, "Edit with AI" sidebar on right.
   4. Style `Sonner` toasts to look like native OS notifications.
 - **Exit:** UI matches the "Magic Notes" aesthetic; interactions are fluid.
+- **Status (2025-11-25):** Completed — premium components added (`RecordingCard`, `SplitView`) in shared UI package, Sonner toasts restyled to glassy/gradient look; globals already carry tokens and shadows.
 
 ### Phase 27 — Adaptive UX Engine
 
@@ -821,6 +827,7 @@ _Status 23 Nov 2025:_ Backend + frontend ✅. `minute_task` table + Alembic migr
      - **Tabs:** "General", "Care Assessment", "Supervision", "Care Review".
   3. Implement "One-Tap Mode Switch": Toggle between "In-Person" and "Online" recording modes.
 - **Exit:** App adapts navigation and layout based on logged-in user role and task.
+- **Status (2025-11-25):** Completed — PersonaProvider added with role-aware default + local override; transcription view now has one-tap mode switch (social worker vs manager) that renames/hides tabs contextually (manager view hides translations, summary renamed).
 
 #### Phase 27B — Role-Specific Dashboards
 - **Objective:** Provide tailored home screens for different user needs.
@@ -833,6 +840,7 @@ _Status 23 Nov 2025:_ Backend + frontend ✅. `minute_task` table + Alembic migr
      - **Focus:** "Team Activity" (Charts), "Flagged Reviews".
   3. Update `app/page.tsx` to render the correct dashboard component.
 - **Exit:** Social workers see tools; Managers see insights; seamless switching.
+- **Status (2025-11-25):** Completed — home now renders persona-driven dashboards: social worker view with quick templates + recent meetings; manager view with insights cards and flagged reviews placeholder; persona switch surfaced on home.
 
 ### Phase 28 — Recording Studio 2.0 (Magic Notes–inspired)
 
@@ -853,6 +861,7 @@ Actions
    - Refine the “Upload audio” journey to feel as integrated as live recording (same metadata form, status chips, and outcomes).
 
 Exit: A social worker can see at a glance whether the app is recording, paused, or saved; the capture flows feel deliberate and calm on both phone and laptop; in‑person vs virtual meetings are clearly labelled throughout.
+- **Status (2025-11-25):** Completed — capture page now shows animated waveform, live status chip with duration, floating pause/resume/stop controls, and consent-backed in-person vs online mode selector persisted into queued metadata. Upload flow polish kept for later if deeper backend support needed.
 
 ### Phase 29 — AI Writing Assistant & Source Check
 

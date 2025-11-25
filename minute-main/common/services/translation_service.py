@@ -5,6 +5,7 @@ import httpx
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
 from common.settings import get_settings
+from common.services.circuit_breaker import breaker
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
@@ -58,13 +59,14 @@ class TranslationService:
         }
         payload = [{"text": text}]
         timeout = httpx.Timeout(30.0, connect=10.0)
-        async with httpx.AsyncClient(timeout=timeout) as client:
-            response = await client.post(self.endpoint, params=params, headers=headers, json=payload)
-            response.raise_for_status()
-            data = response.json()
-            try:
-                return data[0]["translations"][0]["text"]
-            except (IndexError, KeyError) as exc:  # noqa: PERF203
-                raise httpx.HTTPStatusError(
-                    "Unexpected translator response payload", request=response.request, response=response
-                ) from exc
+        async with breaker.guard("azure_translator"):
+            async with httpx.AsyncClient(timeout=timeout) as client:
+                response = await client.post(self.endpoint, params=params, headers=headers, json=payload)
+                response.raise_for_status()
+                data = response.json()
+                try:
+                    return data[0]["translations"][0]["text"]
+                except (IndexError, KeyError) as exc:  # noqa: PERF203
+                    raise httpx.HTTPStatusError(
+                        "Unexpected translator response payload", request=response.request, response=response
+                    ) from exc

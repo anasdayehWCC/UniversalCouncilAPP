@@ -16,6 +16,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Clock, Frown, SearchX } from 'lucide-react'
 import { Skeleton } from '@careminutes/ui'
 import { useFeatureFlagEnabled } from 'posthog-js/react'
+import { usePersona } from '@/providers/PersonaProvider'
 
 import { use } from 'react'
 
@@ -26,6 +27,7 @@ export default function TranscriptionPage({
 }) {
   const { transcriptionId } = use(params)
   const isChatEnabled = useFeatureFlagEnabled(FeatureFlags.ChatEnabled)
+  const { persona, setPersona } = usePersona()
 
   const { data: transcription, isLoading } = useQuery({
     ...getTranscriptionTranscriptionsTranscriptionIdGetOptions({
@@ -156,13 +158,26 @@ export default function TranscriptionPage({
           <span className="rounded-full bg-white/20 px-3 py-1">{subjectLabel}</span>
         )}
       </div>
-      <Tabs defaultValue="summary" className="w-full">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2 text-xs text-white/80">
+          <span className="rounded-full bg-white/10 px-2 py-1">Mode</span>
+          <button
+            type="button"
+            onClick={() => setPersona(persona === 'social_worker' ? 'manager' : 'social_worker')}
+            className="rounded-full bg-white/15 px-3 py-1 text-white hover:bg-white/25 transition"
+          >
+            {persona === 'social_worker' ? 'Social worker view' : 'Manager view'}
+          </button>
+        </div>
+      </div>
+
+      <Tabs defaultValue="summary" className="w-full mt-3">
         <TabsList className="h-12 w-full">
           <TabsTrigger
             value="summary"
             className="border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:shadow-lg focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
-            Meeting summary
+            {persona === 'manager' ? 'Manager summary' : 'Meeting summary'}
           </TabsTrigger>
           <TabsTrigger
             value="transcript"
@@ -170,12 +185,14 @@ export default function TranscriptionPage({
           >
             Transcript
           </TabsTrigger>
-          <TabsTrigger
-            value="translations"
-            className="border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:shadow-lg focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-          >
-            Translations
-          </TabsTrigger>
+          {persona === 'social_worker' && (
+            <TabsTrigger
+              value="translations"
+              className="border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:shadow-lg focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            >
+              Translations
+            </TabsTrigger>
+          )}
           {isChatEnabled && (
             <TabsTrigger
               value="chat"
@@ -191,9 +208,11 @@ export default function TranscriptionPage({
         <TabsContent value="transcript">
           <TranscriptionTab transcription={typedTranscription} />
         </TabsContent>
-        <TabsContent value="translations">
-          <TranslationsTab transcriptionId={transcription.id} />
-        </TabsContent>
+        {persona === 'social_worker' && (
+          <TabsContent value="translations">
+            <TranslationsTab transcriptionId={transcription.id} />
+          </TabsContent>
+        )}
         {isChatEnabled && (
           <TabsContent value="chat">
             <ChatTab transcription={typedTranscription} />

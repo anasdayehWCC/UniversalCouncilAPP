@@ -10,6 +10,7 @@ from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_ex
 
 from common.database.postgres_models import Recording
 from common.services.exceptions import TranscriptionFailedError
+from common.services.circuit_breaker import breaker
 from common.services.transcription_services.adapter import AdapterType, TranscriptionAdapter
 from common.services.transcription_services.azure_common import TOO_MANY_REQUESTS, convert_to_dialogue_entries
 from common.services.transcription_services.lexicon import build_phrase_list
@@ -95,8 +96,9 @@ class AzureSpeechAdapter(TranscriptionAdapter):
             )
         with sentry_sdk.start_transaction(op="process", name="post_file_to_azure_transcribe") as transaction:
             transaction.set_data("file_size", audio_file_path_or_recording.stat().st_size)
-            async with httpx.AsyncClient(timeout=timeout_settings) as client:
-                response = await client.post(url, headers=headers, files=files, params=params)
+            async with breaker.guard("azure_speech"):
+                async with httpx.AsyncClient(timeout=timeout_settings) as client:
+                    response = await client.post(url, headers=headers, files=files, params=params)
                 if response.status_code == TOO_MANY_REQUESTS:
                     response.raise_for_status()
 

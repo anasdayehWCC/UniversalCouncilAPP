@@ -11,6 +11,8 @@ import { CaseCacheProvider } from '@/providers/case-cache-provider'
 import { ApiProvider } from '@/providers/ApiProvider'
 import { useAccessToken } from '@/hooks/use-access-token'
 import { DevPreviewProvider } from '@/lib/dev-preview-provider'
+import { ResilienceProvider } from '@/providers/ResilienceProvider'
+import { PersonaProvider } from '@/providers/PersonaProvider'
 
 export const ProviderShell = ({ children }: { children: ReactNode }) => {
   const { accessToken } = useAccessToken()
@@ -20,17 +22,21 @@ export const ProviderShell = ({ children }: { children: ReactNode }) => {
       <OrgThemeSetter />
       <ApiProvider token={accessToken}>
         <TanstackQueryProvider>
-          <PosthogProvider>
-            <LockNavigationProvider>
-              <RecordingDbProvider>
-                <CaseCacheProvider>
-                  <DevPreviewProvider>
-                    {children}
-                  </DevPreviewProvider>
-                </CaseCacheProvider>
-              </RecordingDbProvider>
-            </LockNavigationProvider>
-          </PosthogProvider>
+          <ResilienceProvider token={accessToken}>
+            <PersonaProvider>
+              <PosthogProvider>
+                <LockNavigationProvider>
+                  <RecordingDbProvider>
+                    <CaseCacheProvider>
+                      <DevPreviewProvider>
+                        {children}
+                      </DevPreviewProvider>
+                    </CaseCacheProvider>
+                  </RecordingDbProvider>
+                </LockNavigationProvider>
+              </PosthogProvider>
+            </PersonaProvider>
+          </ResilienceProvider>
         </TanstackQueryProvider>
       </ApiProvider>
     </ThemeProvider>

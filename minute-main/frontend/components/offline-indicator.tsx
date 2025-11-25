@@ -1,13 +1,11 @@
 'use client';
 
-import { useSyncManager } from '@/hooks/use-sync-manager';
-import { useAccessToken } from '@/hooks/use-access-token';
 import { Wifi, WifiOff, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useResilience } from '@/providers/ResilienceProvider';
 
 export function OfflineIndicator() {
-    const { accessToken } = useAccessToken();
-    const { isOnline, isSyncing, pendingCount } = useSyncManager(accessToken);
+    const { isOnline, isSyncing, pendingCount, retrySync } = useResilience();
 
     if (isOnline && pendingCount === 0) return null;
 
@@ -31,6 +29,15 @@ export function OfflineIndicator() {
                     <Wifi className="h-4 w-4" />
                     <span>Online</span>
                 </>
+            )}
+            {!isSyncing && pendingCount > 0 && (
+                <button
+                    onClick={retrySync}
+                    className="ml-1 rounded-full bg-white/20 px-2 py-1 text-xs font-semibold hover:bg-white/30"
+                    type="button"
+                >
+                    Retry sync
+                </button>
             )}
         </div>
     );

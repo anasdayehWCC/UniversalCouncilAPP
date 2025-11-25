@@ -7,6 +7,9 @@ import { getIcon } from '@/lib/icon-registry';
 import { Skeleton } from '@careminutes/ui';
 import { useQuery } from '@tanstack/react-query';
 import { getUserModulesModulesGetOptions } from '@/lib/client/@tanstack/react-query.gen';
+import { Button } from '@careminutes/ui';
+import { RefreshCw } from 'lucide-react';
+import { useResilience } from '@/providers/ResilienceProvider';
 
 interface NavItem {
     label: string;
@@ -21,12 +24,14 @@ const FALLBACK_NAV: NavItem[] = [
     { label: 'Record', href: '/record', icon: 'Mic', fab: true },
     { label: 'Notes', href: '/transcriptions', icon: 'FileText' },
     { label: 'Tasks', href: '/tasks', icon: 'CheckSquare' },
+    { label: 'Insights', href: '/insights', icon: 'BarChart3' },
 ];
 
 export function BottomNav() {
     const pathname = usePathname();
+    const { isDegraded } = useResilience();
 
-    const { data: moduleData, isLoading, isError } = useQuery({
+    const { data: moduleData, isLoading, isError, refetch } = useQuery({
         ...getUserModulesModulesGetOptions(),
         staleTime: 5 * 60 * 1000,
     });
@@ -47,10 +52,19 @@ export function BottomNav() {
 
     return (
         <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-t border-white/20 pb-safe z-50">
-            {isError && (
-                <p className="absolute -top-8 left-4 right-4 rounded-xl border border-amber-200 bg-amber-50/80 px-3 py-1 text-center text-[11px] text-amber-700">
-                    Offline? Showing default navigation.
-                </p>
+            {(isError || isDegraded) && (
+                <div className="absolute -top-10 left-4 right-4 flex items-center justify-between rounded-xl border border-amber-200 bg-amber-50/80 px-3 py-1 text-[11px] text-amber-700">
+                    <span>Navigation fallback (offline or API unreachable)</span>
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 px-2 text-[11px]"
+                        onClick={() => refetch()}
+                    >
+                        <RefreshCw className="mr-1 h-3 w-3" />
+                        Retry
+                    </Button>
+                </div>
             )}
             <div className="flex items-center justify-around px-2 py-2">
                 {navItems.map((item) => {
@@ -74,15 +88,17 @@ export function BottomNav() {
                         <Link
                             key={item.href}
                             href={item.href}
-                            className={cn(
-                                "flex flex-col items-center gap-1 p-2 min-w-[64px] rounded-lg transition-colors",
-                                isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
-                            )}
-                        >
-                            <IconComponent className={cn("w-5 h-5", isActive && "fill-current")} />
-                            <span className="text-[10px] font-medium">{item.label}</span>
-                        </Link>
-                    );
+                                className={cn(
+                                    "flex flex-col items-center gap-1 p-2 min-w-[64px] rounded-lg transition-colors",
+                                    isActive ? "text-primary" : "text-muted-foreground hover:text-foreground",
+                                    (isError || isDegraded) && "opacity-60",
+                                )}
+                                aria-disabled={isError || isDegraded}
+                            >
+                                <IconComponent className={cn("w-5 h-5", isActive && "fill-current")} />
+                                <span className="text-[10px] font-medium">{item.label}</span>
+                            </Link>
+                        );
                 })}
             </div>
         </nav>

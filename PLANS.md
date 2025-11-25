@@ -127,12 +127,15 @@
 - [x] Phase 22B Task Management Frontend — Completed 2025-11-23T02:15Z (Minute editor tasks panel w/ inline edits + push-to-Planner CTA, Add Task dialog, dynamic navigation now consumes `/api/modules`, and new `/tasks` page with filters + inline status updates)
 - [x] Phase 23A Mobile Core/State — Completed 2025-11-24T14:15Z (Abstracted offline queue to `packages/core/storage`, implemented Dexie adapter for Web, Mobile adapter stub, wired up frontend and mobile app)
 - [x] Phase 23B Mobile UI Implementation — Completed 2025-11-24T14:45Z (Expo app initialized, Capture/List screens implemented, SQLite adapter active, Sync logic added)
-- [ ] Phase 24A Frontend Resilience — pending
-- [ ] Phase 24B Backend Circuit Breakers — pending
-- [ ] Phase 25A Insights Backend — pending
-- [ ] Phase 25B Insights Frontend — pending
-- [ ] Phase 26A Premium App Shell — pending
-- [ ] Phase 26B Premium UI Kit — pending
+- [x] Phase 24A Frontend Resilience — Completed 2025-11-25T10:15Z (global AppErrorBoundary with Sentry capture, resilience banner for offline/API outages, retry controls on query errors, degraded/fallback nav styling, offline indicator reusing shared connectivity state)
+- [x] Phase 24B Backend Circuit Breakers — Completed 2025-11-25T11:05Z (shared in-process circuit breaker guarding Azure Speech batch/sync, Translator, and MS Graph; `/health/ready` now reports degraded status; new `/health/detailed` surfaces breaker state without failing readiness)
+- [x] Phase 25A Insights Backend — Completed 2025-11-25T12:05Z (insights service computes audio minutes/time-saved heuristic + top topics; new `/api/insights` endpoint scoped by org/domain; no schema change, ready for scheduled jobs)
+- [x] Phase 25B Insights Frontend — Completed 2025-11-25T12:45Z (new `/insights` page showing time saved/audio totals/avg length and top topics; uses TanStack query fetcher to `/api/proxy/insights`; fallback nav now includes Insights for non-config environments)
+- [x] Phase 26A Premium App Shell — Completed 2025-11-25T13:05Z (collapsible glass sidebar with animated width, blurred header overlay with toggle control; Framer Motion template retained; viewTransition already enabled; mobile FAB nav preserved)
+- [x] Phase 26B Premium UI Kit — Completed 2025-11-25T13:40Z (shared UI gained RecordingCard + SplitView components, Sonner toasts restyled to premium glass; ready for reuse across capture/transcription flows)
+- [x] Phase 27A Adaptive UX Engine — Completed 2025-11-25T14:05Z (PersonaProvider with role/local fallback, one-tap persona switch on transcription view, contextual tabs that adapt for managers vs social workers)
+- [x] Phase 27B Role-Specific Dashboards — Completed 2025-11-25T14:45Z (home renders persona-driven dashboards; SW view with quick templates + recent meetings; manager view with insights cards and flagged reviews placeholder; persona switch surfaced on home)
+- [x] Phase 28A Recording Studio 2.0 — Completed 2025-11-25T15:35Z (capture page gained animated waveform, live floating controls, consent-backed in-person vs online selector persisted to queue metadata; upload flow polish deferred only if backend support required)
 - [ ] Phase 27A Adaptive UX Engine — pending
 - [ ] Phase 27B Role-Specific Dashboards — pending
 

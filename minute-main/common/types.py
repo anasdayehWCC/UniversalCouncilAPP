@@ -408,3 +408,18 @@ class TranslationStatusEntry(BaseModel):
 
 class TranslationListResponse(BaseModel):
     translations: list[TranslationStatusEntry]
+
+
+class TopicTrend(BaseModel):
+    topic: str
+    count: int
+
+
+class InsightsResponse(BaseModel):
+    status: str = "ok"
+    audio_minutes: float
+    time_saved_minutes: float
+    transcription_count: int
+    minute_count: int
+    avg_audio_minutes: float
+    topics: list[TopicTrend] = []

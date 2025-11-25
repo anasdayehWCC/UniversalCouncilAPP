@@ -5,6 +5,26 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
 @plugin "@tailwindcss/typography";
 
+/* Animated waveform for capture page */
+.animate-wave {
+  animation-name: wavePulse;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+  animation-duration: 1.2s;
+}
+
+@keyframes wavePulse {
+  0% {
+    height: 15%;
+  }
+  50% {
+    height: 90%;
+  }
+  100% {
+    height: 20%;
+  }
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

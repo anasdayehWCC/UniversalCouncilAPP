@@ -13,6 +13,7 @@ from azure.storage.blob import BlobClient, ContainerClient, ContainerSasPermissi
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from common.database.postgres_models import DialogueEntry, Recording
+from common.services.circuit_breaker import breaker
 from common.services.storage_services import get_storage_service
 from common.services.transcription_services.adapter import AdapterType, TranscriptionAdapter
 from common.services.transcription_services.azure_common import speaker_from_entry
@@ -117,10 +118,11 @@ class AzureBatchTranscriptionAdapter(TranscriptionAdapter):
                     "Skipping phrase list for batch transcription (not supported); set custom model for domain instead",
                 )
 
-        async with httpx.AsyncClient(timeout=timeout_settings) as client:
-            response = await client.post(submit_url, headers=headers, json=data, params=params)
-            if response.status_code != 201:  # noqa: PLR2004
-                response.raise_for_status()
+        async with breaker.guard("azure_speech_batch"):
+            async with httpx.AsyncClient(timeout=timeout_settings) as client:
+                response = await client.post(submit_url, headers=headers, json=data, params=params)
+                if response.status_code != 201:  # noqa: PLR2004
+                    response.raise_for_status()
 
         return TranscriptionJobMessageData(transcription_service=cls.name, job_name=response.json()["self"])
 
@@ -131,10 +133,11 @@ class AzureBatchTranscriptionAdapter(TranscriptionAdapter):
         stop=stop_after_attempt(5),
     )
     async def get_results(cls, files_url: str, data: TranscriptionJobMessageData) -> TranscriptionJobMessageData:
-        async with httpx.AsyncClient(timeout=timeout_settings) as client:
-            files_response = await client.get(files_url, headers=headers, params=params)
-            if files_response.status_code != 200:  # noqa: PLR2004
-                files_response.raise_for_status()
+        async with breaker.guard("azure_speech_batch"):
+            async with httpx.AsyncClient(timeout=timeout_settings) as client:
+                files_response = await client.get(files_url, headers=headers, params=params)
+                if files_response.status_code != 200:  # noqa: PLR2004
+                    files_response.raise_for_status()
 
             result = None
             values = files_response.json().get("values")

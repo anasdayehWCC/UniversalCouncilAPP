@@ -54,7 +54,7 @@ export function MinuteStatusBadge({
         config.borderColor,
         sizeClasses[size],
         // Glassmorphism enhancement for pending_review
-        status === 'pending_review' && 'animate-pulse',
+        status === 'pending_review' && 'animate-pulse motion-reduce:animate-none',
         className
       )}
     >
@@ -87,7 +87,7 @@ export function MinuteStatusDot({
         className={cn(
           'w-2 h-2 rounded-full',
           config.bgColor,
-          status === 'pending_review' && 'animate-pulse'
+          status === 'pending_review' && 'animate-pulse motion-reduce:animate-none'
         )} 
       />
       <span className={cn('text-sm', config.color)}>

@@ -183,7 +183,7 @@ export function SearchResults<T>({
         {[...Array(3)].map((_, i) => (
           <div
             key={i}
-            className="h-16 bg-muted/50 rounded-lg animate-pulse"
+            className="h-16 bg-muted/50 rounded-lg animate-pulse motion-reduce:animate-none"
           />
         ))}
       </div>

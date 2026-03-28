@@ -1,17 +1,69 @@
+# Python
 venv
+.venv
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.mypy_cache
+.pytest_cache
+.ipynb_checkpoints
+/setup.cfg
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Environment files - CRITICAL: Never commit these
+.env
+.env.*
+!.env.example
+.envrc
+
+# Secrets & Credentials - CRITICAL
+*.pem
+*.key
+*.p12
+*.pfx
+*_rsa
+*_dsa
+*_ecdsa
+*_ed25519
+.aws/
+.azure/
+google-credentials.json
+**/google-credentials.json
+credentials.json
+**/credentials.json
+secrets.yaml
+secrets.yml
+service-account*.json
+
+# IDE & Editor
 .DS_Store
 .idea
+.vscode/launch.json
+.vscode/*.log
+*.swp
+*.swo
+*~
 .gcloudignore
-.git
-.venv
-__pycache__/
-/setup.cfg
-.ipynb_checkpoints
-# *.ipynb
-.env
 Brewfile.lock.json
-*.pdf
-.mypy_cache
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+openapi-ts-error-*.log
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
 
 # Terraform
 **/.terraform/*
@@ -109,3 +161,36 @@ config/google-credentials.json
 /test-results/
 /playwright-report/
 /playwright/.cache/
+
+# Coverage & Testing
+coverage/
+.coverage
+htmlcov/
+.nyc_output
+junit.xml
+
+# Cache directories  
+.cache/
+.parcel-cache/
+.turbo/
+.eslintcache
+
+# Build outputs & artifacts
+dist/
+build/
+out/
+artifacts/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# OS-specific
+Thumbs.db
+Desktop.ini
+
+# Local development
+.data
+local/
+*.local

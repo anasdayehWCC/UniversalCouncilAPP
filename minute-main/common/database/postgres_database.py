@@ -88,131 +88,89 @@ async def async_session_factory():
 
 
 def cleanup_failed_records():
-    """clear records based on each user's retention period setting."""
-    logger.info("Starting stalled object cleanup process")
+    """
+    DEPRECATED: Use retention_service.run_consolidated_retention_cleanup() instead.
+    
+    This function is kept for backwards compatibility but is no longer called by the scheduler.
+    """
+    logger.warning("cleanup_failed_records() is deprecated - use retention_service instead")
+    from common.services.retention_service import cleanup_failed_records as new_cleanup
     with Session(engine) as session:
-        for object_type in [MinuteVersion, Transcription]:
-            # delete after 24 hrs if not successful
-            cutoff_date = datetime.now(tz=ZoneInfo("Europe/London")) - timedelta(days=1)
-            update_stmt = (
-                update(object_type)
-                .where(
-                    and_(
-                        object_type.created_datetime < cutoff_date,
-                        or_(
-                            object_type.status == JobStatus.IN_PROGRESS, object_type.status == JobStatus.AWAITING_START
-                        ),
-                    )
-                )
-                .values(status=JobStatus.FAILED, error="Unknown error. Job finalised by cleanup process")
-            )
-            result = session.exec(update_stmt)
-            session.commit()
-            logger.info(
-                f"updated {result.rowcount} old {object_type.__qualname__} that were not successfully processed"  # noqa: G004
-            )
-
-    logger.info("Stalled record cleanup process completed")
+        new_cleanup(session)
 
 
 def cleanup_old_records():
-    """Delete records based on each user's retention period setting."""
-    logger.info("Starting data retention cleanup process")
-    with Session(engine) as session:
-        deletion_tasks = []
-        now = datetime.now(tz=ZoneInfo("Europe/London"))
+    """
+    DEPRECATED: Use retention_service.run_consolidated_retention_cleanup() instead.
+    
+    This function had a critical bug where database records were deleted even when
+    blob deletion failed (due to the try/finally pattern). The new retention service
+    fixes this by deleting blobs FIRST, then database records only on success.
+    """
+    logger.warning("cleanup_old_records() is deprecated - use retention_service instead")
+    # Do not call the old logic - it has the bug where DB deletes even if blob deletion fails
 
-        policies = session.exec(select(RetentionPolicy)).all()
-        for policy in policies:
-            recording_filters = []
-            transcription_filters = []
-            minute_filters = []
-            if policy.organisation_id:
-                recording_filters.append(Recording.organisation_id == policy.organisation_id)
-                transcription_filters.append(Transcription.organisation_id == policy.organisation_id)
-                minute_filters.append(Minute.organisation_id == policy.organisation_id)
-            if policy.service_domain_id:
-                recording_filters.append(Recording.service_domain_id == policy.service_domain_id)
-                transcription_filters.append(Transcription.service_domain_id == policy.service_domain_id)
-                minute_filters.append(Minute.service_domain_id == policy.service_domain_id)
 
-            if policy.audio_retention_days:
-                cutoff = now - timedelta(days=policy.audio_retention_days)
-                recs = session.exec(
-                    select(Recording).where(*recording_filters, Recording.created_datetime < cutoff)
-                ).all()
-                for recording in recs:
-                    try:
-                        deletion_tasks.append(asyncio.create_task(storage_service.delete(recording.s3_file_key)))
-                    finally:
-                        session.delete(recording)
-                session.commit()
-
-            if policy.transcript_retention_days:
-                cutoff = now - timedelta(days=policy.transcript_retention_days)
-                transcripts = session.exec(
-                    select(Transcription).where(*(transcription_filters), Transcription.created_datetime < cutoff)
-                ).all()
-                for t in transcripts:
-                    session.delete(t)
-                session.commit()
-
-            if policy.minute_retention_days:
-                cutoff = now - timedelta(days=policy.minute_retention_days)
-                minutes = session.exec(
-                    select(Minute).where(*(minute_filters), Minute.created_datetime < cutoff)
-                ).all()
-                for m in minutes:
-                    session.delete(m)
-                session.commit()
-        # Get all users who have a retention period set
-        users = session.exec(select(User)).all()
-        logger.info(
-            f"Found {len(users)} users"  # noqa: G004
-        )
-
-        for user in users:
-            # delete after 24 hrs always for cabinet and dsit
-            cutoff_date = None
-            parts = user.email.split("@")
-            # assume the email is well formed. If not use the whole thing
-            domain = parts[1].lower() if len(parts) == 2 else user.email.lower()  # noqa: PLR2004
-            if len(parts) == 2 and ("cabinetoffice" in domain or "dsit" in domain):  # noqa: PLR2004
-                cutoff_date = datetime.now(tz=ZoneInfo("Europe/London")) - timedelta(days=1)
-            elif user.data_retention_days:
-                cutoff_date = datetime.now(tz=ZoneInfo("Europe/London")) - timedelta(days=user.data_retention_days)
-            if cutoff_date:
-                # Delete old transcriptions for this user
-                delete_stmt = delete(Transcription).where(
-                    Transcription.user_id == user.id,
-                    Transcription.created_datetime < cutoff_date,
-                )
-                result = session.exec(delete_stmt)
-                session.commit()
-                logger.info(
-                    f"Deleted {result.rowcount} old transcriptions for user {user.id} (retention: {user.data_retention_days} days)"  # noqa: G004, E501
-                )
-
-        recordings = session.exec(select(Recording).where(col(Recording.transcription_id).is_(None))).all()
-        for recording in recordings:
+def _run_retention_cleanup_sync():
+    """
+    Synchronous wrapper for the async retention cleanup service.
+    
+    Used by APScheduler which expects synchronous job functions.
+    """
+    from common.services.retention_service import run_consolidated_retention_cleanup
+    
+    try:
+        with Session(engine) as session:
+            # Run the async cleanup in the existing event loop or create new one
             try:
-                deletion_tasks.append(asyncio.create_task(storage_service.delete(recording.s3_file_key)))
-            finally:
-                session.delete(recording)
-        session.commit()
-        if deletion_tasks:
-            asyncio.get_event_loop().run_until_complete(asyncio.gather(*deletion_tasks))
-    logger.info("Data retention cleanup process completed")
+                loop = asyncio.get_event_loop()
+            except RuntimeError:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+            
+            loop.run_until_complete(run_consolidated_retention_cleanup(session))
+    except Exception as exc:
+        logger.exception(f"Retention cleanup job failed: {exc}")
 
 
 def init_cleanup_scheduler():
-    """Initialize the scheduler to run cleanup daily."""
-    # Run cleanup immediately on startup
-    cleanup_old_records()
-    cleanup_failed_records()
+    """
+    Initialize the consolidated retention cleanup scheduler.
+    
+    Uses a SINGLE scheduled job with distributed locking to prevent concurrent runs.
+    Replaces the previous separate cleanup_old_records() and cleanup_failed_records() jobs.
+    
+    Configuration:
+        - RETENTION_CLEANUP_ENABLED: Enable/disable cleanup (default: True)
+        - RETENTION_CLEANUP_INTERVAL_HOURS: Hours between runs (default: 24)
+        - RETENTION_LOCK_TIMEOUT_SECONDS: Lock timeout (default: 300)
+        - STORAGE_DELETE_MAX_RETRIES: Blob deletion retries (default: 3)
+    """
+    if not settings.RETENTION_CLEANUP_ENABLED:
+        logger.info("Retention cleanup scheduler disabled via RETENTION_CLEANUP_ENABLED=False")
+        return
+    
     scheduler = BackgroundScheduler()
-    # Schedule daily cleanup
-    scheduler.add_job(cleanup_old_records, "interval", days=1)
-    scheduler.add_job(cleanup_failed_records, "interval", days=1)
+    
+    # Single consolidated cleanup job
+    interval_hours = settings.RETENTION_CLEANUP_INTERVAL_HOURS
+    scheduler.add_job(
+        _run_retention_cleanup_sync,
+        "interval",
+        hours=interval_hours,
+        id="consolidated_retention_cleanup",
+        name="Consolidated Retention Cleanup (with locking)",
+        max_instances=1,  # Prevent overlapping runs
+        coalesce=True,    # If multiple runs are pending, combine them
+    )
+    
     scheduler.start()
-    logger.info("cleanup scheduler initialized")
+    
+    logger.info(
+        f"Retention cleanup scheduler initialized: running every {interval_hours} hours "
+        f"(lock timeout: {settings.RETENTION_LOCK_TIMEOUT_SECONDS}s, "
+        f"max retries: {settings.STORAGE_DELETE_MAX_RETRIES})"
+    )
+    
+    # Optional: Run cleanup immediately on startup (useful for testing)
+    # _run_retention_cleanup_sync()

@@ -64,28 +64,32 @@ markdownify = "^1.2.0"
 python-multipart = "^0.0.20"
 azure-servicebus = "^7.14.2"
 azure-keyvault-secrets = "^4.9.0"
+azure-identity = "^1.23.1"
+azure-storage-blob = "^12.26.0"
 prometheus-client = "^0.21.0"
 prometheus-fastapi-instrumentator = "^7.0.0"
 python-json-logger = "^3.2.1"
 python-docx = "^1.1.2"
 weasyprint = "^62.3"
+openai = "^1.42.0"
+ffmpeg-python = "^0.2.0"
+redis = "^5.0.0"
 
 [tool.poetry.group.backend.dependencies]
 pyjwt = "^2.9.0"
 posthog = "^6.6.1"
 uvicorn = "^0.31.0"
 
+[tool.poetry.group.worker]
+optional = true
+
 [tool.poetry.group.worker.dependencies]
 google-genai = "^1.10.0"
-openai = "^1.42.0"
-ffmpeg-python = "^0.2.0"
 ray = {extras = ["default"], version = "^2.47.1"}
-azure-storage-blob = "^12.26.0"
-azure-identity = "^1.23.1"
 
 [tool.poetry.group.dev.dependencies]
-bumpversion = "^0.6.0"
-pre-commit = "^3.8.0"
+bump-my-version = "^1.2.4"
+pre-commit = "^4.0.1"
 pytest = "^8.3.2"
 pytest-env = "^1.1.1"
 pytest-mock = "^3.14.0"
@@ -97,7 +101,7 @@ bandit = "^1.7.9"
 detect-secrets = "^1.5.0"
 playwright = "^1.45"
 pytest-playwright = "^0.5"
-diagrams = "^0.23.4"
+diagrams = "^0.24.4"
 ipykernel = "^6.29.5"
 #needed for running llm related tests
 beautifulsoup4 = "^4.13.3"

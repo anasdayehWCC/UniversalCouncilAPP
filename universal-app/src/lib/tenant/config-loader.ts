@@ -286,6 +286,21 @@ export async function reloadConfig(tenantId?: string): Promise<ConfigLoadResult>
 // Configuration Overrides
 // ============================================================================
 
+function mergeDefinedValues<T extends object>(
+  base: T,
+  overrides: Partial<T>
+): T {
+  const merged = { ...base } as T;
+
+  for (const [key, value] of Object.entries(overrides)) {
+    if (value !== undefined) {
+      merged[key as keyof T] = value as T[keyof T];
+    }
+  }
+
+  return merged;
+}
+
 /**
  * Apply runtime overrides to a configuration
  */
@@ -297,10 +312,15 @@ export function applyConfigOverrides(
 
   // Apply feature flag overrides
   if (overrides.featureFlags) {
-    result.featureFlags = {
-      ...result.featureFlags,
-      ...overrides.featureFlags,
-    };
+    const nextFeatureFlags = { ...result.featureFlags };
+
+    for (const [flag, value] of Object.entries(overrides.featureFlags)) {
+      if (typeof value === 'boolean') {
+        nextFeatureFlags[flag] = value;
+      }
+    }
+
+    result.featureFlags = nextFeatureFlags;
   }
 
   // Apply module status overrides
@@ -313,22 +333,40 @@ export function applyConfigOverrides(
 
   // Apply branding overrides
   if (overrides.branding) {
-    result.branding = {
-      ...result.branding,
-      ...overrides.branding,
-      theme: {
-        ...result.branding.theme,
-        ...overrides.branding.theme,
-      },
-    };
+    result.branding = mergeDefinedValues<typeof result.branding>(
+      result.branding,
+      overrides.branding
+    );
+
+    if (overrides.branding.theme) {
+      result.branding.theme = mergeDefinedValues<typeof result.branding.theme>(
+        result.branding.theme,
+        overrides.branding.theme
+      );
+    }
   }
 
   // Apply environment overrides
   if (overrides.environment) {
-    result.environment = {
-      ...result.environment,
-      ...overrides.environment,
-    };
+    if (result.environment) {
+      result.environment = mergeDefinedValues(
+        result.environment,
+        overrides.environment
+      );
+    } else if (
+      typeof overrides.environment.apiBaseUrl === 'string' &&
+      typeof overrides.environment.authProvider === 'string'
+    ) {
+      result.environment = {
+        apiBaseUrl: overrides.environment.apiBaseUrl,
+        authProvider: overrides.environment.authProvider,
+        azureAdTenantId: overrides.environment.azureAdTenantId,
+        azureAdClientId: overrides.environment.azureAdClientId,
+        posthogKey: overrides.environment.posthogKey,
+        sentryDsn: overrides.environment.sentryDsn,
+        debug: overrides.environment.debug,
+      };
+    }
   }
 
   return result;

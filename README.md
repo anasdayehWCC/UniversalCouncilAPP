@@ -2,7 +2,7 @@
 
 A multi-tenant, department-aware platform for council services. The same codebase serves multiple departments (Children's Social Care, Adult Social Care, Housing, etc.) with navigation, templates, and behavior driven by configuration rather than code forks.
 
-The root repository is the only local git context. `universal-app/` is the canonical web frontend, `apps/mobile/` is the canonical mobile app, and `minute-main/frontend/` is a frozen legacy reference used only for parity checks and migration planning.
+The root repository is the only local git context. `universal-app/` is the canonical web frontend, `apps/mobile/` is the canonical mobile app, and `minute-main/frontend/` is a frozen legacy reference used only for parity checks and migration planning. Docker files still exist for legacy infrastructure, but Docker is not the canonical local development workflow anymore.
 
 ## Repository Structure
 
@@ -63,17 +63,38 @@ pnpm dev:mobile
 pnpm typecheck:mobile
 ```
 
-### Backend / worker (Poetry)
+### Backend / worker (Poetry, direct local workflow)
 ```bash
 cd minute-main
-poetry install --with dev
+poetry install --with dev --without worker
+QUEUE_SERVICE_NAME=noop STORAGE_SERVICE_NAME=local poetry run uvicorn backend.main:app --reload --port 8080
+```
+
+```bash
+cd minute-main
+poetry run pytest tests/test_health.py tests/test_export_handler_service.py tests/test_cost_guard.py tests/test_security_headers.py
+```
+
+### Worker runtime (legacy Ray path, not required for day-to-day web development)
+```bash
+cd minute-main
+poetry install --with dev,worker
+QUEUE_SERVICE_NAME=noop STORAGE_SERVICE_NAME=local poetry run python worker/main.py
+```
+
+### Local Postgres
+Use a locally installed PostgreSQL instance on the MacBook as the canonical non-Docker database dependency. Docker Compose is legacy-only and should not be the default setup path for new work.
+
+### Backend smoke tests
+```bash
+cd minute-main
 poetry run pytest tests/test_health.py tests/test_export_handler_service.py tests/test_cost_guard.py tests/test_security_headers.py
 ```
 
 ## Scripts
 - `scripts/setup-frontend.sh` — install the root pnpm workspace and run the canonical web build
 - `scripts/dev-frontend.sh` — start the canonical web frontend from the root workspace
-- `scripts/check-openapi-drift.sh` — regenerate the `universal-app` OpenAPI client and check for drift
+- `scripts/check-openapi-drift.sh` — regenerate the `universal-app` OpenAPI client and check for drift without discarding local edits
 
 ## Regenerating API Client
 ```bash
@@ -89,13 +110,14 @@ OPENAPI_TS_INPUT=./minute-main/openapi-temp.json pnpm openapi:web
 - `CHANGELOG.md` — canonical change log for the root repository
 - `PLANS.md` — Long-horizon execution plan with phases 1-41
 - `ROADMAP_social_care.md` — Social care delivery roadmap
-- `docs/frontend-parity-matrix.md` — current migration view between `universal-app` and `minute-main/frontend`
+- `docs/frontend-parity-matrix.md` — migration view between `universal-app` and the frozen `minute-main/frontend`, with keep/migrate/retire decisions
 - `minute-main/docs/universal_council_app_foundations.md` — Multi-tenant architecture guide
 - `minute-main/docs/architecture.md` — Technical architecture
 
 ## Conventions
 - Do not run `npm install` inside sub-packages; use `pnpm install` from the repo root
 - Treat `minute-main/frontend` as migration-only and exclude it from new development, CI ownership, and primary setup docs
+- Treat Dockerfiles, Compose files, and image-build workflows as legacy infrastructure until they are removed or archived
 - Navigation is config-driven via `/api/modules` endpoint
 - Users see ONLY modules for their `service_domain` and `role`
 - No council/department-specific code forks allowed

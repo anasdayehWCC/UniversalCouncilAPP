@@ -1,4 +1,4 @@
-name: build-push-frontend
+name: legacy-build-push-web-image
 on:
   workflow_call:
     secrets:
@@ -24,6 +24,7 @@ on:
         required: true
 
 env:
+  # Legacy container-image workflow retained only for compatibility while Docker is being decommissioned.
   ECR_REPO_URL: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/minute-frontend
 
 jobs:

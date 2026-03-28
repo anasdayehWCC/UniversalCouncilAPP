@@ -65,6 +65,8 @@ Assumptions/constraints
 - `apps/mobile/` is the canonical mobile app.
 - `minute-main/backend/` and `minute-main/worker/` remain the production backend and worker bounded context.
 - `minute-main/frontend/` is frozen as a legacy migration reference and should not receive new feature work.
+- Docker, Docker Compose, and image-build workflows are legacy infrastructure and must not be treated as the default local setup path.
+- The canonical local developer workflow is direct-process: `pnpm dev:web` at the repo root, `poetry run uvicorn backend.main:app --reload --port 8080` in `minute-main`, and local PostgreSQL on the MacBook.
 - Historical references below to `frontend/...` describe the legacy `minute-main/frontend` path unless they explicitly point at `universal-app/`.
 
 Vagueness watchlist (keep honest)

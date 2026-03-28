@@ -50,7 +50,7 @@ let defaultTimeout = DEFAULT_TIMEOUT
  * Call this at app startup or when auth state changes.
  */
 export function configureApiClient(config: ApiClientConfig = {}) {
-  const baseUrl = config.baseUrl ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
+  const baseUrl = config.baseUrl ?? process.env.NEXT_PUBLIC_API_URL ?? '/api/proxy'
   
   authToken = config.token ?? null
   maxRetries = config.maxRetries ?? MAX_RETRIES

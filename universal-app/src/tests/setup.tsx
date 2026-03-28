@@ -176,9 +176,9 @@ window.scrollTo = vi.fn();
 
 // Mock requestAnimationFrame
 window.requestAnimationFrame = vi.fn((callback) => {
-  return setTimeout(callback, 0);
+  return setTimeout(callback, 0) as unknown as number;
 });
-window.cancelAnimationFrame = vi.fn((id) => clearTimeout(id));
+window.cancelAnimationFrame = vi.fn((id) => clearTimeout(id as unknown as NodeJS.Timeout));
 
 // Suppress console warnings in tests (optional)
 // vi.spyOn(console, 'warn').mockImplementation(() => {});

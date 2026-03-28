@@ -56,10 +56,10 @@ export const EnhancedInput = React.forwardRef<HTMLTextAreaElement, EnhancedInput
         
         <div className="flex items-center justify-between px-2 pb-2">
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" className="rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100" onClick={onImageClick}>
+            <Button variant="ghost" size="icon" className="rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100" onClick={onImageClick} aria-label="Upload image">
               <ImageIcon className="w-5 h-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100">
+            <Button variant="ghost" size="icon" className="rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100" aria-label="Attach file">
               <Paperclip className="w-5 h-5" />
             </Button>
           </div>
@@ -70,6 +70,7 @@ export const EnhancedInput = React.forwardRef<HTMLTextAreaElement, EnhancedInput
 	                 size="icon" 
 	                 className="rounded-full animate-in zoom-in duration-200"
 	                 onClick={handleSend}
+                   aria-label="Send message"
 	               >
 	                 <Send className="w-4 h-4" />
 	               </Button>
@@ -79,6 +80,7 @@ export const EnhancedInput = React.forwardRef<HTMLTextAreaElement, EnhancedInput
                  size="icon" 
                  className="rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 w-10 h-10"
                  onClick={onMicClick}
+                 aria-label="Voice input"
                >
                  <Mic className="w-5 h-5" />
                </Button>

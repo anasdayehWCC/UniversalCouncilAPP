@@ -324,9 +324,9 @@ export function getStorage(): StorageAdapter {
  * Get the raw Dexie database instance for advanced queries
  * Used by useLiveQuery hooks for reactive data
  */
-export function getDatabase(): UniversalAppDB {
+export function getDatabase(): UniversalAppDB | null {
   if (typeof window === 'undefined') {
-    throw new Error('Database not available in server context');
+    return null;
   }
   return new UniversalAppDB();
 }

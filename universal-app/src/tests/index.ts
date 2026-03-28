@@ -7,8 +7,8 @@
 // Custom render with providers
 export * from './utils/render';
 
-// Testing library utilities
-export * from './utils/testing-library';
+// Testing library utilities (excluding render to avoid conflict)
+export { screen, waitFor, within, fireEvent, act } from './utils/testing-library';
 
 // Mocks
 export * from './mocks';

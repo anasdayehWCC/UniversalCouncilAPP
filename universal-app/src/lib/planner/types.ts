@@ -234,6 +234,8 @@ export interface PlannerTask {
  * Task assignment info
  */
 export interface PlannerTaskAssignment {
+  /** Graph discriminator for planner assignment payloads */
+  '@odata.type'?: string;
   /** Assigned by user ID */
   assignedBy?: PlannerUserInfo;
   /** Assignment timestamp */

@@ -25,35 +25,54 @@ Minute streamlines the traditionally time-intensive process of creating meeting 
 
 ## Development
 
-#### Run the app locally
+### Canonical local workflow
 
-1. copy `.env.example` to a file called `.env`, and fill in the required values
-2. Run `docker compose up --build`
+Docker is no longer the canonical local development path for this repository. The preferred workflow is direct local processes plus a locally installed PostgreSQL instance.
 
-This will build and run 5 containers:
+1. Copy `.env.example` to `.env` and fill in the required values.
+2. Install dependencies:
 
-1. Frontend app hosted at http://localhost:3000
-2. Backend api available at http://localhost:8080
-3. Worker service, which process transcriptions and does not have a public facing url
-4. Postgres database hosted at http:localhost:5432
-5. Localstack to simulate AWS SQS
+```bash
+cd ..
+pnpm install
+cd minute-main
+poetry install --with dev --without worker
+```
 
-#### Set up your development environment:
+3. Run the canonical frontend from the repo root:
 
-We use dev containers to emulate the cloud environment in which Minute is usually deployed.
+```bash
+cd ..
+pnpm dev:web
+```
 
-` docker compose up --watch`
+4. Run the backend directly:
 
-...will sync local file changes to the docker containers and restart them as appropriate. Note that `docker compose down` will revert the containers to their base state. See [this issue](https://github.com/docker/compose/issues/11102)
+```bash
+cd minute-main
+QUEUE_SERVICE_NAME=noop STORAGE_SERVICE_NAME=local poetry run uvicorn backend.main:app --reload --port 8080
+```
 
-## Performance (Mac/Apple Silicon)
+5. Run backend smoke tests directly:
 
-To ensure optimal performance on macOS (especially M1/M2/M3 chips), configure **Docker Desktop** as follows:
+```bash
+cd minute-main
+poetry run pytest tests/test_health.py tests/test_export_handler_service.py tests/test_cost_guard.py tests/test_security_headers.py
+```
 
-1.  **File Sharing**: Go to `Settings > General` and ensure "Choose File Sharing Implementation" is set to **VirtioFS**. This drastically improves build and reload speeds.
-2.  **Virtual Machine**: Go to `Settings > General` and enable **"Use Docker VMM (Beta)"** if available (Docker Desktop 4.35+).
-3.  **Rosetta**: Go to `Settings > Resources` and ensure **"Use Rosetta for x86/amd64 emulation on Apple Silicon"** is enabled.
-4.  **Resources**: Allocate at least **4 CPUs** and **8GB RAM** in `Settings > Resources` for smooth operation of the 5 containers.
+### Optional worker runtime
+
+The current worker still uses the legacy Ray runtime. It is not required for day-to-day frontend and backend development.
+
+```bash
+cd minute-main
+poetry install --with dev,worker
+QUEUE_SERVICE_NAME=noop STORAGE_SERVICE_NAME=local poetry run python worker/main.py
+```
+
+### Legacy Docker workflow
+
+`docker compose`, Dockerfiles, and image-build workflows remain in the repository only as legacy infrastructure while they are being decommissioned. Do not treat them as the source of truth for new setup instructions or developer workflows.
 
 ## Project structure
 
@@ -73,7 +92,7 @@ The worker reads from the queue and executes transcription/file conversion/llm c
 
 #### Architecture diagram
 
-Minute was developed to run on AWS and/or Azure, with abstractions available for message queues and cloud storage.
+Minute was developed to run on AWS and/or Azure, with abstractions available for message queues and cloud storage. That deployment history does not change the canonical local developer workflow, which is now direct-process and non-Docker.
 
 <img src="minute_architecture_diagram.png" height="800" alt="Minute architecture diagram"/>
 

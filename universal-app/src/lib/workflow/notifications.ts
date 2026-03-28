@@ -80,6 +80,7 @@ function createWorkflowNotification(
       actorAvatar: actor.avatarUrl,
     },
     actions,
+    dismissible: true,
   };
 }
 

@@ -194,6 +194,25 @@ class Settings(BaseSettings):
         default_factory=list,
     )
 
+    # Retry and resilience configuration
+    MAX_RETRIES: int = Field(description="Maximum number of retry attempts for worker jobs", default=3)
+    BACKOFF_BASE: float = Field(description="Base delay in seconds for exponential backoff", default=2.0)
+    MAX_BACKOFF_DELAY: float = Field(description="Maximum delay between retries in seconds", default=300.0)
+
+    # Idempotency configuration
+    REDIS_URL: str | None = Field(
+        description="Redis connection URL for idempotency tracking (e.g., redis://localhost:6379/0)",
+        default=None,
+    )
+    IDEMPOTENCY_COMPLETION_TTL: int = Field(
+        description="TTL in seconds for completed job idempotency keys to prevent immediate reprocessing",
+        default=86400,  # 24 hours
+    )
+    ENABLE_JOB_DEDUPLICATION: bool = Field(
+        description="Enable Redis-based job deduplication to prevent duplicate processing",
+        default=True,
+    )
+
     FAST_LLM_PROVIDER: str = Field(
         description="Fast LLM provider to use. Currently 'openai' or 'gemini' are supported. Note that this should be "
         "used for low complexity LLM tasks, like AI edits",
@@ -282,6 +301,32 @@ class Settings(BaseSettings):
     LOCAL_STORAGE_PATH: str = Field(
         default="/tmp",  # noqa: S108
         description="The folder where the data directory is mounted for the local storage service.",
+    )
+
+    # Retention cleanup configuration
+    RETENTION_CLEANUP_ENABLED: bool = Field(
+        default=True,
+        description="Enable scheduled retention cleanup jobs",
+    )
+    RETENTION_CLEANUP_INTERVAL_HOURS: int = Field(
+        default=24,
+        description="Interval in hours between retention cleanup runs",
+    )
+    RETENTION_LOCK_TIMEOUT_SECONDS: int = Field(
+        default=300,
+        description="Timeout for retention cleanup distributed lock (prevents concurrent runs)",
+    )
+    STORAGE_DELETE_MAX_RETRIES: int = Field(
+        default=3,
+        description="Maximum retry attempts for storage blob deletion with exponential backoff",
+    )
+    STORAGE_DELETE_RETRY_BASE_SECONDS: float = Field(
+        default=2.0,
+        description="Base delay in seconds for exponential backoff on storage deletion retries",
+    )
+    RETENTION_ORPHAN_THRESHOLD_HOURS: int = Field(
+        default=72,
+        description="Hours to wait before flagging orphaned records for manual cleanup",
     )
 
     # use a dotenv file for local development

@@ -10,6 +10,7 @@ import { ToastProvider } from "@/components/Toast";
 import { ConnectivityIndicator } from "@/components/ConnectivityIndicator";
 import { ResilienceBanner } from "@/components/ResilienceBanner";
 import { ServiceWorkerRegistration } from "@/lib/pwa";
+import { SkipLinks } from "@/components/a11y/SkipLinks";
 
 export const viewport: Viewport = {
   themeColor: [
@@ -88,6 +89,7 @@ export default function RootLayout({
         suppressHydrationWarning
         className={`${inter.variable} ${spaceGrotesk.variable} font-sans bg-slate-50`}
       >
+        <SkipLinks />
         <ServiceWorkerRegistration />
         <ErrorBoundary showDetails={process.env.NODE_ENV === 'development'}>
           <ToastProvider>

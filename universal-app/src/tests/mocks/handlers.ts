@@ -54,7 +54,7 @@ export const transcriptionHandlers = [
     await delay(100);
     return HttpResponse.json({
       transcriptions: mockMeetingsList.map((m) => ({
-        id: m.transcriptId,
+        id: m.id,
         meetingId: m.id,
         title: m.title,
         status: m.status,
@@ -69,7 +69,7 @@ export const transcriptionHandlers = [
   http.get(`${API_BASE}/api/transcriptions/:id`, async ({ params }) => {
     await delay(50);
     const id = params.id as string;
-    const meeting = mockMeetingsList.find((m) => m.transcriptId === id || m.id === id);
+    const meeting = mockMeetingsList.find((m) => m.id === id);
     
     if (!meeting) {
       return HttpResponse.json(
@@ -79,7 +79,7 @@ export const transcriptionHandlers = [
     }
     
     return HttpResponse.json({
-      id: meeting.transcriptId,
+      id: meeting.id,
       meetingId: meeting.id,
       title: meeting.title,
       status: meeting.status,
@@ -119,22 +119,22 @@ export const minutesHandlers = [
     await delay(100);
     return HttpResponse.json({
       minutes: mockMeetingsList
-        .filter((m) => m.minuteId)
+        .filter((m) => m.status !== 'draft')
         .map((m) => ({
-          id: m.minuteId,
-          transcriptionId: m.transcriptId,
+          id: m.id,
+          transcriptionId: m.id,
           title: m.title,
           status: m.status,
           createdAt: m.uploadedAt,
         })),
-      total: mockMeetingsList.filter((m) => m.minuteId).length,
+      total: mockMeetingsList.filter((m) => m.status !== 'draft').length,
     });
   }),
 
   // Get single minute
   http.get(`${API_BASE}/api/minutes/:id`, async ({ params }) => {
     const id = params.id as string;
-    const meeting = mockMeetingsList.find((m) => m.minuteId === id);
+    const meeting = mockMeetingsList.find((m) => m.id === id);
     
     if (!meeting) {
       return HttpResponse.json(
@@ -144,8 +144,8 @@ export const minutesHandlers = [
     }
     
     return HttpResponse.json({
-      id: meeting.minuteId,
-      transcriptionId: meeting.transcriptId,
+      id: meeting.id,
+      transcriptionId: meeting.id,
       title: meeting.title,
       status: meeting.status,
       content: '## Meeting Minutes\n\nAttendees: Social Worker, Parent, Child',

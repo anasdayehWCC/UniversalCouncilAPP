@@ -496,7 +496,7 @@ export function mergeSchemas<
 >(
   schema1: z.ZodObject<T>,
   schema2: z.ZodObject<U>
-): z.ZodObject<T & U> {
+){
   return schema1.merge(schema2);
 }
 

@@ -37,13 +37,13 @@ export const transcriptionModule: ModuleDefinition = {
       },
     },
     {
-      id: 'transcription-status',
-      path: '/transcriptions',
-      label: 'Transcription Status',
+      id: 'notes-workspace',
+      path: '/my-notes',
+      label: 'Notes Workspace',
       icon: Clock,
-      description: 'View transcription processing status',
+      description: 'View active notes, transcripts, and draft minutes',
       layout: 'default',
-      showInNav: false,
+      showInNav: true,
       auth: {
         requiresAuth: true,
         allowedRoles: ['social_worker', 'housing_officer', 'manager'],
@@ -51,11 +51,11 @@ export const transcriptionModule: ModuleDefinition = {
       },
     },
     {
-      id: 'transcription-detail',
-      path: '/transcriptions/[transcriptionId]',
-      label: 'Transcription Details',
+      id: 'minute-detail',
+      path: '/minutes/[id]',
+      label: 'Minute Details',
       icon: FileText,
-      description: 'View transcription details',
+      description: 'Review transcript-backed minute details',
       layout: 'default',
       showInNav: false,
       auth: {
@@ -66,7 +66,7 @@ export const transcriptionModule: ModuleDefinition = {
     },
     {
       id: 'transcription-settings',
-      path: '/transcriptions/settings',
+      path: '/admin/settings',
       label: 'Transcription Settings',
       icon: Settings,
       description: 'Configure transcription preferences',

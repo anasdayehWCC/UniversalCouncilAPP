@@ -88,11 +88,3 @@ export {
   type SearchRegistryConfig,
   type SearchSuggestion,
 } from './registry';
-  highlightSearchResult,
-  extractContext,
-  getHighlightedSnippets,
-  getHighlightSegments,
-  getFuzzyHighlightSegments,
-  escapeHtml,
-  stripHighlightTags,
-} from './highlight';

@@ -18,7 +18,7 @@ All frontend development work MUST happen in `/universal-app/` directory. This i
 2. Read `universal-app/AGENTS.md` for frontend-specific rules
 3. Use ThemeSetter tokens for styling, not hardcoded colors
 4. Use DemoContext for data mutations
-5. Run `npm run lint` before committing
+5. Run `pnpm lint:web` from the repo root before committing
 
 **Tech Stack (universal-app):**
 - Next.js 16.x with React 19.x
@@ -70,6 +70,7 @@ All frontend development work MUST happen in `/universal-app/` directory. This i
 
 18. `.env` is for local use only; non-local secrets must come from secret stores (e.g., Key Vault). Never hardcode prod endpoints or keys.
 19. Respect regional/privacy constraints: configs must not assume non-UK regions; keep regions in config, not code; do not disable TLS/private endpoints outside local.
+20. Docker and `docker compose` are legacy-only in this repository; do not add new Docker-dependent developer workflows, and treat direct local processes plus local PostgreSQL as the canonical setup path.
 
 ## 8) AI/LLM & Cost Controls
 
@@ -167,7 +168,7 @@ The official frontend (`universal-app/`) includes the following production-ready
 
 ### Analytics & Admin
 - **Insights Dashboard**: Charts, metrics, activity (`src/components/insights/`)
-- **Admin Panel**: User/module/settings management (`src/app/admin/`)
+- **Admin Panel**: Dashboard plus active users/modules/settings/templates/audit routes (`src/app/admin/`)
 - **Web Vitals**: Core Web Vitals monitoring (`src/lib/vitals/`)
 - **Audit Trail**: Action logging
 
@@ -203,6 +204,10 @@ The official frontend (`universal-app/`) includes the following production-ready
 - **E2E Tests**: Playwright configuration (`playwright.config.ts`)
 - **CI Pipeline**: GitHub Actions workflows (`.github/workflows/`)
 - **Coverage**: Codecov integration
+
+### Route Reality Notes
+- **Legacy-only until migrated or retired**: `/admin/configs`, `/admin/adoption`, `/tasks`, and dedicated `/transcriptions/*` routes are not part of the active `universal-app` route tree.
+- **Modern replacements**: note/transcription work lives under `/my-notes`, `/minutes`, and `/review-queue`; admin configuration uses `/admin/settings` and `/admin/modules`.
 
 ### Observability
 - **Sentry**: Error tracking with session replay (`sentry.*.config.ts`)

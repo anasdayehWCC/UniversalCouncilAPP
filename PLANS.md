@@ -18,6 +18,7 @@
 - `apps/mobile/` is the canonical mobile shell.
 - `minute-main/backend/` and `minute-main/worker/` remain the canonical backend and worker bounded context for social care.
 - `minute-main/frontend/` is frozen as a legacy parity reference only; it is excluded from the active pnpm workspace, root CI ownership, and new feature development.
+- Docker, Compose, and image-build workflows are legacy infrastructure only; direct local processes plus local PostgreSQL are now the canonical developer workflow.
 - Historical references below to `frontend/...` describe the legacy `minute-main/frontend` path unless they explicitly mention `universal-app/`.
 
 ## Operating Model for Long Sessions
@@ -81,12 +82,12 @@
 ## Concrete Steps & Commands (per phase, repeatable)
 
 - Framework upgrade audits:
-  - Frontend: `npm run lint && npm run build -- --turbopack`; Playwright smoke for `/` → `/new` → `/templates`; regenerate API client (`npm run openapi-ts`) after typed routes flip. citeturn0search1turn0search5
+  - Frontend: `pnpm lint:web && pnpm build:web`; Playwright smoke for `/` → `/record` → `/templates`; regenerate API client (`pnpm openapi:web`) after typed routes flip. citeturn0search1turn0search5
   - Backend: bump FastAPI/Pydantic, run `poetry lock`, `make test`, ensure `model_validate`/`TypeAdapter` replacements where ORM used. citeturn0search8turn0search0
   - Worker: bump Ray, set `RAY_worker_register_timeout_ms=20000`, namespace calls; run queue load smoke to verify restarts. citeturn1search1
-- Install deps: `docker compose up --build` (local stack), `pnpm install`/`pnpm --filter universal-app dev` (canonical web frontend), `pnpm --filter universal-app openapi-ts` (regenerate client), `make test` (backend/worker tests).
-- Lint/format: follow repo defaults (`ruff`, `npm lint`, `npm format` if present).
-- Frontend preview: `ENVIRONMENT=local npm run dev` with dev JWT; `DEV_PREVIEW_MODE=on` only in local.
+- Install deps: `pnpm install`, `pnpm dev:web` (canonical web frontend), `pnpm openapi:web` (regenerate client), `cd minute-main && poetry install --with dev --without worker` for the canonical Python 3.14 backend path.
+- Lint/format: follow repo defaults (`ruff`, `pnpm lint:web`).
+- Frontend preview: `ENVIRONMENT=local pnpm dev:web` with dev JWT; `DEV_PREVIEW_MODE=on` only in local.
 - Migrations: create Alembic revision (`alembic revision --autogenerate -m "<msg>"`), apply locally `alembic upgrade head`.
 - Tests per change: backend unit, worker integration, Playwright for offline/relabel/export as added.
 
@@ -145,9 +146,9 @@
 - [x] Phase 33B Background Sync — Completed 2026-03-28 (push notification lib + hooks; settings UI; SW with workbox-background-sync; backend endpoints stubbed)
 - [x] Phase 34 Cross-Platform UI Kit — Completed (packages/ui/* with Button, Card, Badge, Dialog shared primitives)
 - [x] Phase 35 Mobile Shell — Completed 2026-03-28 (apps/mobile with Capture/List screens, SQLite adapter, sync logic, expo-av recording)
-- [x] Phase 36A Config Admin Console — Completed (frontend admin routes at /admin/configs with diff view and audit history)
+- [ ] Phase 36A Config Admin Console — Backend endpoints exist, but the active `universal-app` shell has not adopted a dedicated `/admin/configs` route; current admin configuration lives under `/admin/settings` and `/admin/modules`.
 - [x] Phase 36B Module Dashboard — Completed 2026-03-28 (admin/modules page with module registry view and enablement matrix across tenants)
-- [x] Phase 37 Telemetry Dashboards — Completed 2026-03-28 (37A: module events via Prometheus; 37B: /admin/adoption page with metrics, sparkline trends, top modules, offline queue health)
+- [ ] Phase 37B Adoption Dashboard Route — Adoption dashboard components exist, but the active `universal-app` route tree does not currently expose `/admin/adoption`; do not treat the route as shipped until it is wired or explicitly retired.
 - [ ] Phase 38 Collaboration & Real-Time — Not started (yjs CRDT editing, WebSocket sync)
 - [ ] Phase 39 Advanced Search — Not started (Azure Cognitive Search, semantic embeddings)
 - [x] Phase 40A Audit Log Viewer — Completed 2026-03-28 (admin/audit page with filters, export to CSV/JSON, pagination; backend endpoints added)
@@ -167,12 +168,11 @@
 
 - Completed in this session:
   - Phase 36B Module Dashboard (admin/modules page)
-  - Phase 37B Adoption Dashboard (admin/adoption page with metrics, trends, offline queue health)
   - Phase 40A Audit Log Viewer (admin/audit page with filters and export)
   - Phase 32B Multi-Tenant Theme Engine (/api/theme endpoint + hooks)
   - Phase 33B Push Notifications (lib + hooks + settings UI)
   - Phase 41 Performance Optimization (dynamic imports, next/image config, OptimizedImage component)
-- Current state: Admin console fully operational with 4 tabs; theming API live; push notification infrastructure ready; performance optimizations in place.
+- Current state: The active admin console has dashboard, modules, settings, templates, users, and audit surfaces. Adoption and config-detail routes still need either explicit wiring into `universal-app` or retirement from the roadmap claims.
 - Blockers: Phase 38 (yjs) and Phase 39 (Azure Search) require additional infrastructure.
 - Next: Consider Phase 38 yjs integration for real-time collaboration; Phase 39 requires Azure Cognitive Search setup.
 

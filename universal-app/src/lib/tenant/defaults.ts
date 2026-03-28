@@ -146,7 +146,7 @@ export const DEFAULT_SERVICE_DOMAINS: Record<ServiceDomainId, ServiceDomainConfi
       gradient: 'linear-gradient(135deg, #333333 0%, #555555 100%)',
     },
     availableRoles: ['admin', 'manager'],
-    enabledModules: ['analytics', 'audit_log', 'admin:config'],
+    enabledModules: ['analytics', 'audit_log', 'team_dashboard'],
     defaultTemplates: [],
   },
   education: {
@@ -189,33 +189,32 @@ const SOCIAL_WORKER_NAV: NavItemConfig[] = [
   { label: 'Smart Capture', href: '/record', icon: 'Mic', featureFlag: 'smartCapture', description: 'Audio recording' },
   { label: 'Upload', href: '/upload', icon: 'Upload' },
   { label: 'Templates', href: '/templates', icon: 'Clipboard' },
-  { label: 'Tasks', href: '/tasks', icon: 'CheckSquare' },
 ];
 
 const MANAGER_NAV: NavItemConfig[] = [
   { label: 'Home', href: '/', icon: 'Home' },
   { label: 'Team Notes', href: '/my-notes', icon: 'FileText' },
   { label: 'Review Queue', href: '/review-queue', icon: 'CheckSquare' },
-  { label: 'Team Dashboard', href: '/dashboard', icon: 'LayoutDashboard' },
+  { label: 'Team Dashboard', href: '/insights/dashboard', icon: 'LayoutDashboard' },
   { label: 'Team Insights', href: '/insights', icon: 'BarChart', featureFlag: 'aiInsights' },
   { label: 'Users & Teams', href: '/admin/users', icon: 'Users' },
 ];
 
 const ADMIN_NAV: NavItemConfig[] = [
   { label: 'Dashboard', href: '/admin', icon: 'LayoutDashboard' },
-  { label: 'Configuration', href: '/admin/config', icon: 'Settings' },
+  { label: 'Settings', href: '/admin/settings', icon: 'Settings' },
   { label: 'Modules', href: '/admin/modules', icon: 'Building' },
   { label: 'Analytics', href: '/insights', icon: 'BarChart', featureFlag: 'aiInsights' },
   { label: 'Users & Teams', href: '/admin/users', icon: 'Users' },
   { label: 'Audit Log', href: '/admin/audit', icon: 'ClipboardList' },
-  { label: 'Integrations', href: '/admin/integrations', icon: 'Plug' },
+  { label: 'Templates', href: '/admin/templates', icon: 'Clipboard' },
 ];
 
 const QA_NAV: NavItemConfig[] = [
   { label: 'Home', href: '/', icon: 'Home' },
   { label: 'All Notes', href: '/my-notes', icon: 'FileText' },
-  { label: 'Quality Review', href: '/qa-review', icon: 'SearchCheck' },
-  { label: 'Audit Reports', href: '/qa-reports', icon: 'FileBarChart' },
+  { label: 'Quality Review', href: '/review-queue', icon: 'SearchCheck' },
+  { label: 'Audit Reports', href: '/admin/audit', icon: 'FileBarChart' },
   { label: 'Analytics', href: '/insights', icon: 'BarChart', featureFlag: 'aiInsights' },
 ];
 
@@ -224,7 +223,6 @@ const HOUSING_OFFICER_NAV: NavItemConfig[] = [
   { label: 'My Notes', href: '/my-notes', icon: 'FileText' },
   { label: 'Capture', href: '/record', icon: 'Mic', featureFlag: 'smartCapture' },
   { label: 'Upload', href: '/upload', icon: 'Upload' },
-  { label: 'Tasks', href: '/tasks', icon: 'CheckSquare' },
 ];
 
 // ============================================================================
@@ -249,7 +247,7 @@ export const DEFAULT_ROLES: Record<RoleId, RoleConfig> = {
     name: 'Team Lead',
     description: 'Supervises a team of practitioners',
     permissions: ['read:own', 'read:team', 'write:own', 'write:team', 'approve:team', 'export:basic'],
-    navigation: [...SOCIAL_WORKER_NAV, { label: 'Team View', href: '/team', icon: 'Users' }],
+    navigation: [...SOCIAL_WORKER_NAV, { label: 'Team View', href: '/review-queue', icon: 'Users' }],
     modules: ['smart_capture', 'transcription', 'templates', 'task_management', 'team_dashboard', 'export_pdf'],
     dashboardWidgets: ['team_overview', 'pending_reviews', 'team_workload'],
     quickActions: ['new_recording', 'review_queue', 'team_report'],
@@ -273,7 +271,7 @@ export const DEFAULT_ROLES: Record<RoleId, RoleConfig> = {
     name: 'Senior Manager',
     description: 'Senior leadership with cross-team oversight',
     permissions: ['read:all', 'write:all', 'delete:team', 'approve:all', 'admin:users', 'admin:config', 'export:basic', 'export:bulk'],
-    navigation: [...MANAGER_NAV, { label: 'Service Overview', href: '/service-overview', icon: 'Building2' }],
+    navigation: [...MANAGER_NAV, { label: 'Service Overview', href: '/insights/dashboard', icon: 'Building2' }],
     modules: ['review_workflow', 'team_dashboard', 'analytics', 'ai_insights', 'export_pdf', 'export_word', 'bulk_operations', 'audit_log'],
     dashboardWidgets: ['service_overview', 'all_teams', 'strategic_insights', 'compliance_summary'],
     quickActions: ['service_report', 'compliance_check', 'export_all'],
@@ -347,7 +345,7 @@ export const DEFAULT_ROLES: Record<RoleId, RoleConfig> = {
     navigation: [
       { label: 'Home', href: '/', icon: 'Home' },
       { label: 'Notes', href: '/my-notes', icon: 'FileText' },
-      { label: 'Search', href: '/search', icon: 'Search' },
+      { label: 'Templates', href: '/templates', icon: 'Search' },
     ],
     modules: ['export_pdf'],
     dashboardWidgets: ['search', 'recent_activity'],
@@ -369,7 +367,7 @@ export const DEFAULT_MODULES: Record<ModuleId, ModuleConfig> = {
     status: 'enabled',
     allowedRoles: ['social_worker', 'team_lead', 'manager', 'housing_officer'],
     allowedDomains: ['children', 'adults', 'housing', 'education', 'health'],
-    routes: ['/record', '/record/[id]'],
+    routes: ['/record', '/capture'],
     version: '2.0.0',
   },
   transcription: {
@@ -379,7 +377,7 @@ export const DEFAULT_MODULES: Record<ModuleId, ModuleConfig> = {
     status: 'enabled',
     allowedRoles: ['social_worker', 'team_lead', 'manager', 'senior_manager', 'housing_officer'],
     allowedDomains: ['children', 'adults', 'housing', 'education', 'health'],
-    routes: ['/transcriptions', '/transcriptions/[id]'],
+    routes: ['/my-notes', '/minutes/[id]'],
     version: '2.0.0',
   },
   templates: {
@@ -399,7 +397,7 @@ export const DEFAULT_MODULES: Record<ModuleId, ModuleConfig> = {
     status: 'enabled',
     allowedRoles: ['team_lead', 'manager', 'senior_manager', 'admin', 'quality_assurance'],
     allowedDomains: ['children', 'adults'],
-    routes: ['/review-queue', '/review/[id]'],
+    routes: ['/review-queue', '/review-queue/[id]'],
     version: '1.2.0',
   },
   ai_insights: {
@@ -429,7 +427,7 @@ export const DEFAULT_MODULES: Record<ModuleId, ModuleConfig> = {
     status: 'enabled',
     allowedRoles: ['social_worker', 'team_lead', 'manager', 'senior_manager', 'housing_officer'],
     allowedDomains: ['children', 'adults', 'housing', 'education', 'health'],
-    routes: ['/tasks', '/tasks/[id]'],
+    routes: ['/my-notes/[id]', '/review-queue/[id]'],
     version: '1.3.0',
   },
   team_dashboard: {
@@ -439,7 +437,7 @@ export const DEFAULT_MODULES: Record<ModuleId, ModuleConfig> = {
     status: 'enabled',
     allowedRoles: ['team_lead', 'manager', 'senior_manager', 'admin'],
     allowedDomains: ['children', 'adults', 'housing'],
-    routes: ['/dashboard', '/team'],
+    routes: ['/insights/dashboard', '/review-queue'],
     version: '1.1.0',
   },
   analytics: {

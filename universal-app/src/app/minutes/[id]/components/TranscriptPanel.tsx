@@ -68,13 +68,14 @@ export function TranscriptPanel({
         <div className="flex items-center gap-4">
           {/* Playback Controls */}
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="w-8 h-8">
+            <Button variant="ghost" size="icon" className="w-8 h-8" aria-label="Skip backward 10 seconds">
               <SkipBack className="w-4 h-4" />
             </Button>
             <Button 
               size="icon" 
               className="w-10 h-10 bg-[var(--primary)] hover:bg-[var(--primary)]/90"
               onClick={() => setIsPlaying(!isPlaying)}
+              aria-label={isPlaying ? 'Pause' : 'Play'}
             >
               {isPlaying ? (
                 <Pause className="w-4 h-4" />
@@ -82,7 +83,7 @@ export function TranscriptPanel({
                 <Play className="w-4 h-4 ml-0.5" />
               )}
             </Button>
-            <Button variant="ghost" size="icon" className="w-8 h-8">
+            <Button variant="ghost" size="icon" className="w-8 h-8" aria-label="Skip forward 10 seconds">
               <SkipForward className="w-4 h-4" />
             </Button>
           </div>
@@ -105,10 +106,10 @@ export function TranscriptPanel({
 
           {/* Volume & Expand */}
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="w-8 h-8">
+            <Button variant="ghost" size="icon" className="w-8 h-8" aria-label="Adjust volume">
               <Volume2 className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="w-8 h-8">
+            <Button variant="ghost" size="icon" className="w-8 h-8" aria-label="Expand player">
               <Maximize2 className="w-4 h-4" />
             </Button>
           </div>

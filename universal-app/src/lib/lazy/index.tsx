@@ -13,7 +13,7 @@
  * - Total potential savings: ~590KB on initial load
  */
 
-import dynamic from 'next/dynamic';
+import dynamic, { type DynamicOptionsLoadingProps } from 'next/dynamic';
 import type { ComponentType, ReactNode } from 'react';
 
 // ============================================================
@@ -23,6 +23,8 @@ import type { ComponentType, ReactNode } from 'react';
 export type LazyComponentLoader<T = Record<string, unknown>> = () => Promise<{
   default: ComponentType<T>;
 }>;
+
+export type PreloadLoader = () => Promise<unknown>;
 
 export type NamedComponentLoader<T = Record<string, unknown>> = () => Promise<{
   [key: string]: ComponentType<T>;
@@ -37,11 +39,9 @@ export interface PreloadOptions {
 
 export interface DynamicImportOptions {
   /** Custom loading component */
-  loading?: ComponentType;
+  loading?: (loadingProps: DynamicOptionsLoadingProps) => ReactNode;
   /** Enable SSR for the component */
   ssr?: boolean;
-  /** Suspense boundary (React 18+) */
-  suspense?: boolean;
 }
 
 // ============================================================
@@ -50,7 +50,7 @@ export interface DynamicImportOptions {
 
 // Loading component factory
 function createLoadingComponent(name: string, height?: string) {
-  return function LoadingPlaceholder() {
+  return function LoadingPlaceholder(_: DynamicOptionsLoadingProps) {
     return (
       <div 
         className="animate-pulse bg-muted rounded-lg"
@@ -126,23 +126,11 @@ export const LazyInsightsDashboard = dynamic(
 );
 
 /**
- * Lazy AdminPanel - Admin configuration UI
- * Estimated savings: ~50KB
- */
-export const LazyAdminPanel = dynamic(
-  () => import('@/components/admin/AdminPanel').then(mod => mod.AdminPanel),
-  {
-    loading: createLoadingComponent('Admin Panel', '400px'),
-    ssr: false,
-  }
-);
-
-/**
  * Lazy PDF Export - jsPDF is very heavy
  * Estimated savings: ~200KB
  */
 export const LazyPDFExporter = dynamic(
-  () => import('@/components/export/PDFExporter').then(mod => mod.PDFExporter),
+  () => import('@/components/export/ExportDialog').then(mod => mod.ExportDialog),
   {
     loading: createLoadingComponent('PDF Export', '100px'),
     ssr: false,
@@ -154,7 +142,7 @@ export const LazyPDFExporter = dynamic(
  * Estimated savings: ~150KB
  */
 export const LazyWordExporter = dynamic(
-  () => import('@/components/export/WordExporter').then(mod => mod.WordExporter),
+  () => import('@/components/export/ExportPreview').then(mod => mod.ExportPreview),
   {
     loading: createLoadingComponent('Word Export', '100px'),
     ssr: false,
@@ -166,7 +154,7 @@ export const LazyWordExporter = dynamic(
  * Estimated savings: ~40KB
  */
 export const LazyRecordingControls = dynamic(
-  () => import('@/components/recording/RecordingControls').then(mod => mod.RecordingControls),
+  () => import('@/components/recording/QuickRecordButton').then(mod => mod.QuickRecordButton),
   {
     loading: createLoadingComponent('Recording Controls', '150px'),
     ssr: false,
@@ -178,7 +166,7 @@ export const LazyRecordingControls = dynamic(
  * Estimated savings: ~30KB
  */
 export const LazyTemplateGallery = dynamic(
-  () => import('@/components/templates/TemplateGallery').then(mod => mod.TemplateGallery),
+  () => import('@/components/templates/TemplateSelector').then(mod => mod.TemplateSelector),
   {
     loading: createLoadingComponent('Template Gallery', '300px'),
     ssr: true,
@@ -194,7 +182,7 @@ export const LazyTemplateGallery = dynamic(
  * Call this on hover or route prefetch
  */
 export function preloadComponent(
-  loader: () => Promise<{ default: ComponentType<unknown> }>
+  loader: PreloadLoader
 ): void {
   // Trigger the import but don't wait for it
   loader().catch(() => {
@@ -209,10 +197,10 @@ export const preloadMap = {
   transcription: () => import('@/components/transcription/TranscriptViewer'),
   minutes: () => import('@/components/minutes/MinuteEditor'),
   insights: () => import('@/components/insights/InsightsDashboard'),
-  admin: () => import('@/components/admin/AdminPanel'),
+  admin: () => import('@/components/admin/AdminHeader'),
   export: () => Promise.all([
-    import('@/components/export/PDFExporter'),
-    import('@/components/export/WordExporter'),
+    import('@/components/export/ExportDialog'),
+    import('@/components/export/ExportPreview'),
   ]),
 } as const;
 
@@ -221,7 +209,7 @@ export const preloadMap = {
  */
 export function preloadForRoute(route: string): void {
   switch (true) {
-    case route.includes('/transcriptions'):
+    case route.includes('/my-notes') || route.includes('/minutes') || route.includes('/review-queue'):
       preloadMap.transcription();
       break;
     case route.includes('/minutes'):
@@ -266,7 +254,7 @@ export function preloadWithPriority(
  * Preload during idle time (non-blocking)
  */
 export function preloadWhenIdle(
-  loader: LazyComponentLoader,
+  loader: PreloadLoader,
   timeout = 2000
 ): void {
   if (typeof window === 'undefined') return;
@@ -285,7 +273,7 @@ export function preloadWhenIdle(
 /**
  * Preload on mouse enter (hover intent)
  */
-export function createHoverPreloader(loader: LazyComponentLoader) {
+export function createHoverPreloader(loader: PreloadLoader) {
   let preloaded = false;
   
   return {
@@ -303,7 +291,7 @@ export function createHoverPreloader(loader: LazyComponentLoader) {
  */
 export function preloadOnVisible(
   element: HTMLElement,
-  loader: LazyComponentLoader,
+  loader: PreloadLoader,
   options?: IntersectionObserverInit
 ): () => void {
   if (typeof window === 'undefined') return () => {};
@@ -343,13 +331,11 @@ export function createLazyComponent<T extends Record<string, unknown>>(
   const {
     loading,
     ssr = false,
-    suspense = false,
   } = options;
 
   return dynamic(loader, {
     loading: loading || createLoadingComponent(name),
     ssr,
-    suspense,
   }) as ComponentType<T>;
 }
 
@@ -370,11 +356,79 @@ export function createLazyNamedExport<T extends Record<string, unknown>>(
   );
 }
 
+// ============================================================
+// ADMIN COMPONENTS (Heavy, load on demand)
+// ============================================================
+
+/**
+ * Lazy Admin Dashboard - Heavy component with stats, charts, audit log
+ * Estimated savings: ~60KB
+ */
+export const LazyAdminDashboard = dynamic(
+  () => import('@/components/admin/MainConfigArea'),
+  {
+    loading: createLoadingComponent('Admin Dashboard', '600px'),
+    ssr: false,
+  }
+);
+
+/**
+ * Lazy AuditLog - Heavy table with filtering and pagination
+ * Estimated savings: ~35KB
+ */
+export const LazyAuditLog = dynamic(
+  () => import('@/components/admin/AuditLog').then(mod => ({ default: mod.AuditLog })),
+  {
+    loading: createLoadingComponent('Audit Log', '400px'),
+    ssr: false,
+  }
+);
+
+/**
+ * Lazy UserTable - User management table
+ * Estimated savings: ~25KB
+ */
+export const LazyUserTable = dynamic(
+  () => import('@/components/admin/UserTable').then(mod => ({ default: mod.UserTable })),
+  {
+    loading: createLoadingComponent('User Table', '300px'),
+    ssr: false,
+  }
+);
+
+/**
+ * Lazy SettingsForm - Large settings configuration form
+ * Estimated savings: ~40KB
+ */
+export const LazySettingsForm = dynamic(
+  () => import('@/components/admin/SettingsForm').then(mod => ({ default: mod.SettingsForm })),
+  {
+    loading: createLoadingComponent('Settings Form', '500px'),
+    ssr: false,
+  }
+);
+
+/**
+ * Lazy ModuleToggle - Module configuration grid
+ * Estimated savings: ~20KB
+ */
+export const LazyModuleToggle = dynamic(
+  () => import('@/components/admin/ModuleToggle').then(mod => ({ default: mod.ModuleToggle })),
+  {
+    loading: createLoadingComponent('Module Configuration', '400px'),
+    ssr: false,
+  }
+);
+
+// ============================================================
+// PRELOADING UTILITIES
+// ============================================================
+
 /**
  * Batch preload multiple modules
  */
 export function preloadBatch(
-  loaders: LazyComponentLoader[],
+  loaders: PreloadLoader[],
   options: PreloadOptions = {}
 ): Promise<void[]> {
   const { idle = false } = options;
@@ -398,12 +452,12 @@ export function preloadBatch(
  */
 export class RoutePreloader {
   private preloadedRoutes = new Set<string>();
-  private routeLoaders: Record<string, LazyComponentLoader[]> = {};
+  private routeLoaders: Record<string, PreloadLoader[]> = {};
 
   /**
    * Register loaders for a route pattern
    */
-  register(routePattern: string, loaders: LazyComponentLoader[]): void {
+  register(routePattern: string, loaders: PreloadLoader[]): void {
     this.routeLoaders[routePattern] = loaders;
   }
 
@@ -441,7 +495,10 @@ export class RoutePreloader {
 export const routePreloader = new RoutePreloader();
 
 // Register default routes
-routePreloader.register('/transcriptions', [
+routePreloader.register('/my-notes', [
+  () => import('@/components/transcription/TranscriptViewer'),
+]);
+routePreloader.register('/review-queue', [
   () => import('@/components/transcription/TranscriptViewer'),
 ]);
 routePreloader.register('/minutes', [
@@ -451,11 +508,11 @@ routePreloader.register('/insights', [
   () => import('@/components/insights/InsightsDashboard'),
 ]);
 routePreloader.register('/admin', [
-  () => import('@/components/admin/AdminPanel'),
+  () => import('@/components/admin/AdminHeader'),
 ]);
 routePreloader.register('/export', [
-  () => import('@/components/export/PDFExporter'),
-  () => import('@/components/export/WordExporter'),
+  () => import('@/components/export/ExportDialog'),
+  () => import('@/components/export/ExportPreview'),
 ]);
 
 // ============================================================

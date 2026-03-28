@@ -276,7 +276,7 @@ export class SearchRegistry {
   /**
    * Register default actions with handlers
    */
-  registerDefaultActions(handlers: Record<string, () => void>): void {
+  registerDefaultActions(handlers: Partial<Record<string, () => void>>): void {
     DEFAULT_ACTIONS.forEach((action) => {
       const handler = handlers[action.id];
       if (handler) {

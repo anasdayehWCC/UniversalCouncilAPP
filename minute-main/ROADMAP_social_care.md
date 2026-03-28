@@ -59,6 +59,14 @@ Assumptions/constraints
 - MVP domain focus: Children’s social care; Adults follows the same patterns with different templates/prompts/lexicons.
 - Principle: “One codebase, many domains” via config (org/domain/role claims) rather than branching code.
 
+## 2026-03-28 Consolidation Baseline
+
+- `universal-app/` is the canonical web frontend for ongoing work.
+- `apps/mobile/` is the canonical mobile app.
+- `minute-main/backend/` and `minute-main/worker/` remain the social-care backend boundary.
+- `minute-main/frontend/` is frozen as a legacy reference and must not receive new feature work.
+- Docker, Compose, and image-build workflows are legacy infrastructure only; direct local processes plus local PostgreSQL are the canonical developer workflow.
+
 Vagueness watchlist (keep honest)
 
 - Ensure “domain-aware UX” means UI copy, templates, export targets, retention, and lexicons are all domain-driven config—not just template lists.

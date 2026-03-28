@@ -10,9 +10,8 @@ import type {
   ExportResult,
   IExportFormatter,
   ExportFormat,
-  ActionItem,
 } from '../types';
-import type { MinuteAttendee, MinuteSection } from '../../minutes/types';
+import type { ActionItem, EvidenceLink, MinuteAttendee, MinuteSection } from '../../minutes/types';
 
 /**
  * Format date for display
@@ -561,7 +560,7 @@ export class HtmlFormatter implements IExportFormatter {
       `).join('');
   }
 
-  private buildEvidence(evidence: typeof arguments[0], options: typeof arguments[1]): string {
+  private buildEvidence(evidence: EvidenceLink[], options: typeof arguments[1]): string {
     return `
     <div class="evidence">
       <div class="evidence-title">Supporting Evidence</div>

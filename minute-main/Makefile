@@ -12,7 +12,7 @@ build-pyenv:
 install:
 	cd .. && pnpm install
 	brew install ffmpeg
-	poetry install --with dev --no-root
+	poetry install --with dev --without worker --no-root
 	poetry run pre-commit install
 
 run-pre-commit:
@@ -28,16 +28,19 @@ run_backend:
 	poetry run uvicorn backend.main:app --reload --port 8080
 
 run_worker:
-	poetry run python backend/services/queue_service.py
+	poetry run python worker/main.py
 
 run:
-	docker compose up -d --wait
+	@echo "Canonical local workflow is direct-process, not Docker."
+	@echo "1. make run_backend"
+	@echo "2. make run_frontend"
+	@echo "3. Optionally: poetry install --with dev,worker && make run_worker"
 
 run_watch:
-	docker compose up --watch
+	@echo "Use direct local process watchers instead of docker compose."
 
 stop:
-	docker compose down
+	@echo "No docker-managed processes to stop in the canonical local workflow."
 
 
 .PHONY: generate_aws_diagram
@@ -45,7 +48,7 @@ generate_aws_diagram:
 	poetry install --with dev
 	poetry run python terraform/diagram_script.py
 
-# Docker
+# Legacy Docker / image build targets
 
 ECR_REPO_NAME=$(APP_NAME)-$(service)
 ECR_URL=$(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com

@@ -76,6 +76,11 @@ const nextConfig: NextConfig = {
       'posthog-js',
       '@sentry/nextjs',
       'web-vitals',
+      '@azure/msal-browser',
+      '@azure/msal-react',
+      'immer',
+      'uuid',
+      'zustand',
     ],
     // Granular chunking for better caching
     webpackBuildWorker: true,

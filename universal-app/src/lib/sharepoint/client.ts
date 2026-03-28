@@ -412,14 +412,14 @@ export class SharePointClient {
         return response.blob();
       }
 
-      const chunks: Uint8Array[] = [];
+      const chunks: BlobPart[] = [];
       let bytesDownloaded = 0;
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
         
-        chunks.push(value);
+        chunks.push(value.buffer.slice(value.byteOffset, value.byteOffset + value.byteLength));
         bytesDownloaded += value.length;
         
         options.onProgress({

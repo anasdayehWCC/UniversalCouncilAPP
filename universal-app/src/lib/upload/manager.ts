@@ -152,9 +152,7 @@ export class UploadManager {
     // Quick validation first
     let validation: ValidationResult | undefined;
     if (!options.skipValidation) {
-      validation = options.skipValidation
-        ? undefined
-        : await validateFile(file, this.config.validation);
+      validation = await validateFile(file, this.config.validation);
 
       if (!validation.valid) {
         const error = this.createError(

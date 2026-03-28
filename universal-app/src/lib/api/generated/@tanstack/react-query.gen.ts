@@ -153,7 +153,7 @@ export const listTranscriptionsTranscriptionsGetInfiniteOptions = (options?: Opt
                 signal,
                 throwOnError: true
             });
-            return data as unknown as ListTranscriptionsTranscriptionsGetResponse;
+            return data;
         },
         queryKey: listTranscriptionsTranscriptionsGetInfiniteQueryKey(options)
     });

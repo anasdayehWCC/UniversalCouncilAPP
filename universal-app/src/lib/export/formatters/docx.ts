@@ -12,6 +12,7 @@ import type {
   ExportFormat,
 } from '../types';
 import type { MinuteSection, ActionItem, MinuteAttendee } from '../../minutes/types';
+import type { FileChild } from 'docx';
 
 // Note: The docx library needs to be added to package.json
 // This formatter is designed to work with the 'docx' npm package
@@ -101,6 +102,7 @@ export class DocxFormatter implements IExportFormatter {
     const { styles } = template;
     const primaryColor = hexToDocxColor(styles.primaryColor);
     const accentColor = hexToDocxColor(styles.accentColor);
+    const footerRunSize = styles.fontSize.caption * 2;
 
     try {
       const {
@@ -124,7 +126,7 @@ export class DocxFormatter implements IExportFormatter {
       } = docx;
 
       // Build document sections
-      const children: typeof Paragraph[] = [];
+      const children: FileChild[] = [];
 
       // Title
       children.push(
@@ -335,18 +337,19 @@ export class DocxFormatter implements IExportFormatter {
                 children: [
                   new Paragraph({
                     children: [
-                      new TextRun({ text: 'Page ' }),
+                      new TextRun({ text: 'Page ', size: footerRunSize }),
                       new TextRun({
                         children: [PageNumber.CURRENT],
+                        size: footerRunSize,
                       }),
-                      new TextRun({ text: ' of ' }),
+                      new TextRun({ text: ' of ', size: footerRunSize }),
                       new TextRun({
                         children: [PageNumber.TOTAL_PAGES],
+                        size: footerRunSize,
                       }),
-                      new TextRun({ text: `  |  ${template.organizationShort}` }),
+                      new TextRun({ text: `  |  ${template.organizationShort}`, size: footerRunSize }),
                     ],
                     alignment: AlignmentType.CENTER,
-                    size: styles.fontSize.caption * 2,
                   }),
                 ],
               }),

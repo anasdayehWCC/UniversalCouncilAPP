@@ -105,7 +105,7 @@ export default function MyNotesPage() {
               <SelectItem value="flagged">Changes Requested</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" size="icon">
+          <Button variant="outline" size="icon" aria-label="Filter options">
             <SlidersHorizontal className="w-4 h-4 text-slate-500" />
           </Button>
         </div>

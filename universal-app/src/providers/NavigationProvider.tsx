@@ -51,7 +51,7 @@ export function NavigationProvider({
 
   // Get filtered navigation config
   const filteredConfig: NavigationConfig = useMemo(
-    () => filterNavigationForRole(role, domain, featureFlags),
+    () => filterNavigationForRole(role, domain, featureFlags as unknown as Partial<Record<string, boolean>>),
     [role, domain, featureFlags]
   );
 

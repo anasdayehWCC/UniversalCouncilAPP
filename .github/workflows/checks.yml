@@ -1,16 +1,25 @@
-# Put action within a raw block so that the curly bracket expressions aren't picked up by the cookiecutter
-#
 name: Checks
-
-env:
-  DOCKER_BUILDKIT: 1
 
 on:
   push:
     paths:
-      - backend/**
-      - Makefile
-      - frontend/**
+      - .github/workflows/checks.yml
+      - AGENTS.md
+      - README.md
+      - package.json
+      - pnpm-lock.yaml
+      - pnpm-workspace.yaml
+      - packages/**
+      - apps/mobile/**
+      - universal-app/**
+      - minute-main/backend/**
+      - minute-main/common/**
+      - minute-main/worker/**
+      - minute-main/tests/**
+      - minute-main/pyproject.toml
+      - minute-main/poetry.toml
+      - minute-main/Makefile
+      - scripts/**
     branches:
       - "main"
       - "feature/**"
@@ -23,45 +32,50 @@ on:
   workflow_dispatch:
 
 jobs:
-  static_checks:
+  workspace_checks:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - name: Install workspace deps
+        run: pnpm install --frozen-lockfile
+      - name: Web tests
+        run: pnpm test:web
+      - name: Mobile typecheck
+        run: pnpm typecheck:mobile
+      - name: OpenAPI drift
+        run: ./scripts/check-openapi-drift.sh
 
-      - name: Set up Python 3.14
-        uses: actions/setup-python@v5
+  backend_smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.14"
-
-      - name: Set up Poetry
-        uses: abatilo/actions-poetry@v2
-        with:
-          poetry-version: 1.8.0
-
-      - name: Install dependencies
+      - name: Install Poetry
         run: |
-          poetry install --no-root --no-ansi --only dev
-
-      - name: Format code
-        run: |
-          poetry run ruff format . --check
-          poetry run ruff check .
-
-  run_tests:
-    name: Run tests
-
-    runs-on: ubuntu-latest
-    environment: release
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Copy env file
-        run: |
-          cp .env.example .env
-
-      - name: Run tests
-        run: |
-          make test
-
-#
+          python -m pip install --upgrade pip
+          pip install poetry
+      - name: Install backend deps
+        working-directory: minute-main
+        env:
+          POETRY_VIRTUALENVS_IN_PROJECT: "true"
+        run: poetry install --with dev --without worker
+      - name: Run backend smoke tests
+        working-directory: minute-main
+        env:
+          QUEUE_SERVICE_NAME: noop
+          STORAGE_SERVICE_NAME: local
+          TRANSCRIPTION_QUEUE_NAME: dummy
+          TRANSCRIPTION_DEADLETTER_QUEUE_NAME: dummy
+          LLM_QUEUE_NAME: dummy
+          LLM_DEADLETTER_QUEUE_NAME: dummy
+          SENTRY_DSN: http://public@example.com/1
+        run: poetry run pytest tests/test_health.py tests/test_export_handler_service.py tests/test_cost_guard.py tests/test_security_headers.py

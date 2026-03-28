@@ -14,7 +14,6 @@ export {
   LazyTranscriptViewer,
   LazyMinuteEditor,
   LazyInsightsDashboard,
-  LazyAdminPanel,
   LazyPDFExporter,
   LazyWordExporter,
   LazyRecordingControls,

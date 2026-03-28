@@ -16,13 +16,9 @@ import {
   Users,
   Settings,
   Building,
-  Bell,
-  HelpCircle,
   Shield,
   Clock,
-  Search,
   FolderOpen,
-  MessageSquare,
   ClipboardCheck,
   Layers,
   Database,
@@ -93,7 +89,7 @@ const captureSection: NavSection = {
     {
       id: 'batch-upload',
       label: 'Batch Upload',
-      href: '/upload/batch',
+      href: '/upload',
       icon: FolderOpen,
       description: 'Upload multiple files at once',
       roles: MANAGEMENT_ROLES,
@@ -135,7 +131,7 @@ const notesSection: NavSection = {
     {
       id: 'all-notes',
       label: 'All Notes',
-      href: '/admin/notes',
+      href: '/my-notes',
       icon: Database,
       description: 'View all transcriptions',
       roles: ['admin'],
@@ -190,7 +186,7 @@ const reviewSection: NavSection = {
     {
       id: 'qa-dashboard',
       label: 'QA Dashboard',
-      href: '/qa',
+      href: '/review-queue',
       icon: Shield,
       description: 'Quality assurance metrics',
       roles: ['manager', 'admin'],
@@ -201,7 +197,7 @@ const reviewSection: NavSection = {
     {
       id: 'approval-history',
       label: 'Approval History',
-      href: '/review/history',
+      href: '/review-queue',
       icon: Clock,
       description: 'Past approvals and rejections',
       roles: MANAGEMENT_ROLES,
@@ -244,7 +240,7 @@ const insightsSection: NavSection = {
     {
       id: 'usage-reports',
       label: 'Usage Reports',
-      href: '/insights/usage',
+      href: '/insights/dashboard',
       icon: Activity,
       description: 'Platform usage statistics',
       roles: ['admin'],
@@ -254,7 +250,7 @@ const insightsSection: NavSection = {
     {
       id: 'export-data',
       label: 'Export Data',
-      href: '/insights/export',
+      href: '/insights',
       icon: Database,
       description: 'Export analytics data',
       roles: ['admin'],
@@ -331,22 +327,7 @@ const adminSection: NavSection = {
 /**
  * Footer items - Always visible at bottom of navigation
  */
-const footerItems: FooterItem[] = [
-  {
-    id: 'notifications',
-    label: 'Notifications',
-    href: '/notifications',
-    icon: Bell,
-    roles: ALL_ROLES,
-  },
-  {
-    id: 'help',
-    label: 'Help & Support',
-    href: '/help',
-    icon: HelpCircle,
-    roles: ALL_ROLES,
-  },
-];
+const footerItems: FooterItem[] = [];
 
 /**
  * Quick actions - Role-specific action buttons
@@ -370,15 +351,6 @@ const quickActions: QuickAction[] = [
     roles: FRONTLINE_ROLES,
     variant: 'secondary',
     shortcut: 'U',
-  },
-  {
-    id: 'search',
-    label: 'Search',
-    href: '/search',
-    icon: Search,
-    roles: ALL_ROLES,
-    variant: 'ghost',
-    shortcut: '/',
   },
   {
     id: 'review-next',

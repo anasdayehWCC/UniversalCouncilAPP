@@ -182,14 +182,14 @@ export function deleteOptimistically<T>(
 // Batch Strategy
 // ============================================================================
 
-export interface BatchOperation<T> {
+export interface BatchOperation<T extends { id?: string }> {
   type: OptimisticOperationType;
   entityId?: string;
   data: T;
   previousData?: T;
 }
 
-export interface BatchOptimisticallyOptions<T> {
+export interface BatchOptimisticallyOptions<T extends { id?: string }> {
   /** Entity type */
   entityType: string;
   /** Operations to perform */
@@ -201,7 +201,7 @@ export interface BatchOptimisticallyOptions<T> {
 /**
  * Apply multiple optimistic operations as a batch
  */
-export function batchOptimistically<T>(
+export function batchOptimistically<T extends { id?: string }>(
   options: BatchOptimisticallyOptions<T>
 ): { updateIds: string[]; optimisticResults: Array<{ data: T; updateId: string }> } {
   const { entityType, operations, meta } = options;

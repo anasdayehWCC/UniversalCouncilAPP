@@ -554,7 +554,7 @@ const LOCALIZED_CONTENT: Record<string, Partial<Record<Locale, Partial<HelpConte
   'recording-start': {
     cy: {
       title: 'Dechrau Recordiad',
-      summary: 'Tapiwch y botwm recordio i ddechrau dal sain o'ch cyfarfod.',
+      summary: "Tapiwch y botwm recordio i ddechrau dal sain o'ch cyfarfod.",
     },
   },
 };

@@ -137,7 +137,7 @@ type MessageHandler = (message: CrossTabMessage) => void;
  * Cross-tab communication channel using BroadcastChannel API
  * Falls back to localStorage events when BroadcastChannel is not available.
  */
-class CrossTabChannel {
+export class CrossTabChannel {
   private channel: BroadcastChannel | null = null;
   private handlers: Set<MessageHandler> = new Set();
   private tabId: string;
@@ -476,5 +476,3 @@ export function getSessionStorage(): SecureSessionStorage {
   }
   return defaultStorage;
 }
-
-export { SecureSessionStorage, CrossTabChannel };

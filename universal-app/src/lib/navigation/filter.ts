@@ -161,7 +161,7 @@ function applyDomainOverrides(
 export function filterNavigationForRole(
   role: UserRole,
   domain: ServiceDomain,
-  featureFlags: Record<string, boolean> = {}
+  featureFlags: Partial<Record<string, boolean>> = {}
 ): NavigationConfig {
   const context: NavigationUserContext = {
     role,
@@ -243,7 +243,7 @@ export function filterNavigationForPermissions(
 export function getQuickActions(
   role: UserRole,
   domain: ServiceDomain,
-  featureFlags: Record<string, boolean> = {}
+  featureFlags: Partial<Record<string, boolean>> = {}
 ): QuickAction[] {
   const context: NavigationUserContext = {
     role,

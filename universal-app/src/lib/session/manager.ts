@@ -457,8 +457,8 @@ export class SessionManager {
       scroll: 'scroll',
       touch: 'touchstart',
       focus: 'focus',
-      visibility_change: 'visibilitychange',
       api_request: 'focus', // Placeholder, API activity tracked separately
+      visibility_change: 'focus',
     };
 
     for (const eventType of this.config.activityEvents) {
@@ -658,5 +658,3 @@ export function resetSessionManager(): void {
     sessionManagerInstance = null;
   }
 }
-
-export { SessionManager };

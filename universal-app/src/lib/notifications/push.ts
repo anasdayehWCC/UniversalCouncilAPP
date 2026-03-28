@@ -184,7 +184,7 @@ export async function subscribeToPush(): Promise<PushSubscription | null> {
     
     // If not subscribed, create new subscription
     if (!subscription) {
-      const applicationServerKey = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
+      const applicationServerKey = urlBase64ToUint8Array(VAPID_PUBLIC_KEY) as unknown as BufferSource;
       
       subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,

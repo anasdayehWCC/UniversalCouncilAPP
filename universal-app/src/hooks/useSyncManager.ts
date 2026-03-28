@@ -129,14 +129,14 @@ export function useSyncManager(accessToken?: string | null): UseSyncManagerRetur
 
   // Query pending recordings reactively
   const pendingRecordings = useLiveQuery(
-    () => db.recordings.where('status').equals('pending').toArray(),
+    () => db ? db.recordings.where('status').equals('pending').toArray() : Promise.resolve([] as any[]),
     [],
     []
   );
 
   // Query pending sync operations reactively
   const pendingSyncOperations = useLiveQuery(
-    () => db.syncOperations.where('status').equals('pending').toArray(),
+    () => db ? db.syncOperations.where('status').equals('pending').toArray() : Promise.resolve([] as any[]),
     [],
     []
   );

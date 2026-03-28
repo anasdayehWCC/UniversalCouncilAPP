@@ -220,5 +220,5 @@ export interface NavigationUserContext {
   /** User's permissions */
   permissions: Permission[];
   /** Feature flags */
-  featureFlags: Record<string, boolean>;
+  featureFlags: Partial<Record<string, boolean>>;
 }

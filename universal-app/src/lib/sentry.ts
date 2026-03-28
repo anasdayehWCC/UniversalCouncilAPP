@@ -60,7 +60,7 @@ export const baseSentryConfig: Sentry.BrowserOptions = {
   replaysOnErrorSampleRate: 1.0, // Capture 100% of sessions with errors
 
   // Privacy controls
-  beforeSend(event) {
+  beforeSend(event: Sentry.ErrorEvent, _hint: Sentry.EventHint): Sentry.ErrorEvent | null {
     // Don't send events in demo mode
     if (isDemoMode) {
       return null;
@@ -118,7 +118,7 @@ export const baseSentryConfig: Sentry.BrowserOptions = {
  * Scrub PII from Sentry events
  * Removes sensitive user data before sending to Sentry
  */
-function scrubPIIFromEvent(event: Sentry.Event): Sentry.Event {
+function scrubPIIFromEvent(event: Sentry.ErrorEvent): Sentry.ErrorEvent {
   // Scrub user PII - keep only anonymous identifiers
   if (event.user) {
     const { email, username, ...safeUserData } = event.user;
@@ -132,7 +132,9 @@ function scrubPIIFromEvent(event: Sentry.Event): Sentry.Event {
 
   // Scrub cookies
   if (event.request?.cookies) {
-    event.request.cookies = '[Filtered]';
+    event.request.cookies = Object.fromEntries(
+      Object.keys(event.request.cookies).map((cookieName) => [cookieName, '[Filtered]'])
+    );
   }
 
   // Scrub headers that might contain sensitive info

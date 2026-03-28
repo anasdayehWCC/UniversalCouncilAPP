@@ -123,7 +123,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 py-6 px-4 space-y-1 overflow-y-auto">
+        <nav id="main-navigation" aria-label="Main navigation" className="flex-1 py-6 px-4 space-y-1 overflow-y-auto">
           <div className="px-2 mb-3 text-xs font-semibold text-white/90 uppercase tracking-wider">
             {config.name}
           </div>
@@ -185,7 +185,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   className="gap-2 cursor-pointer"
                 >
                   <div className="w-6 h-6 rounded-full bg-slate-100 overflow-hidden">
-                    <Image src={user.avatar} alt={user.name} width={24} height={24} className="w-full h-full object-cover" unoptimized />
+                    <Image src={user.avatar} alt={user.name} width={24} height={24} className="w-full h-full object-cover" sizes="24px" />
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-medium">{user.name}</span>

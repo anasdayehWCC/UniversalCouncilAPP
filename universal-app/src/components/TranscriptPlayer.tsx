@@ -27,6 +27,7 @@ export function TranscriptPlayer({ transcript, duration }: TranscriptPlayerProps
 	          size="icon" 
 	          className="rounded-full w-10 h-10 shadow-sm"
 	          onClick={() => setIsPlaying(!isPlaying)}
+            aria-label={isPlaying ? 'Pause' : 'Play'}
 	        >
           {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
         </Button>
@@ -40,14 +41,14 @@ export function TranscriptPlayer({ transcript, duration }: TranscriptPlayerProps
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-600">
+          <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-600" aria-label="Skip backward">
             <SkipBack className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-600">
+          <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-600" aria-label="Skip forward">
             <SkipForward className="w-4 h-4" />
           </Button>
           <div className="w-px h-4 bg-slate-200 mx-1"></div>
-          <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-600">
+          <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-600" aria-label="Adjust volume">
             <Volume2 className="w-4 h-4" />
           </Button>
         </div>

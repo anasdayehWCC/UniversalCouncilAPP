@@ -55,6 +55,12 @@ class TranscriptionCreateRequest(BaseModel):
     visit_type: str | None = None
     intended_outcomes: str | None = None
     risk_flags: str | None = None
+    meeting_mode: str | None = Field(
+        default=None, description="in_person or online - indicates meeting type"
+    )
+    consent_ack: bool | None = Field(
+        default=None, description="Acknowledgment that consent was obtained"
+    )
 
 
 class RecordingCreateRequest(BaseModel):
@@ -170,6 +176,7 @@ class MinuteListItem(BaseModel):
     visit_type: str | None = None
     intended_outcomes: str | None = None
     risk_flags: str | None = None
+    tags: list[str] | None = None
 
 
 class MinutesCreateRequest(BaseModel):
@@ -179,6 +186,7 @@ class MinutesCreateRequest(BaseModel):
     visit_type: str | None = Field(default=None)
     intended_outcomes: str | None = Field(default=None)
     risk_flags: str | None = Field(default=None)
+    tags: list[str] | None = Field(default=None)
 
 
 class AiEdit(BaseModel):
@@ -347,6 +355,10 @@ class TemplateMetadata(BaseModel):
     category: str
     agenda_usage: AgendaUsage
     service_domains: list[str] | None = None
+    # Optional UI hints used by the frontend to drive contextual tabs per template/service domain
+    tabs: list[str] | None = None
+    default_tab_worker: str | None = None
+    default_tab_manager: str | None = None
 
 
 class CreateQuestion(BaseModel):
@@ -408,6 +420,22 @@ class TranslationStatusEntry(BaseModel):
 
 class TranslationListResponse(BaseModel):
     translations: list[TranslationStatusEntry]
+
+
+class SourceCheckRequest(BaseModel):
+    text: str
+
+
+class EvidenceFragment(BaseModel):
+    excerpt: str
+    start_time: float | None = None
+    end_time: float | None = None
+    support: str
+
+
+class SourceCheckResponse(BaseModel):
+    status: str
+    evidence: list[EvidenceFragment] = []
 
 
 class TopicTrend(BaseModel):

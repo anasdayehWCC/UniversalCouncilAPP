@@ -8,7 +8,7 @@ import mistune
 from sqlalchemy.orm import selectinload
 
 from common.convert_american_to_british_spelling import convert_american_to_british_spelling
-from common.database.postgres_database import SessionLocal
+from common.database.postgres_database import SessionLocal, async_session_factory
 from common.database.postgres_models import DialogueEntry, Hallucination, JobStatus, Minute, MinuteVersion, UserTemplate
 from common.metrics import llm_path_total, llm_tokens_total, minute_generation_latency_seconds
 from common.format_transcript import transcript_as_speaker_and_utterance
@@ -38,6 +38,24 @@ class MinuteGenerationFailedError(Exception):
 
 
 class MinuteHandlerService:
+    """Service layer for minute generation and processing.
+    
+    Session Usage Patterns:
+    -----------------------
+    This service is called primarily from Ray worker actors which run in
+    separate processes from FastAPI. The methods use sync SessionLocal() 
+    for database access, which is acceptable in the worker context.
+    
+    For API route handlers that need to call these methods, use the async 
+    variants or wrap calls appropriately. The sync DB calls don't block 
+    the FastAPI event loop because they run in Ray actor processes.
+    
+    Future Migration:
+    ----------------
+    Methods should be migrated to accept AsyncSession as a parameter for
+    better testability and to follow SQLAlchemy 2.0 async patterns.
+    """
+    
     @staticmethod
     def convert_llm_hallucination_to_db_hallucination(
         llm_hallucination: LLMHallucination, minute_version_id: UUID

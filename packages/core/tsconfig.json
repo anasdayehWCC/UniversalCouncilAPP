@@ -24,10 +24,12 @@
             ]
         }
     },
-    "include": [
-        "**/*.ts"
-    ],
-    "exclude": [
-        "node_modules"
-    ]
+  "include": [
+    "**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "__tests__",
+    "**/__tests__/**"
+  ]
 }

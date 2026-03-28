@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@careminutes/ui'
 import { Button } from '@careminutes/ui'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { useCallback } from 'react'
 
 type ConfigFile = {
     id: string
@@ -20,33 +21,10 @@ export default function AdminConfigPage() {
     const [error, setError] = useState<string | null>(null)
     const [hasAdminAccess, setHasAdminAccess] = useState(false)
 
-    useEffect(() => {
-        checkAdminAccess()
-    }, [checkAdminAccess])
-
-    async function checkAdminAccess() {
-        try {
-            // Check if user has admin permissions
-            const response = await fetch('/api/admin/check-access')
-            const data = await response.json()
-
-            if (!data.hasAccess) {
-                router.push('/unauthorised')
-                return
-            }
-
-            setHasAdminAccess(true)
-            await loadConfigs()
-        } catch (err) {
-            setError('Failed to verify admin access')
-            console.error(err)
-        }
-    }
-
-    async function loadConfigs() {
+    const loadConfigs = useCallback(async () => {
         try {
             setLoading(true)
-            const response = await fetch('/api/admin/configs')
+            const response = await fetch('/api/proxy/admin/configs')
 
             if (!response.ok) {
                 throw new Error('Failed to load configs')
@@ -60,7 +38,33 @@ export default function AdminConfigPage() {
         } finally {
             setLoading(false)
         }
-    }
+    }, [])
+
+    const checkAdminAccess = useCallback(async () => {
+        try {
+            const response = await fetch('/api/proxy/admin/check-access')
+            const data = await response.json()
+
+            if (!data.hasAccess) {
+                router.push('/unauthorised')
+                return
+            }
+
+            setHasAdminAccess(true)
+            await loadConfigs()
+        } catch (err) {
+            setError('Failed to verify admin access')
+            console.error(err)
+        }
+    }, [loadConfigs, router])
+
+    useEffect(() => {
+        const run = async () => {
+            await checkAdminAccess()
+        }
+        run()
+        return () => {}
+    }, [checkAdminAccess])
 
     if (!hasAdminAccess && !error) {
         return null

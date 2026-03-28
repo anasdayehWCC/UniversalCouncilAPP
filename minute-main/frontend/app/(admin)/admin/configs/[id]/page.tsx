@@ -38,8 +38,8 @@ export default function ConfigDetailPage({ params }: { params: Promise<{ id: str
             try {
                 setLoading(true)
                 const [configRes, auditRes] = await Promise.all([
-                    fetch(`/api/admin/configs/${id}`),
-                    fetch(`/api/admin/configs/${id}/audit`),
+                    fetch(`/api/proxy/admin/configs/${id}`),
+                    fetch(`/api/proxy/admin/configs/${id}/audit`),
                 ])
 
                 if (!configRes.ok) {

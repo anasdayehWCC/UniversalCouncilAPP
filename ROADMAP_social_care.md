@@ -59,6 +59,14 @@ Assumptions/constraints
 - MVP domain focus: Children’s social care; Adults follows the same patterns with different templates/prompts/lexicons.
 - Principle: “One codebase, many domains” via config (org/domain/role claims) rather than branching code.
 
+## 2026-03-28 Repository Consolidation Baseline
+
+- `universal-app/` is now the canonical web frontend for ongoing work.
+- `apps/mobile/` is the canonical mobile app.
+- `minute-main/backend/` and `minute-main/worker/` remain the production backend and worker bounded context.
+- `minute-main/frontend/` is frozen as a legacy migration reference and should not receive new feature work.
+- Historical references below to `frontend/...` describe the legacy `minute-main/frontend` path unless they explicitly point at `universal-app/`.
+
 Vagueness watchlist (keep honest)
 
 - Ensure “domain-aware UX” means UI copy, templates, export targets, retention, and lexicons are all domain-driven config—not just template lists.
@@ -119,7 +127,7 @@ Actions
 3. Context propagation
    - Add a `RequestContext` object resolved per request carrying `org_id`, `domain_id`, `role`; ensure every query in API routes filters by org/domain (minutes, transcriptions, templates, user-templates).
 4. Frontend
-   - Consume ID token from Entra (MSAL) and pass bearer token in `frontend/lib/api.ts`; surface role/domain in global state/provider.
+   - Consume ID token from Entra (MSAL) and pass bearer token through `universal-app/src/lib/api-client.ts` plus the generated client surface under `universal-app/src/lib/api/generated/`; surface role/domain in global state/provider.
    - Add `DEV_PREVIEW_MODE` that serves fixture JSON (Next.js route handlers or MSW) for list/detail pages when backend is unreachable so UI can be navigated without Postgres/Azure. Ensure middleware allows this mode without token when env=local and flag set.
 5. Tests
    - Unit tests for token validation (happy/expired/issuer mismatch) and RLS filters. Integration test hitting a protected endpoint with a test Entra token.
@@ -801,6 +809,8 @@ Actions
    - Ensure tags appear in the note list chips and search facets; allow combining tag filters with date, case, and domain filters.
 
 Exit: Long notes are split into meaningful sections; social workers and managers can quickly jump to relevant parts and retrieve notes by topic or tag.
+
+- **Status 2025-11-25:** Tabs now come from template metadata with persona-specific defaults; tag autocomplete + filters shipped on “My notes”; exports include tags. Remaining: none.
 
 ### Phase 31 — Config System & Module Registry (Universal App Foundation)
 

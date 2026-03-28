@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json.schemastore.org/size-limit.json",
+  "checks": [
+    {
+      "name": "Initial JS (First Load)",
+      "path": ".next/static/chunks/main-*.js",
+      "limit": "120 KB",
+      "gzip": true
+    },
+    {
+      "name": "Framework Bundle",
+      "path": ".next/static/chunks/framework-*.js",
+      "limit": "85 KB",
+      "gzip": true
+    },
+    {
+      "name": "Commons Bundle",
+      "path": ".next/static/chunks/commons-*.js",
+      "limit": "50 KB",
+      "gzip": true
+    },
+    {
+      "name": "Radix UI Bundle",
+      "path": ".next/static/chunks/radix-*.js",
+      "limit": "35 KB",
+      "gzip": true
+    },
+    {
+      "name": "Animation Bundle (Framer Motion)",
+      "path": ".next/static/chunks/animation-*.js",
+      "limit": "60 KB",
+      "gzip": true
+    },
+    {
+      "name": "Icons Bundle (Lucide)",
+      "path": ".next/static/chunks/icons-*.js",
+      "limit": "25 KB",
+      "gzip": true
+    },
+    {
+      "name": "Monitoring Bundle (Sentry/PostHog)",
+      "path": ".next/static/chunks/monitoring-*.js",
+      "limit": "45 KB",
+      "gzip": true
+    },
+    {
+      "name": "Storage Bundle (Dexie)",
+      "path": ".next/static/chunks/storage-*.js",
+      "limit": "20 KB",
+      "gzip": true
+    },
+    {
+      "name": "Auth Bundle (MSAL)",
+      "path": ".next/static/chunks/auth-*.js",
+      "limit": "40 KB",
+      "gzip": true
+    },
+    {
+      "name": "Export Bundle (docx/jspdf) - Async",
+      "path": ".next/static/chunks/export-*.js",
+      "limit": "200 KB",
+      "gzip": true
+    },
+    {
+      "name": "Total First Load JS",
+      "path": [
+        ".next/static/chunks/main-*.js",
+        ".next/static/chunks/framework-*.js",
+        ".next/static/chunks/commons-*.js",
+        ".next/static/chunks/webpack-*.js"
+      ],
+      "limit": "300 KB",
+      "gzip": true
+    },
+    {
+      "name": "App Shell (layout + core pages)",
+      "path": ".next/static/chunks/app/layout-*.js",
+      "limit": "50 KB",
+      "gzip": true
+    },
+    {
+      "name": "Dashboard Page",
+      "path": ".next/static/chunks/app/dashboard/page-*.js",
+      "limit": "40 KB",
+      "gzip": true
+    },
+    {
+      "name": "Record Page",
+      "path": ".next/static/chunks/app/record/page-*.js",
+      "limit": "35 KB",
+      "gzip": true
+    },
+    {
+      "name": "Minutes Page",
+      "path": ".next/static/chunks/app/minutes/page-*.js",
+      "limit": "45 KB",
+      "gzip": true
+    }
+  ],
+  "settings": {
+    "analyzer": "webpack"
+  }
+}

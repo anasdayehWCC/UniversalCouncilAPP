@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { Role, Domain, getThemeForRole } from './theme/tokens';
 
 // Mock User Interface matching the backend model roughly
@@ -59,17 +59,9 @@ export function DevPreviewProvider({ children }: { children: React.ReactNode }) 
 
     useEffect(() => {
         setMounted(true);
-        // Apply initial theme
-        applyTheme(currentRole);
     }, []);
 
-    useEffect(() => {
-        if (mounted) {
-            applyTheme(currentRole);
-        }
-    }, [currentRole, mounted]);
-
-    const applyTheme = (role: Role) => {
+    const applyTheme = useCallback((role: Role) => {
         const theme = getThemeForRole(role);
         const root = document.documentElement;
 
@@ -81,7 +73,13 @@ export function DevPreviewProvider({ children }: { children: React.ReactNode }) 
 
         // Also set a data-attribute for scoped styling if needed
         root.setAttribute('data-theme', role);
-    };
+    }, []);
+
+    useEffect(() => {
+        if (mounted) {
+            applyTheme(currentRole);
+        }
+    }, [currentRole, mounted, applyTheme]);
 
     const currentUser = {
         ...MOCK_USERS[currentRole],

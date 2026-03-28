@@ -2,16 +2,40 @@
 
 import { OfflineRecordings } from '@/components/recent-meetings/offline-recordings'
 import { TranscriptionListItem } from '@/components/recent-meetings/transcription-list-item'
-import { Button } from '@careminutes/ui'
-import { listTranscriptionsTranscriptionsGetOptions } from '@/lib/client/@tanstack/react-query.gen'
+import { Badge, Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@careminutes/ui'
+import {
+  getTemplatesTemplatesGetOptions,
+  listTranscriptionsTranscriptionsGetOptions,
+} from '@/lib/client/@tanstack/react-query.gen'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { ChevronLeft, ChevronRight, FileText, Loader2 } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export const PaginatedTranscriptions = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const pageSize = 10
+  const [tagInput, setTagInput] = useState('')
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
+  const [templateFilter, setTemplateFilter] = useState<string | undefined>(undefined)
+
+  const {
+    data: templateMetadata = [],
+    isLoading: templatesLoading,
+  } = useQuery({
+    ...getTemplatesTemplatesGetOptions(),
+  })
+
+  const { data: suggestedTags = [] } = useQuery({
+    queryKey: ['tag-suggestions', tagInput],
+    queryFn: async () => {
+      if (!tagInput.trim()) return []
+      const resp = await fetch(`/api/proxy/tags?search=${encodeURIComponent(tagInput)}&limit=10`)
+      if (!resp.ok) return []
+      return (await resp.json()) as string[]
+    },
+    enabled: tagInput.trim().length > 0,
+  })
 
   const {
     data: paginatedResponse,
@@ -19,7 +43,12 @@ export const PaginatedTranscriptions = () => {
     error,
   } = useQuery({
     ...listTranscriptionsTranscriptionsGetOptions({
-      query: { page: currentPage, page_size: pageSize },
+      query: {
+        page: currentPage,
+        page_size: pageSize,
+        tags: selectedTags.length ? selectedTags : undefined,
+        template_name: templateFilter || undefined,
+      },
     }),
     refetchInterval: (query) =>
       !!query.state.data &&
@@ -30,6 +59,10 @@ export const PaginatedTranscriptions = () => {
         : false,
     placeholderData: keepPreviousData,
   })
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [selectedTags, templateFilter])
 
   const transcriptions = paginatedResponse?.items || []
   const totalPages = paginatedResponse?.total_pages || 1
@@ -72,6 +105,113 @@ export const PaginatedTranscriptions = () => {
         <h2 className="text-3xl font-bold text-foreground">Recent Meetings</h2>
         <div className="rounded-full bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary border border-primary/20">
           {totalCount} transcription{totalCount !== 1 ? 's' : ''}
+        </div>
+      </div>
+
+      <div className="mb-6 rounded-2xl border border-slate-200 bg-white/70 p-4 shadow-sm backdrop-blur">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-1 flex-wrap gap-3">
+            <div className="min-w-[220px] space-y-2">
+              <p className="text-xs font-semibold text-slate-600">Filter by tags</p>
+              <div className="flex gap-2">
+                <Input
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  placeholder="Start typing a tag"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      const trimmed = tagInput.trim()
+                      if (trimmed && !selectedTags.includes(trimmed)) {
+                        setSelectedTags((prev) => [...prev, trimmed])
+                      }
+                      setTagInput('')
+                    }
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    const trimmed = tagInput.trim()
+                    if (trimmed && !selectedTags.includes(trimmed)) {
+                      setSelectedTags((prev) => [...prev, trimmed])
+                    }
+                    setTagInput('')
+                  }}
+                  disabled={!tagInput.trim()}
+                >
+                  Add
+                </Button>
+              </div>
+              {suggestedTags.length > 0 && (
+                <div className="flex flex-wrap gap-2 text-xs">
+                  {suggestedTags.map((tag) => (
+                    <Badge
+                      key={tag}
+                      className="cursor-pointer bg-primary/5 text-primary hover:bg-primary/10"
+                      onClick={() => {
+                        if (!selectedTags.includes(tag)) {
+                          setSelectedTags((prev) => [...prev, tag])
+                        }
+                        setTagInput('')
+                      }}
+                    >
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+              <div className="flex flex-wrap gap-2">
+                {selectedTags.map((tag) => (
+                  <Badge
+                    key={tag}
+                    className="bg-primary/10 text-primary border-primary/20 cursor-pointer"
+                    onClick={() =>
+                      setSelectedTags((prev) => prev.filter((t) => t !== tag))
+                    }
+                  >
+                    {tag} ✕
+                  </Badge>
+                ))}
+                {selectedTags.length === 0 && (
+                  <p className="text-[11px] text-slate-500">No tag filters applied.</p>
+                )}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <p className="text-xs font-semibold text-slate-600">Template</p>
+              <Select
+                value={templateFilter ?? 'all'}
+                onValueChange={(value) => setTemplateFilter(value === 'all' ? undefined : value)}
+                disabled={templatesLoading}
+              >
+                <SelectTrigger className="min-w-[220px]">
+                  <SelectValue placeholder="All templates" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All templates</SelectItem>
+                  {templateMetadata.map((template) => (
+                    <SelectItem key={template.name} value={template.name}>
+                      {template.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <Button
+            variant="ghost"
+            className="text-sm"
+            onClick={() => {
+              setSelectedTags([])
+              setTemplateFilter(undefined)
+              setTagInput('')
+            }}
+            disabled={selectedTags.length === 0 && !templateFilter}
+          >
+            Clear filters
+          </Button>
         </div>
       </div>
 

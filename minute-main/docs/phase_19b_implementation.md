@@ -213,8 +213,8 @@ Smoke tests that verify:
 ### Frontend Build Status
 To verify frontend compiles:
 ```bash
-cd frontend
-npm run build
+cd ..
+pnpm --filter universal-app build
 ```
 
 ### Backend Tests
@@ -228,7 +228,7 @@ python -m pytest tests/test_admin_routes.py -v
 
 ### Manual Testing
 1. Start backend: `make run-backend`
-2. Start frontend: `cd frontend && npm run dev`
+2. Start frontend from the repo root: `pnpm --filter universal-app dev`
 3. Navigate to `/admin/configs` (requires admin authentication)
 4. Verify config list loads
 5. Click config to view details

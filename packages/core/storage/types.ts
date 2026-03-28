@@ -21,9 +21,11 @@ export interface OfflineRecording {
     subject_dob?: string | null;
     fast_path?: boolean;
     processing_mode?: "fast" | "economy";
+    meeting_mode?: "in_person" | "online";
     visit_type?: string | null;
     intended_outcomes?: string | null;
     risk_flags?: string | null;
+    consent_ack?: boolean;
   };
 }
 

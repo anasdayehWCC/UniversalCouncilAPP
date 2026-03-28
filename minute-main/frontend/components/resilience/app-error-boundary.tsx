@@ -20,7 +20,7 @@ export class AppErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    Sentry.captureException(error, { extra: errorInfo })
+    Sentry.captureException(error, { extra: { componentStack: errorInfo.componentStack } })
   }
 
   handleReload = () => {

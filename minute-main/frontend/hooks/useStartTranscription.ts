@@ -64,6 +64,8 @@ export const useStartTranscription = (
       visit_type,
       intended_outcomes,
       risk_flags,
+      meeting_mode,
+      consent_ack,
     }: TranscriptionForm) => {
       if (!file) {
         return
@@ -103,6 +105,8 @@ export const useStartTranscription = (
                           visit_type,
                           intended_outcomes,
                           risk_flags,
+                          meeting_mode,
+                          consent_ack,
                         },
                       },
                       {
@@ -137,6 +141,8 @@ export const useStartTranscription = (
           visit_type: visit_type || null,
           intended_outcomes: intended_outcomes || null,
           risk_flags: risk_flags || null,
+          meeting_mode: meeting_mode || 'in_person',
+          consent_ack: consent_ack || false,
         }, isFile && 'name' in file ? file.name : undefined)
         toast.warning('Offline — saved locally. We will sync when back online.')
       }
@@ -162,6 +168,8 @@ export const useStartTranscription = (
       intended_outcomes: '',
       risk_flags: '',
       ...defaultValues,
+      meeting_mode: 'in_person',
+      consent_ack: false,
     },
   })
   return {

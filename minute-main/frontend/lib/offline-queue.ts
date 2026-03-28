@@ -89,7 +89,11 @@ export async function syncQueuedRecording(recording: OfflineRecording, token: st
     return resp
   })
   const recordingJson = await recordingResp.json()
-  await withBackoff(() => uploadBlob(recordingJson.upload_url, recording.blob))
+  const blob = recording.blob
+  if (!blob) {
+    throw new Error('Missing blob content for offline recording')
+  }
+  await withBackoff(() => uploadBlob(recordingJson.upload_url, blob))
 
   const transcriptionBody = {
     recording_id: recordingJson.id,

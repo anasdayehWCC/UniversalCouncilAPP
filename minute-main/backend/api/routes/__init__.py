@@ -6,9 +6,11 @@ from .config import config_router
 from .health import health_router
 from .insights import insights_router
 from .minutes import minutes_router
+from .minute_tags import tags_router
 from .modules import modules_router
 from .templates import templates_router
 from .tasks import tasks_router
+from .theme import theme_router
 from .transcriptions import transcriptions_router
 from .users import users_router
 
@@ -18,11 +20,13 @@ router.include_router(health_router)
 router.include_router(transcriptions_router)
 router.include_router(users_router)
 router.include_router(minutes_router)
+router.include_router(tags_router)
 router.include_router(templates_router)
 router.include_router(config_router)
 router.include_router(modules_router)
 router.include_router(admin_router)
 router.include_router(tasks_router)
 router.include_router(insights_router)
+router.include_router(theme_router)
 
 router.include_router(chat_router)

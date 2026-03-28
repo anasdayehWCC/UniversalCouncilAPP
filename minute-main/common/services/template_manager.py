@@ -10,6 +10,57 @@ from common.types import TemplateMetadata
 
 logger = logging.getLogger(__name__)
 
+# UI hint mapping to help the frontend build contextual tabs without hardcoding per-template logic.
+# Keys are template names as registered; values declare tab keys and default landing tabs per persona.
+TEMPLATE_TAB_CONFIG: dict[str, dict[str, object]] = {
+    # Social care templates
+    "Home visit": {
+        "tabs": ["summary", "recording", "care_assessment", "supervision", "care_review"],
+        "default_tab_worker": "summary",
+        "default_tab_manager": "care_review",
+    },
+    "Supervision": {
+        "tabs": ["summary", "recording", "supervision", "care_review"],
+        "default_tab_worker": "supervision",
+        "default_tab_manager": "care_review",
+    },
+    "Strategy discussion": {
+        "tabs": ["summary", "recording", "care_assessment", "care_review"],
+        "default_tab_worker": "summary",
+        "default_tab_manager": "care_review",
+    },
+    "Child protection conference": {
+        "tabs": ["summary", "recording", "care_review"],
+        "default_tab_worker": "summary",
+        "default_tab_manager": "care_review",
+    },
+    "Adult safeguarding": {
+        "tabs": ["summary", "recording", "care_assessment", "care_review"],
+        "default_tab_worker": "summary",
+        "default_tab_manager": "care_review",
+    },
+    "LAC review": {
+        "tabs": ["summary", "recording", "care_review"],
+        "default_tab_worker": "summary",
+        "default_tab_manager": "care_review",
+    },
+    "Chronology update": {
+        "tabs": ["summary", "recording", "care_review"],
+        "default_tab_worker": "summary",
+        "default_tab_manager": "care_review",
+    },
+    "Manager summary": {
+        "tabs": ["summary", "recording", "care_review"],
+        "default_tab_worker": "summary",
+        "default_tab_manager": "summary",
+    },
+    "Actions only": {
+        "tabs": ["summary", "recording", "care_review"],
+        "default_tab_worker": "summary",
+        "default_tab_manager": "summary",
+    },
+}
+
 
 class TemplateManager:
     templates: typing.ClassVar[dict[str, Template]] = {}
@@ -46,6 +97,13 @@ class TemplateManager:
                 category=template.category,
                 agenda_usage=template.agenda_usage,
                 service_domains=getattr(template, "service_domains", None),
+                tabs=(TEMPLATE_TAB_CONFIG.get(template.name) or {}).get("tabs"),  # type: ignore[arg-type]
+                default_tab_worker=(TEMPLATE_TAB_CONFIG.get(template.name) or {}).get(
+                    "default_tab_worker"
+                ),  # type: ignore[arg-type]
+                default_tab_manager=(TEMPLATE_TAB_CONFIG.get(template.name) or {}).get(
+                    "default_tab_manager"
+                ),  # type: ignore[arg-type]
             )
             for template in cls.templates.values()
         ]

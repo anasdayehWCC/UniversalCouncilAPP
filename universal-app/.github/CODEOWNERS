@@ -1,0 +1,52 @@
+# CODEOWNERS for Universal Council App
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owners for everything
+* @digital-team
+
+# Frontend architecture and core components
+/src/app/ @frontend-leads @digital-team
+/src/components/ @frontend-leads
+/src/lib/ @frontend-leads @digital-team
+
+# Configuration files
+/src/config/ @digital-team @platform-team
+next.config.ts @frontend-leads @platform-team
+tsconfig.json @frontend-leads
+
+# Styling and design system
+/src/components/ui/ @design-system-team @frontend-leads
+postcss.config.mjs @design-system-team
+tailwind.config.* @design-system-team
+
+# API and data layer
+/src/lib/api/ @backend-team @frontend-leads
+/src/hooks/ @frontend-leads
+/src/providers/ @frontend-leads
+
+# Security and authentication
+/src/lib/auth/ @security-team @digital-team
+middleware.ts @security-team @frontend-leads
+
+# Types and contracts
+/src/types/ @frontend-leads @backend-team
+
+# Sentry and observability
+sentry.*.config.ts @platform-team @digital-team
+/src/instrumentation.ts @platform-team
+
+# CI/CD and infrastructure
+/.github/ @platform-team @digital-team
+/scripts/ @platform-team
+
+# Documentation
+*.md @digital-team
+/docs/ @digital-team
+
+# Package management
+package.json @frontend-leads @platform-team
+pnpm-lock.yaml @frontend-leads
+.nvmrc @platform-team
+
+# Environment and secrets
+.env* @security-team @platform-team

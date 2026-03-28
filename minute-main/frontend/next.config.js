@@ -1,5 +1,9 @@
 import { withSentryConfig } from '@sentry/nextjs'
 import withPWAInit from 'next-pwa'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const withPWA = withPWAInit({
   dest: 'public',
@@ -15,6 +19,34 @@ let nextConfig = {
   experimental: {
     viewTransition: true,
     externalDir: true,
+  },
+  // Silence dual-lockfile root inference and anchor tracing to monorepo root
+  outputFileTracingRoot: path.join(__dirname, '..', '..'),
+  
+  // Image optimization (Phase 41B)
+  images: {
+    // Enable modern image formats
+    formats: ['image/avif', 'image/webp'],
+    // Allowed remote image domains
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '*.blob.core.windows.net',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.azureedge.net',
+      },
+    ],
+    // Device breakpoints for responsive images
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
+    // Image widths for srcset
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    // Minimum cache TTL in seconds (1 hour)
+    minimumCacheTTL: 3600,
+    // Blur placeholder generation for local images
+    dangerouslyAllowSVG: false,
+    contentDispositionType: 'inline',
   },
 }
 
@@ -61,5 +93,14 @@ const sentryConfig = {
 // Apply PWA first, then Sentry
 nextConfig = withPWA(nextConfig)
 nextConfig = withSentryConfig(nextConfig, sentryConfig)
+
+// Wrap with bundle analyzer if ANALYZE env is set
+if (process.env.ANALYZE === 'true') {
+  const withBundleAnalyzer = (await import('@next/bundle-analyzer')).default({
+    enabled: true,
+    openAnalyzer: true,
+  })
+  nextConfig = withBundleAnalyzer(nextConfig)
+}
 
 export default nextConfig

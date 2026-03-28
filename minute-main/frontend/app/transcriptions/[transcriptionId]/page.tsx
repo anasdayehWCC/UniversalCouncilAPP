@@ -1,8 +1,5 @@
 'use client'
-import ChatTab from '@/app/transcriptions/[transcriptionId]/ChatTab/ChatTab'
-import { MinuteTab } from '@/app/transcriptions/[transcriptionId]/MinuteTab/MinuteTab'
-import { TranscriptionTab } from '@/app/transcriptions/[transcriptionId]/TranscriptionTab/TranscriptionTab'
-import { TranslationsTab } from '@/app/transcriptions/[transcriptionId]/TranslationsTab/TranslationsTab'
+import dynamic from 'next/dynamic'
 import { DownloadButton } from '@/components/download-button'
 import { AudioWav } from '@/components/icons/AudioWav'
 import { TranscriptionTitleEditor } from '@/components/transcription-title-editor'
@@ -11,6 +8,8 @@ import {
   getRecordingsForTranscriptionTranscriptionsTranscriptionIdRecordingsGetOptions,
   getTranscriptionTranscriptionsTranscriptionIdGetOptions,
 } from '@/lib/client/@tanstack/react-query.gen'
+import { getTemplatesTemplatesGetOptions } from '@/lib/client/@tanstack/react-query.gen'
+import { listMinutesForTranscriptionTranscriptionTranscriptionIdMinutesGetOptions } from '@/lib/client/@tanstack/react-query.gen'
 import { FeatureFlags } from '@/lib/feature-flags'
 import { useQuery } from '@tanstack/react-query'
 import { Clock, Frown, SearchX } from 'lucide-react'
@@ -18,7 +17,24 @@ import { Skeleton } from '@careminutes/ui'
 import { useFeatureFlagEnabled } from 'posthog-js/react'
 import { usePersona } from '@/providers/PersonaProvider'
 
-import { use } from 'react'
+import { use, useEffect, useState } from 'react'
+
+// Code-split heavy tab components for better initial load performance
+const ChatTab = dynamic(() => import('@/app/transcriptions/[transcriptionId]/ChatTab/ChatTab'), {
+  loading: () => <Skeleton className="h-96 w-full" />,
+})
+const MinuteTab = dynamic(
+  () => import('@/app/transcriptions/[transcriptionId]/MinuteTab/MinuteTab').then(m => ({ default: m.MinuteTab })),
+  { loading: () => <Skeleton className="h-96 w-full" /> }
+)
+const TranscriptionTab = dynamic(
+  () => import('@/app/transcriptions/[transcriptionId]/TranscriptionTab/TranscriptionTab').then(m => ({ default: m.TranscriptionTab })),
+  { loading: () => <Skeleton className="h-96 w-full" /> }
+)
+const TranslationsTab = dynamic(
+  () => import('@/app/transcriptions/[transcriptionId]/TranslationsTab/TranslationsTab').then(m => ({ default: m.TranslationsTab })),
+  { loading: () => <Skeleton className="h-96 w-full" /> }
+)
 
 export default function TranscriptionPage({
   params,
@@ -28,6 +44,7 @@ export default function TranscriptionPage({
   const { transcriptionId } = use(params)
   const isChatEnabled = useFeatureFlagEnabled(FeatureFlags.ChatEnabled)
   const { persona, setPersona } = usePersona()
+  const [activeTab, setActiveTab] = useState('summary')
 
   const { data: transcription, isLoading } = useQuery({
     ...getTranscriptionTranscriptionsTranscriptionIdGetOptions({
@@ -39,6 +56,34 @@ export default function TranscriptionPage({
         ? 2000
         : false,
   })
+  const { data: templateMetadata = [] } = useQuery({
+    ...getTemplatesTemplatesGetOptions(),
+  })
+
+  const { data: availableMinutes = [] } = useQuery({
+    ...listMinutesForTranscriptionTranscriptionTranscriptionIdMinutesGetOptions({
+      path: { transcription_id: transcriptionId },
+    }),
+    enabled: !!transcription,
+  })
+
+  // Casting to shared Transcription shape used by editor components
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const typedTranscription: any = transcription
+  const primaryTemplateName =
+    availableMinutes?.[0]?.template_name || templateMetadata?.[0]?.name || 'Summary'
+  const primaryTemplate = templateMetadata.find((t) => t.name === primaryTemplateName)
+  const baseTabs = primaryTemplate?.tabs?.length ? primaryTemplate.tabs : ['summary', 'recording']
+  const defaultTabFromTemplate =
+    persona === 'manager' ? primaryTemplate?.default_tab_manager : primaryTemplate?.default_tab_worker
+  const defaultTab =
+    (defaultTabFromTemplate && baseTabs.includes(defaultTabFromTemplate)
+      ? defaultTabFromTemplate
+      : baseTabs[0]) || 'summary'
+  useEffect(() => {
+    if (!transcription) return
+    setActiveTab(defaultTab)
+  }, [defaultTab, persona, primaryTemplateName, transcription])
 
   if (isLoading) {
     return (
@@ -68,9 +113,23 @@ export default function TranscriptionPage({
     )
   }
 
-  // Casting to shared Transcription shape used by editor components
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const typedTranscription: any = transcription
+  const tabLabels: Record<string, string> = {
+    summary: persona === 'manager' ? 'Manager summary' : 'Meeting summary',
+    recording: 'Recording & transcript',
+    care_assessment: 'Care assessment',
+    supervision: 'Supervision',
+    care_review: 'Care review',
+    translations: 'Translations',
+    chat: 'Chat with your meeting',
+  }
+
+  const tabsToRender = [...new Set([...baseTabs])]
+  if (persona === 'social_worker' && !tabsToRender.includes('translations')) {
+    tabsToRender.push('translations')
+  }
+  if (isChatEnabled && !tabsToRender.includes('chat')) {
+    tabsToRender.push('chat')
+  }
 
   const date = new Date(transcription.created_datetime)
   const dateLabel = `${date.toDateString()} at ${date.toLocaleTimeString()}`
@@ -171,53 +230,47 @@ export default function TranscriptionPage({
         </div>
       </div>
 
-      <Tabs defaultValue="summary" className="w-full mt-3">
-        <TabsList className="h-12 w-full">
-          <TabsTrigger
-            value="summary"
-            className="border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:shadow-lg focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-          >
-            {persona === 'manager' ? 'Manager summary' : 'Meeting summary'}
-          </TabsTrigger>
-          <TabsTrigger
-            value="transcript"
-            className="border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:shadow-lg focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-          >
-            Transcript
-          </TabsTrigger>
-          {persona === 'social_worker' && (
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mt-3">
+        <TabsList className="h-12 w-full flex-wrap">
+          {tabsToRender.map((tabKey) => (
             <TabsTrigger
-              value="translations"
+              key={tabKey}
+              value={tabKey}
               className="border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:shadow-lg focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             >
-              Translations
+              {tabLabels[tabKey] || tabKey.replace(/_/g, ' ')}
             </TabsTrigger>
-          )}
-          {isChatEnabled && (
-            <TabsTrigger
-              value="chat"
-              className="border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:shadow-lg focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-            >
-              Chat with your meeting
-            </TabsTrigger>
-          )}
+          ))}
         </TabsList>
-        <TabsContent value="summary">
-          <MinuteTab transcription={typedTranscription} />
-        </TabsContent>
-        <TabsContent value="transcript">
-          <TranscriptionTab transcription={typedTranscription} />
-        </TabsContent>
-        {persona === 'social_worker' && (
-          <TabsContent value="translations">
-            <TranslationsTab transcriptionId={transcription.id} />
-          </TabsContent>
-        )}
-        {isChatEnabled && (
-          <TabsContent value="chat">
-            <ChatTab transcription={typedTranscription} />
-          </TabsContent>
-        )}
+        {tabsToRender.map((tabKey) => {
+          const label = tabLabels[tabKey] || tabKey.replace(/_/g, ' ')
+          if (tabKey === 'recording') {
+            return (
+              <TabsContent key={tabKey} value={tabKey}>
+                <TranscriptionTab transcription={typedTranscription} />
+              </TabsContent>
+            )
+          }
+          if (tabKey === 'translations' && persona === 'social_worker') {
+            return (
+              <TabsContent key={tabKey} value={tabKey}>
+                <TranslationsTab transcriptionId={transcription.id} />
+              </TabsContent>
+            )
+          }
+          if (tabKey === 'chat' && isChatEnabled) {
+            return (
+              <TabsContent key={tabKey} value={tabKey}>
+                <ChatTab transcription={typedTranscription} />
+              </TabsContent>
+            )
+          }
+          return (
+            <TabsContent key={tabKey} value={tabKey}>
+              <MinuteTab transcription={typedTranscription} contextLabel={label} />
+            </TabsContent>
+          )
+        })}
       </Tabs>
     </div>
   )

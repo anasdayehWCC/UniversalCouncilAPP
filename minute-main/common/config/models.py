@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import List, Optional
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 
 class ModuleConfig(BaseModel):
@@ -14,6 +14,12 @@ class ModuleConfig(BaseModel):
     )
     departments: Optional[List[str]] = Field(
         default=None, description="Optional list of service_domain ids this module applies to"
+    )
+    routes: Optional[List[str]] = Field(
+        default=None, description="Optional list of routes exposed by this module (used by manifests)"
+    )
+    dependencies: Optional[List[str]] = Field(
+        default=None, description="Optional list of module ids this module depends on"
     )
 
 
@@ -40,6 +46,11 @@ class TenantConfig(BaseModel):
     name: str
     version: str = Field(..., description="Config version tag, e.g. 1.0.0")
     defaultLocale: str = Field(..., pattern=r"^[a-z]{2}-[A-Z]{2}$")
+    organisation: str | None = Field(default=None, description="Human-readable organisation/council name")
+    service_domain: str | None = Field(default=None, description="Primary service domain for this config")
+    roles: List[str] | None = Field(default=None, description="List of allowed roles for this tenant")
+    templates: List[str] | None = Field(default=None, description="List of template ids enabled for this tenant")
+    lexicon: List[str] | None = Field(default=None, description="List of domain-specific lexicon entries")
     designTokens: dict | None = Field(default=None)
     retentionDaysDefault: Optional[int] = Field(
         default=None, description="Default retention in days for recordings/transcriptions/minutes"
@@ -52,7 +63,8 @@ class TenantConfig(BaseModel):
     navigation: List[NavigationItem] | None = Field(default=None, description="Optional navigation overrides")
     modules: List[ModuleConfig]
 
-    @validator("modules", pre=True)
+    @field_validator("modules", mode="before")
+    @classmethod
     def ensure_modules(cls, value):
         if value is None:
             raise ValueError("modules must be provided")

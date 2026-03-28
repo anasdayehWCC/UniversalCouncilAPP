@@ -45,6 +45,8 @@ import posthog from 'posthog-js'
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { MinuteTasksPanel } from '@/app/transcriptions/[transcriptionId]/MinuteTab/MinuteTasksPanel'
+import { SourceCheckButton } from '@/app/transcriptions/[transcriptionId]/MinuteTab/minute-editor/source-check-button'
+import { TagsEditor } from '@/app/transcriptions/[transcriptionId]/MinuteTab/minute-editor/tags-editor'
 
 type MinuteEditorForm = {
   html: string
@@ -85,6 +87,8 @@ export function MinuteEditor({
     () => minuteVersion?.status == 'failed',
     [minuteVersion?.status]
   )
+
+  const initialTags = useMemo(() => (minute as { tags?: string[] }).tags ?? [], [minute])
 
   const queryClient = useQueryClient()
   const [isEditable, setIsEditable] = useState(false)
@@ -406,12 +410,13 @@ export function MinuteEditor({
             {lastExportInfo.sharepoint_item_id ? ' • SharePoint uploaded' : ''}
           </Badge>
         )}
-        <div className="flex gap-2 self-start lg:self-center">
+        <div className="flex gap-2 self-start lg:self-center flex-wrap">
           <RatingButton
             minuteVersionId={minuteVersion.id}
             minutes={minuteVersion.html_content}
             transcript={transcription.dialogue_entries!}
           />
+          <SourceCheckButton minuteId={minute.id!} text={htmlContent || ''} />
         </div>
       </div>
       <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
@@ -478,6 +483,15 @@ export function MinuteEditor({
               <p className="text-xs text-slate-500">No recording available.</p>
             )}
           </div>
+          <div className="flex gap-2 self-start lg:self-center flex-wrap">
+            <RatingButton
+              minuteVersionId={minuteVersion.id}
+              minutes={minuteVersion.html_content}
+              transcript={transcription.dialogue_entries!}
+            />
+            <SourceCheckButton minuteId={minute.id!} text={htmlContent || ''} />
+          </div>
+          <TagsEditor minuteId={minute.id!} initialTags={initialTags} />
           <MinuteTasksPanel minuteId={minute.id!} />
         </div>
       </div>

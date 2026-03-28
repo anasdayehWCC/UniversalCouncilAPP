@@ -10,3 +10,7 @@ export * from './token-text';
 export * from './tokens/index.mjs';
 export * from './recording-card';
 export * from './split-view';
+export * from './dialog';
+export * from './label';
+export * from './checkbox';
+export * from './badge';

@@ -18,6 +18,8 @@ export const StartTranscriptionSection = ({
   const selectedTemplate = form.watch('template')
   const caseReference = form.watch('case_reference')
   const processingMode = form.watch('processing_mode') || 'fast'
+  const meetingMode = form.watch('meeting_mode') || 'in_person'
+  const consentAck = form.watch('consent_ack') || false
 
   const { recentCases } = useCaseCache()
   // Fetch templates from API
@@ -83,6 +85,27 @@ export const StartTranscriptionSection = ({
         </div>
       </div>
       <div className="grid gap-3 rounded-2xl glass-panel-premium p-4 sm:grid-cols-2">
+        <div className="sm:col-span-2">
+          <p className="text-xs font-semibold text-slate-600">Meeting mode</p>
+          <div className="mt-2 flex gap-2">
+            <Button
+              type="button"
+              variant={meetingMode === 'in_person' ? 'default' : 'outline'}
+              className="flex-1"
+              onClick={() => form.setValue('meeting_mode', 'in_person')}
+            >
+              In-person
+            </Button>
+            <Button
+              type="button"
+              variant={meetingMode === 'online' ? 'default' : 'outline'}
+              className="flex-1"
+              onClick={() => form.setValue('meeting_mode', 'online')}
+            >
+              Online / hybrid
+            </Button>
+          </div>
+        </div>
         <div>
           <label className="text-xs font-medium text-slate-600">
             Visit type (optional)
@@ -124,7 +147,8 @@ export const StartTranscriptionSection = ({
           !isShowing ||
           !selectedTemplate ||
           !caseReference ||
-          (selectedTemplate.agenda_usage == 'required' && !form.watch('agenda'))
+          (selectedTemplate.agenda_usage == 'required' && !form.watch('agenda')) ||
+          !consentAck
         }
       >
         {isPending ? (
@@ -193,6 +217,17 @@ Agenda item 3
           >
             Economy
           </Button>
+        </div>
+      </div>
+      <div className="flex items-start gap-2 rounded-2xl glass-panel-premium p-3">
+        <Input
+          type="checkbox"
+          className="w-4"
+          checked={consentAck}
+          onChange={(e) => form.setValue('consent_ack', e.target.checked)}
+        />
+        <div className="text-sm text-slate-700">
+          I confirm I have informed participants and obtained permission to record or upload this session.
         </div>
       </div>
     </div>

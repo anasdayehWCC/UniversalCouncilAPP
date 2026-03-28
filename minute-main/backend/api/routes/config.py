@@ -1,9 +1,10 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 
 from backend.api.dependencies import SQLSessionDep
 from common.config.loader import ConfigNotFoundError, load_tenant_config
 from common.config.models import TenantConfig
 from common.database.postgres_models import AuditEvent
+from common.errors import ErrorCodes, not_found
 from common.telemetry.events import record_config_served
 
 config_router = APIRouter(tags=["Config"])
@@ -14,7 +15,7 @@ async def get_tenant_config(tenant_id: str, session: SQLSessionDep) -> TenantCon
     try:
         config = load_tenant_config(tenant_id)
     except ConfigNotFoundError:
-        raise HTTPException(status_code=404, detail="Tenant config not found")
+        raise not_found("Tenant config", ErrorCodes.CONFIG_NOT_FOUND)
     record_config_served(tenant_id, config.version)
     audit_entry = AuditEvent(
         resource_type="config",

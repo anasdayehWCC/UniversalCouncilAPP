@@ -119,7 +119,7 @@ Actions
 3. Context propagation
    - Add a `RequestContext` object resolved per request carrying `org_id`, `domain_id`, `role`; ensure every query in API routes filters by org/domain (minutes, transcriptions, templates, user-templates).
 4. Frontend
-   - Consume ID token from Entra (MSAL) and pass bearer token in `frontend/lib/api.ts`; surface role/domain in global state/provider.
+   - Consume ID token from Entra (MSAL) and pass bearer token through `../universal-app/src/lib/api-client.ts` plus the generated client surface under `../universal-app/src/lib/api/generated/`; surface role/domain in global state/provider.
    - Add `DEV_PREVIEW_MODE` that serves fixture JSON (Next.js route handlers or MSW) for list/detail pages when backend is unreachable so UI can be navigated without Postgres/Azure. Ensure middleware allows this mode without token when env=local and flag set.
 5. Tests
    - Unit tests for token validation (happy/expired/issuer mismatch) and RLS filters. Integration test hitting a protected endpoint with a test Entra token.
@@ -861,7 +861,7 @@ Actions
    - Refine the “Upload audio” journey to feel as integrated as live recording (same metadata form, status chips, and outcomes).
 
 Exit: A social worker can see at a glance whether the app is recording, paused, or saved; the capture flows feel deliberate and calm on both phone and laptop; in‑person vs virtual meetings are clearly labelled throughout.
-- **Status (2025-11-25):** Completed — capture page now shows animated waveform, live status chip with duration, floating pause/resume/stop controls, and consent-backed in-person vs online mode selector persisted into queued metadata. Upload flow polish kept for later if deeper backend support needed.
+- **Status (2025-11-25):** Completed — capture page now shows animated waveform, live status chip with duration, floating pause/resume/stop controls, and consent-backed in-person vs online mode selector persisted into queued metadata; upload flow now carries the same consent/mode metadata.
 
 ### Phase 29 — AI Writing Assistant & Source Check
 
@@ -879,6 +879,7 @@ Actions
      - Retrieves candidate transcript segments by timestamp/template anchors.
      - Asks a verification model to confirm whether the statement is supported, partially supported, or unsupported.
      - Surfaces results inline with clear, non‑legalistic language.
+- **Status (2025-11-25):** Completed — AI Edit popover now offers role-aware instructions; Source Check endpoint compares minute text to transcript segments and returns supported/partial/unsupported with evidence; UI button in minute editor displays status and excerpts.
 4. **Governance controls**
    - Log all AI edits and source checks in the audit trail; allow tenants to enable/disable or limit these features by role/domain.
 
@@ -900,6 +901,7 @@ Actions
    - Ensure tags appear in the note list chips and search facets; allow combining tag filters with date, case, and domain filters.
 
 Exit: Long notes are split into meaningful sections; social workers and managers can quickly jump to relevant parts and retrieve notes by topic or tag.
+**Status (2025-11-25):** Partial complete — tagging landed (DB column, API get/put, minute editor add/remove chips, tags returned in list, tag filter on minutes list API). Contextual tabs covered earlier via persona view; UI tag filters/search facets and export tagging remain outstanding.
 
 ### Phase 31 — Config System & Module Registry (Universal App Foundation)
 
@@ -918,6 +920,8 @@ Actions
    - Ensure tests cover module enable/disable, per‑role nav differences, and backwards compatibility with existing routes.
 
 Exit: Adding a new department or module is primarily a config/schema change plus templates, not a series of hard‑coded nav and routing edits; both Minute and the universal app shells consume the same module registry.
+
+**Status 2025-11-25:** 31A (schema + validation), 31B (module manifest API), and 31C (frontend nav wiring) complete: tenant schema/model now align with real config keys (roles, templates, lexicon, routes/dependencies) and `scripts/validate_configs.py` fails fast on invalid configs; `/api/modules` returns ModuleManifest objects (routes, deps, feature flags) plus role-filtered navigation; sidebar/bottom-nav now render from the config-driven navigation payload with graceful fallback when offline.
 
 ### Phase 32 — Design Tokens & Theme Engine
 

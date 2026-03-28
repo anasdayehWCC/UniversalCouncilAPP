@@ -120,7 +120,7 @@ jobs:
         env:
           DOCKER_BUILDKIT: 1
         with:
-          file: frontend/Dockerfile
+          file: universal-app/Dockerfile
           context: .
           builder: ${{ needs.set-vars.outputs.app-name }}
           push: true

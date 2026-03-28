@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { motion } from 'framer-motion';
 import { cn } from './utils';
-import { Badge } from './tokens/badge';
+import { Badge } from './badge';
 import { TokenText } from './token-text';
 
 type StatusTone = 'success' | 'warning' | 'danger' | 'info';

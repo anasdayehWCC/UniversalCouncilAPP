@@ -312,9 +312,6 @@ class Transcription(BaseTableMixin, table=True):
     export_status: ExportStatus | None = Field(default=None)
     export_error: str | None = Field(default=None)
     last_exported_at: datetime | None = Field(default=None, sa_column=Column(TIMESTAMP(timezone=True), nullable=True))
-    visit_type: str | None = Field(default=None)
-    intended_outcomes: str | None = Field(default=None)
-    risk_flags: str | None = Field(default=None)
     processing_mode: str = Field(default="fast", sa_column_kwargs={"server_default": "fast"})
 
     # Kept old minute versions so we can migrate them
@@ -431,6 +428,10 @@ class Minute(BaseTableMixin, table=True):
     sharepoint_docx_item_id: str | None = Field(default=None)
     sharepoint_pdf_item_id: str | None = Field(default=None)
     planner_task_ids: List[str] = Field(
+        default_factory=list,
+        sa_column=Column(JSONB, nullable=False, server_default="'[]'::jsonb"),
+    )
+    tags: List[str] = Field(
         default_factory=list,
         sa_column=Column(JSONB, nullable=False, server_default="'[]'::jsonb"),
     )

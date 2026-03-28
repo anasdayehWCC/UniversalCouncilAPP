@@ -3,10 +3,12 @@ import logging
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
+from contextlib import asynccontextmanager
+
 from apscheduler.schedulers.background import BackgroundScheduler
 from azure.identity import DefaultAzureCredential
 from dotenv import load_dotenv
-from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlmodel import Session, and_, col, create_engine, delete, or_, select, update
 
 from common.database.postgres_models import (
@@ -62,7 +64,27 @@ async_engine = create_async_engine(
 
 
 def SessionLocal() -> Session:  # noqa: N802
+    """Sync session factory for background jobs and CLI scripts only.
+    
+    Do NOT use in async contexts (FastAPI routes, async service methods).
+    For async contexts, use async_session_factory() instead.
+    """
     return Session(engine)
+
+
+@asynccontextmanager
+async def async_session_factory():
+    """Async session factory for handler services and worker actors.
+    
+    Use this in any async context that needs database access:
+    
+        async with async_session_factory() as session:
+            result = await session.execute(stmt)
+    
+    Note: expire_on_commit=False to allow accessing attributes after commit.
+    """
+    async with AsyncSession(async_engine, expire_on_commit=False) as session:
+        yield session
 
 
 def cleanup_failed_records():

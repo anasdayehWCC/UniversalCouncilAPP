@@ -97,6 +97,38 @@
           "default": null,
           "description": "Optional list of service_domain ids this module applies to",
           "title": "Departments"
+        },
+        "routes": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional list of routes exposed by this module (used by manifests)",
+          "title": "Routes"
+        },
+        "dependencies": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional list of module ids this module depends on",
+          "title": "Dependencies"
         }
       },
       "required": [
@@ -193,6 +225,80 @@
       ],
       "default": null,
       "title": "Designtokens"
+    },
+    "organisation": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Human-readable organisation/council name",
+      "title": "Organisation"
+    },
+    "service_domain": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Primary service domain for this config",
+      "title": "Service Domain"
+    },
+    "roles": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Allowed roles for this tenant",
+      "title": "Roles"
+    },
+    "templates": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Template identifiers enabled for this tenant",
+      "title": "Templates"
+    },
+    "lexicon": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Domain-specific lexicon entries",
+      "title": "Lexicon"
     },
     "retentionDaysDefault": {
       "anyOf": [

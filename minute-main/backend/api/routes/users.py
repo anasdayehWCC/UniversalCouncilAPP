@@ -1,9 +1,10 @@
 import logging
 from datetime import UTC, datetime
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 
 from backend.api.dependencies import SQLSessionDep, UserDep
+from common.errors import ErrorCodes, bad_request, forbidden
 from common.types import DataRetentionUpdateResponse, GetUserResponse
 
 users_router = APIRouter(tags=["Users"])
@@ -36,14 +37,15 @@ async def update_data_retention(
         current_user: The current authenticated user
     """
     if user.strict_data_retention:
-        raise HTTPException(
-            status_code=403, detail="Strict data retention enabled, you cannot update your data retention."
+        raise forbidden(
+            "Strict data retention enabled, you cannot update your data retention.",
+            ErrorCodes.FORBIDDEN,
         )
 
     if data.data_retention_days is not None and data.data_retention_days < 1:
-        raise HTTPException(
-            status_code=400,
-            detail="Data retention period must be at least 1 day or None for indefinite retention",
+        raise bad_request(
+            "Data retention period must be at least 1 day or None for indefinite retention",
+            ErrorCodes.VALIDATION_ERROR,
         )
 
     user.data_retention_days = data.data_retention_days

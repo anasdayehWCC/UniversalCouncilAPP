@@ -6,7 +6,7 @@ import {
   SelectItem,
   SelectTrigger,
 } from '@careminutes/ui'
-import { ContentSource, MinuteVersionResponse } from '@/lib/client'
+import { ContentSource, MinuteVersion, MinuteVersionResponse } from '@/lib/client'
 import { Edit, Wand2 } from 'lucide-react'
 import { Dispatch, SetStateAction } from 'react'
 
@@ -35,7 +35,7 @@ export const MinuteVersionSelect = ({
   version,
   setVersion,
 }: {
-  minuteVersions: MinuteVersionResponse[]
+  minuteVersions: (MinuteVersionResponse & Partial<Pick<MinuteVersion, 'content_source' | 'ai_edit_instructions'>>)[]
   version: number
   setVersion: Dispatch<SetStateAction<number>>
 }) => {
@@ -45,11 +45,12 @@ export const MinuteVersionSelect = ({
       <SelectContent>
         {minuteVersions.map((v, index) => {
           const date = new Date(v.created_datetime!)
+          const source = (v.content_source as ContentSource | undefined) ?? 'initial_generation'
           return (
             <SelectItem key={v.id!} value={`${index}`}>
               <div className="flex w-full max-w-md flex-1 flex-col items-start">
                 <div className="flex items-center gap-2">
-                  <MapContentSource source={v.content_source} />
+                  <MapContentSource source={source} />
                   <div className="text-muted-foreground flex gap-1 text-xs">
                     {date.toLocaleDateString()}{' '}
                     {date.toLocaleTimeString(undefined, {

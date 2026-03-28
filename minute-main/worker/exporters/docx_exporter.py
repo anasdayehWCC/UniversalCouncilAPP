@@ -36,6 +36,7 @@ def _add_cover(document: Document, minute_version: MinuteVersion) -> None:
     add_row("Service domain", getattr(minute, "service_domain_id", None) and str(minute.service_domain_id))
     add_row("Created", minute.created_datetime.isoformat() if minute.created_datetime else "-")
     add_row("Updated", minute.updated_datetime.isoformat() if minute.updated_datetime else "-")
+    add_row("Tags", ", ".join(minute.tags) if getattr(minute, "tags", None) else "-")
 
 
 def build_docx(minute_version: MinuteVersion, output_path: Path) -> Path:

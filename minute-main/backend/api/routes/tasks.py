@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Query
 from sqlmodel import col, select
 
 from backend.api.dependencies import SQLSessionDep, UserDep
 from common.database.postgres_models import Minute, MinuteTask, TaskStatus
+from common.errors import ErrorCodes, unauthorized
 from common.types import MinuteTaskListItemResponse, MinuteTaskResponse
 
 
@@ -26,7 +27,7 @@ async def list_my_tasks(
     if status:
         query = query.where(MinuteTask.status == status)
     if not user.id:
-        raise HTTPException(status_code=401, detail="User not authenticated")
+        raise unauthorized("User not authenticated")
     query = query.where(Minute.created_by_user_id == user.id)
 
     results = await session.exec(query)

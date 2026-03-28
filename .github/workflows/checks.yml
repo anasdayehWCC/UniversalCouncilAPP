@@ -1,5 +1,5 @@
 # Put action within a raw block so that the curly bracket expressions aren't picked up by the cookiecutter
-# 
+#
 name: Checks
 
 env:
@@ -12,14 +12,14 @@ on:
       - Makefile
       - frontend/**
     branches:
-      - 'main'
-      - 'feature/**'
-      - 'chore/**'
-      - 'bugfix/**'
-      - 'hotfix/**'
-      - 'develop'
-      - 'dependabot/**'
-      - 'security/**'
+      - "main"
+      - "feature/**"
+      - "chore/**"
+      - "bugfix/**"
+      - "hotfix/**"
+      - "develop"
+      - "dependabot/**"
+      - "security/**"
   workflow_dispatch:
 
 jobs:
@@ -28,10 +28,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v3
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.14"
 
       - name: Set up Poetry
         uses: abatilo/actions-poetry@v2
@@ -54,13 +54,14 @@ jobs:
     environment: release
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Copy env file
-      run: |
-        cp .env.example .env
+      - name: Copy env file
+        run: |
+          cp .env.example .env
 
-    - name: Run tests
-      run: |
-        make test
+      - name: Run tests
+        run: |
+          make test
+
 #

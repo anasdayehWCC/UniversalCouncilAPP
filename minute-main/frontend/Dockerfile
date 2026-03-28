@@ -7,9 +7,9 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Install dependencies based on the preferred package manager
-COPY frontend/package.json frontend/package-lock.json ./
-RUN npm ci
+# Install dependencies for the frozen legacy frontend
+COPY frontend/package.json ./
+RUN npm install
 
 # Rebuild the source code only when needed
 FROM base AS builder

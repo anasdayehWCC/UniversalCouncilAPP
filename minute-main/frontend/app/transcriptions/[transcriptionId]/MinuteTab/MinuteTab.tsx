@@ -15,7 +15,13 @@ import { useQuery } from '@tanstack/react-query'
 import { AudioWaveform } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-export function MinuteTab({ transcription }: { transcription: Transcription }) {
+export function MinuteTab({
+  transcription,
+  contextLabel,
+}: {
+  transcription: Transcription
+  contextLabel?: string
+}) {
   const { data: minutes = [], isLoading } = useQuery({
     ...listMinutesForTranscriptionTranscriptionTranscriptionIdMinutesGetOptions(
       {
@@ -49,6 +55,11 @@ export function MinuteTab({ transcription }: { transcription: Transcription }) {
   }
   return (
     <>
+      {contextLabel && (
+        <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary border border-primary/20">
+          {contextLabel}
+        </div>
+      )}
       <div className="mb-4 flex flex-wrap gap-2">
         <Select
           value={`${selectedMinute}`}

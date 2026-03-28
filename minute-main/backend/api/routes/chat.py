@@ -1,7 +1,7 @@
 import logging
 import uuid
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from sqlalchemy import delete
 from sqlmodel import col, select
 
@@ -10,6 +10,7 @@ from common.database.postgres_models import (
     Chat,
     Transcription,
 )
+from common.errors import ErrorCodes, not_found
 from common.services.queue_services import get_queue_service
 from common.settings import get_settings
 from common.types import (
@@ -45,7 +46,7 @@ async def list_chat(
             current_user.service_domain_id and transcription.service_domain_id != current_user.service_domain_id
         )
     ):
-        raise HTTPException(404, "Not found")
+        raise not_found("Transcription", ErrorCodes.TRANSCRIPTION_NOT_FOUND)
 
     query = select(Chat).where(Chat.transcription_id == transcription_id).order_by(col(Chat.updated_datetime).asc())
     result = await session.exec(query)
@@ -82,7 +83,7 @@ async def create_chat(
             current_user.service_domain_id and transcription.service_domain_id != current_user.service_domain_id
         )
     ):
-        raise HTTPException(404, "Not found")
+        raise not_found("Transcription", ErrorCodes.TRANSCRIPTION_NOT_FOUND)
     chat_id = uuid.uuid4()
     chat = Chat(user_content=request.user_content, transcription_id=transcription_id, id=chat_id)
     session.add(chat)
@@ -108,7 +109,7 @@ async def get_chat(
             current_user.service_domain_id and transcription.service_domain_id != current_user.service_domain_id
         )
     ):
-        raise HTTPException(status_code=404, detail="Transcription not found")
+        raise not_found("Transcription", ErrorCodes.TRANSCRIPTION_NOT_FOUND)
 
     chat = await session.get(Chat, chat_id)
     return ChatGetResponse(
@@ -134,7 +135,7 @@ async def delete_chat(transcription_id: uuid.UUID, chat_id: uuid.UUID, session: 
             current_user.service_domain_id and transcription.service_domain_id != current_user.service_domain_id
         )
     ):
-        raise HTTPException(status_code=404, detail="Transcription not found")
+        raise not_found("Transcription", ErrorCodes.TRANSCRIPTION_NOT_FOUND)
     chat = await session.get(Chat, chat_id)
     # Delete the transcription
     await session.delete(chat)
@@ -153,7 +154,7 @@ async def delete_chats(transcription_id: uuid.UUID, session: SQLSessionDep, curr
             current_user.service_domain_id and transcription.service_domain_id != current_user.service_domain_id
         )
     ):
-        raise HTTPException(status_code=404, detail="Transcription not found")
+        raise not_found("Transcription", ErrorCodes.TRANSCRIPTION_NOT_FOUND)
     await session.execute(delete(Chat).where(Chat.transcription_id == transcription_id))
 
     # Delete the transcription

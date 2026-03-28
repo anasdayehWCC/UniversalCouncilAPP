@@ -3,12 +3,14 @@ from contextlib import asynccontextmanager
 
 import sentry_sdk
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordBearer
 from prometheus_fastapi_instrumentator import Instrumentator
 
 from backend.api.routes import router as api_router
+from common.errors import APIException
 from backend.api.middleware.audit import AuditMiddleware
 from backend.api.middleware.security import OriginCheckMiddleware, SecurityHeadersMiddleware, SimpleRateLimitMiddleware
 from backend.api.middleware.tracing import TracingMiddleware
@@ -43,6 +45,32 @@ if settings.SENTRY_DSN:
         }
     sentry_sdk.init(settings.SENTRY_DSN, environment=settings.ENVIRONMENT, **sentry_init_opts)
 app = FastAPI(lifespan=lifespan, openapi_url="/api/openapi.json")
+
+
+@app.exception_handler(APIException)
+async def api_exception_handler(request: Request, exc: APIException) -> JSONResponse:
+    """Handle APIException with structured error response.
+    
+    Strips context field in production to avoid leaking internal details.
+    """
+    detail = exc.detail
+    
+    # Strip context in production
+    if settings.ENVIRONMENT == "prod" and isinstance(detail, dict):
+        detail.pop("context", None)
+    
+    log.warning(
+        "API error: %s %s - %s",
+        exc.status_code,
+        request.url.path,
+        detail.get("message") if isinstance(detail, dict) else detail,
+    )
+    
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": detail},
+        headers=exc.headers or {},
+    )
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")

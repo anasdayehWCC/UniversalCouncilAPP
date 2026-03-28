@@ -1668,11 +1668,11 @@ export const getUserModulesModulesGetQueryKey = (
  * Filters by:
  * - user.service_domain_id (from UserOrgRole table)
  * - user.role (from UserOrgRole table)
- * - tenant config (from config/{tenant}_{domain}.yaml)
+ * - tenant config (config*.yaml)
  *
  * Returns:
- * - modules: List of enabled module IDs
- * - nav_items: List of navigation items with labels, hrefs, icons
+ * - modules: List of module manifests (id, label, icon, routes, deps, feature flags)
+ * - navigation: List of navigation items with labels, hrefs, icons
  * - service_domain: Current user's domain
  * - role: Current user's role
  */

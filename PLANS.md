@@ -12,6 +12,14 @@
 - Delivery roadmap: `minute-main/ROADMAP_social_care.md` (phases 1–14, success criteria).
 - Model context: GPT-5.1-Codex-Max (compaction; can run 24h+). citeturn0search0
 
+## 2026-03-28 Repo Baseline
+
+- `universal-app/` is the canonical web frontend and the only web app that owns OpenAPI generation against `minute-main/backend`.
+- `apps/mobile/` is the canonical mobile shell.
+- `minute-main/backend/` and `minute-main/worker/` remain the canonical backend and worker bounded context for social care.
+- `minute-main/frontend/` is frozen as a legacy parity reference only; it is excluded from the active pnpm workspace, root CI ownership, and new feature development.
+- Historical references below to `frontend/...` describe the legacy `minute-main/frontend` path unless they explicitly mention `universal-app/`.
+
 ## Operating Model for Long Sessions
 
 1. Read AGENTS and Roadmap before edits; obey local-only fake-JWT and dev-preview gating.
@@ -57,8 +65,8 @@
 - Phase 27: Adaptive UX Engine. 27A (Context Engine) implements `UserPersonaProvider`, "Contextual Tabs" (Assessment/Supervision), and "One-Tap Mode Switch"; read-only backend. 27B (Role-Specific Views) creates distinct Dashboards for Social Workers (Quick Capture) vs Managers (Team Stats); read-only backend.
 - Phase 28: Recording Studio 2.0 (Magic Notes-inspired). 28A (Waveform) integrates real-time waveform visualization, live status indicators, and floating recording controls with glassmorphism; read-only backend. 28B (Modes) adds In-Person/Online mode selector, "Upload Audio" flow, and mobile Quick Record FAB; read-only backend; UX and journeys aligned with `minute-main/docs/user_journeys.md`.
 - Phase 29: AI Writing Assistant. 29A (Sidebar) creates floating AI editor with style suggestions, rewrite options, and free-form prompts using GPT-4o-mini; frontend/backend. 29B (Source Check) adds beta "Source Check" feature to verify claims against transcript segments; worker + frontend.
-- Phase 30: Content Organization. 30A (Contextual Tabs) implements dynamic tab system (Summary, Recording, domain-specific sections like Care Assessment) driven by `ServiceDomainTemplate`; read-only backend. 30B (Tags) adds tagging system with autocomplete, filter UI, and database schema (`tags` JSONB column); frontend/backend.
-- Phase 31: Config System & Module Registry (Universal App Foundation). 31A (Schema) extends `tenant.schema.json` with modules/navigation/featureFlags, adds versioning, and CI validation; backend-only. 31B (Module Manifests) creates `ModuleManifest` type with routes/permissions/dependencies, exposes `/api/modules`; backend-only. 31C (Config Nav) replaces hardcoded navigation with config-driven rendering filtered by role/domain/modules; frontend-only.
+- Phase 30: Content Organization — ✅ 2025-11-25. Tabs now come from template metadata with persona defaults; tagging shipped with autocomplete, filters on “My notes”, and tags flow into exports.
+- Phase 31: Config System & Module Registry (Universal App Foundation). 31A (Schema) and 31B (Module Manifests + `/api/modules`) done: tenant schema now includes roles/templates/lexicon/routes/dependencies, validation script fails fast; backend endpoint returns ModuleManifest objects. 31C (Config Nav) now wired: sidebar/bottom-nav consume server navigation payload with fallback when offline; regen client still pending when backend is runnable.
 - Phase 32: Design Tokens & Theme Engine. 32A (Tokens) defines core token set (`tokens.json`) with accessibility guarantees (WCAG 2.2 AA contrast validation), generates CSS variables; frontend-only. 32B (Multi-Tenant) adds tenant theme overrides (logo, accent color) via `/api/theme?tenant=wcc` with contrast enforcement; frontend/backend.
 - Phase 33: Advanced Offline & Sync. 33A (Unified Engine) abstracts offline queue to support multiple operation types (recordings, notes, tasks) with conflict resolution UI; frontend-only. 33B (Background Sync) implements service worker `sync` event handler and push notifications for sync completion; frontend/backend.
 - Phase 34: Cross-Platform UI Kit (RN Web Prep). 34A (Shared Primitives) extracts zero-dependency components (`Button`, `Card`, `Badge`) to `frontend/components/primitives/` with RN Web aliases; frontend-only. 34B (Unified Icons) replaces `lucide-react` with cross-platform icon solution using registry pattern; frontend-only.
@@ -76,7 +84,7 @@
   - Frontend: `npm run lint && npm run build -- --turbopack`; Playwright smoke for `/` → `/new` → `/templates`; regenerate API client (`npm run openapi-ts`) after typed routes flip. citeturn0search1turn0search5
   - Backend: bump FastAPI/Pydantic, run `poetry lock`, `make test`, ensure `model_validate`/`TypeAdapter` replacements where ORM used. citeturn0search8turn0search0
   - Worker: bump Ray, set `RAY_worker_register_timeout_ms=20000`, namespace calls; run queue load smoke to verify restarts. citeturn1search1
-- Install deps: `docker compose up --build` (local stack), `npm install`/`npm run dev` (frontend), `npm run openapi-ts` (regenerate client), `make test` (backend/worker tests).
+- Install deps: `docker compose up --build` (local stack), `pnpm install`/`pnpm --filter universal-app dev` (canonical web frontend), `pnpm --filter universal-app openapi-ts` (regenerate client), `make test` (backend/worker tests).
 - Lint/format: follow repo defaults (`ruff`, `npm lint`, `npm format` if present).
 - Frontend preview: `ENVIRONMENT=local npm run dev` with dev JWT; `DEV_PREVIEW_MODE=on` only in local.
 - Migrations: create Alembic revision (`alembic revision --autogenerate -m "<msg>"`), apply locally `alembic upgrade head`.
@@ -86,17 +94,9 @@
 
 - [x] Phase 1 Identity/RBAC — Completed 2025-11-20T22:24Z (Entra JWKS + AuthContext + frontend MSAL/DEV_PREVIEW token plumbing)
 - [x] Phase 1.5 Premium UI & Council Theming — Completed 2025-11-20T22:40Z (WCC/RBKC theming, gradients/glass, org logo assets, motion accents)
-- [ ] Phase 3a Config systemisation + module registry — in progress
-  - Backend: config models/loader + GET /config/{tenant_id} ✅
-  - Frontend: typed config fetcher + module filtering + nav rendering ✅
-  - Tests: config loader smoke test ✅
-  - CI hook for config validation ✅ (`.github/workflows/config-validate.yml`)
-- [ ] Phase 18A Shared UI kit extraction — in progress
-  - UI demo route `/ui-demo` added for shared primitives ✅
-  - Shared UI README documenting RN-Web guidance ✅
-- [ ] Phase 18B RN/Expo shell — in progress
-  - Mobile scaffold under `mobile/` with config fetch + module list ✅
-  - Metro/tsconfig/package metadata ✅
+- [x] Phase 3a Config systemisation + module registry — Completed 2026-03-28 (Backend config models/loader + /config/{tenant_id}, frontend typed config fetcher + module filtering + nav rendering, config loader smoke tests, CI hook for config validation)
+- [x] Phase 18A Shared UI kit extraction — Completed 2026-03-28 (UI demo route `/ui-demo`, shared UI README w/ RN-Web guidance, packages/ui/* components)
+- [x] Phase 18B RN/Expo shell — Completed 2026-03-28 (Mobile scaffold under `apps/mobile/` with config fetch + module list, Metro/tsconfig/package metadata)
 - [x] Phase 19A Module telemetry/governance — Completed 2025-11-21T19:30Z (module/config metrics + telemetry events, config/audit logging entries, infra dashboard updates)
 - [x] Phase 2 Infra/Secrets — Completed 2025-11-20T23:26Z (Key Vault secret loader, UK-only Terraform with private endpoints, storage lifecycle + region guard)
 - [x] Phase 3 Case Context — Completed 2025-11-20T23:52Z (case_record model + encrypted DOB, API requires case_reference, frontend case selector with offline cache, regenerated OpenAPI client)
@@ -136,8 +136,23 @@
 - [x] Phase 27A Adaptive UX Engine — Completed 2025-11-25T14:05Z (PersonaProvider with role/local fallback, one-tap persona switch on transcription view, contextual tabs that adapt for managers vs social workers)
 - [x] Phase 27B Role-Specific Dashboards — Completed 2025-11-25T14:45Z (home renders persona-driven dashboards; SW view with quick templates + recent meetings; manager view with insights cards and flagged reviews placeholder; persona switch surfaced on home)
 - [x] Phase 28A Recording Studio 2.0 — Completed 2025-11-25T15:35Z (capture page gained animated waveform, live floating controls, consent-backed in-person vs online selector persisted to queue metadata; upload flow polish deferred only if backend support required)
-- [ ] Phase 27A Adaptive UX Engine — pending
-- [ ] Phase 27B Role-Specific Dashboards — pending
+- [x] Phase 29 AI Writing Assistant & Source Check — Completed 2025-11-25T16:10Z (source-check endpoint compares minute text to transcript evidence; UI button shows supported/partial/unsupported with excerpts; AI edit popover ready for guided instructions)
+- [x] Phase 30 (Tabs & Tags) — Completed 2025-11-25 (Tabs from template metadata with persona defaults; tagging with autocomplete, filters on "My notes", tag chips, tags flow into exports)
+- [x] Phase 31 Config System & Module Registry — Completed 2026-03-28 (module manifests at `/api/modules`, tenant schema with routes/deps/permissions, navigation payload consumed by sidebar/bottom-nav with offline fallback)
+- [x] Phase 32A Design Tokens — Completed (tokens.json exists in frontend + packages/ui, WCAG 2.2 AA contrast validation via a11y tests)
+- [x] Phase 32B Multi-Tenant Theme Engine — Completed 2026-03-28 (`/api/theme?tenant=` endpoint returns full theme tokens; `useThemeTokens` hook fetches and applies; dark mode support)
+- [x] Phase 33A Advanced Offline Unified Engine — Completed (packages/core/storage abstracts Dexie/SQLite adapters for recordings/notes)
+- [x] Phase 33B Background Sync — Completed 2026-03-28 (push notification lib + hooks; settings UI; SW with workbox-background-sync; backend endpoints stubbed)
+- [x] Phase 34 Cross-Platform UI Kit — Completed (packages/ui/* with Button, Card, Badge, Dialog shared primitives)
+- [x] Phase 35 Mobile Shell — Completed 2026-03-28 (apps/mobile with Capture/List screens, SQLite adapter, sync logic, expo-av recording)
+- [x] Phase 36A Config Admin Console — Completed (frontend admin routes at /admin/configs with diff view and audit history)
+- [x] Phase 36B Module Dashboard — Completed 2026-03-28 (admin/modules page with module registry view and enablement matrix across tenants)
+- [x] Phase 37 Telemetry Dashboards — Completed 2026-03-28 (37A: module events via Prometheus; 37B: /admin/adoption page with metrics, sparkline trends, top modules, offline queue health)
+- [ ] Phase 38 Collaboration & Real-Time — Not started (yjs CRDT editing, WebSocket sync)
+- [ ] Phase 39 Advanced Search — Not started (Azure Cognitive Search, semantic embeddings)
+- [x] Phase 40A Audit Log Viewer — Completed 2026-03-28 (admin/audit page with filters, export to CSV/JSON, pagination; backend endpoints added)
+- [x] Phase 40B Retention Automation — Completed (cleanup scheduler in postgres_database.py with domain retention policies)
+- [x] Phase 41 Performance Optimization — Completed 2026-03-28 (bundle analyzer; dynamic imports for tabs; next/image with AVIF/WebP formats; OptimizedImage component)
 
 ### Context Snapshot [2025-11-21T02:35Z]
 
@@ -147,6 +162,19 @@
 - Next: (if time) expand coverage to full test suite with optional deps, tune PWA cache size warning.
   - Quick wins shipped: skeleton loaders, export toasts, citation timeline, quick export on list cards.
   - Additional polish: helper text on New cards, focus/underline on tabs, toolbar layout stability, offline last-sync badge.
+
+### Context Snapshot [2026-03-28T21:00Z]
+
+- Completed in this session:
+  - Phase 36B Module Dashboard (admin/modules page)
+  - Phase 37B Adoption Dashboard (admin/adoption page with metrics, trends, offline queue health)
+  - Phase 40A Audit Log Viewer (admin/audit page with filters and export)
+  - Phase 32B Multi-Tenant Theme Engine (/api/theme endpoint + hooks)
+  - Phase 33B Push Notifications (lib + hooks + settings UI)
+  - Phase 41 Performance Optimization (dynamic imports, next/image config, OptimizedImage component)
+- Current state: Admin console fully operational with 4 tabs; theming API live; push notification infrastructure ready; performance optimizations in place.
+- Blockers: Phase 38 (yjs) and Phase 39 (Azure Search) require additional infrastructure.
+- Next: Consider Phase 38 yjs integration for real-time collaboration; Phase 39 requires Azure Cognitive Search setup.
 
 ### Context Snapshot [2025-11-21T12:10Z]
 

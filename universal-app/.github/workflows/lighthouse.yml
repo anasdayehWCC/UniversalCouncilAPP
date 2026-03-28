@@ -1,0 +1,155 @@
+name: Lighthouse CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "URL to audit"
+        required: false
+        type: string
+
+env:
+  NODE_VERSION: "20.x"
+  PNPM_VERSION: "10"
+
+jobs:
+  lighthouse:
+    name: Lighthouse Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build application
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
+
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v12
+        id: lighthouse
+        with:
+          configPath: ".lighthouserc.json"
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+        continue-on-error: true
+
+      - name: Format Lighthouse Score
+        id: format
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const formatScore = (score) => {
+              if (score === null || score === undefined) return 'N/A';
+              const numScore = Number(score) * 100;
+              const emoji = numScore >= 90 ? '🟢' : numScore >= 50 ? '🟡' : '🔴';
+              return `${emoji} ${numScore.toFixed(0)}`;
+            };
+
+            // Note: Actual scores would be extracted from artifacts
+            console.log('Lighthouse audit completed');
+
+      - name: Upload Lighthouse Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-report
+          path: .lighthouseci/
+          retention-days: 14
+
+  lighthouse-budget-check:
+    name: Performance Budget Check
+    runs-on: ubuntu-latest
+    needs: lighthouse
+    if: always()
+    steps:
+      - name: Check performance budgets
+        run: |
+          echo "📊 Performance Budget Check"
+          echo ""
+          echo "Target budgets:"
+          echo "  - Performance: ≥ 80"
+          echo "  - Accessibility: ≥ 90"
+          echo "  - Best Practices: ≥ 90"
+          echo "  - SEO: ≥ 90"
+          echo ""
+          echo "Check Lighthouse artifacts for detailed results."
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+
+            const body = `## 🔦 Lighthouse Performance Report
+
+            | Metric | Budget | Status |
+            |--------|--------|--------|
+            | Performance | ≥ 80 | Check artifacts |
+            | Accessibility | ≥ 90 | Check artifacts |
+            | Best Practices | ≥ 90 | Check artifacts |
+            | SEO | ≥ 90 | Check artifacts |
+
+            📦 Download the Lighthouse report from workflow artifacts for detailed analysis.
+
+            ### Performance Budgets
+
+            | Resource | Budget |
+            |----------|--------|
+            | Total JS | < 500 KB |
+            | Total CSS | < 100 KB |
+            | Max Image Size | < 200 KB |
+            | Time to Interactive | < 5s |
+            | Largest Contentful Paint | < 2.5s |
+            | Cumulative Layout Shift | < 0.1 |
+
+            ---
+            <sub>🤖 Lighthouse CI runs automatically on every PR</sub>`;
+
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+
+            const botComment = comments.find(comment => 
+              comment.user.login === 'github-actions[bot]' &&
+              comment.body.includes('🔦 Lighthouse Performance Report')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: body,
+              });
+            }

@@ -3,10 +3,11 @@ import math
 import uuid
 from pathlib import Path
 
-from fastapi import APIRouter, HTTPException, Query, Request, Response, Depends
-from sqlmodel import col, func, select
+from fastapi import APIRouter, Query, Request, Response, Depends
+from sqlmodel import col, func, select, exists
 
 from backend.api.dependencies import SQLSessionDep, UserDep
+from common.errors import APIException, ErrorCodes, not_found, bad_request
 from backend.utils.get_file_s3_key import get_file_s3_key
 from common.config.loader import load_tenant_config
 from common.database.postgres_models import Case, Minute, MinuteVersion, Recording, Transcription, TranscriptionFeedback
@@ -72,7 +73,7 @@ async def _get_transcription_for_user(
         or transcription.organisation_id != current_user.organisation_id
         or (current_user.service_domain_id and transcription.service_domain_id != current_user.service_domain_id)
     ):
-        raise HTTPException(status_code=404, detail="Transcription not found")
+        raise not_found("Transcription", ErrorCodes.TRANSCRIPTION_NOT_FOUND)
     return transcription
 
 
@@ -95,16 +96,43 @@ async def list_transcriptions(
     current_user: UserDep,
     page: int = Query(1, ge=1, description="Page number (starts from 1)"),
     page_size: int = Query(20, ge=1, le=100, description="Number of items per page"),
+    tags: list[str] | None = Query(
+        default=None, description="Filter to transcriptions that have minutes containing any of these tags"
+    ),
+    template_name: str | None = Query(
+        default=None, description="Filter to transcriptions that have a minute using this template"
+    ),
 ) -> PaginatedTranscriptionsResponse:
     """Get paginated metadata for transcriptions for the current user."""
     context = _context_from_user(current_user)
     record_module_access(context, "transcription", True)
+
+    minute_filter = (
+        select(Minute.id)
+        .where(
+            Minute.transcription_id == Transcription.id,
+            Minute.organisation_id == current_user.organisation_id,
+        )
+        .limit(1)
+    )
+    if current_user.service_domain_id:
+        minute_filter = minute_filter.where(Minute.service_domain_id == current_user.service_domain_id)
+    if tags:
+        minute_filter = minute_filter.where(
+            Minute.tags.is_not(None),
+            func.jsonb_exists_any(Minute.tags, tags),
+        )
+    if template_name:
+        minute_filter = minute_filter.where(Minute.template_name == template_name)
+
     count_statement = select(func.count(col(Transcription.id))).where(
         Transcription.user_id == current_user.id,
         Transcription.organisation_id == current_user.organisation_id,
     )
     if current_user.service_domain_id:
         count_statement = count_statement.where(Transcription.service_domain_id == current_user.service_domain_id)
+    if tags or template_name:
+        count_statement = count_statement.where(exists(minute_filter))
     count_result = await session.exec(count_statement)
     total_count = count_result.one()
 
@@ -115,6 +143,8 @@ async def list_transcriptions(
     )
     if current_user.service_domain_id:
         statement = statement.where(Transcription.service_domain_id == current_user.service_domain_id)
+    if tags or template_name:
+        statement = statement.where(exists(minute_filter))
     statement = statement.order_by(col(Transcription.created_datetime).desc()).offset(offset).limit(page_size)
     result = await session.exec(statement)
     transcriptions = result.all()
@@ -186,9 +216,9 @@ async def create_transcription(
         or recording.organisation_id != current_user.organisation_id
         or (current_user.service_domain_id and recording.service_domain_id != current_user.service_domain_id)
     ):
-        raise HTTPException(404, detail="Recording not found")
+        raise not_found("Recording", ErrorCodes.RECORDING_NOT_FOUND)
     if not request.case_reference:
-        raise HTTPException(status_code=400, detail="case_reference is required")
+        raise bad_request("case_reference is required", ErrorCodes.VALIDATION_ERROR)
 
     existing_case = await session.exec(
         select(Case).where(
@@ -224,10 +254,7 @@ async def create_transcription(
     )
 
     if not await storage_service.check_object_exists(recording.s3_file_key):
-        raise HTTPException(
-            status_code=404,
-            detail=f"Recording file not found in S3: {recording.s3_file_key}",
-        )
+        raise not_found("Recording file", ErrorCodes.RECORDING_NOT_FOUND)
 
     minute = Minute(
         template_name=request.template_name,
@@ -291,7 +318,7 @@ async def get_transcription(
         or transcription.organisation_id != current_user.organisation_id
         or (current_user.service_domain_id and transcription.service_domain_id != current_user.service_domain_id)
     ):
-        raise HTTPException(status_code=404, detail="Transcription not found")
+        raise not_found("Transcription", ErrorCodes.TRANSCRIPTION_NOT_FOUND)
     return TranscriptionGetResponse(
         id=transcription.id,
         status=transcription.status,
@@ -334,11 +361,11 @@ async def request_transcription_translation(
 ) -> TranslationListResponse:
     record_module_access(_context_from_user(current_user), "transcription", True)
     if not payload.languages:
-        raise HTTPException(status_code=400, detail="languages list is required")
+        raise bad_request("languages list is required", ErrorCodes.VALIDATION_ERROR)
     transcription = await _get_transcription_for_user(session, current_user, transcription_id)
     allowed_languages = _allowed_translation_languages()
     if not allowed_languages:
-        raise HTTPException(status_code=400, detail="Translations are not enabled for this tenant")
+        raise bad_request("Translations are not enabled for this tenant", ErrorCodes.FEATURE_DISABLED)
 
     deduped_languages: list[str] = []
     invalid_languages: list[str] = []
@@ -354,7 +381,7 @@ async def request_transcription_translation(
         seen.add(normalised)
 
     if invalid_languages:
-        raise HTTPException(status_code=400, detail=f"Invalid translation languages: {', '.join(invalid_languages)}")
+        raise bad_request(f"Invalid translation languages: {', '.join(invalid_languages)}", ErrorCodes.VALIDATION_ERROR)
 
     TranslationHandlerService.request_translations(
         queue_service=llm_queue_service,
@@ -382,7 +409,7 @@ async def get_recordings_for_transcription(
         or transcription.organisation_id != user.organisation_id
         or (user.service_domain_id and transcription.service_domain_id != user.service_domain_id)
     ):
-        raise HTTPException(404)
+        raise not_found("Transcription", ErrorCodes.TRANSCRIPTION_NOT_FOUND)
 
     result = await session.exec(
         select(Recording)
@@ -419,9 +446,9 @@ async def get_signed_recording(
         or recording.organisation_id != user.organisation_id
         or (user.service_domain_id and recording.service_domain_id != user.service_domain_id)
     ):
-        raise HTTPException(404)
+        raise not_found("Recording", ErrorCodes.RECORDING_NOT_FOUND)
     if not await storage_service.check_object_exists(recording.s3_file_key):
-        raise HTTPException(404, "Recording not found")
+        raise not_found("Recording file", ErrorCodes.RECORDING_NOT_FOUND)
     filename = Path(recording.s3_file_key).name
     url = await storage_service.generate_presigned_url_get_object(recording.s3_file_key, filename, 60 * 60)
     return SingleRecording(id=recording.id, url=url, extension=Path(recording.s3_file_key).suffix)
@@ -446,13 +473,13 @@ async def get_signed_recording_range(
         or transcription.organisation_id != user.organisation_id
         or (user.service_domain_id and transcription.service_domain_id != user.service_domain_id)
     ):
-        raise HTTPException(404)
+        raise not_found("Transcription", ErrorCodes.TRANSCRIPTION_NOT_FOUND)
 
     recording = await session.get(Recording, recording_id)
     if not recording or recording.transcription_id != transcription.id:
-        raise HTTPException(404)
+        raise not_found("Recording", ErrorCodes.RECORDING_NOT_FOUND)
     if not await storage_service.check_object_exists(recording.s3_file_key):
-        raise HTTPException(404, "Recording not found")
+        raise not_found("Recording file", ErrorCodes.RECORDING_NOT_FOUND)
 
     filename = Path(recording.s3_file_key).name
     base_url = await storage_service.generate_presigned_url_get_object(
@@ -491,10 +518,10 @@ async def record_evidence_click(
         or transcription.organisation_id != user.organisation_id
         or (user.service_domain_id and transcription.service_domain_id != user.service_domain_id)
     ):
-        raise HTTPException(404)
+        raise not_found("Transcription", ErrorCodes.TRANSCRIPTION_NOT_FOUND)
     recording = await session.get(Recording, payload.recording_id)
     if not recording or recording.transcription_id != transcription.id:
-        raise HTTPException(404)
+        raise not_found("Recording", ErrorCodes.RECORDING_NOT_FOUND)
     # Audit middleware handles logging; avoid storing payload to reduce PII exposure
     return Response(status_code=204)
 
@@ -516,7 +543,7 @@ async def save_transcription(
         or transcription.organisation_id != current_user.organisation_id
         or (current_user.service_domain_id and transcription.service_domain_id != current_user.service_domain_id)
     ):
-        raise HTTPException(status_code=404, detail="Transcription not found")
+        raise not_found("Transcription", ErrorCodes.TRANSCRIPTION_NOT_FOUND)
 
     if transcription_data.title is not None:
         transcription.title = transcription_data.title
@@ -541,7 +568,7 @@ async def get_dialogue(
         or transcription.organisation_id != current_user.organisation_id
         or (current_user.service_domain_id and transcription.service_domain_id != current_user.service_domain_id)
     ):
-        raise HTTPException(status_code=404, detail="Transcription not found")
+        raise not_found("Transcription", ErrorCodes.TRANSCRIPTION_NOT_FOUND)
     return transcription.dialogue_entries or []
 
 
@@ -559,7 +586,7 @@ async def update_dialogue(
         or transcription.organisation_id != current_user.organisation_id
         or (current_user.service_domain_id and transcription.service_domain_id != current_user.service_domain_id)
     ):
-        raise HTTPException(status_code=404, detail="Transcription not found")
+        raise not_found("Transcription", ErrorCodes.TRANSCRIPTION_NOT_FOUND)
     transcription.dialogue_entries = body.dialogue_entries
     await session.commit()
     await session.refresh(transcription)
@@ -580,7 +607,7 @@ async def submit_feedback(
         or transcription.organisation_id != current_user.organisation_id
         or (current_user.service_domain_id and transcription.service_domain_id != current_user.service_domain_id)
     ):
-        raise HTTPException(status_code=404, detail="Transcription not found")
+        raise not_found("Transcription", ErrorCodes.TRANSCRIPTION_NOT_FOUND)
     feedback = TranscriptionFeedback(
         transcription_id=transcription_id,
         organisation_id=current_user.organisation_id,
@@ -605,7 +632,7 @@ async def delete_transcription(transcription_id: uuid.UUID, session: SQLSessionD
         or transcription.organisation_id != current_user.organisation_id
         or (current_user.service_domain_id and transcription.service_domain_id != current_user.service_domain_id)
     ):
-        raise HTTPException(status_code=404, detail="Transcription not found")
+        raise not_found("Transcription", ErrorCodes.TRANSCRIPTION_NOT_FOUND)
 
     # Delete the transcription
     await session.delete(transcription)

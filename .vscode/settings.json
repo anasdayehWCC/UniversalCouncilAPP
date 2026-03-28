@@ -10,10 +10,10 @@
     "typescript"
   ],
   "eslint.nodePath": "./node_modules/eslint",
-  "typescript.tsdk": "./frontend/node_modules/typescript/lib",
+  "typescript.tsdk": "./universal-app/node_modules/typescript/lib",
   "typescript.preferences.importModuleSpecifier": "non-relative",
   "eslint.workingDirectories": [
-    "./frontend"
+    "./universal-app"
   ],
   "ruff.enable": true,
   "ruff.importStrategy": "fromEnvironment",
@@ -26,5 +26,7 @@
     ]
   },
   "js/ts.implicitProjectConfig.checkJs": true,
-  "python.analysis.typeCheckingMode": "standard"
+  "python.analysis.typeCheckingMode": "standard",
+  "terminal.integrated.shellIntegration.environmentReporting": true,
+  "terminal.integrated.shellIntegration.history": 500
 }

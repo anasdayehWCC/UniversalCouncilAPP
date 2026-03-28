@@ -1,0 +1,4 @@
+packages:
+  - universal-app
+  - apps/mobile
+  - packages/*

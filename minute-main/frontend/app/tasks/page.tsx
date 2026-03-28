@@ -3,8 +3,8 @@
 import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
-  listTasksTasksGetOptions,
-  listTasksTasksGetQueryKey,
+  listMyTasksTasksGetOptions,
+  listMyTasksTasksGetQueryKey,
   patchMinuteTaskMinutesMinuteIdTasksTaskIdPatchMutation,
 } from '@/lib/client/@tanstack/react-query.gen'
 import { MinuteTaskListItemResponse, TaskStatus } from '@/lib/client'
@@ -36,8 +36,8 @@ const FILTERS: { label: string; value: TaskStatus | 'all' }[] = [
 export default function TasksPage() {
   const [filter, setFilter] = useState<TaskStatus | 'all'>('pending')
   const queryClient = useQueryClient()
-  const queryKey = listTasksTasksGetQueryKey()
-  const { data: tasks = [], isLoading } = useQuery({ ...listTasksTasksGetOptions() })
+  const queryKey = listMyTasksTasksGetQueryKey()
+  const { data: tasks = [], isLoading } = useQuery({ ...listMyTasksTasksGetOptions() })
 
   const updateTask = useMutation({
     ...patchMinuteTaskMinutesMinuteIdTasksTaskIdPatchMutation(),

@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM python:3.14-slim
 
 # The following three ENVs are to ensure ray logs appear properly
 ENV RAY_ROTATION_MAX_BYTES=10485760

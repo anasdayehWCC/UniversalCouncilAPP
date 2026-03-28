@@ -1,0 +1,76 @@
+id: "wcc_housing"
+name: "Westminster Housing Services"
+version: "1.0.0"
+defaultLocale: "en-GB"
+languages:
+  default: "en"
+  available:
+    - "en"
+    - "pl"
+    - "ar"
+    - "uk"
+  autoTranslate: true
+organisation: "Westminster"
+service_domain: "housing"
+templates:
+  - property_inspection
+  - tenant_meeting
+  - maintenance_visit
+  - housing_assessment
+sharepoint_library_path: "Shared Documents/Housing/Inspections/2025/"
+lexicon:
+  - "WCC"
+  - "HRA"
+  - "council tax"
+  - "tenancy agreement"
+  - "repairs"
+  - "antisocial behaviour"
+planner:
+  plan_id: "<planner-plan-id-housing>"
+  bucket_id: "<planner-bucket-id-housing>"
+roles:
+  - housing_officer
+  - team_leader
+  - admin
+modules:
+  - id: "recordings"
+    enabled: true
+    label: "Property Visits"
+    icon: "Home"
+    departments:
+      - "housing"
+  - id: "minutes"
+    enabled: true
+    label: "Visit Notes"
+    icon: "FileText"
+    departments:
+      - "housing"
+  - id: "templates"
+    enabled: true
+  - id: "tasks"
+    enabled: true
+    label: "Repairs & Actions"
+    icon: "Wrench"
+navigation:
+  - label: "Home"
+    href: "/"
+    icon: "LayoutDashboard"
+    roles: ["housing_officer", "team_leader", "admin"]
+  - label: "Properties"
+    href: "/cases"
+    icon: "Building2"
+    roles: ["housing_officer", "team_leader"]
+  - label: "Visit"
+    href: "/record"
+    icon: "Mic"
+    fab: true
+    roles: ["housing_officer"]
+  - label: "Notes"
+    href: "/transcriptions"
+    icon: "FileText"
+    roles: ["housing_officer", "team_leader"]
+  - label: "Repairs"
+    href: "/tasks"
+    icon: "Wrench"
+    roles: ["housing_officer", "team_leader"]
+retentionDaysDefault: 1095 # 3 years for housing records

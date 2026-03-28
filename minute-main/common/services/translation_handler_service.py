@@ -79,7 +79,6 @@ class TranslationHandlerService:
                 session.commit()
 
     @classmethod
-    @classmethod
     def enqueue_translation(
         cls,
         transcription_id: UUID,

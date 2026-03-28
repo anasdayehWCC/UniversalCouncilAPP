@@ -36,7 +36,9 @@ export function BottomNav() {
         staleTime: 5 * 60 * 1000,
     });
 
-    const navItems = (moduleData?.nav_items?.length ? moduleData.nav_items : FALLBACK_NAV) as NavItem[];
+    const navItems = ((moduleData as unknown as { navigation?: NavItem[] })?.navigation?.length
+        ? (moduleData as unknown as { navigation?: NavItem[] }).navigation
+        : FALLBACK_NAV) as NavItem[];
 
     if (isLoading) {
         return (

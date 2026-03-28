@@ -1,13 +1,14 @@
 import datetime
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from sqlalchemy.orm import selectinload
 from sqlmodel import col, select
 
 from backend.api.dependencies import UserDep
 from backend.api.dependencies.get_session import SQLSessionDep
 from common.database.postgres_models import ServiceDomainTemplate, TemplateQuestion, TemplateType, UserTemplate
+from common.errors import ErrorCodes, not_found
 from common.services.template_manager import TemplateManager
 from common.settings import get_settings
 from common.types import (
@@ -82,7 +83,7 @@ async def get_user_template(user: UserDep, session: SQLSessionDep, template_id: 
     ).first()
 
     if not template:
-        raise HTTPException(404)
+        raise not_found("Template", ErrorCodes.TEMPLATE_NOT_FOUND)
 
     return TemplateResponse(
         id=template.id,
@@ -131,7 +132,7 @@ async def edit_user_template(
     ).first()
 
     if not template:
-        raise HTTPException(404)
+        raise not_found("Template", ErrorCodes.TEMPLATE_NOT_FOUND)
 
     if request.name is not None:
         template.name = request.name
@@ -176,7 +177,7 @@ async def delete_user_template(user: UserDep, session: SQLSessionDep, template_i
     ).first()
 
     if not template:
-        raise HTTPException(404)
+        raise not_found("Template", ErrorCodes.TEMPLATE_NOT_FOUND)
 
     await session.delete(template)
     await session.commit()
@@ -193,7 +194,7 @@ async def duplicate_user_template(user: UserDep, session: SQLSessionDep, templat
     ).first()
 
     if not original_template:
-        raise HTTPException(404)
+        raise not_found("Template", ErrorCodes.TEMPLATE_NOT_FOUND)
 
     template = UserTemplate(
         user_id=user.id,

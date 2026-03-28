@@ -1,7 +1,7 @@
 -include .env
 export
 
-PY_VERSION := $(shell cat .python-version)
+PY_VERSION := $(shell cat ../.python-version)
 
 .PHONY: build-pyenv install pre-commit-setup test test_e2e run_frontend run_backend run stop
 
@@ -10,9 +10,9 @@ build-pyenv:
 	poetry env use ${PY_VERSION}
 
 install:
-	cd frontend && npm install
+	cd .. && pnpm install
 	brew install ffmpeg
-	poetry install --with fastapi --no-root
+	poetry install --with dev --no-root
 	poetry run pre-commit install
 
 run-pre-commit:
@@ -22,7 +22,7 @@ test:
 	poetry run pytest tests/
 
 run_frontend:
-	cd frontend && npm run dev
+	cd .. && pnpm dev:web
 
 run_backend:
 	poetry run uvicorn backend.main:app --reload --port 8080
@@ -148,4 +148,4 @@ release:
 	chmod +x ./release.sh && ./release.sh $(env)
 
 generate_api_types:
-	cd frontend && npm run openapi-ts
+	cd .. && pnpm openapi:web

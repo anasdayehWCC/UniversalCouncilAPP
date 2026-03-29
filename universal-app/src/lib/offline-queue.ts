@@ -183,7 +183,7 @@ function getExtension(fileName: string): string {
  */
 export async function syncQueuedRecording(
   recording: OfflineRecording,
-  token: string
+  token?: string | null
 ): Promise<{ id: string; transcription_id?: string }> {
   if (!recording.metadata) {
     throw new Error('Missing metadata on offline recording');
@@ -261,7 +261,7 @@ export async function syncQueuedRecording(
  * Sync all pending recordings
  * Returns summary of sync results
  */
-export async function syncAllQueued(token: string): Promise<{
+export async function syncAllQueued(token?: string | null): Promise<{
   synced: number;
   failed: number;
   errors: Array<{ id: number; error: string }>;
@@ -307,7 +307,7 @@ export async function syncAllQueued(token: string): Promise<{
 /**
  * Retry failed recordings (up to max attempts)
  */
-export async function retryFailed(token: string): Promise<{
+export async function retryFailed(token?: string | null): Promise<{
   retried: number;
   stillFailed: number;
 }> {

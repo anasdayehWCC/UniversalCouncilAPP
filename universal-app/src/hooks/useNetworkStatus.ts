@@ -55,7 +55,7 @@ const API_BASE =
   'http://localhost:8080';
 
 /** Health endpoint for backend ping */
-const HEALTH_ENDPOINT = `${API_BASE}/health`;
+const HEALTH_ENDPOINT = `${API_BASE}/healthcheck`;
 
 /** How often to ping backend when online (ms) */
 const PING_INTERVAL_ONLINE = 30000; // 30 seconds

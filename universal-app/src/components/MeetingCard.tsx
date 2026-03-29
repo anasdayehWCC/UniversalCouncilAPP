@@ -25,11 +25,11 @@ interface MeetingCardProps {
 
 export function MeetingCard({ meeting, compact = false }: MeetingCardProps) {
   const statusColors = {
-    draft: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-    processing: 'bg-blue-100 text-blue-700 border-blue-200',
-    ready: 'bg-green-100 text-green-700 border-green-200',
-    approved: 'bg-slate-100 text-slate-700 border-slate-200',
-    flagged: 'bg-red-100 text-red-700 border-red-200',
+    draft: 'bg-warning/10 text-warning border-warning/30',
+    processing: 'bg-info/10 text-info border-info/30',
+    ready: 'bg-success/10 text-success border-success/30',
+    approved: 'bg-muted text-muted-foreground border-input',
+    flagged: 'bg-destructive/10 text-destructive border-destructive/30',
   };
 
   const statusLabels = {
@@ -40,17 +40,17 @@ export function MeetingCard({ meeting, compact = false }: MeetingCardProps) {
     flagged: 'Changes Requested',
   };
   const riskColors = {
-    low: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    medium: 'bg-amber-50 text-amber-700 border-amber-200',
-    high: 'bg-red-50 text-red-700 border-red-200',
+    low: 'bg-success/10 text-success border-success/30',
+    medium: 'bg-warning/10 text-warning border-warning/30',
+    high: 'bg-destructive/10 text-destructive border-destructive/30',
   };
 
   return (
-    <div className="group bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
+    <div className="group bg-card rounded-xl border border-border shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
       <div className="p-5">
         <div className="flex items-start justify-between mb-3">
           <div className="flex gap-2">
-            <Badge variant="outline" className={cn("capitalize font-medium border", statusColors[meeting.status], meeting.status === 'processing' && "animate-pulse")}>
+            <Badge variant="outline" className={cn("capitalize font-medium border", statusColors[meeting.status], meeting.status === 'processing' && "animate-pulse motion-reduce:animate-none")}>
               {statusLabels[meeting.status]}
             </Badge>
             {meeting.riskScore && (
@@ -59,7 +59,7 @@ export function MeetingCard({ meeting, compact = false }: MeetingCardProps) {
               </Badge>
             )}
             {meeting.processingMode && (
-              <Badge variant="secondary" className="bg-slate-100 text-slate-700 border-slate-200">
+              <Badge variant="outline" className="bg-muted text-muted-foreground border-input">
                 {meeting.processingMode === 'fast' ? 'Fast Mode' : 'Economy'}
               </Badge>
             )}
@@ -68,7 +68,7 @@ export function MeetingCard({ meeting, compact = false }: MeetingCardProps) {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2 text-slate-400 hover:text-slate-600 focus-visible:ring-0" aria-label="More actions">
+              <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2 text-muted-foreground hover:text-foreground focus-visible:ring-0" aria-label="More actions">
                 <MoreHorizontal className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -77,20 +77,20 @@ export function MeetingCard({ meeting, compact = false }: MeetingCardProps) {
               <DropdownMenuSeparator />
               <Link href={`/my-notes/${meeting.id}`}>
                 <DropdownMenuItem className="cursor-pointer">
-                  <Eye className="w-4 h-4 mr-2 text-slate-500" />
+                  <Eye className="w-4 h-4 mr-2 text-muted-foreground" />
                   View Details
                 </DropdownMenuItem>
               </Link>
               <DropdownMenuItem className="cursor-pointer" onClick={() => alert('Edit functionality coming soon')}>
-                <Edit className="w-4 h-4 mr-2 text-slate-500" />
+                <Edit className="w-4 h-4 mr-2 text-muted-foreground" />
                 Edit Note
               </DropdownMenuItem>
               <DropdownMenuItem className="cursor-pointer" onClick={() => alert('PDF generation started...')}>
-                <Download className="w-4 h-4 mr-2 text-slate-500" />
+                <Download className="w-4 h-4 mr-2 text-muted-foreground" />
                 Download PDF
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer text-red-600 focus:text-red-700 focus:bg-red-50" onClick={() => alert('Delete functionality restricted in demo')}>
+              <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10" onClick={() => alert('Delete functionality restricted in demo')}>
                 <Trash2 className="w-4 h-4 mr-2" />
                 Delete
               </DropdownMenuItem>
@@ -98,13 +98,13 @@ export function MeetingCard({ meeting, compact = false }: MeetingCardProps) {
           </DropdownMenu>
         </div>
 
-        <Link href={`/my-notes/${meeting.id}`} className="block group-hover:text-blue-600 transition-colors">
-          <h3 className="font-display font-semibold text-lg text-slate-900 mb-1 line-clamp-1">
+        <Link href={`/my-notes/${meeting.id}`} className="block group-hover:text-primary transition-colors">
+          <h3 className="font-display font-semibold text-lg text-foreground mb-1 line-clamp-1">
             {meeting.title}
           </h3>
         </Link>
 
-        <div className="flex items-center gap-4 text-sm text-slate-500 mb-4">
+        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
           <div className="flex items-center gap-1.5">
             <Calendar className="w-4 h-4" />
             <span>{formatDate(meeting.date)}</span>
@@ -114,7 +114,7 @@ export function MeetingCard({ meeting, compact = false }: MeetingCardProps) {
             <span>{meeting.duration}</span>
           </div>
           {(meeting.uploadedAt || meeting.submittedAt) && (
-            <span className="text-[11px] bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
+            <span className="text-[11px] bg-muted px-2 py-0.5 rounded-full border border-input">
               Submitted {formatDate(meeting.uploadedAt || meeting.submittedAt || meeting.date)}
             </span>
           )}
@@ -122,28 +122,28 @@ export function MeetingCard({ meeting, compact = false }: MeetingCardProps) {
 
         {!compact && (
           <div className="mb-4">
-            <p className="text-sm text-slate-600 line-clamp-2 leading-relaxed">
+            <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
               {meeting.summary || "No summary available yet..."}
             </p>
           </div>
         )}
 
-        <div className="flex items-center justify-between pt-4 border-t border-slate-50">
+        <div className="flex items-center justify-between pt-4 border-t border-border">
           <div className="flex -space-x-2">
             {meeting.attendees.slice(0, 3).map((attendee, i) => (
-              <div key={i} className="w-7 h-7 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px] font-medium text-slate-600" title={attendee}>
+              <div key={i} className="w-7 h-7 rounded-full bg-muted border-2 border-card flex items-center justify-center text-[10px] font-medium text-muted-foreground" title={attendee}>
                 {attendee.charAt(0)}
               </div>
             ))}
             {meeting.attendees.length > 3 && (
-              <div className="w-7 h-7 rounded-full bg-slate-50 border-2 border-white flex items-center justify-center text-[10px] font-medium text-slate-500">
+              <div className="w-7 h-7 rounded-full bg-muted border-2 border-card flex items-center justify-center text-[10px] font-medium text-muted-foreground">
                 +{meeting.attendees.length - 3}
               </div>
             )}
           </div>
-          
+
           <Link href={`/my-notes/${meeting.id}`}>
-            <Button variant="ghost" size="sm" className="text-slate-600 hover:text-blue-600 gap-1 pl-2 pr-1">
+            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary gap-1 pl-2 pr-1">
               Open
               <ChevronRight className="w-4 h-4" />
             </Button>

@@ -1,68 +1,94 @@
 'use client';
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { EnhancedInput } from '@/components/ui/EnhancedInput';
-import { Sparkles, Wand2, SpellCheck, AlignLeft, Eraser } from 'lucide-react';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Sparkles, Wand2, AlignLeft, Star, EyeOff, Pen, Send } from 'lucide-react';
+
+interface ActionButtonProps {
+  icon: React.ReactNode;
+  label: string;
+  onClick?: () => void;
+}
+
+function ActionButton({ icon, label, onClick }: ActionButtonProps) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg border border-border bg-muted/50 hover:bg-muted text-sm text-foreground transition-colors text-left group"
+    >
+      <span className="text-muted-foreground group-hover:text-primary transition-colors shrink-0">
+        {icon}
+      </span>
+      <span>{label}</span>
+    </button>
+  );
+}
+
+interface SectionHeaderProps {
+  label: string;
+}
+
+function SectionHeader({ label }: SectionHeaderProps) {
+  return (
+    <div>
+      <p className="text-xs font-semibold text-muted-foreground tracking-wide uppercase px-0 pt-4 pb-2">
+        {label}
+      </p>
+      <div className="h-px bg-border" />
+    </div>
+  );
+}
 
 export function AIEditSidebar() {
   return (
-    <Card className="h-full border-l border-slate-200 rounded-none border-y-0 border-r-0 shadow-none bg-slate-50/50">
-      <CardHeader>
-        <div className="flex items-center gap-2 text-purple-600 mb-1">
+    <aside className="w-80 shrink-0 fixed right-0 top-[var(--shell-header-height)] h-[calc(100dvh-var(--shell-header-height))] flex flex-col bg-card border-l border-border shadow-xl overflow-y-auto z-30">
+      {/* Panel header */}
+      <div className="px-4 py-4 border-b border-border shrink-0">
+        <div className="flex items-center gap-2 text-primary mb-1">
           <Sparkles className="w-4 h-4" />
           <span className="text-xs font-bold uppercase tracking-wider">AI Assistant</span>
         </div>
-        <CardTitle className="text-lg">Edit with AI</CardTitle>
-        <CardDescription>
+        <p className="text-base font-semibold text-foreground">Edit with AI</p>
+        <p className="text-xs text-muted-foreground mt-0.5">
           Select text in the summary to see context-aware actions.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <p className="text-xs font-semibold text-slate-500 uppercase">Quick Actions</p>
-          <Button variant="outline" className="w-full justify-start gap-2 bg-white hover:border-purple-200 hover:text-purple-700 transition-colors">
-            <Wand2 className="w-4 h-4" />
-            Make more professional
-          </Button>
-          <Button variant="outline" className="w-full justify-start gap-2 bg-white hover:border-purple-200 hover:text-purple-700 transition-colors">
-            <AlignLeft className="w-4 h-4" />
-            Summarize selection
-          </Button>
-          <Button variant="outline" className="w-full justify-start gap-2 bg-white hover:border-purple-200 hover:text-purple-700 transition-colors">
-            <SpellCheck className="w-4 h-4" />
-            Fix grammar & spelling
-          </Button>
-        </div>
+        </p>
+      </div>
 
-        <div className="space-y-2 pt-4 border-t border-slate-200">
-          <p className="text-xs font-semibold text-slate-500 uppercase">Social Care Specific</p>
-          <Button variant="outline" className="w-full justify-start gap-2 bg-white hover:border-blue-200 hover:text-blue-700 transition-colors">
-            <Sparkles className="w-4 h-4" />
-            Make strengths-based
-          </Button>
-          <Button variant="outline" className="w-full justify-start gap-2 bg-white hover:border-blue-200 hover:text-blue-700 transition-colors">
-            <Eraser className="w-4 h-4" />
-            Anonymize names
-          </Button>
+      {/* Quick Actions */}
+      <div className="px-4 pt-2">
+        <SectionHeader label="Quick Actions" />
+        <div className="flex flex-col gap-1.5 pt-2">
+          <ActionButton icon={<Wand2 className="w-4 h-4" />} label="Make more professional" />
+          <ActionButton icon={<AlignLeft className="w-4 h-4" />} label="Summarize selection" />
+          <ActionButton icon={<Pen className="w-4 h-4" />} label="Fix grammar & spelling" />
         </div>
+      </div>
 
-        <div className="pt-4 border-t border-slate-200">
-          <p className="text-xs font-semibold text-slate-500 uppercase mb-2">Custom Instruction</p>
-          <EnhancedInput 
-            placeholder="e.g. 'Rewrite this to focus on the child's voice'" 
-            className="bg-white"
-            rows={2}
+      {/* Social Care Specific */}
+      <div className="px-4 pt-1">
+        <SectionHeader label="Social Care Specific" />
+        <div className="flex flex-col gap-1.5 pt-2">
+          <ActionButton icon={<Star className="w-4 h-4" />} label="Make strengths-based" />
+          <ActionButton icon={<EyeOff className="w-4 h-4" />} label="Anonymize names" />
+        </div>
+      </div>
+
+      {/* Custom Instruction */}
+      <div className="px-4 pt-1 pb-6">
+        <SectionHeader label="Custom Instruction" />
+        <div className="pt-3 flex flex-col gap-2">
+          <label className="text-xs font-medium text-muted-foreground">
+            Custom instruction
+          </label>
+          <textarea
+            placeholder="e.g. 'Rewrite this to focus on the child's voice'"
+            className="w-full min-h-[80px] px-3 py-2 text-sm bg-muted/50 border border-border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground placeholder:text-muted-foreground"
           />
+          <button className="flex items-center justify-center gap-2 w-full px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
+            <Send className="w-3.5 h-3.5" />
+            Apply
+          </button>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </aside>
   );
 }

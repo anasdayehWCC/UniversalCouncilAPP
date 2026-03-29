@@ -27,7 +27,7 @@ function DefaultFallback({ moduleId, moduleName, reason, missingDependencies }: 
   if (reason === 'loading') {
     return (
       <div className="flex flex-col items-center justify-center min-h-[200px] p-8 text-center">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground mb-4" />
+        <Loader2 className="h-8 w-8 animate-spin motion-reduce:animate-none text-muted-foreground mb-4" />
         <p className="text-muted-foreground">Loading module...</p>
       </div>
     );

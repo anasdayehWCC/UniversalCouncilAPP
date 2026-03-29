@@ -72,6 +72,11 @@ class TaskSource(StrEnum):
     MANUAL = "manual"
 
 
+class ColorMode(StrEnum):
+    LIGHT = "light"
+    DARK = "dark"
+    SYSTEM = "system"
+
 
 
 
@@ -168,6 +173,10 @@ class User(BaseTableMixin, table=True):
     updated_datetime: datetime = Field(sa_column=updated_datetime_column(), default=None)
     email: str = Field(index=True)
     data_retention_days: int | None = Field(default=30)
+    preferences: List["UserPreference"] = Relationship(
+        back_populates="user",
+        sa_relationship=relationship("UserPreference", back_populates="user"),
+    )
     transcriptions: List["Transcription"] = Relationship(
         back_populates="user",
         sa_relationship=relationship("Transcription", back_populates="user"),
@@ -185,6 +194,23 @@ class User(BaseTableMixin, table=True):
             return "cabinetoffice" in domain.lower() or "dsit" in domain.lower()
         except ValueError:
             return False
+
+
+class UserPreference(BaseTableMixin, table=True):
+    __tablename__ = "user_preference"
+    __table_args__ = (
+        UniqueConstraint("user_id", name="uq_user_preference_user_id"),
+    )
+
+    created_datetime: datetime = Field(sa_column=created_datetime_column(), default=None)
+    updated_datetime: datetime = Field(sa_column=updated_datetime_column(), default=None)
+    user_id: UUID = Field(foreign_key="user.id", ondelete="CASCADE", index=True)
+    color_mode: str = Field(default=ColorMode.SYSTEM.value, index=True)
+
+    user: User = Relationship(
+        back_populates="preferences",
+        sa_relationship=relationship("User", back_populates="preferences"),
+    )
 
 
 class Case(BaseTableMixin, table=True):

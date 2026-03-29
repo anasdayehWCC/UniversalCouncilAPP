@@ -253,7 +253,7 @@ export function formatDayDescription(date: Date, baseDate: Date = new Date()): s
  * Get SLA status for a submitted item
  */
 export function getSLAStatus(submittedAt: string | undefined | null) {
-  if (!submittedAt) return { label: 'Due in 24h', color: 'text-slate-500', bg: 'bg-slate-50' };
+  if (!submittedAt) return { label: 'Due in 24h', color: 'text-slate-500', bg: 'bg-slate-50', isOverdue: false, overdueHours: 0 };
   
   const submitted = new Date(submittedAt);
   const now = new Date();
@@ -263,11 +263,17 @@ export function getSLAStatus(submittedAt: string | undefined | null) {
   const diffHours = Math.ceil(diffMs / (1000 * 60 * 60));
 
   if (diffHours < 0) {
-    return { label: `Overdue by ${Math.abs(diffHours)}h`, color: 'text-red-700', bg: 'bg-red-50' };
+    const overdueHours = Math.abs(diffHours);
+    const overdueLabel = overdueHours < 24
+      ? `${overdueHours}h`
+      : overdueHours < 168
+        ? `${Math.floor(overdueHours / 24)}d`
+        : `${Math.floor(overdueHours / 168)}wk`;
+    return { label: `Overdue · ${overdueLabel}`, color: 'text-red-700', bg: 'bg-red-50', isOverdue: true, overdueHours };
   } else if (diffHours <= 4) {
-    return { label: `Due in ${diffHours}h`, color: 'text-orange-700', bg: 'bg-orange-50' };
+    return { label: `Due in ${diffHours}h`, color: 'text-orange-700', bg: 'bg-orange-50', isOverdue: false, overdueHours: 0 };
   } else {
-    return { label: `Due in ${diffHours}h`, color: 'text-slate-600', bg: 'bg-slate-50' };
+    return { label: `Due in ${diffHours}h`, color: 'text-slate-600', bg: 'bg-slate-50', isOverdue: false, overdueHours: 0 };
   }
 }
 

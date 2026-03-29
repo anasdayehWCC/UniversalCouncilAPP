@@ -9,12 +9,13 @@
  * @module components/OfflineFallback
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import { motion } from 'framer-motion';
 import { WifiOff, RefreshCw, Cloud, Smartphone, Signal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { useSyncManager } from '@/hooks/useSyncManager';
+import { useAuth } from '@/hooks/useAuth';
 
 // ============================================================================
 // Component
@@ -43,8 +44,15 @@ export function OfflineFallback({
   children,
   forceOffline = false,
 }: OfflineFallbackProps) {
+  const isMounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+
   const { state, checkNow, isChecking } = useNetworkStatus();
-  const { pendingCount } = useSyncManager();
+  const { accessToken } = useAuth();
+  const { pendingCount } = useSyncManager(accessToken);
   const [retryCount, setRetryCount] = useState(0);
 
   const isOffline = forceOffline || state === 'offline';
@@ -65,17 +73,17 @@ export function OfflineFallback({
     await checkNow();
   };
 
-  // If online, render children or nothing
-  if (!isOffline) {
+  // Don't render until after hydration to prevent SSR mismatch
+  // If online (or not yet mounted), render children or nothing
+  if (!isMounted || !isOffline) {
     return children ? <>{children}</> : null;
   }
 
   return (
     <div
       className={cn(
-        'min-h-screen flex items-center justify-center p-6',
-        'bg-gradient-to-b from-slate-50 to-slate-100',
-        'dark:from-slate-900 dark:to-slate-950',
+        'min-h-[100dvh] flex items-center justify-center p-6',
+        'bg-gradient-to-b from-background to-muted',
         className
       )}
     >
@@ -99,11 +107,11 @@ export function OfflineFallback({
           className="relative mx-auto w-24 h-24 mb-8"
         >
           {/* Background glow */}
-          <div className="absolute inset-0 bg-red-500/20 rounded-full blur-xl" />
+          <div className="absolute inset-0 bg-destructive/20 rounded-full blur-xl" />
           
           {/* Icon container */}
-          <div className="relative flex items-center justify-center w-full h-full bg-red-100 dark:bg-red-950/50 rounded-full">
-            <WifiOff className="w-10 h-10 text-red-600 dark:text-red-400" />
+          <div className="relative flex items-center justify-center w-full h-full bg-destructive/10 rounded-full">
+            <WifiOff className="w-10 h-10 text-destructive" />
           </div>
           
           {/* Orbiting signal dots */}
@@ -112,18 +120,18 @@ export function OfflineFallback({
             transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
             className="absolute inset-0"
           >
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-red-400 rounded-full opacity-50" />
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-red-400 rounded-full opacity-30" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-destructive rounded-full opacity-50" />
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-destructive rounded-full opacity-30" />
           </motion.div>
         </motion.div>
 
         {/* Title */}
-        <h1 className="text-2xl font-semibold text-slate-900 dark:text-white mb-3">
+        <h1 className="text-2xl font-semibold text-foreground mb-3">
           {title}
         </h1>
 
         {/* Description */}
-        <p className="text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
+        <p className="text-muted-foreground mb-6 leading-relaxed">
           {description}
         </p>
 
@@ -132,7 +140,7 @@ export function OfflineFallback({
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="mb-6 inline-flex items-center gap-2 px-4 py-2 bg-amber-100 dark:bg-amber-950/50 rounded-full text-sm text-amber-700 dark:text-amber-400"
+            className="mb-6 inline-flex items-center gap-2 px-4 py-2 bg-warning/10 rounded-full text-sm text-warning"
           >
             <Cloud className="w-4 h-4" />
             <span>
@@ -150,13 +158,12 @@ export function OfflineFallback({
           className={cn(
             'w-full flex items-center justify-center gap-2',
             'px-6 py-3 rounded-xl font-medium',
-            'bg-primary text-primary-foreground',
-            'hover:bg-primary/90 transition-colors',
+            'bg-primary text-primary-foreground hover:bg-primary/90 transition-colors',
             'disabled:opacity-50 disabled:cursor-not-allowed',
             'shadow-lg shadow-primary/25'
           )}
         >
-          <RefreshCw className={cn('w-5 h-5', isChecking && 'animate-spin')} />
+          <RefreshCw className={cn('w-5 h-5', isChecking && 'animate-spin motion-reduce:animate-none')} />
           {isChecking ? 'Checking connection...' : 'Try Again'}
         </motion.button>
 
@@ -165,7 +172,7 @@ export function OfflineFallback({
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="mt-3 text-xs text-slate-500 dark:text-slate-500"
+          className="mt-3 text-xs text-muted-foreground"
           >
             Checked {retryCount} time{retryCount > 1 ? 's' : ''}
           </motion.p>
@@ -173,10 +180,10 @@ export function OfflineFallback({
 
         {/* Tips */}
         <div className="mt-10 space-y-3">
-          <p className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wider">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
             Things to try
           </p>
-          <div className="flex flex-col gap-2 text-sm text-slate-600 dark:text-slate-400">
+          <div className="flex flex-col gap-2 text-sm text-muted-foreground">
             <TipItem icon={Signal} text="Check your Wi-Fi or mobile data" />
             <TipItem icon={Smartphone} text="Try toggling airplane mode" />
             <TipItem icon={RefreshCw} text="Restart your browser or app" />
@@ -199,7 +206,7 @@ interface TipItemProps {
 function TipItem({ icon: Icon, text }: TipItemProps) {
   return (
     <div className="flex items-center gap-3 justify-center">
-      <Icon className="w-4 h-4 text-slate-400" />
+      <Icon className="w-4 h-4 text-muted-foreground" />
       <span>{text}</span>
     </div>
   );
@@ -217,10 +224,17 @@ interface OfflineCardProps {
  * Compact card variant for embedding in pages
  */
 export function OfflineCard({ className }: OfflineCardProps) {
+  const isMounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+
   const { state, checkNow, isChecking } = useNetworkStatus();
   const { pendingCount } = useSyncManager();
 
-  if (state !== 'offline') {
+  // Don't render until after hydration to prevent SSR mismatch
+  if (!isMounted || state !== 'offline') {
     return null;
   }
 
@@ -231,20 +245,20 @@ export function OfflineCard({ className }: OfflineCardProps) {
       exit={{ opacity: 0, y: -10 }}
       className={cn(
         'rounded-xl p-4 flex items-center gap-4',
-        'bg-red-50 dark:bg-red-950/30',
-        'border border-red-200 dark:border-red-800/50',
+        'bg-destructive/10',
+        'border border-destructive/20',
         className
       )}
     >
-      <div className="shrink-0 w-10 h-10 flex items-center justify-center bg-red-100 dark:bg-red-900/50 rounded-full">
-        <WifiOff className="w-5 h-5 text-red-600 dark:text-red-400" />
+      <div className="shrink-0 w-10 h-10 flex items-center justify-center bg-destructive/10 rounded-full">
+        <WifiOff className="w-5 h-5 text-destructive" />
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-red-900 dark:text-red-100">
+        <p className="font-medium text-destructive">
           You&apos;re offline
         </p>
-        <p className="text-sm text-red-700 dark:text-red-300">
+        <p className="text-sm text-destructive/80">
           {pendingCount > 0
             ? `${pendingCount} item${pendingCount > 1 ? 's' : ''} will sync when reconnected`
             : 'Waiting for connection...'}
@@ -256,14 +270,14 @@ export function OfflineCard({ className }: OfflineCardProps) {
         disabled={isChecking}
         className={cn(
           'shrink-0 p-2 rounded-lg',
-          'text-red-600 dark:text-red-400',
-          'hover:bg-red-100 dark:hover:bg-red-900/50',
+          'text-destructive',
+          'hover:bg-destructive/10',
           'transition-colors',
           'disabled:opacity-50 disabled:cursor-not-allowed'
         )}
         aria-label="Retry connection"
       >
-        <RefreshCw className={cn('w-5 h-5', isChecking && 'animate-spin')} />
+        <RefreshCw className={cn('w-5 h-5', isChecking && 'animate-spin motion-reduce:animate-none')} />
       </button>
     </motion.div>
   );

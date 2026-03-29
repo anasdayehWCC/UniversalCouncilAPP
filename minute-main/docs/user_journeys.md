@@ -146,6 +146,51 @@ These journeys exist for every persona and are reused across departments via con
 2. When connectivity is available, background sync promotes items; the list and detail screens show the same states across devices.
 3. When a note is ready, user gets a subtle toast in-app and, optionally, an email notification: “Your Magic Note–style summary is ready for [Case/Visit].”
 
+### 2.3 Appearance and account continuity
+
+**Journey map**
+
+- **Open settings**
+  - Actions: User opens the appearance shortcut in the header or the `/settings` route.
+  - Thoughts: “I want this account to stay light or dark the way I left it.”
+  - Pain points: Shared devices, mixed visual states, no durable place to change theme.
+  - Opportunities: One account-scoped appearance setting, clear source/sync state, live preview.
+- **Change theme**
+  - Actions: User switches between light, dark, and system.
+  - Thoughts: “The whole shell should update immediately.”
+  - Pain points: Only some cards changing, or a toggle that only works until reload.
+  - Opportunities: One shared theme provider, `.dark` as the canonical selector, and a quick toggle that updates all surfaces.
+- **Switch persona**
+  - Actions: The user switches persona or account on a shared browser.
+  - Thoughts: “My settings should follow the account, not the machine.”
+  - Opportunities: Theme preference rehydrates from the signed-in user record, with local cache used only as a bootstrap/fallback.
+
+**User flow**
+
+1. User opens `/settings` from the header or user menu.
+2. They choose `Light`, `Dark`, or `System` and see the preview update immediately.
+3. The preference is saved locally first, then synced to the signed-in account when the backend is reachable.
+4. If the user changes persona, the app switches to that persona’s stored appearance preference instead of reusing the previous one.
+
+### 2.4 Shell contract and resilience overlays
+
+**Journey map**
+
+- **Header stability**
+  - Actions: User opens long pages such as notes, minutes, or capture flows.
+  - Pain points: Header being pushed off-screen or the page growing indefinitely.
+  - Opportunities: One shell viewport contract, sticky header, and route content that scrolls inside the shell instead of redefining viewport math.
+- **Sync banner**
+  - Actions: Connectivity or sync state changes.
+  - Pain points: Banners covering the header or blocking primary navigation.
+  - Opportunities: Compact top-docked banner with expand/collapse controls that sits below the header safe area.
+
+**User flow**
+
+1. Shell renders at `100dvh` and keeps the header fixed in the layout.
+2. Route content scrolls inside the main content area instead of changing the overall page height.
+3. Resilience banner appears in a docked overlay below the header and can be expanded or dismissed without hiding primary navigation.
+
 ---
 
 ## 3. Social Worker Journeys (Children’s & Adults Social Care)

@@ -24,18 +24,24 @@ interface AuthGateProps {
  */
 function DefaultLoadingComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-primary/10 to-accent/10">
+    <div 
+      className="flex min-h-[100dvh] items-center justify-center bg-background"
+      role="status"
+      aria-busy="true"
+      aria-label="Signing in with Microsoft Entra"
+    >
       <div className="flex flex-col items-center gap-4">
         <div className="relative">
           {/* Spinner */}
-          <div className="h-12 w-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+          <div className="h-12 w-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin motion-reduce:animate-none" />
         </div>
-        <p className="text-sm text-slate-600 font-medium">
+        <p className="text-sm text-muted-foreground font-medium">
           Signing you in with Microsoft Entra...
         </p>
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-muted-foreground">
           You will be redirected shortly
         </p>
+        <span className="sr-only">Authentication in progress</span>
       </div>
     </div>
   );

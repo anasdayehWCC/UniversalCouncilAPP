@@ -201,7 +201,7 @@ const MemoryDisplay = memo(function MemoryDisplay({
         <div
           className={`h-full transition-all duration-300 ${
             memory.usagePercent < 50
-              ? 'bg-green-400'
+              ? 'bg-success'
               : memory.usagePercent < 75
                 ? 'bg-amber-400'
                 : 'bg-red-400'

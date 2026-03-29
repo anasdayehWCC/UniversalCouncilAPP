@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-03-29 (Universal App Sync & PWA Recovery)
+
+### Fixed
+- Aligned the universal-app connectivity probe with the backend's real `/healthcheck` route so offline/degraded state reflects the actual API contract.
+- Propagated the request CSP nonce into the root `theme-init` script to remove the server/client hydration mismatch in Next.js development.
+- Corrected local/demo sync auth behavior so the frontend no longer blocks backend-local fake JWT flows, and demo mode now uses the backend-recognized `dev-preview-token`.
+- Removed stale PWA screenshot references and regenerated the icon assets referenced by the manifest, browser config, and root layout.
+- Fixed a malformed JSX tag in `TemplateCard` that was causing `/templates`, `/record`, and `/upload` to fail compilation in dev.
+- Switched the theme bootstrap script to a CSP hash and disabled dev-only nonce propagation on page responses to eliminate the local Next.js hydration mismatch while preserving production CSP enforcement.
+- Removed unsupported `Permissions-Policy` directives that Chromium was warning about on every page load.
+
 ## 2026-03-28 (Comprehensive Bug Fixes - Build, Accessibility & Theme Tokens)
 
 ### Fixed - Critical Build Errors

@@ -53,14 +53,14 @@ function createLoadingComponent(name: string, height?: string) {
   return function LoadingPlaceholder(_: DynamicOptionsLoadingProps) {
     return (
       <div 
-        className="animate-pulse bg-muted rounded-lg"
+        className="animate-pulse motion-reduce:animate-none bg-muted rounded-lg"
         style={{ minHeight: height || '200px' }}
         role="status"
         aria-label={`Loading ${name}...`}
       >
         <div className="flex items-center justify-center h-full text-muted-foreground">
           <svg 
-            className="animate-spin h-6 w-6 mr-2" 
+            className="animate-spin motion-reduce:animate-none h-6 w-6 mr-2" 
             viewBox="0 0 24 24"
             fill="none"
           >

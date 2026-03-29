@@ -153,7 +153,7 @@ export function CopyButton({
         'disabled:pointer-events-none disabled:opacity-50',
         variantStyles[variant],
         sizeStyles[size],
-        state === 'copied' && 'text-green-600 dark:text-green-400',
+        state === 'copied' && 'text-success',
         state === 'error' && 'text-destructive',
         className
       )}

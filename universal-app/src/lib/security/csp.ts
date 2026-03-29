@@ -8,7 +8,13 @@
  * @see https://nextjs.org/docs/app/building-your-application/configuring/content-security-policy
  */
 
+import { createHash } from 'crypto';
 import { headers } from 'next/headers';
+import { getThemeInitScript } from '@/lib/themes/theme-init';
+
+const THEME_INIT_SCRIPT_HASH = createHash('sha256')
+  .update(getThemeInitScript())
+  .digest('base64');
 
 /**
  * Generate a cryptographically secure nonce for CSP.
@@ -156,7 +162,7 @@ export function buildCSPHeader(nonce: string): string {
     `default-src 'self'`,
 
     // Scripts - require nonce for inline, allow trusted sources
-    `script-src ${TRUSTED_SOURCES.scripts.join(' ')} 'nonce-${nonce}' 'strict-dynamic'`,
+    `script-src ${TRUSTED_SOURCES.scripts.join(' ')} 'nonce-${nonce}' 'sha256-${THEME_INIT_SCRIPT_HASH}' 'strict-dynamic'`,
 
     // Styles - allow inline for component libraries
     `style-src ${TRUSTED_SOURCES.styles.join(' ')}`,
@@ -312,7 +318,7 @@ export function buildDevCSPHeader(nonce: string): string {
   const directives: string[] = [
     `default-src 'self'`,
     // More permissive for hot reload and dev tools
-    `script-src 'self' 'unsafe-eval' 'nonce-${nonce}'`,
+    `script-src 'self' 'unsafe-eval' 'nonce-${nonce}' 'sha256-${THEME_INIT_SCRIPT_HASH}'`,
     `style-src 'self' 'unsafe-inline'`,
     `font-src 'self' data:`,
     `img-src 'self' data: blob: https:`,

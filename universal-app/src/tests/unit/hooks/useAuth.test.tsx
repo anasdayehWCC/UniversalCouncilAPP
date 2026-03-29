@@ -59,11 +59,15 @@ describe('useAuth', () => {
   let queryClient: QueryClient;
 
   function createWrapper() {
-    return ({ children }: { children: React.ReactNode }) => (
+    const TestQueryClientProvider = ({ children }: { children: React.ReactNode }) => (
       <QueryClientProvider client={queryClient}>
         {children}
       </QueryClientProvider>
     );
+
+    TestQueryClientProvider.displayName = 'TestQueryClientProvider';
+
+    return TestQueryClientProvider;
   }
 
   beforeEach(() => {
@@ -348,7 +352,7 @@ describe('useAuth Demo Mode', () => {
 
     await waitFor(() => {
       // In demo mode, should have demo token
-      expect(result.current.accessToken).toBe('demo-mode-token');
+      expect(result.current.accessToken).toBe('dev-preview-token');
     });
   });
 });

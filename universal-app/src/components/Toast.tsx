@@ -42,10 +42,10 @@ const TOAST_ICONS: Record<ToastType, React.ReactNode> = {
 };
 
 const TOAST_STYLES: Record<ToastType, string> = {
-  success: 'border-green-500/20 bg-green-50 dark:bg-green-950/20',
+  success: 'border-success/20 bg-success/10 dark:bg-success/20',
   error: 'border-destructive/20 bg-red-50 dark:bg-red-950/20',
   warning: 'border-yellow-500/20 bg-yellow-50 dark:bg-yellow-950/20',
-  info: 'border-blue-500/20 bg-blue-50 dark:bg-blue-950/20',
+  info: 'border-info/20 bg-info/10 dark:bg-info/20',
 };
 
 const DEFAULT_DURATION = 5000;

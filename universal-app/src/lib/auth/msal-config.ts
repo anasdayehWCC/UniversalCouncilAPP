@@ -13,6 +13,7 @@ import { Configuration, LogLevel } from '@azure/msal-browser';
 
 const tenantId = process.env.NEXT_PUBLIC_AZURE_TENANT_ID || '';
 const clientId = process.env.NEXT_PUBLIC_AZURE_CLIENT_ID || '';
+const hasMsalConfig = Boolean(tenantId && clientId);
 const defaultRedirect =
   process.env.NEXT_PUBLIC_AZURE_REDIRECT_URI ||
   (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
@@ -85,7 +86,9 @@ export const isDemoMode =
   process.env.NEXT_PUBLIC_DEMO_MODE === '1' ||
   // Also support the legacy env var name for backwards compatibility
   process.env.NEXT_PUBLIC_DEV_PREVIEW_MODE === 'true' ||
-  process.env.NEXT_PUBLIC_DEV_PREVIEW_MODE === '1';
+  process.env.NEXT_PUBLIC_DEV_PREVIEW_MODE === '1' ||
+  // Fall back to demo mode during local `next dev` when MSAL env vars are unset.
+  (process.env.NODE_ENV === 'development' && !hasMsalConfig);
 
 /**
  * Login request configuration

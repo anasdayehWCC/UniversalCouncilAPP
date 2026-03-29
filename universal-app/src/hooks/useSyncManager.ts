@@ -129,14 +129,20 @@ export function useSyncManager(accessToken?: string | null): UseSyncManagerRetur
 
   // Query pending recordings reactively
   const pendingRecordings = useLiveQuery(
-    () => db ? db.recordings.where('status').equals('pending').toArray() : Promise.resolve([] as any[]),
+    () =>
+      db
+        ? db.recordings.where('status').equals('pending').toArray()
+        : Promise.resolve([] as OfflineRecording[]),
     [],
     []
   );
 
   // Query pending sync operations reactively
   const pendingSyncOperations = useLiveQuery(
-    () => db ? db.syncOperations.where('status').equals('pending').toArray() : Promise.resolve([] as any[]),
+    () =>
+      db
+        ? db.syncOperations.where('status').equals('pending').toArray()
+        : Promise.resolve([] as SyncOperation[]),
     [],
     []
   );
@@ -175,7 +181,6 @@ export function useSyncManager(accessToken?: string | null): UseSyncManagerRetur
   useEffect(() => {
     if (!isOnline || !autoSyncEnabled || isSyncing) return;
     if (pendingCount === 0) return;
-    if (!accessToken) return;
 
     // Clear any existing timeout
     if (autoSyncTimeoutRef.current) {
@@ -256,11 +261,6 @@ export function useSyncManager(accessToken?: string | null): UseSyncManagerRetur
   // ---------------------------------------------------------------------------
 
   const syncAll = useCallback(async () => {
-    if (!accessToken) {
-      toast.warning('Cannot sync', 'Authentication required');
-      return;
-    }
-
     if (!isOnline) {
       toast.warning('Cannot sync', 'No internet connection');
       return;
@@ -296,18 +296,14 @@ export function useSyncManager(accessToken?: string | null): UseSyncManagerRetur
       await refreshStats();
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unknown error';
-      toast.error('Sync failed', message);
+      const detail = /\b401\b|\b403\b/.test(message) ? 'Authentication required' : message;
+      toast.error('Sync failed', detail);
     } finally {
       setIsSyncing(false);
     }
   }, [accessToken, isOnline, isSyncing, toast, refreshStats]);
 
   const retryFailedItems = useCallback(async () => {
-    if (!accessToken) {
-      toast.warning('Cannot retry', 'Authentication required');
-      return;
-    }
-
     if (!isOnline) {
       toast.warning('Cannot retry', 'No internet connection');
       return;
@@ -334,7 +330,8 @@ export function useSyncManager(accessToken?: string | null): UseSyncManagerRetur
       await refreshStats();
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Retry failed';
-      toast.error('Retry failed', message);
+      const detail = /\b401\b|\b403\b/.test(message) ? 'Authentication required' : message;
+      toast.error('Retry failed', detail);
     } finally {
       setIsSyncing(false);
     }

@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 from common.database.postgres_models import (
     ContentSource,
     DialogueEntry,
+    ColorMode,
     HallucinationType,
     JobStatus,
     TaskSource,
@@ -129,6 +130,16 @@ class GetUserResponse(BaseModel):
 
 class DataRetentionUpdateResponse(BaseModel):
     data_retention_days: int | None
+
+
+class UserPreferencesResponse(BaseModel):
+    color_mode: ColorMode
+    updated_datetime: datetime
+    synced: bool = True
+
+
+class UserPreferencesUpdateRequest(BaseModel):
+    color_mode: ColorMode
 
 
 class TranscriptionGetResponse(BaseModel):

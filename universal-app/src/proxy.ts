@@ -65,6 +65,7 @@ function applySecurityHeaders(
   nonce: string,
   isApi: boolean = false
 ): void {
+  const isDevelopment = process.env.NODE_ENV === 'development';
   const securityHeaders = buildSecurityHeaders({
     nonce,
     allowMicrophone: true,
@@ -75,14 +76,16 @@ function applySecurityHeaders(
     response.headers.set(key, value);
   });
 
-  if (!isApi) {
+  if (!isApi && !isDevelopment) {
     const cspHeaderName = getCSPHeaderName();
     const cspHeaderValue = getCSPHeaderValue(nonce);
     response.headers.set(cspHeaderName, cspHeaderValue);
     response.headers.set('Report-To', buildReportToHeader());
   }
 
-  response.headers.set('x-nonce', nonce);
+  if (!isDevelopment) {
+    response.headers.set('x-nonce', nonce);
+  }
 
   if (isApi) {
     response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
@@ -97,6 +100,7 @@ function applySecurityHeaders(
  */
 export function proxy(request: NextRequest): NextResponse {
   const { pathname } = request.nextUrl;
+  const isDevelopment = process.env.NODE_ENV === 'development';
 
   if (shouldSkipProxy(pathname)) {
     return NextResponse.next();
@@ -106,7 +110,9 @@ export function proxy(request: NextRequest): NextResponse {
   const isApi = isApiRoute(pathname);
 
   const requestHeaders = new Headers(request.headers);
-  requestHeaders.set('x-nonce', nonce);
+  if (!isDevelopment) {
+    requestHeaders.set('x-nonce', nonce);
+  }
 
   const response = NextResponse.next({
     request: {

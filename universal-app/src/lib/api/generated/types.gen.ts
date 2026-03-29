@@ -5,6 +5,23 @@ export type AccessCheckResponse = {
     role?: string | null;
 };
 
+export type AdoptionDashboardResponse = {
+    metrics: AdoptionMetrics;
+    recordings_by_day: Array<DailyRecordingCount>;
+    top_modules: Array<ModuleUsageItem>;
+    offline_queue: OfflineQueueStats;
+};
+
+export type AdoptionMetrics = {
+    total_users: number;
+    active_users_today: number;
+    active_users_week: number;
+    total_recordings: number;
+    recordings_today: number;
+    total_minutes_generated: number;
+    minutes_today: number;
+};
+
 export type AgendaUsage = 'not_used' | 'optional' | 'required';
 
 export type AiEdit = {
@@ -18,6 +35,28 @@ export type AuditEntryResponse = {
     user: string;
     action: string;
     outcome: string;
+};
+
+export type AuditEventItem = {
+    id: string;
+    user_id: string | null;
+    user_email?: string | null;
+    action: string;
+    resource_type: string;
+    resource_id: string;
+    details?: {
+        [key: string]: unknown;
+    } | null;
+    ip_address?: string | null;
+    user_agent?: string | null;
+    created_at: string;
+};
+
+export type AuditListResponse = {
+    events: Array<AuditEventItem>;
+    total: number;
+    page: number;
+    page_size: number;
 };
 
 export type ChatCreateRequest = {
@@ -40,6 +79,8 @@ export type ChatGetResponse = {
     assistant_content: string | null;
     status: JobStatus;
 };
+
+export type ColorMode = 'light' | 'dark' | 'system';
 
 export type ConfigAuditResponse = {
     entries: Array<AuditEntryResponse>;
@@ -84,6 +125,11 @@ export type CreateUserTemplateRequest = {
     questions?: Array<CreateQuestion> | null;
 };
 
+export type DailyRecordingCount = {
+    date: string;
+    count: number;
+};
+
 export type DataRetentionUpdateResponse = {
     data_retention_days: number | null;
 };
@@ -101,6 +147,13 @@ export type EvidenceClickRequest = {
     start_time: number;
     end_time?: number | null;
     citation_number?: number | null;
+};
+
+export type EvidenceFragment = {
+    excerpt: string;
+    start_time?: number | null;
+    end_time?: number | null;
+    support: string;
 };
 
 export type ExportResponse = {
@@ -123,6 +176,16 @@ export type GetUserResponse = {
 
 export type HttpValidationError = {
     detail?: Array<ValidationError>;
+};
+
+export type InsightsResponse = {
+    status?: string;
+    audio_minutes: number;
+    time_saved_minutes: number;
+    transcription_count: number;
+    minute_count: number;
+    avg_audio_minutes: number;
+    topics?: Array<TopicTrend>;
 };
 
 export type JobStatus = 'awaiting_start' | 'in_progress' | 'completed' | 'failed';
@@ -166,6 +229,7 @@ export type Minute = {
     sharepoint_docx_item_id?: string | null;
     sharepoint_pdf_item_id?: string | null;
     planner_task_ids?: Array<string>;
+    tags?: Array<string>;
     export_status?: ExportStatus | null;
     export_error?: string | null;
     last_exported_at?: string | null;
@@ -182,6 +246,7 @@ export type MinuteListItem = {
     visit_type?: string | null;
     intended_outcomes?: string | null;
     risk_flags?: string | null;
+    tags?: Array<string> | null;
 };
 
 export type MinuteTaskCreateRequest = {
@@ -291,6 +356,7 @@ export type MinutesCreateRequest = {
     visit_type?: string | null;
     intended_outcomes?: string | null;
     risk_flags?: string | null;
+    tags?: Array<string> | null;
 };
 
 export type ModuleConfig = {
@@ -315,6 +381,25 @@ export type ModuleConfig = {
      * Optional list of service_domain ids this module applies to
      */
     departments?: Array<string> | null;
+    /**
+     * Optional list of routes exposed by this module (used by manifests)
+     */
+    routes?: Array<string> | null;
+    /**
+     * Optional list of module ids this module depends on
+     */
+    dependencies?: Array<string> | null;
+};
+
+export type ModuleManifest = {
+    id: string;
+    label: string;
+    icon?: string | null;
+    routes: Array<string>;
+    enabled?: boolean;
+    feature_flags?: Array<string> | null;
+    permissions?: Array<string> | null;
+    dependencies?: Array<string> | null;
 };
 
 export type ModuleResponse = {
@@ -323,6 +408,12 @@ export type ModuleResponse = {
     role: string;
     modules: Array<ModuleManifest>;
     navigation: Array<NavItem>;
+};
+
+export type ModuleUsageItem = {
+    module_id: string;
+    access_count: number;
+    unique_users: number;
 };
 
 export type NavItem = {
@@ -354,6 +445,13 @@ export type NavigationItem = {
      * Optional list of roles allowed to see this navigation item
      */
     roles?: Array<string> | null;
+};
+
+export type OfflineQueueStats = {
+    pending: number;
+    in_progress: number;
+    completed_today: number;
+    failed_today: number;
 };
 
 /**
@@ -405,6 +503,19 @@ export type SingleRecordingSegment = {
     end_seconds?: number | null;
 };
 
+export type SourceCheckRequest = {
+    text: string;
+};
+
+export type SourceCheckResponse = {
+    status: string;
+    evidence?: Array<EvidenceFragment>;
+};
+
+export type TagsUpdateRequest = {
+    tags: Array<string>;
+};
+
 export type TaskSource = 'ai_generated' | 'manual';
 
 export type TaskStatus = 'pending' | 'in_progress' | 'done';
@@ -415,17 +526,8 @@ export type TemplateMetadata = {
     category: string;
     agenda_usage: AgendaUsage;
     service_domains?: Array<string> | null;
-    /**
-     * UI hints for contextual tabs per template
-     */
     tabs?: Array<string> | null;
-    /**
-     * Default tab for social workers
-     */
     default_tab_worker?: string | null;
-    /**
-     * Default tab for managers
-     */
     default_tab_manager?: string | null;
 };
 
@@ -452,6 +554,26 @@ export type TenantConfig = {
      */
     version: string;
     defaultLocale: string;
+    /**
+     * Human-readable organisation/council name
+     */
+    organisation?: string | null;
+    /**
+     * Primary service domain for this config
+     */
+    service_domain?: string | null;
+    /**
+     * List of allowed roles for this tenant
+     */
+    roles?: Array<string> | null;
+    /**
+     * List of template ids enabled for this tenant
+     */
+    templates?: Array<string> | null;
+    /**
+     * List of domain-specific lexicon entries
+     */
+    lexicon?: Array<string> | null;
     designTokens?: {
         [key: string]: unknown;
     } | null;
@@ -478,6 +600,76 @@ export type TenantConfig = {
      */
     navigation?: Array<NavigationItem> | null;
     modules: Array<ModuleConfig>;
+};
+
+export type ThemeColors = {
+    background: string;
+    surface: string;
+    surfaceAlt: string;
+    text: string;
+    textMuted: string;
+    primary: string;
+    primaryForeground: string;
+    secondary: string;
+    secondaryForeground: string;
+    accent: string;
+    accentForeground: string;
+    success: string;
+    warning: string;
+    error: string;
+    border: string;
+};
+
+export type ThemeListItem = {
+    id: string;
+    name: string;
+};
+
+export type ThemeListResponse = {
+    themes: Array<ThemeListItem>;
+};
+
+export type ThemeRadius = {
+    sm: number;
+    md: number;
+    lg: number;
+    xl: number;
+};
+
+export type ThemeResponse = {
+    id: string;
+    name: string;
+    colors: ThemeColors;
+    typography: ThemeTypography;
+    spacing: ThemeSpacing;
+    radius: ThemeRadius;
+    shadows: ThemeShadows;
+};
+
+export type ThemeShadows = {
+    sm: string;
+    md: string;
+    lg: string;
+};
+
+export type ThemeSpacing = {
+    xs: number;
+    sm: number;
+    md: number;
+    lg: number;
+    xl: number;
+    xxl: number;
+};
+
+export type ThemeTypography = {
+    fontFamily: string;
+    baseFontSize: number;
+    scale: Array<number>;
+};
+
+export type TopicTrend = {
+    topic: string;
+    count: number;
 };
 
 export type Transcription = {
@@ -615,21 +807,20 @@ export type TranslationStatusEntry = {
     auto_requested?: boolean;
 };
 
+export type UserPreferencesResponse = {
+    color_mode: ColorMode;
+    updated_datetime: string;
+    synced?: boolean;
+};
+
+export type UserPreferencesUpdateRequest = {
+    color_mode: ColorMode;
+};
+
 export type ValidationError = {
     loc: Array<string | number>;
     msg: string;
     type: string;
-};
-
-export type ModuleManifest = {
-    id: string;
-    label: string;
-    icon?: string | null;
-    routes: Array<string>;
-    enabled?: boolean;
-    feature_flags?: Array<string> | null;
-    permissions?: Array<string> | null;
-    dependencies?: Array<string> | null;
 };
 
 export type HealthcheckHealthcheckGetData = {
@@ -668,6 +859,20 @@ export type HealthReadyHealthReadyGetData = {
 };
 
 export type HealthReadyHealthReadyGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type HealthDetailedHealthDetailedGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/health/detailed';
+};
+
+export type HealthDetailedHealthDetailedGetResponses = {
     /**
      * Successful Response
      */
@@ -1212,6 +1417,64 @@ export type UpdateDataRetentionUsersDataRetentionPatchResponses = {
 
 export type UpdateDataRetentionUsersDataRetentionPatchResponse = UpdateDataRetentionUsersDataRetentionPatchResponses[keyof UpdateDataRetentionUsersDataRetentionPatchResponses];
 
+export type GetUserPreferencesUsersMePreferencesGetData = {
+    body?: never;
+    headers?: {
+        authorization?: string | null;
+        'x-amzn-oidc-accesstoken'?: string | null;
+    };
+    path?: never;
+    query?: never;
+    url: '/users/me/preferences';
+};
+
+export type GetUserPreferencesUsersMePreferencesGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetUserPreferencesUsersMePreferencesGetError = GetUserPreferencesUsersMePreferencesGetErrors[keyof GetUserPreferencesUsersMePreferencesGetErrors];
+
+export type GetUserPreferencesUsersMePreferencesGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: UserPreferencesResponse;
+};
+
+export type GetUserPreferencesUsersMePreferencesGetResponse = GetUserPreferencesUsersMePreferencesGetResponses[keyof GetUserPreferencesUsersMePreferencesGetResponses];
+
+export type UpdateUserPreferencesUsersMePreferencesPatchData = {
+    body: UserPreferencesUpdateRequest;
+    headers?: {
+        authorization?: string | null;
+        'x-amzn-oidc-accesstoken'?: string | null;
+    };
+    path?: never;
+    query?: never;
+    url: '/users/me/preferences';
+};
+
+export type UpdateUserPreferencesUsersMePreferencesPatchErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type UpdateUserPreferencesUsersMePreferencesPatchError = UpdateUserPreferencesUsersMePreferencesPatchErrors[keyof UpdateUserPreferencesUsersMePreferencesPatchErrors];
+
+export type UpdateUserPreferencesUsersMePreferencesPatchResponses = {
+    /**
+     * Successful Response
+     */
+    200: UserPreferencesResponse;
+};
+
+export type UpdateUserPreferencesUsersMePreferencesPatchResponse = UpdateUserPreferencesUsersMePreferencesPatchResponses[keyof UpdateUserPreferencesUsersMePreferencesPatchResponses];
+
 export type ListMinutesForTranscriptionTranscriptionTranscriptionIdMinutesGetData = {
     body?: never;
     headers?: {
@@ -1221,7 +1484,12 @@ export type ListMinutesForTranscriptionTranscriptionTranscriptionIdMinutesGetDat
     path: {
         transcription_id: string;
     };
-    query?: never;
+    query?: {
+        /**
+         * Optional tag filter (matches any)
+         */
+        tags?: Array<string> | null;
+    };
     url: '/transcription/{transcription_id}/minutes';
 };
 
@@ -1271,6 +1539,37 @@ export type CreateMinuteTranscriptionTranscriptionIdMinutesPostResponses = {
      */
     200: unknown;
 };
+
+export type SourceCheckMinutesMinuteIdSourceCheckPostData = {
+    body: SourceCheckRequest;
+    headers?: {
+        authorization?: string | null;
+        'x-amzn-oidc-accesstoken'?: string | null;
+    };
+    path: {
+        minute_id: string;
+    };
+    query?: never;
+    url: '/minutes/{minute_id}/source-check';
+};
+
+export type SourceCheckMinutesMinuteIdSourceCheckPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type SourceCheckMinutesMinuteIdSourceCheckPostError = SourceCheckMinutesMinuteIdSourceCheckPostErrors[keyof SourceCheckMinutesMinuteIdSourceCheckPostErrors];
+
+export type SourceCheckMinutesMinuteIdSourceCheckPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: SourceCheckResponse;
+};
+
+export type SourceCheckMinutesMinuteIdSourceCheckPostResponse = SourceCheckMinutesMinuteIdSourceCheckPostResponses[keyof SourceCheckMinutesMinuteIdSourceCheckPostResponses];
 
 export type GetMinuteMinutesMinutesIdGetData = {
     body?: never;
@@ -1582,6 +1881,106 @@ export type ExportMinuteMinutesMinuteIdExportPostResponses = {
 };
 
 export type ExportMinuteMinutesMinuteIdExportPostResponse = ExportMinuteMinutesMinuteIdExportPostResponses[keyof ExportMinuteMinutesMinuteIdExportPostResponses];
+
+export type ListAvailableTagsTagsGetData = {
+    body?: never;
+    headers?: {
+        authorization?: string | null;
+        'x-amzn-oidc-accesstoken'?: string | null;
+    };
+    path?: never;
+    query?: {
+        /**
+         * Filter tags containing this text
+         */
+        search?: string | null;
+        /**
+         * Maximum number of tags to return
+         */
+        limit?: number;
+    };
+    url: '/tags';
+};
+
+export type ListAvailableTagsTagsGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ListAvailableTagsTagsGetError = ListAvailableTagsTagsGetErrors[keyof ListAvailableTagsTagsGetErrors];
+
+export type ListAvailableTagsTagsGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: Array<string>;
+};
+
+export type ListAvailableTagsTagsGetResponse = ListAvailableTagsTagsGetResponses[keyof ListAvailableTagsTagsGetResponses];
+
+export type GetTagsMinutesMinuteIdTagsGetData = {
+    body?: never;
+    headers?: {
+        authorization?: string | null;
+        'x-amzn-oidc-accesstoken'?: string | null;
+    };
+    path: {
+        minute_id: string;
+    };
+    query?: never;
+    url: '/minutes/{minute_id}/tags';
+};
+
+export type GetTagsMinutesMinuteIdTagsGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetTagsMinutesMinuteIdTagsGetError = GetTagsMinutesMinuteIdTagsGetErrors[keyof GetTagsMinutesMinuteIdTagsGetErrors];
+
+export type GetTagsMinutesMinuteIdTagsGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: Array<string>;
+};
+
+export type GetTagsMinutesMinuteIdTagsGetResponse = GetTagsMinutesMinuteIdTagsGetResponses[keyof GetTagsMinutesMinuteIdTagsGetResponses];
+
+export type UpdateTagsMinutesMinuteIdTagsPutData = {
+    body: TagsUpdateRequest;
+    headers?: {
+        authorization?: string | null;
+        'x-amzn-oidc-accesstoken'?: string | null;
+    };
+    path: {
+        minute_id: string;
+    };
+    query?: never;
+    url: '/minutes/{minute_id}/tags';
+};
+
+export type UpdateTagsMinutesMinuteIdTagsPutErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type UpdateTagsMinutesMinuteIdTagsPutError = UpdateTagsMinutesMinuteIdTagsPutErrors[keyof UpdateTagsMinutesMinuteIdTagsPutErrors];
+
+export type UpdateTagsMinutesMinuteIdTagsPutResponses = {
+    /**
+     * Successful Response
+     */
+    200: Array<string>;
+};
+
+export type UpdateTagsMinutesMinuteIdTagsPutResponse = UpdateTagsMinutesMinuteIdTagsPutResponses[keyof UpdateTagsMinutesMinuteIdTagsPutResponses];
 
 export type GetTemplatesTemplatesGetData = {
     body?: never;
@@ -1988,6 +2387,102 @@ export type GetConfigHistoryAdminConfigsTenantIdHistoryGetResponses = {
 
 export type GetConfigHistoryAdminConfigsTenantIdHistoryGetResponse = GetConfigHistoryAdminConfigsTenantIdHistoryGetResponses[keyof GetConfigHistoryAdminConfigsTenantIdHistoryGetResponses];
 
+export type ListAuditEventsAdminAuditGetData = {
+    body?: never;
+    path?: never;
+    query: {
+        user_id?: string | null;
+        resource_type?: string | null;
+        action?: string | null;
+        start_date?: string | null;
+        end_date?: string | null;
+        page?: number;
+        page_size?: number;
+        args: unknown;
+        kwargs: unknown;
+    };
+    url: '/admin/audit';
+};
+
+export type ListAuditEventsAdminAuditGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ListAuditEventsAdminAuditGetError = ListAuditEventsAdminAuditGetErrors[keyof ListAuditEventsAdminAuditGetErrors];
+
+export type ListAuditEventsAdminAuditGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: AuditListResponse;
+};
+
+export type ListAuditEventsAdminAuditGetResponse = ListAuditEventsAdminAuditGetResponses[keyof ListAuditEventsAdminAuditGetResponses];
+
+export type ExportAuditEventsAdminAuditExportGetData = {
+    body?: never;
+    path?: never;
+    query: {
+        format?: string;
+        user_id?: string | null;
+        resource_type?: string | null;
+        action?: string | null;
+        start_date?: string | null;
+        end_date?: string | null;
+        args: unknown;
+        kwargs: unknown;
+    };
+    url: '/admin/audit/export';
+};
+
+export type ExportAuditEventsAdminAuditExportGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ExportAuditEventsAdminAuditExportGetError = ExportAuditEventsAdminAuditExportGetErrors[keyof ExportAuditEventsAdminAuditExportGetErrors];
+
+export type ExportAuditEventsAdminAuditExportGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type GetAdoptionDashboardAdminAdoptionGetData = {
+    body?: never;
+    path?: never;
+    query: {
+        days?: number;
+        args: unknown;
+        kwargs: unknown;
+    };
+    url: '/admin/adoption';
+};
+
+export type GetAdoptionDashboardAdminAdoptionGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetAdoptionDashboardAdminAdoptionGetError = GetAdoptionDashboardAdminAdoptionGetErrors[keyof GetAdoptionDashboardAdminAdoptionGetErrors];
+
+export type GetAdoptionDashboardAdminAdoptionGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: AdoptionDashboardResponse;
+};
+
+export type GetAdoptionDashboardAdminAdoptionGetResponse = GetAdoptionDashboardAdminAdoptionGetResponses[keyof GetAdoptionDashboardAdminAdoptionGetResponses];
+
 export type ListMyTasksTasksGetData = {
     body?: never;
     headers?: {
@@ -2021,6 +2516,108 @@ export type ListMyTasksTasksGetResponses = {
 };
 
 export type ListMyTasksTasksGetResponse = ListMyTasksTasksGetResponses[keyof ListMyTasksTasksGetResponses];
+
+export type GetInsightsInsightsGetData = {
+    body?: never;
+    headers?: {
+        authorization?: string | null;
+        'x-amzn-oidc-accesstoken'?: string | null;
+    };
+    path?: never;
+    query?: never;
+    url: '/insights';
+};
+
+export type GetInsightsInsightsGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetInsightsInsightsGetError = GetInsightsInsightsGetErrors[keyof GetInsightsInsightsGetErrors];
+
+export type GetInsightsInsightsGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: InsightsResponse;
+};
+
+export type GetInsightsInsightsGetResponse = GetInsightsInsightsGetResponses[keyof GetInsightsInsightsGetResponses];
+
+export type GetThemeThemeGetData = {
+    body?: never;
+    path?: never;
+    query?: {
+        tenant?: string | null;
+        dark?: boolean;
+    };
+    url: '/theme';
+};
+
+export type GetThemeThemeGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetThemeThemeGetError = GetThemeThemeGetErrors[keyof GetThemeThemeGetErrors];
+
+export type GetThemeThemeGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: ThemeResponse;
+};
+
+export type GetThemeThemeGetResponse = GetThemeThemeGetResponses[keyof GetThemeThemeGetResponses];
+
+export type ListThemesThemesGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/themes';
+};
+
+export type ListThemesThemesGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: ThemeListResponse;
+};
+
+export type ListThemesThemesGetResponse = ListThemesThemesGetResponses[keyof ListThemesThemesGetResponses];
+
+export type GetThemeByIdThemeThemeIdGetData = {
+    body?: never;
+    path: {
+        theme_id: string;
+    };
+    query?: {
+        dark?: boolean;
+    };
+    url: '/theme/{theme_id}';
+};
+
+export type GetThemeByIdThemeThemeIdGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetThemeByIdThemeThemeIdGetError = GetThemeByIdThemeThemeIdGetErrors[keyof GetThemeByIdThemeThemeIdGetErrors];
+
+export type GetThemeByIdThemeThemeIdGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: ThemeResponse;
+};
+
+export type GetThemeByIdThemeThemeIdGetResponse = GetThemeByIdThemeThemeIdGetResponses[keyof GetThemeByIdThemeThemeIdGetResponses];
 
 export type DeleteChatsTranscriptionsTranscriptionIdChatDeleteData = {
     body?: never;

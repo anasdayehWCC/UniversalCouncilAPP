@@ -5,6 +5,8 @@ import { InteractionStatus, SilentRequest, AccountInfo } from '@azure/msal-brows
 import { useAccount, useMsal } from '@azure/msal-react';
 import { apiScopes, isDemoMode, loginRequest } from '@/lib/auth/msal-config';
 
+const DEMO_ACCESS_TOKEN = 'dev-preview-token';
+
 /**
  * ID token claims structure from Azure Entra ID
  */
@@ -84,9 +86,8 @@ export function useAuth(): AuthState & AuthActions {
   const { instance, inProgress, accounts } = useMsal();
   const account = useAccount(accounts[0] || null);
   
-  // Initialize with demo mode values if applicable
   const [accessToken, setAccessToken] = useState<string | null>(
-    isDemoMode ? 'demo-mode-token' : null
+    isDemoMode ? DEMO_ACCESS_TOKEN : null
   );
   const [idTokenClaims, setIdTokenClaims] = useState<IdTokenClaims | null>(
     isDemoMode ? {
@@ -150,7 +151,7 @@ export function useAuth(): AuthState & AuthActions {
   const login = useCallback(async () => {
     if (isDemoMode) {
       // In demo mode, just set authenticated state
-      setAccessToken('demo-mode-token');
+      setAccessToken(DEMO_ACCESS_TOKEN);
       setIdTokenClaims({
         organisation_id: process.env.NEXT_PUBLIC_DEFAULT_ORG_ID ?? 'demo-org',
         email: 'demo@example.com',
@@ -189,7 +190,7 @@ export function useAuth(): AuthState & AuthActions {
   // Get token action (with optional force refresh)
   const getToken = useCallback(async (forceRefresh = false): Promise<string | null> => {
     if (isDemoMode) {
-      return 'demo-mode-token';
+      return DEMO_ACCESS_TOKEN;
     }
 
     if (!account) {
@@ -222,6 +223,29 @@ export function useAuth(): AuthState & AuthActions {
   // Compute authentication status
   const isAuthenticated = isDemoMode ? !!accessToken : !!account && !!accessToken;
   const isLoading = !isDemoMode && inProgress !== InteractionStatus.None;
+
+  if (isDemoMode) {
+    const demoAccessToken = accessToken ?? DEMO_ACCESS_TOKEN;
+    const demoClaims = idTokenClaims ?? {
+      organisation_id: process.env.NEXT_PUBLIC_DEFAULT_ORG_ID ?? 'demo-org',
+      email: 'demo@example.com',
+      name: 'Demo User',
+      roles: ['user'],
+    };
+
+    return {
+      isAuthenticated: true,
+      isLoading: false,
+      accessToken: demoAccessToken,
+      account: null,
+      idTokenClaims: demoClaims,
+      inProgress: InteractionStatus.None,
+      error: null,
+      login: async () => {},
+      logout: async () => {},
+      getToken: async () => demoAccessToken,
+    };
+  }
 
   return {
     isAuthenticated,

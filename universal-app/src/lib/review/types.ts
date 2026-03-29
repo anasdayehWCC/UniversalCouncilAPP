@@ -357,10 +357,16 @@ export function getSlaRemaining(submittedAt: string, slaHours = 24): {
   const remainingHours = Math.ceil(remainingMs / (1000 * 60 * 60));
 
   if (remainingHours < 0) {
+    const overdueHours = Math.abs(remainingHours);
+    const overdueLabel = overdueHours < 24
+      ? `${overdueHours}h`
+      : overdueHours < 168
+        ? `${Math.floor(overdueHours / 24)}d`
+        : `${Math.floor(overdueHours / 168)}wk`;
     return {
-      hours: Math.abs(remainingHours),
+      hours: overdueHours,
       isOverdue: true,
-      label: `Overdue by ${Math.abs(remainingHours)}h`,
+      label: `Overdue · ${overdueLabel}`,
       color: 'text-red-700',
     };
   }

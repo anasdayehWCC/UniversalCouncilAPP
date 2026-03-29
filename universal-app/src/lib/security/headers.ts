@@ -166,11 +166,9 @@ export function getPermissionsPolicy(config: Partial<SecurityHeadersConfig> = {}
     'bluetooth=()', // Disabled - not needed
     'serial=()', // Disabled - not needed
     'midi=()', // Disabled - not needed
-    'battery=()', // Disabled - privacy concern
     'magnetometer=()', // Disabled - not needed
     'gyroscope=()', // Disabled - not needed
     'accelerometer=()', // Disabled - not needed
-    'ambient-light-sensor=()', // Disabled - not needed
 
     // Display features
     'fullscreen=(self)', // Allow fullscreen for video playback
@@ -195,11 +193,6 @@ export function getPermissionsPolicy(config: Partial<SecurityHeadersConfig> = {}
     'clipboard-read=(self)',
     'clipboard-write=(self)',
 
-    // Notifications - allow for push notifications
-    'notifications=(self)',
-
-    // Web share - allow for sharing functionality
-    'web-share=(self)',
   ];
 
   return permissions.join(', ');

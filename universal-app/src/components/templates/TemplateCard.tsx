@@ -235,7 +235,7 @@ export function TemplateCard({
             {template.sections.slice(0, 4).map((section, i) => (
               <span
                 key={section.id || i}
-                className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded border border-border">
+                className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded border border-border"
               >
                 {section.title}
               </span>

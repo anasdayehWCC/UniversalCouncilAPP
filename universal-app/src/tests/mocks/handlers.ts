@@ -283,7 +283,7 @@ export const insightsHandlers = [
 // ============================================
 
 export const healthHandlers = [
-  http.get(`${API_BASE}/api/health`, () => {
+  http.get(`${API_BASE}/healthcheck`, () => {
     return HttpResponse.json({ status: 'healthy', version: '1.0.0' });
   }),
 ];

@@ -28,9 +28,9 @@ interface ModuleToggleProps {
 }
 
 const CATEGORY_CONFIG: Record<AdminModule['category'], { icon: React.ReactNode; label: string; color: string }> = {
-  core: { icon: <Puzzle className="w-4 h-4" />, label: 'Core', color: 'bg-blue-100 text-blue-700' },
+  core: { icon: <Puzzle className="w-4 h-4" />, label: 'Core', color: 'bg-info/10 text-info' },
   ai: { icon: <Sparkles className="w-4 h-4" />, label: 'AI Features', color: 'bg-purple-100 text-purple-700' },
-  integration: { icon: <Plug className="w-4 h-4" />, label: 'Integration', color: 'bg-green-100 text-green-700' },
+  integration: { icon: <Plug className="w-4 h-4" />, label: 'Integration', color: 'bg-success/10 text-success' },
   pilot: { icon: <TestTube className="w-4 h-4" />, label: 'Pilot', color: 'bg-amber-100 text-amber-700' }
 };
 
@@ -77,20 +77,20 @@ export function ModuleToggle({ modules, onToggle, onConfigure, canEdit }: Module
       {Object.entries(groupedModules).map(([category, categoryModules]) => {
         const config = CATEGORY_CONFIG[category as AdminModule['category']];
         return (
-          <Card key={category} variant="glass" hoverEffect={false} className="bg-white/80 overflow-hidden">
-            <div className="p-4 border-b border-slate-200 bg-slate-50/50">
+          <Card key={category} variant="glass" hoverEffect={false} className="bg-card/80 overflow-hidden">
+            <div className="p-4 border-b border-border bg-muted/30">
               <div className="flex items-center gap-2">
                 <div className={cn('p-1.5 rounded', config.color)}>
                   {config.icon}
                 </div>
-                <h3 className="font-semibold text-slate-900">{config.label}</h3>
+                <h3 className="font-semibold text-foreground">{config.label}</h3>
                 <Badge variant="secondary" className="ml-auto">
                   {categoryModules.filter(m => m.enabled).length}/{categoryModules.length} active
                 </Badge>
               </div>
             </div>
 
-            <div className="divide-y divide-slate-100">
+            <div className="divide-y divide-border">
               {categoryModules.map((module) => {
                 const isExpanded = expandedModule === module.id;
                 const hasDependencyIssue = module.dependencies?.some(
@@ -102,23 +102,23 @@ export function ModuleToggle({ modules, onToggle, onConfigure, canEdit }: Module
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <h4 className="font-medium text-slate-900">{module.name}</h4>
+                          <h4 className="font-medium text-foreground">{module.name}</h4>
                           {module.enabled && (
-                            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                            <Badge variant="outline" className="bg-success/10 text-success border-success/30">
                               Active
                             </Badge>
                           )}
                           {hasDependencyIssue && !module.enabled && (
-                            <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
+                            <Badge variant="outline" className="bg-warning/10 text-warning border-warning/30">
                               <AlertTriangle className="w-3 h-3 mr-1" />
                               Requires dependencies
                             </Badge>
                           )}
                         </div>
-                        <p className="text-sm text-slate-500 mt-1">{module.description}</p>
+                        <p className="text-sm text-muted-foreground mt-1">{module.description}</p>
                         
                         {module.dependencies && (
-                          <p className="text-xs text-slate-400 mt-2">
+                          <p className="text-xs text-muted-foreground/60 mt-2">
                             Depends on: {module.dependencies.map(
                               depId => modules.find(m => m.id === depId)?.name || depId
                             ).join(', ')}
@@ -132,7 +132,7 @@ export function ModuleToggle({ modules, onToggle, onConfigure, canEdit }: Module
                             variant="ghost" 
                             size="sm"
                             onClick={() => onConfigure(module.id)}
-                            className="text-slate-500"
+                            className="text-muted-foreground"
                           >
                             <Settings className="w-4 h-4" />
                           </Button>
@@ -143,7 +143,7 @@ export function ModuleToggle({ modules, onToggle, onConfigure, canEdit }: Module
                           disabled={!canEdit}
                           className={cn(
                             'transition-transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed',
-                            module.enabled ? 'text-[var(--primary)]' : 'text-slate-300'
+                            module.enabled ? 'text-primary' : 'text-muted-foreground/30'
                           )}
                           aria-label={`Toggle ${module.name}`}
                         >
@@ -160,7 +160,7 @@ export function ModuleToggle({ modules, onToggle, onConfigure, canEdit }: Module
                       <>
                         <button
                           onClick={() => setExpandedModule(isExpanded ? null : module.id)}
-                          className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mt-3"
+                          className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mt-3"
                         >
                           {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                           {isExpanded ? 'Hide settings' : 'Show settings'}
@@ -175,8 +175,8 @@ export function ModuleToggle({ modules, onToggle, onConfigure, canEdit }: Module
                               transition={{ duration: 0.2 }}
                               className="overflow-hidden"
                             >
-                              <div className="mt-3 p-3 bg-slate-50 rounded-lg">
-                                <pre className="text-xs text-slate-600 font-mono">
+                              <div className="mt-3 p-3 bg-muted rounded-lg">
+                                <pre className="text-xs text-muted-foreground font-mono">
                                   {JSON.stringify(module.settings, null, 2)}
                                 </pre>
                               </div>

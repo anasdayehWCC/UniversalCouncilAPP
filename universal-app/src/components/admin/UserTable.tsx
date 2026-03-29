@@ -39,9 +39,9 @@ interface UserTableProps {
 }
 
 const STATUS_COLORS: Record<AdminUser['status'], string> = {
-  active: 'bg-green-100 text-green-700 border-green-200',
-  inactive: 'bg-slate-100 text-slate-600 border-slate-200',
-  pending: 'bg-amber-100 text-amber-700 border-amber-200'
+  active: 'bg-success/10 text-success border-success/20',
+  inactive: 'bg-muted text-muted-foreground border-border',
+  pending: 'bg-warning/10 text-warning border-warning/20'
 };
 
 const ROLE_LABELS: Record<string, string> = {
@@ -131,13 +131,13 @@ export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTable
   };
 
   return (
-    <Card variant="glass" hoverEffect={false} className="bg-white/80 overflow-hidden">
+    <Card variant="glass" hoverEffect={false} className="bg-card/80 overflow-hidden">
       {/* Toolbar */}
-      <div className="p-4 border-b border-slate-200 space-y-4">
+      <div className="p-4 border-b border-border space-y-4">
         <div className="flex flex-col sm:flex-row gap-4">
           {/* Search */}
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input 
               placeholder="Search users..."
               value={search}
@@ -185,8 +185,8 @@ export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTable
 
         {/* Bulk actions */}
         {selectedUsers.size > 0 && (
-          <div className="flex items-center gap-4 py-2 px-3 bg-slate-50 rounded-lg">
-            <span className="text-sm text-slate-600">
+          <div className="flex items-center gap-4 py-2 px-3 bg-muted rounded-lg">
+            <span className="text-sm text-muted-foreground">
               {selectedUsers.size} selected
             </span>
             <Button variant="ghost" size="sm" onClick={() => setSelectedUsers(new Set())}>
@@ -206,17 +206,17 @@ export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTable
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-slate-200 bg-slate-50/50">
+            <tr className="border-b border-border bg-muted/50">
               <th className="px-4 py-3 text-left">
                 <input 
                   type="checkbox" 
                   checked={selectedUsers.size === filteredUsers.length && filteredUsers.length > 0}
                   onChange={toggleSelectAll}
-                  className="rounded border-slate-300"
+                  className="rounded border-input"
                 />
               </th>
               <th 
-                className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-slate-700"
+                className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider cursor-pointer hover:text-foreground"
                 onClick={() => handleSort('name')}
               >
                 <div className="flex items-center gap-1">
@@ -224,7 +224,7 @@ export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTable
                 </div>
               </th>
               <th 
-                className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-slate-700"
+                className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider cursor-pointer hover:text-foreground"
                 onClick={() => handleSort('role')}
               >
                 <div className="flex items-center gap-1">
@@ -232,7 +232,7 @@ export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTable
                 </div>
               </th>
               <th 
-                className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-slate-700"
+                className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider cursor-pointer hover:text-foreground"
                 onClick={() => handleSort('status')}
               >
                 <div className="flex items-center gap-1">
@@ -240,14 +240,14 @@ export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTable
                 </div>
               </th>
               <th 
-                className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-slate-700"
+                className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider cursor-pointer hover:text-foreground"
                 onClick={() => handleSort('lastLogin')}
               >
                 <div className="flex items-center gap-1">
                   Last Login <SortIcon field="lastLogin" />
                 </div>
               </th>
-              <th className="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Actions
               </th>
             </tr>
@@ -257,8 +257,8 @@ export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTable
               <tr 
                 key={user.id} 
                 className={cn(
-                  'hover:bg-slate-50/50 transition-colors',
-                  selectedUsers.has(user.id) && 'bg-blue-50/50'
+                  'hover:bg-muted/50 transition-colors',
+                  selectedUsers.has(user.id) && 'bg-info/10'
                 )}
               >
                 <td className="px-4 py-3">
@@ -266,7 +266,7 @@ export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTable
                     type="checkbox" 
                     checked={selectedUsers.has(user.id)}
                     onChange={() => toggleSelect(user.id)}
-                    className="rounded border-slate-300"
+                    className="rounded border-input"
                   />
                 </td>
                 <td className="px-4 py-3">
@@ -275,19 +275,19 @@ export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTable
                       {user.name.split(' ').map(n => n[0]).join('')}
                     </div>
                     <div>
-                      <p className="font-medium text-slate-900">{user.name}</p>
-                      <p className="text-xs text-slate-500">{user.email}</p>
+                      <p className="font-medium text-foreground">{user.name}</p>
+                      <p className="text-xs text-muted-foreground">{user.email}</p>
                     </div>
                   </div>
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
-                    <Shield className="w-3.5 h-3.5 text-slate-400" />
-                    <span className="text-sm text-slate-700">
+                    <Shield className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span className="text-sm text-foreground">
                       {ROLE_LABELS[user.role] || user.role}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-400 mt-0.5">{user.team}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{user.team}</p>
                 </td>
                 <td className="px-4 py-3">
                   <Badge 
@@ -297,7 +297,7 @@ export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTable
                     {user.status}
                   </Badge>
                 </td>
-                <td className="px-4 py-3 text-sm text-slate-500">
+                <td className="px-4 py-3 text-sm text-muted-foreground">
                   {user.lastLogin 
                     ? formatDistanceToNow(new Date(user.lastLogin))
                     : 'Never'
@@ -309,9 +309,9 @@ export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTable
                       variant="ghost" 
                       size="icon" 
                       className="h-8 w-8"
-                      title="Send email"
+                      aria-label="Send email to user"
                     >
-                      <Mail className="w-4 h-4 text-slate-400" />
+                      <Mail className="w-4 h-4 text-muted-foreground" />
                     </Button>
                     {canEdit && (
                       <>
@@ -320,9 +320,9 @@ export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTable
                           size="icon" 
                           className="h-8 w-8"
                           onClick={() => onEdit(user)}
-                          title="Edit user"
+                          aria-label="Edit user"
                         >
-                          <Edit2 className="w-4 h-4 text-slate-400" />
+                          <Edit2 className="w-4 h-4 text-muted-foreground" />
                         </Button>
                         <div className="relative">
                           <Button 
@@ -330,13 +330,15 @@ export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTable
                             size="icon" 
                             className="h-8 w-8"
                             onClick={() => setActiveMenu(activeMenu === user.id ? null : user.id)}
+                            aria-label="More options"
+                            aria-expanded={activeMenu === user.id}
                           >
-                            <MoreVertical className="w-4 h-4 text-slate-400" />
+                            <MoreVertical className="w-4 h-4 text-muted-foreground" />
                           </Button>
                           {activeMenu === user.id && (
-                            <div className="absolute right-0 top-full mt-1 w-40 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-10">
+                            <div className="absolute right-0 top-full mt-1 w-40 bg-card rounded-lg shadow-lg border border-border py-1 z-10">
                               <button 
-                                className="w-full px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                                className="w-full px-3 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-2"
                                 onClick={() => {
                                   onEdit(user);
                                   setActiveMenu(null);
@@ -345,7 +347,7 @@ export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTable
                                 <Edit2 className="w-4 h-4" /> Edit
                               </button>
                               <button 
-                                className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                                className="w-full px-3 py-2 text-left text-sm text-destructive hover:bg-destructive/10 flex items-center gap-2"
                                 onClick={() => {
                                   if (confirm(`Delete ${user.name}?`)) {
                                     onDelete(user.id);
@@ -369,14 +371,14 @@ export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTable
 
         {filteredUsers.length === 0 && (
           <div className="py-12 text-center">
-            <p className="text-slate-500">No users found</p>
-            <p className="text-sm text-slate-400 mt-1">Try adjusting your search or filters</p>
+            <p className="text-muted-foreground">No users found</p>
+            <p className="text-sm text-muted-foreground mt-1">Try adjusting your search or filters</p>
           </div>
         )}
       </div>
 
       {/* Footer */}
-      <div className="px-4 py-3 border-t border-slate-200 bg-slate-50/50 text-sm text-slate-500">
+      <div className="px-4 py-3 border-t border-border bg-muted/50 text-sm text-muted-foreground">
         Showing {filteredUsers.length} of {users.length} users
       </div>
     </Card>

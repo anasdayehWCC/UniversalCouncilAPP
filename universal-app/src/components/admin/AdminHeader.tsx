@@ -52,25 +52,25 @@ export function AdminHeader({
   const pageTitle = title || ROUTE_LABELS[pathname] || 'Admin';
 
   return (
-    <div className="border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+    <div className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-10">
       <div className="px-6 py-4">
         {/* Breadcrumbs */}
-        <nav className="flex items-center gap-1 text-sm text-slate-500 mb-2">
-          <Link href="/" className="hover:text-slate-700 transition-colors">
+        <nav className="flex items-center gap-1 text-sm text-muted-foreground mb-2">
+          <Link href="/" className="hover:text-foreground transition-colors">
             <Home className="w-4 h-4" />
           </Link>
           {breadcrumbs.map((crumb, index) => (
             <React.Fragment key={crumb.label}>
-              <ChevronRight className="w-4 h-4 text-slate-300" />
+              <ChevronRight className="w-4 h-4 text-muted-foreground/60" />
               {crumb.href ? (
                 <Link 
                   href={crumb.href} 
-                  className="hover:text-slate-700 transition-colors"
+                  className="hover:text-foreground transition-colors"
                 >
                   {crumb.label}
                 </Link>
               ) : (
-                <span className="text-slate-900 font-medium">{crumb.label}</span>
+                <span className="text-foreground font-medium">{crumb.label}</span>
               )}
             </React.Fragment>
           ))}
@@ -79,9 +79,9 @@ export function AdminHeader({
         {/* Title and Action */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-display font-bold text-slate-900">{pageTitle}</h1>
+            <h1 className="text-2xl font-display font-bold text-foreground">{pageTitle}</h1>
             {description && (
-              <p className="text-sm text-slate-500 mt-1">{description}</p>
+              <p className="text-sm text-muted-foreground mt-1">{description}</p>
             )}
           </div>
           {action && <div>{action}</div>}
@@ -103,7 +103,7 @@ export function AdminPageWrapper({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-0">
       <AdminHeader title={title} description={description} action={action} />
       <div className="p-6">
         {children}

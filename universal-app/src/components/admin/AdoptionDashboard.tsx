@@ -148,7 +148,7 @@ function TimeRangeSelector({
   ];
 
   return (
-    <div className="inline-flex rounded-lg bg-slate-100 dark:bg-slate-800 p-1">
+    <div className="inline-flex rounded-lg bg-muted p-1">
       {options.map((option) => (
         <button
           key={option.value}
@@ -157,8 +157,8 @@ function TimeRangeSelector({
             px-3 py-1.5 text-sm font-medium rounded-md transition-all
             ${
               value === option.value
-                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                ? 'bg-card text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
             }
           `}
         >
@@ -189,9 +189,9 @@ function MetricCard({
 
   const colorStyles = {
     blue: {
-      bg: 'bg-blue-50 dark:bg-blue-950/50',
-      text: 'text-blue-600 dark:text-blue-400',
-      border: 'border-blue-100 dark:border-blue-900',
+      bg: 'bg-info/10',
+      text: 'text-info',
+      border: 'border-info/20',
     },
     purple: {
       bg: 'bg-purple-50 dark:bg-purple-950/50',
@@ -199,9 +199,9 @@ function MetricCard({
       border: 'border-purple-100 dark:border-purple-900',
     },
     green: {
-      bg: 'bg-green-50 dark:bg-green-950/50',
-      text: 'text-green-600 dark:text-green-400',
-      border: 'border-green-100 dark:border-green-900',
+      bg: 'bg-success/10',
+      text: 'text-success',
+      border: 'border-success/20',
     },
     amber: {
       bg: 'bg-amber-50 dark:bg-amber-950/50',
@@ -223,7 +223,7 @@ function MetricCard({
   const styles = colorStyles[color];
 
   return (
-    <Card variant="glass" className="p-6 bg-white/80 dark:bg-slate-900/80">
+    <Card variant="glass" className="p-6 bg-card/80">
       <div className="flex items-start justify-between mb-4">
         <div className={`p-3 rounded-xl ${styles.bg} ${styles.border} border shadow-sm`}>
           <Icon className={`w-5 h-5 ${styles.text}`} />
@@ -234,8 +234,8 @@ function MetricCard({
               flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full border
               ${
                 isPositive
-                  ? 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/50 border-green-200 dark:border-green-900'
-                  : 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/50 border-red-200 dark:border-red-900'
+                  ? 'text-success bg-success/10 border-success/20'
+                  : 'text-destructive bg-destructive/10 border-destructive/20'
               }
             `}
           >
@@ -244,12 +244,12 @@ function MetricCard({
           </div>
         )}
       </div>
-      <h3 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1 font-display">
+      <h3 className="text-3xl font-bold text-foreground mb-1 font-display">
         {value.toLocaleString()}
       </h3>
-      <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">{title}</p>
+      <p className="text-sm text-muted-foreground font-medium">{title}</p>
       {subtitle && (
-        <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{subtitle}</p>
+        <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
       )}
     </Card>
   );
@@ -259,16 +259,16 @@ function FeatureUsageChart({ data }: { data: FeatureUsage[] }) {
   const maxUsage = Math.max(...data.map((d) => d.usage));
 
   return (
-    <Card variant="glass" className="p-6 bg-white/80 dark:bg-slate-900/80">
+    <Card variant="glass" className="p-6 bg-card/80">
       <div className="flex items-center gap-2 mb-6">
         <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg">
           <BarChart3 className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+          <h3 className="text-lg font-semibold text-foreground">
             Feature Adoption
           </h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-sm text-muted-foreground">
             Usage percentage across all users
           </p>
         </div>
@@ -277,14 +277,14 @@ function FeatureUsageChart({ data }: { data: FeatureUsage[] }) {
         {data.map((feature) => (
           <div key={feature.name} className="group">
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+              <span className="text-sm font-medium text-foreground">
                 {feature.name}
               </span>
-              <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+              <span className="text-sm font-semibold text-foreground">
                 {feature.usage}%
               </span>
             </div>
-            <div className="h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+            <div className="h-2.5 bg-muted rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-500 group-hover:opacity-80"
                 style={{
@@ -345,7 +345,7 @@ function AreaTrendChart({
   }, [data]);
 
   return (
-    <Card variant="glass" className="p-6 bg-white/80 dark:bg-slate-900/80">
+    <Card variant="glass" className="p-6 bg-card/80">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <div
@@ -355,15 +355,15 @@ function AreaTrendChart({
             <Activity className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{title}</h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400">{subtitle}</p>
+            <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+            <p className="text-sm text-muted-foreground">{subtitle}</p>
           </div>
         </div>
         <div className="text-right">
-          <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+          <div className="text-2xl font-bold text-foreground">
             {data[data.length - 1].value.toLocaleString()}
           </div>
-          <div className="text-xs text-slate-500">Latest</div>
+          <div className="text-xs text-muted-foreground">Latest</div>
         </div>
       </div>
 
@@ -381,7 +381,7 @@ function AreaTrendChart({
             </linearGradient>
           </defs>
           {/* Grid lines */}
-          <g className="stroke-slate-200 dark:stroke-slate-700" strokeWidth="0.2">
+          <g className="stroke-border" strokeWidth="0.2">
             <line x1="5" y1="15" x2="95" y2="15" />
             <line x1="5" y1="32.5" x2="95" y2="32.5" strokeDasharray="2,2" />
             <line x1="5" y1="50" x2="95" y2="50" />
@@ -413,7 +413,7 @@ function AreaTrendChart({
         {/* X-axis labels */}
         <div className="flex justify-between mt-2 px-1">
           {data.filter((_, i) => i % 3 === 0 || i === data.length - 1).map((d, i) => (
-            <span key={i} className="text-xs text-slate-400 dark:text-slate-500">
+            <span key={i} className="text-xs text-muted-foreground">
               {d.label}
             </span>
           ))}
@@ -421,24 +421,24 @@ function AreaTrendChart({
       </div>
 
       {/* Stats row */}
-      <div className="flex justify-between mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+      <div className="flex justify-between mt-4 pt-4 border-t border-border">
         <div className="text-center">
-          <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+          <div className="text-sm font-semibold text-foreground">
             {minValue.toLocaleString()}
           </div>
-          <div className="text-xs text-slate-500">Min</div>
+          <div className="text-xs text-muted-foreground">Min</div>
         </div>
         <div className="text-center">
-          <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+          <div className="text-sm font-semibold text-foreground">
             {Math.round(avgValue).toLocaleString()}
           </div>
-          <div className="text-xs text-slate-500">Avg</div>
+          <div className="text-xs text-muted-foreground">Avg</div>
         </div>
         <div className="text-center">
-          <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+          <div className="text-sm font-semibold text-foreground">
             {maxValue.toLocaleString()}
           </div>
-          <div className="text-xs text-slate-500">Max</div>
+          <div className="text-xs text-muted-foreground">Max</div>
         </div>
       </div>
     </Card>
@@ -494,16 +494,16 @@ function DepartmentBreakdown({ data }: { data: DepartmentData[] }) {
   };
 
   return (
-    <Card variant="glass" className="p-6 bg-white/80 dark:bg-slate-900/80">
+    <Card variant="glass" className="p-6 bg-card/80">
       <div className="flex items-center gap-2 mb-6">
         <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 shadow-lg">
           <Building2 className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+          <h3 className="text-lg font-semibold text-foreground">
             Department Breakdown
           </h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-sm text-muted-foreground">
             Users and recordings by department
           </p>
         </div>
@@ -527,10 +527,10 @@ function DepartmentBreakdown({ data }: { data: DepartmentData[] }) {
             </svg>
             {/* Center text */}
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+              <span className="text-2xl font-bold text-foreground">
                 {totalUsers}
               </span>
-              <span className="text-xs text-slate-500">Users</span>
+              <span className="text-xs text-muted-foreground">Users</span>
             </div>
           </div>
         </div>
@@ -540,22 +540,22 @@ function DepartmentBreakdown({ data }: { data: DepartmentData[] }) {
           {data.map((dept) => (
             <div
               key={dept.name}
-              className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+              className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors"
             >
               <div className="flex items-center gap-3">
                 <div
                   className="w-3 h-3 rounded-full"
                   style={{ backgroundColor: dept.color }}
                 />
-                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                <span className="text-sm font-medium text-foreground">
                   {dept.name}
                 </span>
               </div>
               <div className="text-right">
-                <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                <div className="text-sm font-semibold text-foreground">
                   {dept.users}
                 </div>
-                <div className="text-xs text-slate-500">{dept.recordings} rec.</div>
+                <div className="text-xs text-muted-foreground">{dept.recordings} rec.</div>
               </div>
             </div>
           ))}
@@ -581,7 +581,7 @@ function QuickStats({
       icon: Mic,
       label: 'Total Recordings',
       value: totalRecordings.toLocaleString(),
-      color: 'text-blue-500',
+      color: 'text-info',
     },
     {
       icon: Calendar,
@@ -593,7 +593,7 @@ function QuickStats({
       icon: Sparkles,
       label: 'AI Accuracy',
       value: `${accuracy}%`,
-      color: 'text-green-500',
+      color: 'text-success',
     },
     {
       icon: TrendingUp,
@@ -604,19 +604,19 @@ function QuickStats({
   ];
 
   return (
-    <Card variant="glass" className="p-4 bg-white/80 dark:bg-slate-900/80">
+    <Card variant="glass" className="p-4 bg-card/80">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {stats.map((stat) => (
           <div
             key={stat.label}
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+            className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors"
           >
             <stat.icon className={`w-5 h-5 ${stat.color}`} />
             <div>
-              <div className="text-lg font-bold text-slate-900 dark:text-slate-100">
+              <div className="text-lg font-bold text-foreground">
                 {stat.value}
               </div>
-              <div className="text-xs text-slate-500">{stat.label}</div>
+              <div className="text-xs text-muted-foreground">{stat.label}</div>
             </div>
           </div>
         ))}
@@ -644,10 +644,10 @@ export function AdoptionDashboard({ className = '' }: AdoptionDashboardProps) {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-display font-bold text-slate-900 dark:text-slate-100">
+          <h2 className="text-2xl font-display font-bold text-foreground">
             Adoption Dashboard
           </h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             Track user engagement and feature adoption across your organization
           </p>
         </div>
@@ -705,42 +705,42 @@ export function AdoptionDashboard({ className = '' }: AdoptionDashboardProps) {
       <DepartmentBreakdown data={adoptionData.departments} />
 
       {/* Engagement Insights */}
-      <Card variant="glass" className="p-6 bg-white/80 dark:bg-slate-900/80">
+      <Card variant="glass" className="p-6 bg-card/80">
         <div className="flex items-center gap-2 mb-4">
           <div className="p-2 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 shadow-lg">
             <Sparkles className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+            <h3 className="text-lg font-semibold text-foreground">
               Engagement Insights
             </h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400">
+            <p className="text-sm text-muted-foreground">
               AI-powered recommendations to improve adoption
             </p>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900">
-            <div className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
+          <div className="p-4 rounded-xl bg-info/10 border border-info/20">
+            <div className="text-sm font-medium text-info mb-1">
               📈 High Growth Area
             </div>
-            <p className="text-sm text-blue-700 dark:text-blue-300">
+            <p className="text-sm text-info/80">
               Children&apos;s Services saw 34% increase in recordings this month
             </p>
           </div>
-          <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900">
-            <div className="text-sm font-medium text-amber-900 dark:text-amber-100 mb-1">
+          <div className="p-4 rounded-xl bg-warning/10 border border-warning/20">
+            <div className="text-sm font-medium text-warning mb-1">
               ⚡ Feature Opportunity
             </div>
-            <p className="text-sm text-amber-700 dark:text-amber-300">
+            <p className="text-sm text-warning/80">
               Offline mode usage is low—consider targeted training sessions
             </p>
           </div>
-          <div className="p-4 rounded-xl bg-green-50 dark:bg-green-950/30 border border-green-100 dark:border-green-900">
-            <div className="text-sm font-medium text-green-900 dark:text-green-100 mb-1">
+          <div className="p-4 rounded-xl bg-success/10 border border-success/20">
+            <div className="text-sm font-medium text-success mb-1">
               ✅ Success Story
             </div>
-            <p className="text-sm text-green-700 dark:text-green-300">
+            <p className="text-sm text-success/80">
               AI Summaries adoption increased 23% after last week&apos;s workshop
             </p>
           </div>

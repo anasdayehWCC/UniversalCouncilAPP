@@ -142,9 +142,9 @@ export function UserForm({ user, onSave, onCancel, isSubmitting = false }: UserF
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <Card variant="glass" className="w-full max-w-lg bg-white shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300">
-        <div className="flex items-center justify-between p-4 border-b border-slate-200">
-          <h2 className="text-lg font-display font-bold text-slate-900">
+      <Card variant="glass" className="w-full max-w-lg bg-card shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300">
+        <div className="flex items-center justify-between p-4 border-b border-border">
+          <h2 className="text-lg font-display font-bold text-foreground">
             {user ? 'Edit User' : 'Add New User'}
           </h2>
           <Button variant="ghost" size="icon" onClick={onCancel}>
@@ -155,7 +155,7 @@ export function UserForm({ user, onSave, onCancel, isSubmitting = false }: UserF
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
           {/* Name */}
           <div className="space-y-2">
-            <Label htmlFor="name" className={cn(errors.name && touched.name && 'text-red-600')}>
+            <Label htmlFor="name" className={cn(errors.name && touched.name && 'text-destructive')}>
               Full Name *
             </Label>
             <Input
@@ -167,7 +167,7 @@ export function UserForm({ user, onSave, onCancel, isSubmitting = false }: UserF
               className={cn(errors.name && touched.name && 'border-red-300 focus-visible:ring-red-500')}
             />
             {errors.name && touched.name && (
-              <p className="text-xs text-red-600 flex items-center gap-1">
+              <p className="text-xs text-destructive flex items-center gap-1">
                 <AlertCircle className="w-3 h-3" />
                 {errors.name}
               </p>
@@ -176,7 +176,7 @@ export function UserForm({ user, onSave, onCancel, isSubmitting = false }: UserF
 
           {/* Email */}
           <div className="space-y-2">
-            <Label htmlFor="email" className={cn(errors.email && touched.email && 'text-red-600')}>
+            <Label htmlFor="email" className={cn(errors.email && touched.email && 'text-destructive')}>
               Email Address *
             </Label>
             <Input
@@ -189,7 +189,7 @@ export function UserForm({ user, onSave, onCancel, isSubmitting = false }: UserF
               className={cn(errors.email && touched.email && 'border-red-300 focus-visible:ring-red-500')}
             />
             {errors.email && touched.email && (
-              <p className="text-xs text-red-600 flex items-center gap-1">
+              <p className="text-xs text-destructive flex items-center gap-1">
                 <AlertCircle className="w-3 h-3" />
                 {errors.email}
               </p>
@@ -245,7 +245,7 @@ export function UserForm({ user, onSave, onCancel, isSubmitting = false }: UserF
 
           {/* Team */}
           <div className="space-y-2">
-            <Label htmlFor="team" className={cn(errors.team && touched.team && 'text-red-600')}>
+            <Label htmlFor="team" className={cn(errors.team && touched.team && 'text-destructive')}>
               Team *
             </Label>
             <Input
@@ -263,7 +263,7 @@ export function UserForm({ user, onSave, onCancel, isSubmitting = false }: UserF
               ))}
             </datalist>
             {errors.team && touched.team && (
-              <p className="text-xs text-red-600 flex items-center gap-1">
+              <p className="text-xs text-destructive flex items-center gap-1">
                 <AlertCircle className="w-3 h-3" />
                 {errors.team}
               </p>
@@ -291,14 +291,14 @@ export function UserForm({ user, onSave, onCancel, isSubmitting = false }: UserF
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
+          <div className="flex justify-end gap-3 pt-4 border-t border-border">
             <Button type="button" variant="outline" onClick={onCancel}>
               Cancel
             </Button>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin motion-reduce:animate-none" />
                   Saving...
                 </>
               ) : (

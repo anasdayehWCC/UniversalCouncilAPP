@@ -45,11 +45,11 @@ export function AdminNav() {
   return (
     <nav className="space-y-1">
       <div className="px-3 py-2 mb-4">
-        <div className="flex items-center gap-2 text-sm font-medium text-slate-500">
+        <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
           <Shield className="w-4 h-4" />
           <span>Admin Panel</span>
         </div>
-        <p className="text-xs text-slate-400 mt-1">{tenantConfig.name}</p>
+        <p className="text-xs text-muted-foreground mt-1">{tenantConfig.name}</p>
       </div>
 
       {visibleItems.map((item) => {
@@ -64,7 +64,7 @@ export function AdminNav() {
               'flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-all',
               isActive 
                 ? 'bg-[var(--primary)] text-white shadow-sm' 
-                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
             )}
           >
             <div className="flex items-center gap-3">

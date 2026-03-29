@@ -121,7 +121,7 @@ export function SettingsForm({ settings, onSave, canEdit }: SettingsFormProps) {
   return (
     <form onSubmit={handleSubmit}>
       <Tabs defaultValue="general" className="space-y-6">
-        <TabsList className="bg-white/80 border border-slate-200">
+        <TabsList className="bg-card/80 border border-border">
           <TabsTrigger value="general" className="gap-2">
             <Settings2 className="w-4 h-4" />
             General
@@ -142,8 +142,8 @@ export function SettingsForm({ settings, onSave, canEdit }: SettingsFormProps) {
 
         {/* General Settings */}
         <TabsContent value="general">
-          <Card variant="glass" hoverEffect={false} className="p-6 bg-white/80">
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">General Settings</h3>
+          <Card variant="glass" hoverEffect={false} className="p-6 bg-card/80">
+            <h3 className="text-lg font-semibold text-foreground mb-4">General Settings</h3>
             
             <div className="space-y-6">
               <div className="space-y-2">
@@ -155,7 +155,7 @@ export function SettingsForm({ settings, onSave, canEdit }: SettingsFormProps) {
                   disabled={!canEdit}
                 />
                 {errors['name'] && (
-                  <p className="text-xs text-red-600 flex items-center gap-1">
+                  <p className="text-xs text-destructive flex items-center gap-1">
                     <AlertCircle className="w-3 h-3" />
                     {errors['name']}
                   </p>
@@ -163,7 +163,7 @@ export function SettingsForm({ settings, onSave, canEdit }: SettingsFormProps) {
               </div>
 
               <div className="space-y-4">
-                <h4 className="font-medium text-slate-700">Feature Toggles</h4>
+                <h4 className="font-medium text-foreground">Feature Toggles</h4>
                 
                 {[
                   { key: 'aiEdit' as const, label: 'AI-Assisted Editing', desc: 'Allow AI to suggest edits to minutes' },
@@ -171,10 +171,10 @@ export function SettingsForm({ settings, onSave, canEdit }: SettingsFormProps) {
                   { key: 'offlineMode' as const, label: 'Offline Mode', desc: 'Enable offline recording and sync' },
                   { key: 'pushNotifications' as const, label: 'Push Notifications', desc: 'Browser and mobile push alerts' }
                 ].map(({ key, label, desc }) => (
-                  <label key={key} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg cursor-pointer hover:bg-slate-100 transition-colors">
+                  <label key={key} className="flex items-center justify-between p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors">
                     <div>
-                      <p className="font-medium text-slate-900">{label}</p>
-                      <p className="text-sm text-slate-500">{desc}</p>
+                      <p className="font-medium text-foreground">{label}</p>
+                      <p className="text-sm text-muted-foreground">{desc}</p>
                     </div>
                     <button
                       type="button"
@@ -182,7 +182,7 @@ export function SettingsForm({ settings, onSave, canEdit }: SettingsFormProps) {
                       disabled={!canEdit}
                       className={cn(
                         'relative w-12 h-7 rounded-full transition-colors',
-                        formData.features[key] ? 'bg-[var(--primary)]' : 'bg-slate-300',
+                        formData.features[key] ? 'bg-[var(--primary)]' : 'bg-muted-foreground/30',
                         !canEdit && 'opacity-50 cursor-not-allowed'
                       )}
                     >
@@ -202,8 +202,8 @@ export function SettingsForm({ settings, onSave, canEdit }: SettingsFormProps) {
 
         {/* Branding Settings */}
         <TabsContent value="branding">
-          <Card variant="glass" hoverEffect={false} className="p-6 bg-white/80">
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">Branding</h3>
+          <Card variant="glass" hoverEffect={false} className="p-6 bg-card/80">
+            <h3 className="text-lg font-semibold text-foreground mb-4">Branding</h3>
             
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
@@ -216,7 +216,7 @@ export function SettingsForm({ settings, onSave, canEdit }: SettingsFormProps) {
                       value={formData.branding.primaryColor}
                       onChange={(e) => updateBranding('primaryColor', e.target.value)}
                       disabled={!canEdit}
-                      className="h-10 w-14 rounded border border-slate-200 cursor-pointer disabled:opacity-50"
+                      className="h-10 w-14 rounded border border-input cursor-pointer disabled:opacity-50"
                     />
                     <Input
                       value={formData.branding.primaryColor}
@@ -226,7 +226,7 @@ export function SettingsForm({ settings, onSave, canEdit }: SettingsFormProps) {
                     />
                   </div>
                   {errors['branding.primaryColor'] && (
-                    <p className="text-xs text-red-600">{errors['branding.primaryColor']}</p>
+                    <p className="text-xs text-destructive">{errors['branding.primaryColor']}</p>
                   )}
                 </div>
 
@@ -239,7 +239,7 @@ export function SettingsForm({ settings, onSave, canEdit }: SettingsFormProps) {
                       value={formData.branding.accentColor}
                       onChange={(e) => updateBranding('accentColor', e.target.value)}
                       disabled={!canEdit}
-                      className="h-10 w-14 rounded border border-slate-200 cursor-pointer disabled:opacity-50"
+                      className="h-10 w-14 rounded border border-input cursor-pointer disabled:opacity-50"
                     />
                     <Input
                       value={formData.branding.accentColor}
@@ -249,17 +249,17 @@ export function SettingsForm({ settings, onSave, canEdit }: SettingsFormProps) {
                     />
                   </div>
                   {errors['branding.accentColor'] && (
-                    <p className="text-xs text-red-600">{errors['branding.accentColor']}</p>
+                    <p className="text-xs text-destructive">{errors['branding.accentColor']}</p>
                   )}
                 </div>
               </div>
 
               <div className="space-y-2">
                 <Label>Logo Upload</Label>
-                <div className="border-2 border-dashed border-slate-200 rounded-lg p-6 text-center hover:border-slate-300 transition-colors">
-                  <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                  <p className="text-sm text-slate-600">Drag and drop or click to upload</p>
-                  <p className="text-xs text-slate-400 mt-1">PNG, SVG up to 2MB</p>
+                <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-input transition-colors">
+                  <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                  <p className="text-sm text-foreground">Drag and drop or click to upload</p>
+                  <p className="text-xs text-muted-foreground mt-1">PNG, SVG up to 2MB</p>
                   <Button type="button" variant="outline" size="sm" className="mt-3" disabled={!canEdit}>
                     Choose File
                   </Button>
@@ -290,8 +290,8 @@ export function SettingsForm({ settings, onSave, canEdit }: SettingsFormProps) {
 
         {/* Compliance Settings */}
         <TabsContent value="compliance">
-          <Card variant="glass" hoverEffect={false} className="p-6 bg-white/80">
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">Compliance & Security</h3>
+          <Card variant="glass" hoverEffect={false} className="p-6 bg-card/80">
+            <h3 className="text-lg font-semibold text-foreground mb-4">Compliance & Security</h3>
             
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
@@ -307,9 +307,9 @@ export function SettingsForm({ settings, onSave, canEdit }: SettingsFormProps) {
                     max={2555}
                   />
                   {errors['compliance.dataRetentionDays'] && (
-                    <p className="text-xs text-red-600">{errors['compliance.dataRetentionDays']}</p>
+                    <p className="text-xs text-destructive">{errors['compliance.dataRetentionDays']}</p>
                   )}
-                  <p className="text-xs text-slate-400">Meeting data and transcripts</p>
+                  <p className="text-xs text-muted-foreground">Meeting data and transcripts</p>
                 </div>
 
                 <div className="space-y-2">
@@ -324,16 +324,16 @@ export function SettingsForm({ settings, onSave, canEdit }: SettingsFormProps) {
                     max={2555}
                   />
                   {errors['compliance.auditLogRetentionDays'] && (
-                    <p className="text-xs text-red-600">{errors['compliance.auditLogRetentionDays']}</p>
+                    <p className="text-xs text-destructive">{errors['compliance.auditLogRetentionDays']}</p>
                   )}
-                  <p className="text-xs text-slate-400">Admin actions and system events</p>
+                  <p className="text-xs text-muted-foreground">Admin actions and system events</p>
                 </div>
               </div>
 
-              <label className="flex items-center justify-between p-3 bg-slate-50 rounded-lg cursor-pointer hover:bg-slate-100 transition-colors">
+              <label className="flex items-center justify-between p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors">
                 <div>
-                  <p className="font-medium text-slate-900">Require Multi-Factor Authentication</p>
-                  <p className="text-sm text-slate-500">Enforce MFA for all users</p>
+                  <p className="font-medium text-foreground">Require Multi-Factor Authentication</p>
+                  <p className="text-sm text-muted-foreground">Enforce MFA for all users</p>
                 </div>
                 <button
                   type="button"
@@ -341,7 +341,7 @@ export function SettingsForm({ settings, onSave, canEdit }: SettingsFormProps) {
                   disabled={!canEdit}
                   className={cn(
                     'relative w-12 h-7 rounded-full transition-colors',
-                    formData.compliance.requireMfa ? 'bg-[var(--primary)]' : 'bg-slate-300',
+                    formData.compliance.requireMfa ? 'bg-[var(--primary)]' : 'bg-muted-foreground/30',
                     !canEdit && 'opacity-50 cursor-not-allowed'
                   )}
                 >
@@ -360,7 +360,7 @@ export function SettingsForm({ settings, onSave, canEdit }: SettingsFormProps) {
                   {formData.compliance.allowedDomains.map((domain, index) => (
                     <span
                       key={index}
-                      className="inline-flex items-center gap-1 px-2 py-1 bg-slate-100 rounded text-sm"
+                      className="inline-flex items-center gap-1 px-2 py-1 bg-muted rounded text-sm"
                     >
                       @{domain}
                       {canEdit && (
@@ -370,7 +370,7 @@ export function SettingsForm({ settings, onSave, canEdit }: SettingsFormProps) {
                             'allowedDomains',
                             formData.compliance.allowedDomains.filter((_, i) => i !== index)
                           )}
-                          className="text-slate-400 hover:text-slate-600"
+                          className="text-muted-foreground hover:text-foreground"
                         >
                           ×
                         </button>
@@ -385,18 +385,18 @@ export function SettingsForm({ settings, onSave, canEdit }: SettingsFormProps) {
 
         {/* Notification Settings */}
         <TabsContent value="notifications">
-          <Card variant="glass" hoverEffect={false} className="p-6 bg-white/80">
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">Notifications</h3>
+          <Card variant="glass" hoverEffect={false} className="p-6 bg-card/80">
+            <h3 className="text-lg font-semibold text-foreground mb-4">Notifications</h3>
             
             <div className="space-y-6">
               {[
                 { key: 'emailEnabled' as const, label: 'Email Notifications', desc: 'Send email alerts for approvals and updates' },
                 { key: 'slackEnabled' as const, label: 'Slack Integration', desc: 'Post notifications to a Slack channel' }
               ].map(({ key, label, desc }) => (
-                <label key={key} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg cursor-pointer hover:bg-slate-100 transition-colors">
+                <label key={key} className="flex items-center justify-between p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors">
                   <div>
-                    <p className="font-medium text-slate-900">{label}</p>
-                    <p className="text-sm text-slate-500">{desc}</p>
+                    <p className="font-medium text-foreground">{label}</p>
+                    <p className="text-sm text-muted-foreground">{desc}</p>
                   </div>
                   <button
                     type="button"
@@ -404,7 +404,7 @@ export function SettingsForm({ settings, onSave, canEdit }: SettingsFormProps) {
                     disabled={!canEdit}
                     className={cn(
                       'relative w-12 h-7 rounded-full transition-colors',
-                      formData.notifications[key] ? 'bg-[var(--primary)]' : 'bg-slate-300',
+                      formData.notifications[key] ? 'bg-[var(--primary)]' : 'bg-muted-foreground/30',
                       !canEdit && 'opacity-50 cursor-not-allowed'
                     )}
                   >
@@ -429,9 +429,9 @@ export function SettingsForm({ settings, onSave, canEdit }: SettingsFormProps) {
                   placeholder="https://your-webhook-endpoint.com/hooks/..."
                 />
                 {errors['notifications.webhookUrl'] && (
-                  <p className="text-xs text-red-600">{errors['notifications.webhookUrl']}</p>
+                  <p className="text-xs text-destructive">{errors['notifications.webhookUrl']}</p>
                 )}
-                <p className="text-xs text-slate-400">Receive POST requests for all admin events</p>
+                <p className="text-xs text-muted-foreground">Receive POST requests for all admin events</p>
               </div>
             </div>
           </Card>
@@ -442,7 +442,7 @@ export function SettingsForm({ settings, onSave, canEdit }: SettingsFormProps) {
       {canEdit && (
         <div className="flex items-center justify-end gap-4 mt-6">
           {isSaved && (
-            <span className="text-sm text-green-600 flex items-center gap-1">
+            <span className="text-sm text-success flex items-center gap-1">
               <CheckCircle className="w-4 h-4" />
               Settings saved
             </span>
@@ -450,7 +450,7 @@ export function SettingsForm({ settings, onSave, canEdit }: SettingsFormProps) {
           <Button type="submit" disabled={isSubmitting} className="gap-2">
             {isSubmitting ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin motion-reduce:animate-none" />
                 Saving...
               </>
             ) : (

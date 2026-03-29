@@ -71,13 +71,13 @@ interface FeatureTogglePanelProps {
 function StatusIcon({ status }: { status: FeatureFlag['status'] }) {
   switch (status) {
     case 'released':
-      return <Rocket className="w-3.5 h-3.5 text-green-500" />;
+      return <Rocket className="w-3.5 h-3.5 text-success" />;
     case 'beta':
-      return <Beaker className="w-3.5 h-3.5 text-blue-500" />;
+      return <Beaker className="w-3.5 h-3.5 text-primary" />;
     case 'development':
-      return <AlertTriangle className="w-3.5 h-3.5 text-yellow-500" />;
+      return <AlertTriangle className="w-3.5 h-3.5 text-warning" />;
     case 'deprecated':
-      return <AlertTriangle className="w-3.5 h-3.5 text-red-500" />;
+      return <AlertTriangle className="w-3.5 h-3.5 text-destructive" />;
     default:
       return null;
   }
@@ -177,7 +177,7 @@ function FlagToggleRow({
             <div className="flex items-center gap-2">
               <span className="font-medium text-sm truncate">{flag.name}</span>
               {hasOverride && (
-                <span className="px-1.5 py-0.5 text-[10px] font-medium rounded bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">
+                <span className="px-1.5 py-0.5 text-[10px] font-medium rounded bg-warning/10 text-warning">
                   Override
                 </span>
               )}
@@ -458,13 +458,13 @@ export function FeatureTogglePanel({
                 className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50"
                 title="Sync from PostHog"
               >
-                <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin motion-reduce:animate-none' : ''}`} />
               </button>
             )}
             {showClearAll && state.overrides.size > 0 && (
               <button
                 onClick={() => admin.clearOverrides()}
-                className="px-2 py-1 text-xs text-red-600 hover:text-red-700 rounded hover:bg-red-50 dark:hover:bg-red-900/20"
+                className="px-2 py-1 text-xs text-destructive hover:text-destructive rounded hover:bg-destructive/10"
               >
                 Clear All Overrides
               </button>
@@ -487,7 +487,7 @@ export function FeatureTogglePanel({
       <div className="p-4">
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
-            <RefreshCw className="w-6 h-6 animate-spin text-gray-400" />
+            <RefreshCw className="w-6 h-6 animate-spin motion-reduce:animate-none text-gray-400" />
           </div>
         ) : (
           <FeatureToggle />

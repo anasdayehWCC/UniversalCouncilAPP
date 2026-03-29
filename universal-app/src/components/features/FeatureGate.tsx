@@ -53,7 +53,7 @@ interface MultiFeatureGateProps {
 
 function DefaultLoading() {
   return (
-    <div className="animate-pulse h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
+    <div className="animate-pulse motion-reduce:animate-none h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
   );
 }
 

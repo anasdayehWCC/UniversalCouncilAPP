@@ -140,10 +140,10 @@ export function ExportDialog({
           onClick={e => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50">
+          <div className="flex items-center justify-between px-6 py-4 border-b bg-muted">
             <div>
-              <h2 className="text-lg font-semibold text-slate-900">Export Minutes</h2>
-              <p className="text-sm text-slate-500 truncate max-w-md">{minute.title}</p>
+              <h2 className="text-lg font-semibold text-foreground">Export Minutes</h2>
+              <p className="text-sm text-muted-foreground truncate max-w-md">{minute.title}</p>
             </div>
             <Button
               variant="ghost"
@@ -160,7 +160,7 @@ export function ExportDialog({
             <div className="flex-1 p-6 space-y-6 max-h-[70vh] overflow-y-auto">
               {/* Format Selection */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-3">
+                <label className="block text-sm font-medium text-foreground mb-3">
                   Export Format
                 </label>
                 <div className="grid grid-cols-2 gap-3">
@@ -175,20 +175,20 @@ export function ExportDialog({
                         onClick={() => handleFormatChange(format)}
                         className={`flex items-start gap-3 p-3 rounded-lg border-2 transition-all text-left ${
                           isSelected
-                            ? 'border-[var(--primary)] bg-[var(--primary)]/5'
-                            : 'border-slate-200 hover:border-slate-300'
+                            ? 'border-primary bg-primary/5'
+                            : 'border-border hover:border-primary/50'
                         }`}
                       >
                         <div className={`p-2 rounded-lg ${
-                          isSelected ? 'bg-[var(--primary)] text-white' : 'bg-slate-100 text-slate-600'
+                          isSelected ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'
                         }`}>
                           <Icon className="w-4 h-4" />
                         </div>
                         <div>
-                          <p className={`font-medium ${isSelected ? 'text-[var(--primary)]' : 'text-slate-900'}`}>
+                          <p className={`font-medium ${isSelected ? 'text-primary' : 'text-foreground'}`}>
                             {info.label}
                           </p>
-                          <p className="text-xs text-slate-500">{info.description}</p>
+                          <p className="text-xs text-muted-foreground">{info.description}</p>
                         </div>
                         {isSelected && (
                           <Check className="w-4 h-4 text-[var(--primary)] ml-auto" />
@@ -201,13 +201,13 @@ export function ExportDialog({
 
               {/* Template Selection */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Template
                 </label>
                 <select
                   value={selectedTemplateId}
                   onChange={e => setSelectedTemplateId(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-[var(--primary)] outline-none"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                 >
                   {availableTemplates.map(t => (
                     <option key={t.id} value={t.id}>
@@ -221,13 +221,13 @@ export function ExportDialog({
               <div>
                 <button
                   onClick={() => setShowOptions(!showOptions)}
-                  className="flex items-center gap-2 text-sm font-medium text-slate-700 hover:text-slate-900"
+                  className="flex items-center gap-2 text-sm font-medium text-foreground hover:text-primary"
                 >
                   <Settings2 className="w-4 h-4" />
                   Export Options
                   <motion.span
                     animate={{ rotate: showOptions ? 180 : 0 }}
-                    className="text-slate-400"
+                    className="text-muted-foreground"
                   >
                     ▼
                   </motion.span>
@@ -241,7 +241,7 @@ export function ExportDialog({
                       exit={{ height: 0, opacity: 0 }}
                       className="overflow-hidden"
                     >
-                      <div className="grid grid-cols-2 gap-3 mt-4 p-4 bg-slate-50 rounded-lg">
+                      <div className="grid grid-cols-2 gap-3 mt-4 p-4 bg-muted rounded-lg">
                         <OptionCheckbox
                           label="Include timestamps"
                           icon={Clock}
@@ -313,13 +313,13 @@ export function ExportDialog({
               <div>
                 <button
                   onClick={() => setShowPreview(!showPreview)}
-                  className="flex items-center gap-2 text-sm font-medium text-slate-700 hover:text-slate-900"
+                  className="flex items-center gap-2 text-sm font-medium text-foreground hover:text-primary"
                 >
                   <Eye className="w-4 h-4" />
                   Preview
                   <motion.span
                     animate={{ rotate: showPreview ? 180 : 0 }}
-                    className="text-slate-400"
+                    className="text-muted-foreground"
                   >
                     ▼
                   </motion.span>
@@ -356,20 +356,20 @@ export function ExportDialog({
 
               {/* Error */}
               {error && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <div className="flex items-center gap-2 text-red-700">
+                <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+                  <div className="flex items-center gap-2 text-destructive">
                     <AlertCircle className="w-4 h-4" />
-                    <p className="text-sm font-medium">Export failed</p>
+                    <span className="font-medium">Export failed</span>
                   </div>
-                  <p className="text-sm text-red-600 mt-1">{error.message}</p>
+                  <p className="text-sm text-destructive mt-1">{error.message}</p>
                 </div>
               )}
             </div>
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between px-6 py-4 border-t border-slate-200 bg-slate-50">
-            <div className="text-sm text-slate-500">
+          <div className="flex items-center justify-between px-6 py-4 border-t bg-muted">
+            <div className="text-sm text-muted-foreground">
               Estimated size: <span className="font-medium">{estimatedSize}</span>
             </div>
             <div className="flex items-center gap-3">
@@ -421,10 +421,10 @@ function OptionCheckbox({ label, icon: Icon, checked, onChange, disabled }: Opti
         checked={checked}
         onChange={e => onChange(e.target.checked)}
         disabled={disabled}
-        className="w-4 h-4 rounded border-slate-300 text-[var(--primary)] focus:ring-[var(--primary)]"
+        className="w-4 h-4 rounded border-input text-primary focus:ring-primary"
       />
-      <Icon className="w-4 h-4 text-slate-400" />
-      <span className="text-sm text-slate-700">{label}</span>
+      <Icon className="w-4 h-4 text-muted-foreground" />
+      <span className="text-sm text-foreground">{label}</span>
     </label>
   );
 }

@@ -117,7 +117,7 @@ export function VitalsMonitor({
             <span className="text-sm">📊</span>
             <span className="text-white font-semibold">Web Vitals</span>
             {isActive && (
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" title="Active" />
+              <span className="w-2 h-2 rounded-full bg-success animate-pulse motion-reduce:animate-none" title="Active" />
             )}
           </div>
           <div className="flex items-center gap-2">

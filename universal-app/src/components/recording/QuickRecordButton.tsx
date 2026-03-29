@@ -124,9 +124,9 @@ export function QuickRecordButton({
               'absolute bottom-20 right-0',
               'w-64',
               'rounded-2xl overflow-hidden',
-              'bg-white/90 dark:bg-slate-900/90',
+              'bg-white/90 dark:bg-background/90',
               'backdrop-blur-xl',
-              'border border-white/30 dark:border-slate-700/50',
+              'border border-white/30 dark:border-border/50',
               'shadow-xl'
             )}
           >
@@ -144,21 +144,21 @@ export function QuickRecordButton({
                       'w-full flex items-center gap-3 p-3 rounded-xl',
                       'transition-colors duration-150',
                       'hover:bg-primary/10',
-                      action.id === 'record' && 'bg-red-500/5'
+                      action.id === 'record' && 'bg-destructive/5'
                     )}
                   >
                     <div
                       className={cn(
                         'w-10 h-10 rounded-xl flex items-center justify-center',
                         action.id === 'record'
-                          ? 'bg-red-500/20'
+                          ? 'bg-destructive/20'
                           : 'bg-primary/10'
                       )}
                     >
                       <Icon
                         className={cn(
                           'w-5 h-5',
-                          action.id === 'record' ? 'text-red-500' : 'text-primary'
+                          action.id === 'record' ? 'text-destructive' : 'text-primary'
                         )}
                       />
                     </div>
@@ -184,11 +184,11 @@ export function QuickRecordButton({
         className={cn(
           'relative w-16 h-16 rounded-full',
           'flex items-center justify-center',
-          'shadow-lg shadow-red-500/30',
+          'shadow-lg shadow-destructive/30',
           'transition-all duration-300',
           isExpanded
-            ? 'bg-slate-900 dark:bg-slate-700'
-            : 'bg-linear-to-br from-red-500 to-red-600 hover:shadow-xl hover:shadow-red-500/40'
+            ? 'bg-muted dark:bg-muted'
+            : 'bg-linear-to-br from-destructive to-destructive hover:shadow-xl hover:shadow-destructive/40'
         )}
         aria-label={isExpanded ? 'Close menu' : 'Quick actions'}
       >
@@ -206,7 +206,7 @@ export function QuickRecordButton({
         {/* Pulse animation when not expanded */}
         {!isExpanded && (
           <motion.div
-            className="absolute inset-0 rounded-full border-2 border-red-400/50"
+            className="absolute inset-0 rounded-full border-2 border-destructive/50"
             animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0, 0.5] }}
             transition={{ duration: 2, repeat: Infinity }}
           />
@@ -223,7 +223,7 @@ export function QuickRecordButton({
           <span
             className={cn(
               'px-2 py-1 rounded-lg text-xs font-medium',
-              'bg-slate-900/80 text-white',
+              'bg-muted/80 text-white',
               'shadow-lg'
             )}
           >

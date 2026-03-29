@@ -65,16 +65,16 @@ const BADGE_VARIANTS: Record<
   beta: {
     label: 'Beta',
     icon: <Beaker className="w-3 h-3" />,
-    bgColor: 'bg-blue-100 dark:bg-blue-900/30',
-    textColor: 'text-blue-700 dark:text-blue-400',
-    borderColor: 'border-blue-200 dark:border-blue-800',
+    bgColor: 'bg-primary/10',
+    textColor: 'text-primary',
+    borderColor: 'border-primary/20',
   },
   new: {
     label: 'New',
     icon: <Sparkles className="w-3 h-3" />,
-    bgColor: 'bg-green-100 dark:bg-green-900/30',
-    textColor: 'text-green-700 dark:text-green-400',
-    borderColor: 'border-green-200 dark:border-green-800',
+    bgColor: 'bg-success/10',
+    textColor: 'text-success',
+    borderColor: 'border-success/20',
   },
   experimental: {
     label: 'Experimental',
@@ -93,16 +93,16 @@ const BADGE_VARIANTS: Record<
   deprecated: {
     label: 'Deprecated',
     icon: <AlertTriangle className="w-3 h-3" />,
-    bgColor: 'bg-red-100 dark:bg-red-900/30',
-    textColor: 'text-red-700 dark:text-red-400',
-    borderColor: 'border-red-200 dark:border-red-800',
+    bgColor: 'bg-destructive/10',
+    textColor: 'text-destructive',
+    borderColor: 'border-destructive/20',
   },
   premium: {
     label: 'Premium',
     icon: <Star className="w-3 h-3" />,
-    bgColor: 'bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/30',
-    textColor: 'text-amber-700 dark:text-amber-400',
-    borderColor: 'border-amber-200 dark:border-amber-800',
+    bgColor: 'bg-gradient-to-r from-warning/10 to-warning/10',
+    textColor: 'text-warning',
+    borderColor: 'border-warning/20',
   },
 };
 
@@ -333,17 +333,17 @@ export function FeatureStatusIndicator({
   };
 
   const colorClass = isEnabled
-    ? 'bg-green-500'
+    ? 'bg-success'
     : flagData?.status === 'development'
-    ? 'bg-yellow-500'
-    : 'bg-gray-400';
+    ? 'bg-warning'
+    : 'bg-muted';
 
   return (
     <span className="inline-flex items-center gap-1.5">
       <span
         className={`
           ${sizeClasses[size]} rounded-full ${colorClass}
-          ${isEnabled ? 'animate-pulse' : ''}
+          ${isEnabled ? 'animate-pulse motion-reduce:animate-none' : ''}
         `}
       />
       {showLabel && (

@@ -104,21 +104,21 @@ export function ExportPreview({
 
   if (!minute) {
     return (
-      <div className={`flex items-center justify-center h-64 bg-slate-50 rounded-lg border border-dashed border-slate-300 ${className}`}>
-        <p className="text-slate-400">No minute selected for preview</p>
+      <div className={`flex items-center justify-center h-64 bg-muted rounded-lg border border-dashed ${className}`}>
+        <p className="text-muted-foreground">No minute selected for preview</p>
       </div>
     );
   }
 
   return (
-    <div className={`flex flex-col bg-white rounded-lg border border-slate-200 overflow-hidden ${className}`}>
+    <div className={`flex flex-col bg-card rounded-lg border overflow-hidden ${className}`}>
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2 bg-slate-50 border-b border-slate-200">
+      <div className="flex items-center justify-between px-4 py-2 bg-muted border-b">
         <div className="flex items-center gap-2">
           {FORMAT_ICONS[format]}
-          <span className="text-sm font-medium text-slate-700">{FORMAT_LABELS[format]}</span>
+          <span className="text-sm font-medium text-foreground">{FORMAT_LABELS[format]}</span>
           {isLoading && (
-            <RefreshCw className="w-3 h-3 animate-spin text-blue-500" />
+            <RefreshCw className="w-3 h-3 animate-spin motion-reduce:animate-none text-primary" />
           )}
         </div>
         <div className="flex items-center gap-1">
@@ -157,17 +157,17 @@ export function ExportPreview({
             {isLoading ? (
               <div className="flex items-center justify-center h-64">
                 <div className="flex flex-col items-center gap-2">
-                  <RefreshCw className="w-8 h-8 animate-spin text-blue-500" />
-                  <p className="text-sm text-slate-500">Generating preview...</p>
+                  <RefreshCw className="w-8 h-8 animate-spin motion-reduce:animate-none text-primary" />
+                  <p className="text-sm text-muted-foreground">Generating preview...</p>
                 </div>
               </div>
             ) : error ? (
               <div className="flex items-center justify-center h-64">
                 <div className="flex flex-col items-center gap-2 text-center px-4">
-                  <div className="p-2 bg-red-100 rounded-full">
-                    <FileText className="w-6 h-6 text-red-500" />
+                  <div className="p-2 bg-destructive/10 rounded-full">
+                    <FileText className="w-6 h-6 text-destructive" />
                   </div>
-                  <p className="text-sm text-red-600">{error}</p>
+                  <p className="text-sm text-destructive">{error}</p>
                 </div>
               </div>
             ) : (
@@ -199,7 +199,7 @@ interface PreviewContentProps {
 function PreviewContent({ format, content, iframeRef, preRef }: PreviewContentProps) {
   if (!content) {
     return (
-      <div className="flex items-center justify-center h-64 text-slate-400">
+      <div className="flex items-center justify-center h-64 text-muted-foreground">
         No preview available
       </div>
     );
@@ -220,10 +220,10 @@ function PreviewContent({ format, content, iframeRef, preRef }: PreviewContentPr
   // Text preview uses pre/code
   if (format === 'txt') {
     return (
-      <div className="h-full overflow-auto bg-slate-900 p-4">
+      <div className="h-full overflow-auto bg-muted p-4">
         <pre
           ref={preRef}
-          className="text-xs font-mono text-slate-100 whitespace-pre-wrap"
+          className="text-xs font-mono text-foreground whitespace-pre-wrap"
         >
           {content}
         </pre>
@@ -234,18 +234,18 @@ function PreviewContent({ format, content, iframeRef, preRef }: PreviewContentPr
   // DOCX and PDF show a placeholder message
   return (
     <div className="flex flex-col items-center justify-center h-64 gap-4 px-8 text-center">
-      <div className="p-4 bg-slate-100 rounded-full">
+      <div className="p-4 bg-muted rounded-full">
         {FORMAT_ICONS[format]}
       </div>
       <div>
-        <p className="text-sm text-slate-600 font-medium">
+        <p className="text-sm text-foreground font-medium">
           Preview not available for {format.toUpperCase()} format
         </p>
-        <p className="text-xs text-slate-400 mt-1">
+        <p className="text-xs text-muted-foreground mt-1">
           Download the file to view the full document
         </p>
       </div>
-      <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg text-blue-700">
+      <div className="flex items-center gap-2 p-3 bg-primary/10 rounded-lg text-primary">
         <Download className="w-4 h-4" />
         <span className="text-sm">Click Export to generate and download</span>
       </div>

@@ -92,11 +92,11 @@ export function SelectableItem({
         'border-2 transition-all duration-150',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2',
         isSelected
-          ? 'bg-[var(--primary)] border-[var(--primary)]'
-          : 'bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600',
+          ? 'bg-primary border-primary'
+          : 'bg-white dark:bg-background border-border',
         disabled
           ? 'opacity-50 cursor-not-allowed'
-          : 'hover:border-[var(--primary)] cursor-pointer'
+          : 'hover:border-primary cursor-pointer'
       )}
     >
       {isSelected && (
@@ -126,8 +126,8 @@ export function SelectableItem({
         'cursor-pointer',
         // Selection ring
         isSelected && [
-          'ring-2 ring-[var(--primary)] ring-offset-2',
-          'dark:ring-offset-slate-900',
+          'ring-2 ring-primary ring-offset-2',
+          'dark:ring-offset-background',
         ],
         // Hover state
         !isSelected && !disabled && [
@@ -136,8 +136,8 @@ export function SelectableItem({
         ],
         // Selected background tint
         isSelected && [
-          'bg-[var(--primary)]/5',
-          'dark:bg-[var(--primary)]/10',
+          'bg-primary/5',
+          'dark:bg-primary/10',
         ],
         // Disabled state
         disabled && 'opacity-60 cursor-not-allowed',
@@ -174,7 +174,7 @@ export function SelectableItem({
         <motion.div
           className={cn(
             'absolute top-0 bottom-0 w-1 rounded-full',
-            'bg-[var(--primary)]',
+            'bg-primary',
             checkboxPosition === 'left' ? 'left-0' : 'right-0'
           )}
           layoutId={`selection-indicator-${id}`}
@@ -218,7 +218,7 @@ export function SelectAllCheckbox({
     <label
       className={cn(
         'inline-flex items-center gap-2 cursor-pointer',
-        'text-sm text-slate-600 dark:text-slate-400',
+        'text-sm text-muted-foreground',
         disabled && 'opacity-50 cursor-not-allowed',
         className
       )}
@@ -234,13 +234,13 @@ export function SelectAllCheckbox({
           'relative flex-shrink-0',
           'h-5 w-5 rounded',
           'border-2 transition-all duration-150',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
           isAllSelected || isIndeterminate
-            ? 'bg-[var(--primary)] border-[var(--primary)]'
-            : 'bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600',
+            ? 'bg-primary border-primary'
+            : 'bg-white dark:bg-background border-border',
           disabled
             ? 'cursor-not-allowed'
-            : 'hover:border-[var(--primary)] cursor-pointer'
+            : 'hover:border-primary cursor-pointer'
         )}
       >
         {(isAllSelected || isIndeterminate) && (

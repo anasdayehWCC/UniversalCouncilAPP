@@ -41,7 +41,7 @@ interface LoadingSkeletonProps {
 function LoadingSkeleton({ minHeight = '200px', name = 'content' }: LoadingSkeletonProps) {
   return (
     <div 
-      className="animate-pulse rounded-lg bg-gradient-to-r from-muted via-muted/80 to-muted"
+      className="animate-pulse motion-reduce:animate-none rounded-lg bg-gradient-to-r from-muted via-muted/80 to-muted"
       style={{ minHeight }}
       role="status"
       aria-busy="true"
@@ -50,9 +50,9 @@ function LoadingSkeleton({ minHeight = '200px', name = 'content' }: LoadingSkele
       <div className="flex items-center justify-center h-full">
         {/* Subtle loading indicator */}
         <div className="flex space-x-1">
-          <div className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce [animation-delay:-0.3s]" />
-          <div className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce [animation-delay:-0.15s]" />
-          <div className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce" />
+          <div className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce motion-reduce:animate-none [animation-delay:-0.3s]" />
+          <div className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce motion-reduce:animate-none [animation-delay:-0.15s]" />
+          <div className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce motion-reduce:animate-none" />
         </div>
         <span className="sr-only">Loading {name}...</span>
       </div>

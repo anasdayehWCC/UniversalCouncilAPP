@@ -21,7 +21,6 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import {
   TooltipRoot as Tooltip,
   TooltipContent,
@@ -156,14 +155,14 @@ function RecentItemRow({
             className={cn(
               'group relative flex items-center gap-3 rounded-lg cursor-pointer',
               'transition-all duration-150',
-              'hover:bg-slate-100/80 dark:hover:bg-slate-800/60',
+              'hover:bg-muted/80',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500',
               compact ? 'px-2 py-1.5' : 'px-3 py-2.5'
             )}
           >
             {/* Pin indicator */}
             {item.isPinned && (
-              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-blue-500 rounded-full" />
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-primary rounded-full" />
             )}
 
             {/* Icon */}
@@ -188,18 +187,18 @@ function RecentItemRow({
               <div className="flex items-center gap-2">
                 <span
                   className={cn(
-                    'font-medium text-slate-800 dark:text-slate-100 truncate',
+                    'font-medium text-foreground truncate',
                     compact ? 'text-sm' : 'text-sm'
                   )}
                 >
                   {item.title}
                 </span>
                 {item.isPinned && (
-                  <Pin className="w-3 h-3 text-blue-500 flex-shrink-0" />
+                  <Pin className="w-3 h-3 text-primary flex-shrink-0" />
                 )}
               </div>
               {item.subtitle && !compact && (
-                <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                <p className="text-xs text-muted-foreground truncate">
                   {item.subtitle}
                 </p>
               )}
@@ -207,7 +206,7 @@ function RecentItemRow({
 
             {/* Time & Actions */}
             <div className="flex items-center gap-1 flex-shrink-0">
-              <span className="text-xs text-slate-400 dark:text-slate-500 group-hover:hidden">
+              <span className="text-xs text-muted-foreground group-hover:hidden">
                 {formatRelativeTime(item.accessedAt)}
               </span>
 
@@ -219,15 +218,16 @@ function RecentItemRow({
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-6 w-6 hover:bg-slate-200 dark:hover:bg-slate-700"
+                        className="h-6 w-6 hover:bg-muted"
                         onClick={handleTogglePin}
+                        aria-label={item.isPinned ? 'Unpin item' : 'Pin to top'}
                       >
                         <Pin
                           className={cn(
                             'w-3.5 h-3.5',
                             item.isPinned
-                              ? 'text-blue-500 fill-blue-500'
-                              : 'text-slate-400'
+                              ? 'text-primary fill-primary'
+                              : 'text-muted-foreground'
                           )}
                         />
                       </Button>
@@ -242,10 +242,11 @@ function RecentItemRow({
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-6 w-6 hover:bg-red-100 dark:hover:bg-red-900/30"
+                        className="h-6 w-6 hover:bg-destructive/10"
                         onClick={handleRemove}
+                        aria-label="Remove from recent items"
                       >
-                        <X className="w-3.5 h-3.5 text-slate-400 hover:text-red-500" />
+                        <X className="w-3.5 h-3.5 text-muted-foreground hover:text-destructive" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent side="top" className="text-xs">
@@ -255,7 +256,7 @@ function RecentItemRow({
                 </TooltipProvider>
               </div>
 
-              <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-slate-400 transition-colors" />
+              <ChevronRight className="w-4 h-4 text-muted-foreground/60 group-hover:text-muted-foreground transition-colors" />
             </div>
           </div>
         </motion.div>
@@ -270,7 +271,7 @@ function RecentItemRow({
           <Pin
             className={cn(
               'w-4 h-4 mr-2',
-              item.isPinned && 'text-blue-500 fill-blue-500'
+              item.isPinned && 'text-primary fill-primary'
             )}
           />
           {item.isPinned ? 'Unpin' : 'Pin to top'}
@@ -278,7 +279,7 @@ function RecentItemRow({
         <ContextMenuSeparator />
         <ContextMenuItem
           onClick={handleRemove}
-          className="text-red-600 focus:text-red-600 focus:bg-red-50"
+          className="text-destructive focus:text-destructive focus:bg-destructive/10"
         >
           <Trash2 className="w-4 h-4 mr-2" />
           Remove
@@ -331,8 +332,8 @@ export function RecentItemsList({
           className
         )}
       >
-        <Clock className="w-10 h-10 text-slate-300 dark:text-slate-600 mb-3" />
-        <p className="text-sm text-slate-500 dark:text-slate-400">
+        <Clock className="w-10 h-10 text-muted-foreground/40 mb-3" />
+        <p className="text-sm text-muted-foreground">
           {emptyMessage}
         </p>
       </div>
@@ -344,7 +345,7 @@ export function RecentItemsList({
       {/* Clear all header */}
       {showClearAll && items.length > 0 && (
         <div className="flex items-center justify-between px-3 py-1">
-          <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
             {category === 'all'
               ? 'Recent'
               : RECENT_TYPE_META[category as RecentItemType]?.pluralLabel}
@@ -352,7 +353,7 @@ export function RecentItemsList({
           <Button
             variant="ghost"
             size="sm"
-            className="h-6 px-2 text-xs text-slate-500 hover:text-red-500"
+            className="h-6 px-2 text-xs text-muted-foreground hover:text-destructive"
             onClick={onClearAll}
           >
             <Trash2 className="w-3 h-3 mr-1" />
@@ -364,7 +365,7 @@ export function RecentItemsList({
       {/* Pinned items section */}
       {pinnedItems.length > 0 && (
         <div className="space-y-0.5">
-          <span className="px-3 text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide">
+          <span className="px-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">
             Pinned
           </span>
           <AnimatePresence mode="popLayout">
@@ -386,7 +387,7 @@ export function RecentItemsList({
       {visibleUnpinned.length > 0 && (
         <div className="space-y-0.5">
           {pinnedItems.length > 0 && (
-            <span className="px-3 text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide">
+            <span className="px-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">
               Recent
             </span>
           )}
@@ -405,7 +406,7 @@ export function RecentItemsList({
 
           {/* Show more indicator */}
           {hiddenCount > 0 && (
-            <p className="px-3 py-2 text-xs text-slate-400 dark:text-slate-500 text-center">
+            <p className="px-3 py-2 text-xs text-muted-foreground text-center">
               +{hiddenCount} more items
             </p>
           )}

@@ -124,13 +124,13 @@ export function BatchActionBar({
   const getVariantClasses = (variant?: BatchActionConfig['variant']) => {
     switch (variant) {
       case 'destructive':
-        return 'text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/30';
+        return 'text-destructive hover:bg-destructive/10';
       case 'warning':
-        return 'text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950/30';
+        return 'text-warning hover:bg-warning/10';
       case 'success':
-        return 'text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-950/30';
+        return 'text-success hover:bg-success/10';
       default:
-        return 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800';
+        return 'text-foreground hover:bg-muted';
     }
   };
 
@@ -146,32 +146,32 @@ export function BatchActionBar({
     <div
       className={cn(
         'flex items-center gap-3 px-4 py-3',
-        'bg-white/95 dark:bg-slate-900/95',
+        'bg-white/95 dark:bg-background/95',
         'backdrop-blur-md',
-        'border border-slate-200 dark:border-slate-700',
+        'border',
         'rounded-xl shadow-lg',
         'min-w-[320px] max-w-[600px]',
         className
       )}
     >
       {/* Selection count */}
-      <div className="flex items-center gap-2 pr-3 border-r border-slate-200 dark:border-slate-700">
-        <span className="text-sm font-medium text-[var(--primary)]">
+      <div className="flex items-center gap-2 pr-3 border-r">
+        <span className="text-sm font-medium text-primary">
           {selectedCount}
         </span>
-        <span className="text-sm text-slate-500 dark:text-slate-400">
+        <span className="text-sm text-muted-foreground">
           selected
         </span>
       </div>
 
       {/* Progress indicator */}
       {progress && progress.status === 'processing' && (
-        <div className="flex items-center gap-2 px-3 border-r border-slate-200 dark:border-slate-700">
-          <Loader2 className="h-4 w-4 animate-spin text-[var(--primary)]" />
+        <div className="flex items-center gap-2 px-3 border-r">
+          <Loader2 className="h-4 w-4 animate-spin motion-reduce:animate-none text-primary" />
           <div className="w-24">
-            <ProgressBar value={progress.percentage} height="8px" />
+            <ProgressBar value={progress.percentage} height="sm" showPercentage={false} />
           </div>
-          <span className="text-xs text-slate-500">
+          <span className="text-xs text-muted-foreground">
             {progress.processedItems}/{progress.totalItems}
           </span>
         </div>
@@ -180,7 +180,7 @@ export function BatchActionBar({
       {/* Confirmation dialog inline */}
       {confirmingAction && confirmingActionConfig && (
         <div className="flex items-center gap-2 flex-1">
-          <span className="text-sm text-slate-600 dark:text-slate-400 truncate">
+          <span className="text-sm text-muted-foreground truncate">
             {confirmingActionConfig.confirmationMessage || 'Are you sure?'}
           </span>
           <div className="flex items-center gap-1 ml-auto">
@@ -261,12 +261,12 @@ export function BatchActionBar({
             {/* Undo button */}
             {canUndo && (
               <>
-                <DropdownMenuSeparator className="h-4 w-px bg-slate-200 dark:bg-slate-700 mx-1" />
+                <DropdownMenuSeparator className="h-4 w-px bg-border mx-1" />
                 <Button
                   size="sm"
                   variant="ghost"
                   onClick={handleUndo}
-                  className="h-8 px-2 gap-1.5 text-slate-500"
+                    className="h-8 px-2 gap-1.5 text-muted-foreground"
                 >
                   <Undo2 className="h-4 w-4" />
                   <span className="text-sm">Undo</span>
@@ -280,7 +280,7 @@ export function BatchActionBar({
             size="sm"
             variant="ghost"
             onClick={onCancel}
-            className="h-8 w-8 p-0 text-slate-400 hover:text-slate-600"
+            className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
           >
             <X className="h-4 w-4" />
           </Button>

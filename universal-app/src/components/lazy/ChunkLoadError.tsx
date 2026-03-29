@@ -113,7 +113,7 @@ export function ChunkLoadError({
         {isRetrying ? (
           <>
             <svg 
-              className="animate-spin h-4 w-4" 
+              className="animate-spin motion-reduce:animate-none h-4 w-4" 
               viewBox="0 0 24 24"
               fill="none"
             >

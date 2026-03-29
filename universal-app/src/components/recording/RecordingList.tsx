@@ -146,7 +146,7 @@ export function RecordingList({
           disabled={isLoading}
           className="gap-2"
         >
-          <RefreshCw className={cn('w-4 h-4', isLoading && 'animate-spin')} />
+          <RefreshCw className={cn('w-4 h-4', isLoading && 'animate-spin motion-reduce:animate-none')} />
           Refresh
         </Button>
       </div>
@@ -190,7 +190,7 @@ export function RecordingList({
           {isLoading ? (
             // Loading skeleton
             Array.from({ length: 3 }).map((_, i) => (
-              <Card key={`skeleton-${i}`} variant="glass" className="p-4 animate-pulse">
+              <Card key={`skeleton-${i}`} variant="glass" className="p-4 animate-pulse motion-reduce:animate-none">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-xl bg-muted" />
                   <div className="flex-1 space-y-2">
@@ -237,12 +237,12 @@ export function RecordingList({
 
       {/* Bulk actions */}
       {counts.pending > 0 && (
-        <Card className="p-4 bg-amber-500/10 border-amber-500/20">
+        <Card className="p-4 bg-warning/10 border-warning/20">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <WifiOff className="w-5 h-5 text-amber-500" />
+              <WifiOff className="w-5 h-5 text-warning" />
               <div>
-                <p className="font-medium text-amber-600 dark:text-amber-400">
+                <p className="font-medium text-warning">
                   {counts.pending} recording{counts.pending > 1 ? 's' : ''} pending sync
                 </p>
                 <p className="text-sm text-muted-foreground">
@@ -259,12 +259,12 @@ export function RecordingList({
       )}
 
       {counts.failed > 0 && (
-        <Card className="p-4 bg-red-500/10 border-red-500/20">
+        <Card className="p-4 bg-destructive/10 border-destructive/20">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <AlertCircle className="w-5 h-5 text-red-500" />
+              <AlertCircle className="w-5 h-5 text-destructive" />
               <div>
-                <p className="font-medium text-red-600 dark:text-red-400">
+                <p className="font-medium text-destructive">
                   {counts.failed} recording{counts.failed > 1 ? 's' : ''} failed to sync
                 </p>
                 <p className="text-sm text-muted-foreground">
@@ -272,7 +272,7 @@ export function RecordingList({
                 </p>
               </div>
             </div>
-            <Button variant="outline" size="sm" className="gap-2 text-red-600">
+            <Button variant="outline" size="sm" className="gap-2 text-destructive">
               <Trash2 className="w-4 h-4" />
               Clear Failed
             </Button>

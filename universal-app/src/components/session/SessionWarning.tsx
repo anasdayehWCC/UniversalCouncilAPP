@@ -115,10 +115,10 @@ function CountdownTimer({ timeRemaining }: CountdownTimerProps) {
       className={cn(
         'flex items-center justify-center gap-2 text-4xl font-mono font-bold tabular-nums',
         'transition-colors duration-300',
-        urgency === 'critical' && 'text-red-600 animate-pulse',
-        urgency === 'high' && 'text-red-500',
-        urgency === 'medium' && 'text-orange-500',
-        urgency === 'low' && 'text-slate-700'
+        urgency === 'critical' && 'text-destructive animate-pulse motion-reduce:animate-none',
+        urgency === 'high' && 'text-destructive',
+        urgency === 'medium' && 'text-warning',
+        urgency === 'low' && 'text-foreground'
       )}
       role="timer"
       aria-live="polite"
@@ -127,7 +127,7 @@ function CountdownTimer({ timeRemaining }: CountdownTimerProps) {
       <Clock
         className={cn(
           'h-8 w-8',
-          urgency === 'critical' && 'animate-pulse'
+          urgency === 'critical' && 'animate-pulse motion-reduce:animate-none'
         )}
       />
       <span>{formatted}</span>
@@ -166,14 +166,14 @@ function TimeProgressBar({ timeRemaining, totalTime }: TimeProgressBarProps) {
   const urgency = timeRemaining !== null ? getUrgencyLevel(timeRemaining) : 'low';
 
   return (
-    <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+    <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
       <div
         className={cn(
           'h-full transition-all duration-1000 ease-linear rounded-full',
-          urgency === 'critical' && 'bg-red-600',
-          urgency === 'high' && 'bg-red-500',
-          urgency === 'medium' && 'bg-orange-500',
-          urgency === 'low' && 'bg-green-500'
+          urgency === 'critical' && 'bg-destructive',
+          urgency === 'high' && 'bg-destructive',
+          urgency === 'medium' && 'bg-warning',
+          urgency === 'low' && 'bg-success'
         )}
         style={{ width: `${progress}%` }}
         role="progressbar"
@@ -245,7 +245,7 @@ export function SessionWarning({
       <DialogContent
         className={cn(
           'sm:max-w-md',
-          'bg-gradient-to-b from-white to-slate-50',
+          'bg-gradient-to-b from-card to-muted',
           className
         )}
         showCloseButton={false}
@@ -253,10 +253,10 @@ export function SessionWarning({
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
         <DialogHeader className="text-center sm:text-center">
-          <DialogTitle className="text-xl font-semibold text-slate-900">
+          <DialogTitle className="text-xl font-semibold text-foreground">
             {title}
           </DialogTitle>
-          <DialogDescription className="text-slate-600 mt-2">
+          <DialogDescription className="text-muted-foreground mt-2">
             {description}
           </DialogDescription>
         </DialogHeader>
@@ -272,7 +272,7 @@ export function SessionWarning({
           />
 
           {/* Status Text */}
-          <p className="text-center text-sm text-slate-500">
+          <p className="text-center text-sm text-muted-foreground">
             {timeRemaining !== null && timeRemaining <= 10000
               ? 'Session will expire momentarily...'
               : 'Click "Stay Logged In" to continue your session'}
@@ -288,7 +288,7 @@ export function SessionWarning({
           >
             {isLoggingOut ? (
               <>
-                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                <RefreshCw className="mr-2 h-4 w-4 animate-spin motion-reduce:animate-none" />
                 Logging out...
               </>
             ) : (
@@ -308,7 +308,7 @@ export function SessionWarning({
           >
             {isExtending ? (
               <>
-                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                <RefreshCw className="mr-2 h-4 w-4 animate-spin motion-reduce:animate-none" />
                 Extending...
               </>
             ) : (

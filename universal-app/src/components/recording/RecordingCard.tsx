@@ -101,23 +101,23 @@ function StatusBadge({ status }: { status: RecordingStatus }) {
     pending: {
       icon: WifiOff,
       label: 'Pending sync',
-      className: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+      className: 'bg-warning/10 text-warning',
     },
     syncing: {
       icon: Loader2,
       label: 'Syncing...',
-      className: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
+      className: 'bg-primary/10 text-primary',
       animateIcon: true,
     },
     synced: {
       icon: CheckCircle,
       label: 'Synced',
-      className: 'bg-green-500/10 text-green-600 dark:text-green-400',
+      className: 'bg-success/10 text-success',
     },
     failed: {
       icon: AlertCircle,
       label: 'Failed',
-      className: 'bg-red-500/10 text-red-600 dark:text-red-400',
+      className: 'bg-destructive/10 text-destructive',
     },
   };
 
@@ -130,7 +130,7 @@ function StatusBadge({ status }: { status: RecordingStatus }) {
       'inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium',
       className
     )}>
-      <Icon className={cn('w-3 h-3', animateIcon && 'animate-spin')} />
+      <Icon className={cn('w-3 h-3', animateIcon && 'animate-spin motion-reduce:animate-none')} />
       {label}
     </span>
   );
@@ -167,14 +167,14 @@ export function RecordingCard({
           {/* Icon */}
           <div className={cn(
             'w-12 h-12 rounded-xl flex items-center justify-center shrink-0',
-            status === 'synced' ? 'bg-green-500/20' :
-            status === 'failed' ? 'bg-red-500/20' :
+            status === 'synced' ? 'bg-success/20' :
+            status === 'failed' ? 'bg-destructive/20' :
             'bg-primary/20'
           )}>
             <FileAudio className={cn(
               'w-6 h-6',
-              status === 'synced' ? 'text-green-500' :
-              status === 'failed' ? 'text-red-500' :
+              status === 'synced' ? 'text-success' :
+              status === 'failed' ? 'text-destructive' :
               'text-primary'
             )} />
           </div>
@@ -196,7 +196,7 @@ export function RecordingCard({
               <span>{formatDate(createdAt)}</span>
             </div>
             {error && (
-              <p className="text-xs text-red-500 mt-1 truncate">{error}</p>
+              <p className="text-xs text-destructive mt-1 truncate">{error}</p>
             )}
           </div>
 
@@ -209,6 +209,7 @@ export function RecordingCard({
                 size="icon"
                 onClick={onPlay}
                 className="w-9 h-9"
+                aria-label={isPlaying ? 'Pause recording' : 'Play recording'}
               >
                 {isPlaying ? (
                   <Pause className="w-4 h-4" />
@@ -224,7 +225,8 @@ export function RecordingCard({
                 variant="ghost"
                 size="icon"
                 onClick={onRetry}
-                className="w-9 h-9 text-amber-500 hover:text-amber-600"
+                className="w-9 h-9 text-warning hover:text-warning"
+                aria-label="Retry upload"
               >
                 <Upload className="w-4 h-4" />
               </Button>
@@ -236,7 +238,8 @@ export function RecordingCard({
                 variant="ghost"
                 size="icon"
                 onClick={onDelete}
-                className="w-9 h-9 text-red-500 hover:text-red-600 hover:bg-red-500/10"
+                className="w-9 h-9 text-destructive hover:text-destructive hover:bg-destructive/10"
+                aria-label="Delete recording"
               >
                 <Trash2 className="w-4 h-4" />
               </Button>

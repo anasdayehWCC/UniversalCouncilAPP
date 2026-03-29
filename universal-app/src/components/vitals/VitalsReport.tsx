@@ -166,8 +166,8 @@ export function VitalsReport({
                 layout
                 className={`rounded-lg border transition-colors cursor-pointer ${
                   isExpanded
-                    ? 'border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800'
-                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                    ? 'border-primary ring-2 ring-primary/20'
+                    : 'border-border hover:border-primary/50'
                 }`}
                 onClick={() => setExpandedMetric(isExpanded ? null : metric.name)}
               >
@@ -284,11 +284,11 @@ export function VitalsReport({
                 key={i}
                 className={`flex items-start gap-3 p-3 rounded-lg ${
                   rec.priority === 'high'
-                    ? 'bg-red-50 dark:bg-red-900/20'
-                    : 'bg-amber-50 dark:bg-amber-900/20'
+                    ? 'bg-destructive/10'
+                    : 'bg-warning/10'
                 }`}
               >
-                <span className={rec.priority === 'high' ? 'text-red-500' : 'text-amber-500'}>
+                <span className={rec.priority === 'high' ? 'text-destructive' : 'text-warning'}>
                   {rec.priority === 'high' ? '🔴' : '🟡'}
                 </span>
                 <div>
@@ -368,7 +368,7 @@ export function VitalsReport({
             console.log('[Vitals] Report:', report);
             navigator.clipboard?.writeText(JSON.stringify(report, null, 2));
           }}
-          className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-colors"
+          className="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm font-medium transition-colors"
         >
           Export Report
         </button>

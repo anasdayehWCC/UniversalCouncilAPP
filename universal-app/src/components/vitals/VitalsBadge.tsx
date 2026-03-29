@@ -96,7 +96,7 @@ export function VitalsBadge({
           </span>
         )}
         {isActive && (
-          <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+          <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse motion-reduce:animate-none" />
         )}
       </motion.div>
     );
@@ -120,7 +120,7 @@ export function VitalsBadge({
           {score}
         </span>
         {isActive && (
-          <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-green-500 animate-pulse" />
+          <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-success animate-pulse motion-reduce:animate-none" />
         )}
       </div>
 
@@ -133,15 +133,15 @@ export function VitalsBadge({
 
       {/* Rating counts */}
       <div className="mt-2 flex items-center gap-2 text-xs">
-        <span className="flex items-center gap-0.5 text-green-500">
+        <span className="flex items-center gap-0.5 text-success">
           <span>✓</span>
           <span>{ratingCounts.good}</span>
         </span>
-        <span className="flex items-center gap-0.5 text-amber-500">
+        <span className="flex items-center gap-0.5 text-warning">
           <span>⚠</span>
           <span>{ratingCounts['needs-improvement']}</span>
         </span>
-        <span className="flex items-center gap-0.5 text-red-500">
+        <span className="flex items-center gap-0.5 text-destructive">
           <span>✗</span>
           <span>{ratingCounts.poor}</span>
         </span>

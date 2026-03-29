@@ -65,33 +65,33 @@ export function ExportProgress({ progress, format, className = '' }: ExportProgr
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
         <div className={`p-2 rounded-lg ${
-          isComplete ? 'bg-emerald-100 text-emerald-600' :
-          isError ? 'bg-red-100 text-red-600' :
-          'bg-blue-100 text-blue-600'
+          isComplete ? 'bg-success/10 text-success' :
+          isError ? 'bg-destructive/10 text-destructive' :
+          'bg-primary/10 text-primary'
         }`}>
           {isComplete ? <Check className="w-5 h-5" /> :
            isError ? <X className="w-5 h-5" /> :
            FORMAT_ICONS[format]}
         </div>
         <div>
-          <h3 className="font-medium text-slate-900">
+          <h3 className="font-medium text-foreground">
             {isComplete ? 'Export Complete' :
              isError ? 'Export Failed' :
              `Generating ${FORMAT_LABELS[format]}`}
           </h3>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-muted-foreground">
             {progress.message || STAGE_LABELS[progress.stage]}
           </p>
         </div>
       </div>
 
       {/* Progress Bar */}
-      <div className="relative h-2 bg-slate-200 rounded-full overflow-hidden">
+      <div className="relative h-2 bg-muted rounded-full overflow-hidden">
         <motion.div
           className={`absolute inset-y-0 left-0 rounded-full ${
-            isComplete ? 'bg-emerald-500' :
-            isError ? 'bg-red-500' :
-            'bg-blue-500'
+            isComplete ? 'bg-success' :
+            isError ? 'bg-destructive' :
+            'bg-primary'
           }`}
           initial={{ width: 0 }}
           animate={{ width: `${progress.progress}%` }}
@@ -108,10 +108,10 @@ export function ExportProgress({ progress, format, className = '' }: ExportProgr
 
       {/* Progress Percentage */}
       <div className="flex items-center justify-between mt-2 text-sm">
-        <span className="text-slate-500">{progress.progress}%</span>
+        <span className="text-muted-foreground">{progress.progress}%</span>
         {isProcessing && (
-          <span className="flex items-center gap-1 text-blue-600">
-            <Loader2 className="w-3 h-3 animate-spin" />
+          <span className="flex items-center gap-1 text-primary">
+            <Loader2 className="w-3 h-3 animate-spin motion-reduce:animate-none" />
             Processing...
           </span>
         )}
@@ -124,10 +124,10 @@ export function ExportProgress({ progress, format, className = '' }: ExportProgr
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="mt-3 pt-3 border-t border-slate-200"
+            className="mt-3 pt-3 border-t"
           >
-            <p className="text-sm text-slate-500">
-              Current section: <span className="font-medium text-slate-700">{progress.currentSection}</span>
+            <p className="text-sm text-muted-foreground">
+              Current section: <span className="font-medium text-foreground">{progress.currentSection}</span>
             </p>
           </motion.div>
         )}
@@ -140,9 +140,9 @@ export function ExportProgress({ progress, format, className = '' }: ExportProgr
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="mt-3 pt-3 border-t border-red-200"
+            className="mt-3 pt-3 border-t border-destructive/20"
           >
-            <p className="text-sm text-red-600">
+            <p className="text-sm text-destructive">
               {progress.message}
             </p>
           </motion.div>
@@ -167,21 +167,21 @@ export function CompactProgress({ progress, message, isComplete, isError }: Comp
   return (
     <div className="flex items-center gap-3">
       <div className="flex-1">
-        <div className="relative h-1.5 bg-slate-200 rounded-full overflow-hidden">
+        <div className="relative h-1.5 bg-muted rounded-full overflow-hidden">
           <motion.div
             className={`absolute inset-y-0 left-0 rounded-full ${
-              isComplete ? 'bg-emerald-500' :
-              isError ? 'bg-red-500' :
-              'bg-blue-500'
+              isComplete ? 'bg-success' :
+              isError ? 'bg-destructive' :
+              'bg-primary'
             }`}
             style={{ width: `${progress}%` }}
           />
         </div>
       </div>
       <span className={`text-xs font-medium ${
-        isComplete ? 'text-emerald-600' :
-        isError ? 'text-red-600' :
-        'text-slate-500'
+        isComplete ? 'text-success' :
+        isError ? 'text-destructive' :
+        'text-muted-foreground'
       }`}>
         {message || `${progress}%`}
       </span>

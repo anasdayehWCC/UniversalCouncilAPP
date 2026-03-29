@@ -58,15 +58,15 @@ function ConnectionButton({
         inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium
         transition-all duration-200 
         ${isConnected
-          ? 'bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400'
-          : 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
+          ? 'bg-success/10 text-success hover:bg-success/20'
+          : 'bg-primary text-white hover:bg-primary/90'
         }
         disabled:opacity-50 disabled:cursor-not-allowed
       `}
     >
       {isConnecting ? (
         <>
-          <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+          <svg className="animate-spin motion-reduce:animate-none h-4 w-4" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
           </svg>
@@ -105,7 +105,7 @@ function PlanSelector({
   if (isLoading) {
     return (
       <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+        <svg className="animate-spin motion-reduce:animate-none h-4 w-4" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
         </svg>
@@ -164,7 +164,7 @@ function BucketSelector({
   if (isLoading) {
     return (
       <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+        <svg className="animate-spin motion-reduce:animate-none h-4 w-4" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
         </svg>
@@ -235,7 +235,7 @@ function ActionItemsList({
               type="checkbox"
               checked={selectedIds.has(item.id)}
               onChange={() => onToggle(item.id)}
-              className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              className="mt-0.5 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
             />
             <div className="flex-1 min-w-0">
               <p className={`text-sm font-medium ${item.isCompleted ? 'line-through text-gray-500' : 'text-gray-900 dark:text-white'}`}>
@@ -255,9 +255,9 @@ function ActionItemsList({
                 {item.priority && (
                   <span className={`
                     text-xs px-1.5 py-0.5 rounded
-                    ${item.priority === 'high' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : ''}
-                    ${item.priority === 'medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' : ''}
-                    ${item.priority === 'low' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : ''}
+                    ${item.priority === 'high' ? 'bg-destructive/10 text-destructive' : ''}
+                    ${item.priority === 'medium' ? 'bg-warning/10 text-warning' : ''}
+                    ${item.priority === 'low' ? 'bg-success/10 text-success' : ''}
                   `}>
                     {item.priority}
                   </span>
@@ -289,8 +289,8 @@ function SyncResultDisplay({
       className={`
         p-4 rounded-lg border
         ${hasErrors || hasConflicts
-          ? 'bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800'
-          : 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800'
+          ? 'bg-warning/10 border-warning/20'
+          : 'bg-success/10 border-success/20'
         }
       `}
     >
@@ -300,16 +300,16 @@ function SyncResultDisplay({
             Sync Complete
           </h4>
           <ul className="text-sm space-y-1">
-            <li className="text-green-600 dark:text-green-400">
+            <li className="text-success">
               ✓ {result.synced.length} task{result.synced.length !== 1 ? 's' : ''} synced
             </li>
             {result.failed.length > 0 && (
-              <li className="text-red-600 dark:text-red-400">
+              <li className="text-destructive">
                 ✗ {result.failed.length} failed
               </li>
             )}
             {result.conflicts.length > 0 && (
-              <li className="text-yellow-600 dark:text-yellow-400">
+              <li className="text-warning">
                 ⚠ {result.conflicts.length} conflict{result.conflicts.length !== 1 ? 's' : ''}
               </li>
             )}
@@ -462,15 +462,14 @@ export function PlannerSync({
                 disabled={!selectedPlan || selectedItemIds.size === 0 || isSyncing}
                 className="
                   inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium
-                  bg-blue-600 text-white hover:bg-blue-700
-                  dark:bg-blue-500 dark:hover:bg-blue-600
+                  bg-primary text-white hover:bg-primary/90
                   disabled:opacity-50 disabled:cursor-not-allowed
                   transition-all duration-200
                 "
               >
                 {isSyncing ? (
                   <>
-                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                    <svg className="animate-spin motion-reduce:animate-none h-4 w-4" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
@@ -505,8 +504,8 @@ export function PlannerSync({
             exit={{ opacity: 0 }}
             className="text-center py-8"
           >
-            <div className="mx-auto w-16 h-16 mb-4 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-              <svg className="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="mx-auto w-16 h-16 mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+              <svg className="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
               </svg>
             </div>

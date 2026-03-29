@@ -25,7 +25,6 @@ import * as Icons from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { RecentItemsList } from './RecentItemsList';
@@ -222,13 +221,13 @@ export function RecentItemsPanel({
       transition={{ duration: 0.2, ease: 'easeOut' }}
       className={cn(
         'flex flex-col h-full',
-        'bg-white dark:bg-slate-900',
-        'border-r border-slate-200 dark:border-slate-800',
+        'bg-card text-card-foreground',
+        'border-r border-border',
         className
       )}
     >
       {/* Header */}
-      <div className="flex-shrink-0 px-4 py-3 border-b border-slate-200 dark:border-slate-800">
+      <div className="flex-shrink-0 px-4 py-3 border-b border-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {collapsible && (
@@ -237,12 +236,13 @@ export function RecentItemsPanel({
                 size="icon"
                 className="h-8 w-8"
                 onClick={onClose}
+                aria-label="Close panel"
               >
                 <ChevronLeft className="w-4 h-4" />
               </Button>
             )}
-            <Clock className="w-5 h-5 text-slate-500" />
-            <h2 className="font-semibold text-slate-800 dark:text-slate-100">
+            <Clock className="w-5 h-5 text-muted-foreground" />
+            <h2 className="font-semibold text-foreground">
               Recent
             </h2>
           </div>
@@ -253,9 +253,10 @@ export function RecentItemsPanel({
               size="icon"
               className={cn(
                 'h-8 w-8',
-                isSearching && 'bg-slate-100 dark:bg-slate-800'
+                isSearching && 'bg-muted'
               )}
               onClick={handleSearchToggle}
+              aria-label="Toggle search"
             >
               <Search className="w-4 h-4" />
             </Button>
@@ -273,7 +274,7 @@ export function RecentItemsPanel({
               className="overflow-hidden"
             >
               <div className="relative mt-3">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   placeholder="Search recent items..."
                   value={searchQuery}
@@ -287,6 +288,7 @@ export function RecentItemsPanel({
                     size="icon"
                     className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6"
                     onClick={handleSearchClear}
+                    aria-label="Clear search"
                   >
                     <X className="w-3.5 h-3.5" />
                   </Button>
@@ -306,7 +308,7 @@ export function RecentItemsPanel({
         onValueChange={(v) => setActiveTab(v as TabValue)}
         className="flex-1 flex flex-col min-h-0"
       >
-        <div className="flex-shrink-0 px-2 py-2 border-b border-slate-100 dark:border-slate-800/50">
+        <div className="flex-shrink-0 px-2 py-2 border-b border-border/60">
           <TabsList className="w-full h-auto flex-wrap gap-1 bg-transparent p-0">
             {visibleTabs.map((tab) => (
               <TabsTrigger
@@ -314,7 +316,7 @@ export function RecentItemsPanel({
                 value={tab.value}
                 className={cn(
                   'h-7 px-2.5 text-xs font-medium rounded-md',
-                  'data-[state=active]:bg-slate-100 dark:data-[state=active]:bg-slate-800',
+                  'data-[state=active]:bg-muted',
                   'data-[state=active]:shadow-none'
                 )}
               >
@@ -361,8 +363,8 @@ export function RecentItemsPanel({
 
       {/* Footer */}
       {items.length > 0 && (
-        <div className="flex-shrink-0 px-4 py-2 border-t border-slate-100 dark:border-slate-800/50">
-          <p className="text-xs text-slate-400 dark:text-slate-500 text-center">
+        <div className="flex-shrink-0 px-4 py-2 border-t border-border/60">
+          <p className="text-xs text-muted-foreground text-center">
             {items.length} recent {items.length === 1 ? 'item' : 'items'}
           </p>
         </div>

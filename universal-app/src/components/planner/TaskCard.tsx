@@ -53,10 +53,10 @@ function formatRelativeTime(dateString: string): string {
 }
 
 function getPriorityLabel(priority: number): { label: string; color: string } {
-  if (priority <= 2) return { label: 'Urgent', color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' };
-  if (priority <= 5) return { label: 'Important', color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' };
-  if (priority <= 7) return { label: 'Medium', color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' };
-  return { label: 'Low', color: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400' };
+  if (priority <= 2) return { label: 'Urgent', color: 'bg-destructive/10 text-destructive' };
+  if (priority <= 5) return { label: 'Important', color: 'bg-warning/10 text-warning' };
+  if (priority <= 7) return { label: 'Medium', color: 'bg-warning/10 text-warning' };
+  return { label: 'Low', color: 'bg-muted text-muted-foreground' };
 }
 
 function getStatusConfig(status: LinkedPlannerTask['syncStatus']): {
@@ -73,17 +73,17 @@ function getStatusConfig(status: LinkedPlannerTask['syncStatus']): {
           </svg>
         ),
         label: 'Synced',
-        color: 'text-green-600 dark:text-green-400',
+        color: 'text-success',
       };
     case 'pending':
       return {
         icon: (
-          <svg className="w-4 h-4 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-4 h-4 animate-pulse motion-reduce:animate-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         ),
         label: 'Pending',
-        color: 'text-yellow-600 dark:text-yellow-400',
+        color: 'text-warning',
       };
     case 'error':
       return {
@@ -93,7 +93,7 @@ function getStatusConfig(status: LinkedPlannerTask['syncStatus']): {
           </svg>
         ),
         label: 'Error',
-        color: 'text-red-600 dark:text-red-400',
+        color: 'text-destructive',
       };
     case 'conflict':
       return {
@@ -155,7 +155,7 @@ export function TaskCard({
         relative p-4 rounded-lg border
         bg-white dark:bg-gray-900
         border-gray-200 dark:border-gray-700
-        hover:border-blue-300 dark:hover:border-blue-600
+        hover:border-primary
         transition-all duration-200
         ${className}
       `}
@@ -169,7 +169,7 @@ export function TaskCard({
           <div className={`
             mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0
             ${isCompleted 
-              ? 'bg-green-500 border-green-500' 
+              ? 'bg-success border-success' 
               : 'border-gray-300 dark:border-gray-600'
             }
           `}>
@@ -223,7 +223,7 @@ export function TaskCard({
 
             {/* Error Message */}
             {linkedTask.errorMessage && (
-              <p className="text-xs text-red-600 dark:text-red-400 mt-1">
+              <p className="text-xs text-destructive mt-1">
                 {linkedTask.errorMessage}
               </p>
             )}
@@ -235,8 +235,7 @@ export function TaskCard({
           onClick={handleOpenInPlanner}
           className="
             flex-shrink-0 p-1.5 rounded-lg
-            text-gray-400 hover:text-blue-600 hover:bg-blue-50
-            dark:hover:text-blue-400 dark:hover:bg-blue-900/30
+            text-gray-400 hover:text-primary hover:bg-primary/10
             transition-colors
           "
           title="Open in Microsoft Planner"
@@ -259,14 +258,14 @@ export function TaskCard({
             disabled={isRefreshing}
             className="
               flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium
-              text-gray-600 hover:text-blue-600 hover:bg-blue-50
-              dark:text-gray-400 dark:hover:text-blue-400 dark:hover:bg-blue-900/30
+              text-gray-600 hover:text-primary hover:bg-primary/10
+              dark:text-gray-400 dark:hover:text-primary
               disabled:opacity-50 disabled:cursor-not-allowed
               transition-colors
             "
           >
             <svg 
-              className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} 
+              className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin motion-reduce:animate-none' : ''}`} 
               fill="none" 
               viewBox="0 0 24 24" 
               stroke="currentColor"
@@ -280,8 +279,8 @@ export function TaskCard({
             onClick={handleOpenInPlanner}
             className="
               flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium
-              text-gray-600 hover:text-blue-600 hover:bg-blue-50
-              dark:text-gray-400 dark:hover:text-blue-400 dark:hover:bg-blue-900/30
+              text-gray-600 hover:text-primary hover:bg-primary/10
+              dark:text-gray-400 dark:hover:text-primary
               transition-colors
             "
           >
@@ -295,8 +294,8 @@ export function TaskCard({
             onClick={onUnlink}
             className="
               flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium
-              text-gray-600 hover:text-red-600 hover:bg-red-50
-              dark:text-gray-400 dark:hover:text-red-400 dark:hover:bg-red-900/30
+              text-gray-600 hover:text-destructive hover:bg-destructive/10
+              dark:text-gray-400 dark:hover:text-destructive
               transition-colors ml-auto
             "
           >

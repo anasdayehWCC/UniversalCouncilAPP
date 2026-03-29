@@ -19,7 +19,16 @@
 - **SpeakerLegend.tsx**: Added `aria-label="Cancel editing speaker name"` to cancel button
 - **SpeakerLegend.tsx**: Added dynamic `aria-label="Expand/Collapse speaker legend"` to collapse toggle button
 
-### Fixed - Hardcoded Colors → Theme Tokens (30+ instances)
+### Fixed - Hardcoded Colors → Theme Tokens (60+ instances)
+
+**UI Components (src/components/ui/):**
+- **tabs.tsx**: `text-slate-500/400` → `text-muted-foreground`, `bg-white/slate-800` → `bg-card`, `text-slate-950/white` → `text-foreground`
+- **slider.tsx**: `bg-slate-100/800` → `bg-muted`, `bg-white/slate-700` → `bg-card`
+- **flag-gate.tsx**: `border-blue-100` → `border-info/20`, `bg-blue-50` → `bg-info/10`, `border-amber-200` → `border-warning/30`, `bg-amber-50` → `bg-warning/10`, `text-slate-900` → `text-foreground`, `text-slate-600` → `text-muted-foreground`
+- **tooltip.tsx**: All `text-slate-*` variants → `text-muted-foreground/text-foreground`, `bg-slate-700/200` → `bg-foreground/background`
+- **EnhancedInput.tsx**: `bg-slate-50` → `bg-muted`, `bg-white` → `bg-card`, `border-slate-200/300` → `border-border`, `text-slate-900` → `text-foreground`, `text-slate-400/600` → `text-muted-foreground`, `bg-slate-100/200` → `bg-muted`
+- **KeyboardShortcutHint.tsx**: All `bg-slate-*/text-slate-*` → semantic tokens (`bg-muted`, `text-muted-foreground`, `bg-foreground`, `text-background`, `border-border`)
+- **context-menu.tsx**: `border-slate-200/700` → `border-border`, `bg-white/slate-900` → `bg-card`, `text-slate-950/100` → `text-foreground`, `text-red-600/400` → `text-destructive`, `bg-red-50/950` → `bg-destructive/10`, `bg-slate-200/700` → `bg-border`
 
 **Homepage (page.tsx):**
 - Hero CTA button: `bg-white text-slate-900` → `bg-card text-foreground`

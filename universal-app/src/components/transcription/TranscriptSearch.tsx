@@ -131,7 +131,7 @@ export function TranscriptSearch({
     <div
       className={cn(
         'relative flex items-center gap-2',
-        !compact && 'bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-2 shadow-sm',
+        !compact && 'bg-card rounded-xl border border-border p-2 shadow-sm',
         isFocused && !compact && 'ring-2 ring-[var(--accent)]/20 border-[var(--accent)]',
         className
       )}
@@ -140,9 +140,9 @@ export function TranscriptSearch({
       {/* Search Icon */}
       <div className={cn('flex items-center justify-center', compact ? 'w-8' : 'w-10')}>
         {isSearching ? (
-          <Loader2 className={cn('animate-spin text-slate-400', compact ? 'w-4 h-4' : 'w-5 h-5')} />
+          <Loader2 className={cn('animate-spin motion-reduce:animate-none text-muted-foreground', compact ? 'w-4 h-4' : 'w-5 h-5')} />
         ) : (
-          <Search className={cn('text-slate-400', compact ? 'w-4 h-4' : 'w-5 h-5')} />
+          <Search className={cn('text-muted-foreground', compact ? 'w-4 h-4' : 'w-5 h-5')} />
         )}
       </div>
 
@@ -170,8 +170,8 @@ export function TranscriptSearch({
             className={cn(
               'text-xs font-medium px-2 py-1 rounded-md min-w-[60px] text-center',
               hasResults
-                ? 'text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800'
-                : 'text-amber-600 bg-amber-50 dark:bg-amber-900/20'
+                ? 'text-muted-foreground bg-muted'
+                : 'text-warning bg-warning/10'
             )}
           >
             {hasResults ? (
@@ -193,6 +193,7 @@ export function TranscriptSearch({
                 disabled={!hasResults}
                 className={cn(compact ? 'h-7 w-7' : 'h-8 w-8')}
                 title="Previous result (Shift+Enter)"
+                aria-label="Previous result"
               >
                 <ChevronUp className="w-4 h-4" />
               </Button>
@@ -203,6 +204,7 @@ export function TranscriptSearch({
                 disabled={!hasResults}
                 className={cn(compact ? 'h-7 w-7' : 'h-8 w-8')}
                 title="Next result (Enter)"
+                aria-label="Next result"
               >
                 <ChevronDown className="w-4 h-4" />
               </Button>
@@ -215,10 +217,11 @@ export function TranscriptSearch({
             variant="ghost"
             onClick={handleClear}
             className={cn(
-              'text-slate-400 hover:text-slate-600',
+              'text-muted-foreground hover:text-foreground',
               compact ? 'h-7 w-7' : 'h-8 w-8'
             )}
             title="Clear search (Esc)"
+            aria-label="Clear search"
           >
             <X className="w-4 h-4" />
           </Button>
@@ -227,8 +230,8 @@ export function TranscriptSearch({
 
       {/* Keyboard Shortcut Hint */}
       {!hasQuery && !compact && (
-        <div className="flex items-center gap-1 text-xs text-slate-400 pr-2">
-          <kbd className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-[10px] font-mono">
+        <div className="flex items-center gap-1 text-xs text-muted-foreground pr-2">
+          <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-mono">
             ⌘F
           </kbd>
         </div>

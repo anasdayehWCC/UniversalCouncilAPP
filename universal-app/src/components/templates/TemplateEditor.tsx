@@ -231,10 +231,10 @@ export function TemplateEditor({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">
+          <h2 className="text-2xl font-bold text-foreground">
             {isEditing ? 'Edit Template' : 'Create Template'}
           </h2>
-          <p className="text-slate-500 mt-1">
+          <p className="text-muted-foreground mt-1">
             {isEditing
               ? 'Update the template configuration and sections'
               : 'Define a new template for meeting minutes'}
@@ -274,7 +274,7 @@ export function TemplateEditor({
         {/* Basic Info */}
         <div className="lg:col-span-2 space-y-6">
           <Card className="p-6">
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">Basic Information</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-4">Basic Information</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Name */}
@@ -322,7 +322,7 @@ export function TemplateEditor({
                   onChange={(e) => setLongDescription(e.target.value)}
                   placeholder="Provide more context about this template..."
                   rows={3}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-slate-900/10"
+                  className="w-full px-3 py-2 border border-input rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring"
                 />
               </div>
 
@@ -334,7 +334,7 @@ export function TemplateEditor({
                   value={category}
                   onChange={(e) => setCategory(e.target.value as TemplateCategory)}
                   className={cn(
-                    'w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10',
+                    'w-full px-3 py-2 border border-input rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring',
                     errors.category && 'border-red-500'
                   )}
                 >
@@ -361,7 +361,7 @@ export function TemplateEditor({
                   value={meetingType}
                   onChange={(e) => setMeetingType(e.target.value as TemplateMeetingType)}
                   className={cn(
-                    'w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10',
+                    'w-full px-3 py-2 border border-input rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring',
                     errors.meetingType && 'border-red-500'
                   )}
                 >
@@ -387,7 +387,7 @@ export function TemplateEditor({
                   id="domain"
                   value={domain}
                   onChange={(e) => setDomain(e.target.value as ServiceDomain | 'all')}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10"
+                  className="w-full px-3 py-2 border border-input rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 >
                   <option value="all">All Domains</option>
                   <option value="children">Children&apos;s Services</option>
@@ -417,8 +417,8 @@ export function TemplateEditor({
           <Card className="p-6">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-lg font-semibold text-slate-900">Sections</h3>
-                <p className="text-sm text-slate-500">
+                <h3 className="text-lg font-semibold text-foreground">Sections</h3>
+                <p className="text-sm text-muted-foreground">
                   Define the sections that will make up the meeting minutes
                 </p>
               </div>
@@ -436,9 +436,9 @@ export function TemplateEditor({
             )}
 
             {sections.length === 0 ? (
-              <div className="text-center py-12 border-2 border-dashed border-slate-200 rounded-lg">
-                <Icons.Layers className="w-12 h-12 mx-auto text-slate-300 mb-4" />
-                <p className="text-slate-500 mb-4">No sections yet</p>
+              <div className="text-center py-12 border-2 border-dashed border-border rounded-lg">
+                <Icons.Layers className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                <p className="text-muted-foreground mb-4">No sections yet</p>
                 <Button onClick={handleAddSection} variant="outline" className="gap-2">
                   <Plus className="w-4 h-4" />
                   Add First Section
@@ -456,14 +456,14 @@ export function TemplateEditor({
                     key={section.id}
                     value={section}
                     className={cn(
-                      'p-4 bg-white border rounded-lg cursor-move transition-all',
+                      'p-4 bg-card border rounded-lg cursor-move transition-all',
                       activeSection === section.id
-                        ? 'border-slate-400 shadow-md'
-                        : 'border-slate-200 hover:border-slate-300'
+                        ? 'border-border shadow-md'
+                        : 'border-border hover:border-foreground/20'
                     )}
                   >
                     <div className="flex items-start gap-3">
-                      <div className="p-1 text-slate-400 cursor-grab active:cursor-grabbing">
+                      <div className="p-1 text-muted-foreground cursor-grab active:cursor-grabbing">
                         <GripVertical className="w-5 h-5" />
                       </div>
 
@@ -480,7 +480,7 @@ export function TemplateEditor({
                           onClick={() => setActiveSection(section.id)}
                         >
                           <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-slate-900">
+                            <span className="text-sm font-medium text-foreground">
                               {section.title}
                             </span>
                             {section.required && (
@@ -489,10 +489,10 @@ export function TemplateEditor({
                               </span>
                             )}
                             {section.locked && (
-                              <Lock className="w-3 h-3 text-slate-400" />
+                              <Lock className="w-3 h-3 text-muted-foreground" />
                             )}
                           </div>
-                          <p className="text-xs text-slate-500 mt-1 line-clamp-1">
+                          <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
                             {section.prompt || 'Click to edit...'}
                           </p>
                         </div>
@@ -501,7 +501,7 @@ export function TemplateEditor({
                       <div className="flex items-center gap-1">
                         <button
                           onClick={() => handleUpdateSection(section.id, { locked: !section.locked })}
-                          className="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100"
+                          className="p-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted/50"
                           title={section.locked ? 'Unlock section' : 'Lock section'}
                         >
                           {section.locked ? (
@@ -517,8 +517,8 @@ export function TemplateEditor({
                           className={cn(
                             'p-2 rounded-lg',
                             section.locked
-                              ? 'text-slate-200 cursor-not-allowed'
-                              : 'text-slate-400 hover:text-red-600 hover:bg-red-50'
+                              ? 'text-muted-foreground/50 cursor-not-allowed'
+                              : 'text-muted-foreground hover:text-destructive hover:bg-destructive/10'
                           )}
                           title="Remove section"
                         >
@@ -536,7 +536,7 @@ export function TemplateEditor({
         {/* Sidebar - Appearance */}
         <div className="space-y-6">
           <Card className="p-6">
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">Appearance</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-4">Appearance</h3>
 
             {/* Icon */}
             <div className="mb-4">
@@ -544,7 +544,7 @@ export function TemplateEditor({
               <div className="relative">
                 <button
                   onClick={() => setShowIconPicker(!showIconPicker)}
-                  className="w-full flex items-center gap-3 p-3 border border-slate-200 rounded-lg hover:border-slate-300 transition-colors"
+                  className="w-full flex items-center gap-3 p-3 border border-input rounded-lg hover:border-border transition-colors"
                 >
                   <div
                     className="p-2 rounded-lg"
@@ -552,11 +552,11 @@ export function TemplateEditor({
                   >
                     <SelectedIcon className="w-5 h-5" />
                   </div>
-                  <span className="text-sm text-slate-700">{icon}</span>
+                  <span className="text-sm text-foreground">{icon}</span>
                 </button>
 
                 {showIconPicker && (
-                  <div className="absolute top-full left-0 right-0 mt-2 p-3 bg-white rounded-lg shadow-xl border border-slate-200 z-10">
+                  <div className="absolute top-full left-0 right-0 mt-2 p-3 bg-card rounded-lg shadow-xl border border-border z-10">
                     <div className="grid grid-cols-4 gap-2">
                       {availableIcons.map((iconName) => {
                         const IconComp = getIcon(iconName);
@@ -568,11 +568,11 @@ export function TemplateEditor({
                               setShowIconPicker(false);
                             }}
                             className={cn(
-                              'p-3 rounded-lg hover:bg-slate-100 transition-colors',
-                              icon === iconName && 'bg-slate-100 ring-2 ring-slate-300'
+                              'p-3 rounded-lg hover:bg-muted/50 transition-colors',
+                              icon === iconName && 'bg-muted ring-2 ring-border'
                             )}
                           >
-                            <IconComp className="w-5 h-5 mx-auto text-slate-600" />
+                            <IconComp className="w-5 h-5 mx-auto text-muted-foreground" />
                           </button>
                         );
                       })}
@@ -592,7 +592,7 @@ export function TemplateEditor({
                     onClick={() => setColor(c)}
                     className={cn(
                       'w-8 h-8 rounded-lg transition-transform hover:scale-110',
-                      color === c && 'ring-2 ring-offset-2 ring-slate-400'
+                      color === c && 'ring-2 ring-offset-2 ring-border'
                     )}
                     style={{ backgroundColor: c }}
                   >
@@ -620,12 +620,12 @@ export function TemplateEditor({
                 {tags.map((tag) => (
                   <span
                     key={tag}
-                    className="inline-flex items-center gap-1 px-2 py-1 bg-slate-100 text-slate-700 text-sm rounded-lg"
+                    className="inline-flex items-center gap-1 px-2 py-1 bg-muted text-foreground text-sm rounded-lg"
                   >
                     {tag}
                     <button
                       onClick={() => handleRemoveTag(tag)}
-                      className="text-slate-400 hover:text-slate-600"
+                      className="text-muted-foreground hover:text-foreground"
                     >
                       <X className="w-3 h-3" />
                     </button>
@@ -637,7 +637,7 @@ export function TemplateEditor({
 
           {/* Preview card */}
           <Card className="p-6">
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">Preview</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-4">Preview</h3>
             <div
               className="p-4 rounded-xl"
               style={{ 
@@ -653,15 +653,15 @@ export function TemplateEditor({
                   <SelectedIcon className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="font-medium text-slate-900">
+                  <p className="font-medium text-foreground">
                     {name || 'Template Name'}
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     {sections.length} sections · {estimatedDuration}m
                   </p>
                 </div>
               </div>
-              <p className="text-sm text-slate-600 line-clamp-2">
+              <p className="text-sm text-muted-foreground line-clamp-2">
                 {description || 'Template description...'}
               </p>
             </div>

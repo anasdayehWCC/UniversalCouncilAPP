@@ -82,12 +82,12 @@ function getConfidenceLevel(confidence: number): {
   bgColor: string;
 } {
   if (confidence >= 0.9) {
-    return { label: 'High', color: 'text-emerald-600', bgColor: 'bg-emerald-100' };
+    return { label: 'High', color: 'text-success', bgColor: 'bg-success/10' };
   }
   if (confidence >= 0.75) {
-    return { label: 'Medium', color: 'text-amber-600', bgColor: 'bg-amber-100' };
+    return { label: 'Medium', color: 'text-warning', bgColor: 'bg-warning/10' };
   }
-  return { label: 'Low', color: 'text-red-600', bgColor: 'bg-red-100' };
+  return { label: 'Low', color: 'text-destructive', bgColor: 'bg-destructive/10' };
 }
 
 // ============================================================================
@@ -188,9 +188,9 @@ export function TranscriptSegment({
         // Past state (synced segment)
         syncedSegment?.isPast && !displayActive && 'opacity-75',
         // Hover state
-        !displayActive && 'hover:bg-slate-50/80 dark:hover:bg-slate-800/50',
+        !displayActive && 'hover:bg-muted/50 dark:hover:bg-muted/80',
         // Editing state
-        isEditing && 'bg-slate-100 dark:bg-slate-800 ring-2 ring-[var(--accent)]',
+        isEditing && 'bg-muted dark:bg-muted ring-2 ring-[var(--accent)]',
         // Edited indicator
         segment.isEdited && 'border-l-2 border-amber-400',
         className
@@ -230,7 +230,7 @@ export function TranscriptSegment({
               onClick={() => onSeek?.(segment.start)}
               className={cn(
                 'flex items-center gap-1 text-[10px] sm:text-xs font-mono px-1.5 py-0.5 rounded-md',
-                'text-slate-500 hover:text-[var(--primary)] hover:bg-[var(--primary-soft)]',
+                'text-muted-foreground hover:text-[var(--primary)] hover:bg-[var(--primary-soft)]',
                 'transition-colors cursor-pointer'
               )}
               title="Click to seek to this time"
@@ -259,7 +259,7 @@ export function TranscriptSegment({
           {segment.isEdited && (
             <Badge
               variant="outline"
-              className="text-[10px] px-1.5 py-0.5 h-auto bg-amber-100 text-amber-700 border-0"
+              className="text-[10px] px-1.5 py-0.5 h-auto bg-warning/10 text-warning border-0"
             >
               Edited
             </Badge>
@@ -268,7 +268,7 @@ export function TranscriptSegment({
           {/* Low Confidence Warning */}
           {segment.confidence < 0.75 && (
             <span title="Low confidence - may need review">
-              <AlertCircle className="w-3 h-3 text-amber-500" />
+              <AlertCircle className="w-3 h-3 text-warning" />
             </span>
           )}
         </div>
@@ -283,16 +283,16 @@ export function TranscriptSegment({
               onKeyDown={handleKeyDown}
               className={cn(
                 'w-full min-h-[80px] p-2 rounded-lg resize-none',
-                'bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600',
-                'text-sm text-slate-800 dark:text-slate-200',
+                'bg-background dark:bg-background border border-input dark:border-input',
+                'text-sm text-foreground dark:text-foreground',
                 'focus:outline-none focus:ring-2 focus:ring-[var(--accent)]',
                 'transition-all'
               )}
               placeholder="Enter corrected text..."
             />
             <div className="flex items-center justify-between">
-              <span className="text-xs text-slate-400">
-                Press <kbd className="px-1 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-[10px]">⌘↵</kbd> to save
+              <span className="text-xs text-muted-foreground">
+                Press <kbd className="px-1 py-0.5 bg-muted dark:bg-muted rounded text-[10px]">⌘↵</kbd> to save
               </span>
               <div className="flex gap-2">
                 <Button
@@ -320,8 +320,8 @@ export function TranscriptSegment({
           <p
             className={cn(
               'text-sm sm:text-base leading-relaxed',
-              'text-slate-700 dark:text-slate-300',
-              displayActive && 'text-slate-900 dark:text-white font-medium'
+              'text-foreground dark:text-muted-foreground',
+              displayActive && 'text-foreground dark:text-foreground font-medium'
             )}
           >
             {renderText()}
@@ -342,8 +342,8 @@ export function TranscriptSegment({
             size="icon"
             variant="ghost"
             onClick={handleCopy}
-            className="h-7 w-7 text-slate-400 hover:text-slate-600"
-            title="Copy text"
+            className="h-7 w-7 text-muted-foreground hover:text-foreground"
+            aria-label={copied ? 'Copied!' : 'Copy text'}
           >
             {copied ? (
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
@@ -356,8 +356,8 @@ export function TranscriptSegment({
               size="icon"
               variant="ghost"
               onClick={onStartEdit}
-              className="h-7 w-7 text-slate-400 hover:text-slate-600"
-              title="Edit text"
+              className="h-7 w-7 text-muted-foreground hover:text-foreground"
+              aria-label="Edit text"
             >
               <Pencil className="w-3.5 h-3.5" />
             </Button>
@@ -367,7 +367,7 @@ export function TranscriptSegment({
 
       {/* Progress bar for active segment */}
       {syncedSegment?.isActive && (
-        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-slate-200 dark:bg-slate-700 rounded-b-xl overflow-hidden">
+        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-border dark:bg-border rounded-b-xl overflow-hidden">
           <div
             className="h-full bg-[var(--primary)] transition-all duration-200"
             style={{ width: `${syncedSegment.progress * 100}%` }}

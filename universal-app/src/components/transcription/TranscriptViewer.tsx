@@ -157,13 +157,13 @@ function TranscriptSkeleton() {
 function TranscriptEmpty() {
   return (
     <div className="flex flex-col items-center justify-center h-full py-16 text-center">
-      <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4">
-        <FileText className="w-8 h-8 text-slate-400" />
+      <div className="w-16 h-16 rounded-full bg-muted dark:bg-muted flex items-center justify-center mb-4">
+        <FileText className="w-8 h-8 text-muted-foreground" />
       </div>
-      <h3 className="text-lg font-medium text-slate-700 dark:text-slate-300 mb-2">
+      <h3 className="text-lg font-medium text-foreground dark:text-muted-foreground mb-2">
         No transcript available
       </h3>
-      <p className="text-sm text-slate-500 max-w-sm">
+      <p className="text-sm text-muted-foreground max-w-sm">
         The transcript will appear here once the recording has been processed.
       </p>
     </div>
@@ -333,7 +333,7 @@ export function TranscriptViewer({
     <div
       className={cn(
         'flex flex-col lg:flex-row gap-4 h-full',
-        layout === 'fullscreen' && 'fixed inset-0 z-50 bg-white dark:bg-slate-950 p-4',
+        layout === 'fullscreen' && 'fixed inset-0 z-50 bg-background dark:bg-background p-4',
         className
       )}
     >
@@ -342,19 +342,19 @@ export function TranscriptViewer({
         variant="glass"
         className={cn(
           'flex flex-col flex-1 min-w-0 overflow-hidden',
-          'backdrop-blur-xl bg-white/80 dark:bg-slate-900/80'
+          'backdrop-blur-xl bg-background/80 dark:bg-background/90'
         )}
       >
         {/* Header */}
-        <div className="flex-shrink-0 border-b border-slate-200/50 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/50">
+        <div className="flex-shrink-0 border-b border-border/50 dark:border-border/50 bg-muted/50 dark:bg-muted/80">
           {/* Metadata Row */}
           {transcription && (
             <div className="flex flex-wrap items-center gap-3 px-4 py-3">
-              <Badge variant="outline" className="gap-1.5 bg-white/50 dark:bg-slate-800/50">
+              <Badge variant="outline" className="gap-1.5 bg-background/50 dark:bg-muted/50">
                 <Clock className="w-3 h-3" />
                 {formatDuration(transcription.duration)}
               </Badge>
-              <Badge variant="outline" className="gap-1.5 bg-white/50 dark:bg-slate-800/50">
+              <Badge variant="outline" className="gap-1.5 bg-background/50 dark:bg-muted/50">
                 <Languages className="w-3 h-3" />
                 {transcription.language}
               </Badge>
@@ -396,13 +396,13 @@ export function TranscriptViewer({
 
           {/* Audio Player Controls */}
           {audioRef?.current && (
-            <div className="flex items-center gap-3 px-4 py-3 border-t border-slate-200/30 dark:border-slate-700/30">
+            <div className="flex items-center gap-3 px-4 py-3 border-t border-border/30 dark:border-border/30">
               <Button
                 size="icon"
                 variant="ghost"
                 onClick={handleSkipBack}
                 className="h-8 w-8"
-                title="Skip back 10s"
+                aria-label="Skip back 10 seconds"
               >
                 <SkipBack className="w-4 h-4" />
               </Button>
@@ -411,6 +411,7 @@ export function TranscriptViewer({
                 size="icon"
                 onClick={handlePlayPause}
                 className="h-10 w-10 rounded-full shadow-md"
+                aria-label={playback.isPlaying ? 'Pause' : 'Play'}
               >
                 {playback.isPlaying ? (
                   <Pause className="w-4 h-4" />
@@ -424,13 +425,13 @@ export function TranscriptViewer({
                 variant="ghost"
                 onClick={handleSkipForward}
                 className="h-8 w-8"
-                title="Skip forward 10s"
+                aria-label="Skip forward 10 seconds"
               >
                 <SkipForward className="w-4 h-4" />
               </Button>
 
               <div className="flex-1 flex items-center gap-3">
-                <span className="text-xs font-mono text-slate-500 w-12">
+                <span className="text-xs font-mono text-muted-foreground w-12">
                   {formatTime(playback.currentTime)}
                 </span>
                 <Slider
@@ -440,7 +441,7 @@ export function TranscriptViewer({
                   step={0.1}
                   className="flex-1"
                 />
-                <span className="text-xs font-mono text-slate-500 w-12 text-right">
+                <span className="text-xs font-mono text-muted-foreground w-12 text-right">
                   {formatTime(playback.duration)}
                 </span>
               </div>

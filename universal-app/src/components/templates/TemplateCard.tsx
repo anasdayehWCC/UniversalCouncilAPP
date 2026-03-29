@@ -79,8 +79,8 @@ export function TemplateCard({
       <Card
         className={cn(
           'p-4 cursor-pointer transition-all duration-200 group',
-          'hover:shadow-md hover:border-slate-300',
-          isSelected && 'border-2 border-blue-500 bg-blue-50/50',
+          'hover:shadow-md hover:border-border',
+          isSelected && 'border-2 border-primary bg-primary/5',
           className
         )}
         onClick={onSelect}
@@ -100,14 +100,14 @@ export function TemplateCard({
           {/* Info */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-slate-900 truncate">{template.name}</h3>
+              <h3 className="font-semibold text-foreground truncate">{template.name}</h3>
               {template.isSystem && (
-                <span className="px-2 py-0.5 text-xs font-medium bg-slate-100 text-slate-500 rounded-full">
+                <span className="px-2 py-0.5 text-xs font-medium bg-muted text-muted-foreground rounded-full">
                   System
                 </span>
               )}
             </div>
-            <p className="text-sm text-slate-500 truncate">{template.description}</p>
+            <p className="text-sm text-muted-foreground truncate">{template.description}</p>
           </div>
 
           {/* Category badge */}
@@ -130,17 +130,17 @@ export function TemplateCard({
                     e.stopPropagation();
                     onToggleFavorite();
                   }}
-                  className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
+                  className="p-2 rounded-lg hover:bg-muted/50 transition-colors"
                 >
                   <Star
                     className={cn(
                       'w-4 h-4 transition-colors',
-                      isFavorite ? 'text-amber-500 fill-amber-500' : 'text-slate-300'
+                      isFavorite ? 'text-warning fill-warning' : 'text-muted'
                     )}
                   />
                 </button>
               )}
-              <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-slate-500 transition-colors" />
+              <ChevronRight className="w-5 h-5 text-muted group-hover:text-muted-foreground transition-colors" />
             </div>
           )}
         </div>
@@ -154,7 +154,7 @@ export function TemplateCard({
       className={cn(
         'p-5 cursor-pointer transition-all duration-300 group flex flex-col h-full relative overflow-hidden',
         'hover:shadow-lg hover:-translate-y-0.5',
-        isSelected && 'ring-2 ring-blue-500 bg-blue-50/30',
+        isSelected && 'ring-2 ring-primary bg-primary/5',
         compact && 'p-4',
         className
       )}
@@ -165,7 +165,7 @@ export function TemplateCard({
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          className="absolute top-3 right-3 w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center"
+          className="absolute top-3 right-3 w-6 h-6 rounded-full bg-primary flex items-center justify-center"
         >
           <Check className="w-4 h-4 text-white" />
         </motion.div>
@@ -181,14 +181,14 @@ export function TemplateCard({
           className={cn(
             'absolute top-3 right-3 p-2 rounded-lg transition-all duration-200',
             isFavorite
-              ? 'bg-amber-100 text-amber-500'
-              : 'bg-transparent text-slate-300 opacity-0 group-hover:opacity-100 hover:bg-slate-100 hover:text-slate-500'
+              ? 'bg-warning/10 text-warning'
+              : 'bg-transparent text-muted opacity-0 group-hover:opacity-100 hover:bg-muted/50 hover:text-muted-foreground'
           )}
         >
           <Star
             className={cn(
               'w-4 h-4',
-              isFavorite && 'fill-amber-500'
+              isFavorite && 'fill-warning'
             )}
           />
         </button>
@@ -212,13 +212,13 @@ export function TemplateCard({
 
       {/* Title & Description */}
       <h3 className={cn(
-        'font-bold text-slate-900 mb-2',
+        'font-bold text-foreground mb-2',
         compact ? 'text-base' : 'text-lg'
       )}>
         {template.name}
       </h3>
       <p className={cn(
-        'text-slate-500 flex-1',
+        'text-muted-foreground flex-1',
         compact ? 'text-xs line-clamp-2' : 'text-sm line-clamp-3',
         'mb-4'
       )}>
@@ -228,20 +228,20 @@ export function TemplateCard({
       {/* Sections preview */}
       {!compact && (
         <div className="space-y-2 mb-4">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             Sections
           </p>
           <div className="flex flex-wrap gap-1.5">
             {template.sections.slice(0, 4).map((section, i) => (
               <span
                 key={section.id || i}
-                className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded border border-slate-200"
+                className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded border border-border">
               >
                 {section.title}
               </span>
             ))}
             {template.sections.length > 4 && (
-              <span className="text-xs text-slate-400 px-1 py-1">
+              <span className="text-xs text-muted-foreground px-1 py-1">
                 +{template.sections.length - 4} more
               </span>
             )}
@@ -250,7 +250,7 @@ export function TemplateCard({
       )}
 
       {/* Footer */}
-      <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-100">
+      <div className="flex items-center justify-between mt-auto pt-3 border-t border-border">
         {/* Category badge */}
         <div className="flex items-center gap-2">
           <span
@@ -268,7 +268,7 @@ export function TemplateCard({
           </span>
           
           {template.isSystem && (
-            <span className="px-2 py-1 text-xs font-medium bg-slate-100 text-slate-500 rounded-lg">
+            <span className="px-2 py-1 text-xs font-medium bg-muted text-muted-foreground rounded-lg">
               System
             </span>
           )}
@@ -276,7 +276,7 @@ export function TemplateCard({
 
         {/* Last used */}
         {lastUsed && (
-          <div className="flex items-center gap-1 text-xs text-slate-400">
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <Clock className="w-3 h-3" />
             {formatLastUsed(lastUsed)}
           </div>
@@ -284,7 +284,7 @@ export function TemplateCard({
 
         {/* Duration */}
         {!lastUsed && template.estimatedDuration && (
-          <div className="flex items-center gap-1 text-xs text-slate-400">
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <Clock className="w-3 h-3" />
             ~{template.estimatedDuration}m
           </div>

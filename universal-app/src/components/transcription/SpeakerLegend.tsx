@@ -112,7 +112,7 @@ function SpeakerItem({
     <div
       className={cn(
         'group flex items-center gap-3 p-2.5 rounded-lg transition-all',
-        'hover:bg-slate-50 dark:hover:bg-slate-800/50',
+        'hover:bg-muted/50 dark:hover:bg-muted/80',
         isFiltered && 'bg-[var(--primary-soft)] ring-1 ring-[var(--primary)]/20'
       )}
     >
@@ -150,7 +150,7 @@ function SpeakerItem({
               className="h-7 w-7"
               aria-label="Save speaker name"
             >
-              <Check className="w-3 h-3 text-emerald-600" />
+              <Check className="w-3 h-3 text-success" />
             </Button>
             <Button
               size="icon"
@@ -162,21 +162,21 @@ function SpeakerItem({
               className="h-7 w-7"
               aria-label="Cancel editing speaker name"
             >
-              <X className="w-3 h-3 text-red-500" />
+              <X className="w-3 h-3 text-destructive" />
             </Button>
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <span className="font-medium text-sm text-slate-800 dark:text-slate-200 truncate">
+            <span className="font-medium text-sm text-foreground dark:text-foreground truncate">
               {speaker.label}
             </span>
             {onRename && (
               <button
                 onClick={() => setIsEditing(true)}
-                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded"
+                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-muted dark:hover:bg-muted rounded"
                 title="Rename speaker"
               >
-                <Pencil className="w-3 h-3 text-slate-500" />
+                <Pencil className="w-3 h-3 text-muted-foreground" />
               </button>
             )}
           </div>
@@ -184,11 +184,11 @@ function SpeakerItem({
 
         {/* Stats */}
         {showStats && speaker.totalDuration !== undefined && (
-          <div className="flex items-center gap-3 mt-1 text-[11px] text-slate-500">
+          <div className="flex items-center gap-3 mt-1 text-[11px] text-muted-foreground">
             <span className="flex items-center gap-1">
               <Clock className="w-3 h-3" />
               {formatDuration(speaker.totalDuration)}
-              <span className="text-slate-400">
+              <span className="text-muted-foreground/70">
                 ({formatPercent(speaker.totalDuration, totalDuration)})
               </span>
             </span>
@@ -246,7 +246,7 @@ export function SpeakerLegend({
   return (
     <div
       className={cn(
-        'bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700',
+        'bg-card dark:bg-card rounded-xl border border-border dark:border-border',
         'shadow-sm overflow-hidden',
         className
       )}
@@ -255,13 +255,13 @@ export function SpeakerLegend({
       <div
         className={cn(
           'flex items-center justify-between px-4 py-3',
-          'border-b border-slate-100 dark:border-slate-800',
-          'bg-slate-50/50 dark:bg-slate-800/50'
+          'border-b border-border dark:border-border',
+          'bg-muted/50 dark:bg-muted/80'
         )}
       >
         <div className="flex items-center gap-2">
-          <User className="w-4 h-4 text-slate-500" />
-          <span className="font-medium text-sm text-slate-700 dark:text-slate-300">
+          <User className="w-4 h-4 text-muted-foreground" />
+          <span className="font-medium text-sm text-foreground dark:text-muted-foreground">
             Speakers
           </span>
           <Badge variant="secondary" className="text-[10px] px-1.5 py-0.5">
@@ -276,7 +276,7 @@ export function SpeakerLegend({
               size="sm"
               variant="ghost"
               onClick={onClearFilter}
-              className="h-7 px-2 text-xs text-slate-500 hover:text-red-600"
+              className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive"
             >
               <FilterX className="w-3 h-3 mr-1" />
               Clear
@@ -307,7 +307,7 @@ export function SpeakerLegend({
         <div className="p-2 space-y-1">
           {/* Filter Hint */}
           {onToggleFilter && !hasActiveFilter && (
-            <div className="flex items-center gap-2 px-2.5 py-2 text-xs text-slate-500 bg-slate-50 dark:bg-slate-800/50 rounded-lg mb-2">
+            <div className="flex items-center gap-2 px-2.5 py-2 text-xs text-muted-foreground bg-muted dark:bg-muted/80 rounded-lg mb-2">
               <Filter className="w-3 h-3" />
               Click a speaker to filter the transcript
             </div>

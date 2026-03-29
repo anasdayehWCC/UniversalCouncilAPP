@@ -165,7 +165,7 @@ export function TranscriptExport({
 
   if (!transcription) {
     return (
-      <div className={cn('p-6 text-center text-slate-500', className)}>
+      <div className={cn('p-6 text-center text-muted-foreground', className)}>
         No transcription available to export.
       </div>
     );
@@ -174,16 +174,16 @@ export function TranscriptExport({
   return (
     <div
       className={cn(
-        'bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700',
+        'bg-card dark:bg-card rounded-xl border border-border dark:border-border',
         'shadow-sm overflow-hidden',
         className
       )}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border dark:border-border bg-muted/50 dark:bg-muted/80">
         <div className="flex items-center gap-2">
-          <Download className="w-4 h-4 text-slate-500" />
-          <span className="font-medium text-sm text-slate-700 dark:text-slate-300">
+          <Download className="w-4 h-4 text-muted-foreground" />
+          <span className="font-medium text-sm text-foreground dark:text-muted-foreground">
             Export Transcript
           </span>
         </div>
@@ -204,17 +204,17 @@ export function TranscriptExport({
                 'hover:border-[var(--primary)] hover:bg-[var(--primary-soft)]',
                 selectedFormat === option.format
                   ? 'border-[var(--primary)] bg-[var(--primary-soft)] ring-2 ring-[var(--primary)]/20'
-                  : 'border-slate-200 dark:border-slate-700'
+                  : 'border-border dark:border-border'
               )}
             >
               <div className={cn(
-                'text-slate-600 dark:text-slate-400',
+                'text-muted-foreground dark:text-muted-foreground',
                 selectedFormat === option.format && 'text-[var(--primary)]'
               )}>
                 {option.icon}
               </div>
               <div className="text-center">
-                <div className="text-xs font-medium text-slate-800 dark:text-slate-200">
+                <div className="text-xs font-medium text-foreground dark:text-foreground">
                   {option.label}
                 </div>
                 {option.badge && (
@@ -231,14 +231,14 @@ export function TranscriptExport({
         </div>
 
         {/* Selected Format Description */}
-        <p className="text-xs text-slate-500 text-center">
+        <p className="text-xs text-muted-foreground text-center">
           {FORMAT_OPTIONS.find(f => f.format === selectedFormat)?.description}
         </p>
 
         {/* Options Toggle */}
         <button
           onClick={() => setShowOptions(!showOptions)}
-          className="flex items-center justify-center gap-1 w-full py-2 text-sm text-slate-600 hover:text-slate-800 transition-colors"
+          className="flex items-center justify-center gap-1 w-full py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <span>Export options</span>
           <ChevronDown className={cn(
@@ -249,10 +249,10 @@ export function TranscriptExport({
 
         {/* Export Options */}
         {showOptions && (
-          <div className="space-y-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+          <div className="space-y-3 p-3 bg-muted dark:bg-muted/80 rounded-lg">
             {/* Include Options */}
             <div className="space-y-2">
-              <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                 Include in export
               </span>
 
@@ -264,11 +264,11 @@ export function TranscriptExport({
                   {includeTimestamps ? (
                     <CheckSquare className="w-4 h-4 text-[var(--primary)]" />
                   ) : (
-                    <Square className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
+                    <Square className="w-4 h-4 text-muted-foreground group-hover:text-foreground" />
                   )}
                 </button>
-                <Clock className="w-4 h-4 text-slate-400" />
-                <span className="text-sm text-slate-700 dark:text-slate-300">
+                <Clock className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm text-foreground dark:text-muted-foreground">
                   Timestamps
                 </span>
               </label>
@@ -281,11 +281,11 @@ export function TranscriptExport({
                   {includeSpeakers ? (
                     <CheckSquare className="w-4 h-4 text-[var(--primary)]" />
                   ) : (
-                    <Square className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
+                    <Square className="w-4 h-4 text-muted-foreground group-hover:text-foreground" />
                   )}
                 </button>
-                <User className="w-4 h-4 text-slate-400" />
-                <span className="text-sm text-slate-700 dark:text-slate-300">
+                <User className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm text-foreground dark:text-muted-foreground">
                   Speaker labels
                 </span>
               </label>
@@ -298,10 +298,10 @@ export function TranscriptExport({
                   {includeConfidence ? (
                     <CheckSquare className="w-4 h-4 text-[var(--primary)]" />
                   ) : (
-                    <Square className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
+                    <Square className="w-4 h-4 text-muted-foreground group-hover:text-foreground" />
                   )}
                 </button>
-                <span className="text-sm text-slate-700 dark:text-slate-300">
+                <span className="text-sm text-foreground dark:text-muted-foreground">
                   Confidence scores
                 </span>
               </label>
@@ -314,10 +314,10 @@ export function TranscriptExport({
                   {includeMetadata ? (
                     <CheckSquare className="w-4 h-4 text-[var(--primary)]" />
                   ) : (
-                    <Square className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
+                    <Square className="w-4 h-4 text-muted-foreground group-hover:text-foreground" />
                   )}
                 </button>
-                <span className="text-sm text-slate-700 dark:text-slate-300">
+                <span className="text-sm text-foreground dark:text-muted-foreground">
                   Document header/metadata
                 </span>
               </label>
@@ -325,8 +325,8 @@ export function TranscriptExport({
 
             {/* Speaker Filter */}
             {speakers.length > 1 && (
-              <div className="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-700">
-                <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+              <div className="space-y-2 pt-2 border-t border-border dark:border-border">
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                   Filter by speaker
                 </span>
                 <div className="flex flex-wrap gap-2">
@@ -338,7 +338,7 @@ export function TranscriptExport({
                         'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all',
                         selectedSpeakers.includes(speaker.id)
                           ? 'text-white shadow-sm'
-                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400'
+                          : 'bg-muted text-muted-foreground hover:bg-muted/50 dark:bg-muted dark:text-muted-foreground'
                       )}
                       style={
                         selectedSpeakers.includes(speaker.id)
@@ -357,7 +357,7 @@ export function TranscriptExport({
                 {selectedSpeakers.length > 0 && (
                   <button
                     onClick={() => setSelectedSpeakers([])}
-                    className="text-xs text-slate-500 hover:text-slate-700"
+                    className="text-xs text-muted-foreground hover:text-foreground"
                   >
                     Clear filter
                   </button>
@@ -378,7 +378,7 @@ export function TranscriptExport({
         >
           {isExporting ? (
             <>
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="w-4 h-4 animate-spin motion-reduce:animate-none" />
               Exporting...
             </>
           ) : exportSuccess ? (

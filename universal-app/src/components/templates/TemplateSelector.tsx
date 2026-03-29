@@ -132,7 +132,7 @@ export function TemplateSelector({
               'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200',
               activeTab === 'all'
                 ? 'bg-gradient-to-r from-slate-900 to-slate-700 text-white shadow-md'
-                : 'bg-white/60 text-slate-600 hover:bg-white/80 border border-slate-200'
+                : 'bg-card/60 text-muted-foreground hover:bg-card/80 border border-border'
             )}
           >
             All Templates
@@ -142,8 +142,8 @@ export function TemplateSelector({
             className={cn(
               'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2',
               activeTab === 'favorites'
-                ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md'
-                : 'bg-white/60 text-slate-600 hover:bg-white/80 border border-slate-200'
+                ? 'bg-gradient-to-r from-warning to-orange-500 text-white shadow-md'
+                : 'bg-card/60 text-muted-foreground hover:bg-card/80 border border-border'
             )}
           >
             <Star className="w-4 h-4" />
@@ -155,7 +155,7 @@ export function TemplateSelector({
               'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2',
               activeTab === 'recent'
                 ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-md'
-                : 'bg-white/60 text-slate-600 hover:bg-white/80 border border-slate-200'
+                : 'bg-card/60 text-muted-foreground hover:bg-card/80 border border-border'
             )}
           >
             <Clock className="w-4 h-4" />
@@ -166,17 +166,17 @@ export function TemplateSelector({
         <div className="flex items-center gap-2 w-full sm:w-auto">
           {/* Search */}
           <div className="relative flex-1 sm:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder="Search templates..."
               value={filters.search || ''}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 bg-white/60 border-slate-200 focus:bg-white"
+              className="pl-9 bg-card/60 border-border focus:bg-card"
             />
             {filters.search && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -190,7 +190,7 @@ export function TemplateSelector({
               size="default"
               onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
               className={cn(
-                'gap-2 bg-white/60 border-slate-200',
+                'gap-2 bg-card/60 border-border',
                 activeCategory && 'border-2'
               )}
               style={activeCategory ? { borderColor: activeCategory.color } : undefined}
@@ -206,17 +206,17 @@ export function TemplateSelector({
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden z-50"
+                  className="absolute right-0 mt-2 w-56 bg-card rounded-xl shadow-xl border border-border overflow-hidden z-50"
                 >
                   <button
                     onClick={() => handleCategorySelect(null)}
                     className={cn(
-                      'w-full px-4 py-3 text-left text-sm hover:bg-slate-50 flex items-center justify-between',
-                      !activeCategory && 'bg-slate-50'
+                      'w-full px-4 py-3 text-left text-sm hover:bg-muted flex items-center justify-between',
+                      !activeCategory && 'bg-muted'
                     )}
                   >
                     <span>All Categories</span>
-                    {!activeCategory && <Check className="w-4 h-4 text-green-500" />}
+                    {!activeCategory && <Check className="w-4 h-4 text-success" />}
                   </button>
                   {categories.map((cat) => {
                     const IconComp = (Icons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[cat.icon] || Filter;
@@ -225,8 +225,8 @@ export function TemplateSelector({
                         key={cat.id}
                         onClick={() => handleCategorySelect(cat.id)}
                         className={cn(
-                          'w-full px-4 py-3 text-left text-sm hover:bg-slate-50 flex items-center justify-between',
-                          filters.category === cat.id && 'bg-slate-50'
+                          'w-full px-4 py-3 text-left text-sm hover:bg-muted flex items-center justify-between',
+                          filters.category === cat.id && 'bg-muted'
                         )}
                       >
                         <span className="flex items-center gap-2">
@@ -234,11 +234,11 @@ export function TemplateSelector({
                             className="w-2 h-2 rounded-full"
                             style={{ backgroundColor: cat.color }}
                           />
-                          <IconComp className="w-4 h-4 text-slate-400" />
+                          <IconComp className="w-4 h-4 text-muted-foreground" />
                           {cat.label}
                         </span>
                         {filters.category === cat.id && (
-                          <Check className="w-4 h-4 text-green-500" />
+                          <Check className="w-4 h-4 text-success" />
                         )}
                       </button>
                     );
@@ -250,14 +250,14 @@ export function TemplateSelector({
 
           {/* View mode toggle */}
           {!compact && (
-            <div className="flex bg-white/60 border border-slate-200 rounded-lg p-1">
+            <div className="flex bg-card/60 border border-border rounded-lg p-1">
               <button
                 onClick={() => setViewMode('grid')}
                 className={cn(
                   'p-2 rounded-md transition-colors',
                   viewMode === 'grid'
-                    ? 'bg-slate-900 text-white'
-                    : 'text-slate-500 hover:text-slate-700'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
                 )}
               >
                 <Grid className="w-4 h-4" />
@@ -267,8 +267,8 @@ export function TemplateSelector({
                 className={cn(
                   'p-2 rounded-md transition-colors',
                   viewMode === 'list'
-                    ? 'bg-slate-900 text-white'
-                    : 'text-slate-500 hover:text-slate-700'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
                 )}
               >
                 <List className="w-4 h-4" />
@@ -281,9 +281,9 @@ export function TemplateSelector({
       {/* Active filters */}
       {(filters.search || filters.category) && (
         <div className="flex items-center gap-2">
-          <span className="text-sm text-slate-500">Filters:</span>
+          <span className="text-sm text-muted-foreground">Filters:</span>
           {filters.search && (
-            <span className="inline-flex items-center gap-1 px-2 py-1 bg-slate-100 text-slate-700 text-sm rounded-lg">
+            <span className="inline-flex items-center gap-1 px-2 py-1 bg-muted text-foreground text-sm rounded-lg">
               &quot;{filters.search}&quot;
               <button onClick={() => setSearchQuery('')}>
                 <X className="w-3 h-3" />
@@ -303,7 +303,7 @@ export function TemplateSelector({
           )}
           <button
             onClick={clearFilters}
-            className="text-sm text-slate-500 hover:text-slate-700 underline"
+            className="text-sm text-muted-foreground hover:text-foreground underline"
           >
             Clear all
           </button>
@@ -314,16 +314,16 @@ export function TemplateSelector({
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Card key={i} className="h-48 animate-pulse bg-slate-100" />
+            <Card key={i} className="h-48 animate-pulse bg-muted" />
           ))}
         </div>
       ) : displayTemplates.length === 0 ? (
         <Card className="p-12 text-center">
-          <div className="text-slate-400 mb-4">
+          <div className="text-muted-foreground mb-4">
             <Search className="w-12 h-12 mx-auto" />
           </div>
-          <h3 className="text-lg font-semibold text-slate-700 mb-2">No templates found</h3>
-          <p className="text-slate-500">
+          <h3 className="text-lg font-semibold text-foreground mb-2">No templates found</h3>
+          <p className="text-muted-foreground">
             {activeTab === 'favorites'
               ? 'Star templates to add them to your favorites'
               : activeTab === 'recent'
@@ -391,9 +391,9 @@ export function TemplateSelector({
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="text-center text-slate-400 p-8"
+                      className="text-center text-muted-foreground p-8"
                     >
-                      <div className="p-4 rounded-full bg-slate-100 inline-block mb-4">
+                      <div className="p-4 rounded-full bg-muted inline-block mb-4">
                         <Search className="w-8 h-8" />
                       </div>
                       <p className="text-sm">Hover over a template to preview</p>

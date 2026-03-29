@@ -61,7 +61,7 @@ export function RecordingControls({
           className="flex flex-col items-center gap-2"
         >
           <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
-            <Loader2 className="w-10 h-10 text-primary animate-spin" />
+            <Loader2 className="w-10 h-10 text-primary animate-spin motion-reduce:animate-none" />
           </div>
           <span className="text-sm text-muted-foreground">Saving...</span>
         </motion.div>
@@ -91,7 +91,7 @@ export function RecordingControls({
           
           {/* Pulse ring animation */}
           <motion.div
-            className="absolute inset-0 rounded-full border-4 border-red-400/50"
+            className="absolute inset-0 rounded-full border-4 border-destructive/50"
             animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0, 0.5] }}
             transition={{ duration: 2, repeat: Infinity }}
           />
@@ -124,7 +124,7 @@ export function RecordingControls({
           {/* Recording indicator */}
           {isRecording && (
             <motion.div
-              className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-red-500"
+              className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-destructive"
               animate={{ scale: [1, 1.2, 1], opacity: [1, 0.7, 1] }}
               transition={{ duration: 1, repeat: Infinity }}
             />
@@ -183,18 +183,18 @@ export function RecordingControls({
           className={cn(
             'w-14 h-14 rounded-full',
             'backdrop-blur-xl',
-            'bg-red-500/20 dark:bg-red-500/30',
-            'border border-red-500/30',
+            'bg-destructive/20',
+            'border border-destructive/30',
             'shadow-lg',
             'flex items-center justify-center',
             'transition-all duration-200',
-            'hover:bg-red-500/30 dark:hover:bg-red-500/40',
-            'focus:outline-none focus:ring-2 focus:ring-red-500/50',
+            'hover:bg-destructive/30',
+            'focus:outline-none focus:ring-2 focus:ring-destructive/50',
             'disabled:opacity-50 disabled:cursor-not-allowed'
           )}
           aria-label="Cancel recording"
         >
-          <X className="w-6 h-6 text-red-600 dark:text-red-400" />
+          <X className="w-6 h-6 text-destructive" />
         </motion.button>
       </motion.div>
     );

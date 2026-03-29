@@ -64,7 +64,7 @@ export function TranscriptPanel({
   return (
     <Card variant="glass" className={cn('overflow-hidden', className)}>
       {/* Audio Player Controls */}
-      <div className="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
+      <div className="p-4 border-b border-border bg-muted/50">
         <div className="flex items-center gap-4">
           {/* Playback Controls */}
           <div className="flex items-center gap-2">
@@ -91,14 +91,14 @@ export function TranscriptPanel({
           {/* Progress Bar */}
           <div className="flex-1">
             <div className="relative">
-              <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full">
+              <div className="h-1.5 bg-muted rounded-full">
                 <div 
                   className="h-full bg-[var(--primary)] rounded-full"
                   style={{ width: '35%' }}
                 />
               </div>
             </div>
-            <div className="flex items-center justify-between mt-1 text-xs text-slate-500">
+            <div className="flex items-center justify-between mt-1 text-xs text-muted-foreground">
               <span>{formatTime(currentTime)}</span>
               <span>{minute.duration}</span>
             </div>
@@ -120,7 +120,7 @@ export function TranscriptPanel({
       {selectedText && onLinkEvidence && (
         <div className="px-4 py-2 bg-[var(--accent-soft)] border-b border-[var(--card-border)]">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-slate-600 dark:text-slate-400 truncate flex-1 mr-2">
+            <p className="text-sm text-muted-foreground truncate flex-1 mr-2">
               Selected: "{selectedText.text.substring(0, 50)}..."
             </p>
             <Button
@@ -147,21 +147,21 @@ export function TranscriptPanel({
                 'flex gap-3 p-2 rounded-lg cursor-pointer transition-colors',
                 currentTime >= segment.start && currentTime < segment.end
                   ? 'bg-[var(--primary-soft)]'
-                  : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                  : 'hover:bg-muted/50'
               )}
               onClick={() => onSeekTo?.(segment.start)}
             >
               {/* Timestamp */}
-              <span className="flex-shrink-0 text-xs text-slate-400 font-mono pt-0.5">
+              <span className="flex-shrink-0 text-xs text-muted-foreground/60 font-mono pt-0.5">
                 {formatTime(segment.start)}
               </span>
 
               {/* Content */}
               <div className="flex-1">
-                <p className="text-xs font-medium text-slate-500 mb-1">
+                <p className="text-xs font-medium text-muted-foreground mb-1">
                   {segment.speaker}
                 </p>
-                <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                <p className="text-sm text-foreground leading-relaxed">
                   {segment.text}
                 </p>
               </div>

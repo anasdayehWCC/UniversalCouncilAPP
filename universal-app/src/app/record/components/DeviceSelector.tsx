@@ -60,8 +60,8 @@ export function DeviceSelector({
   // Permission denied state
   if (isDenied) {
     return (
-      <div className="flex flex-col items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20">
-        <div className="flex items-center gap-2 text-red-500">
+      <div className="flex flex-col items-center gap-3 p-4 rounded-xl bg-destructive/10 border border-destructive/20">
+        <div className="flex items-center gap-2 text-destructive">
           <MicOff className="w-5 h-5" />
           <span className="text-sm font-medium">Microphone Access Denied</span>
         </div>
@@ -108,7 +108,7 @@ export function DeviceSelector({
           disabled={isRefreshing}
           className="gap-2"
         >
-          <RefreshCw className={cn('w-4 h-4', isRefreshing && 'animate-spin')} />
+          <RefreshCw className={cn('w-4 h-4', isRefreshing && 'animate-spin motion-reduce:animate-none')} />
           <span>Refresh</span>
         </Button>
       </div>
@@ -167,8 +167,8 @@ export function DeviceSelector({
               'absolute z-50 w-full mt-2',
               'rounded-xl overflow-hidden',
               'backdrop-blur-xl',
-              'bg-white/90 dark:bg-slate-900/90',
-              'border border-white/30 dark:border-slate-700/50',
+              'bg-card/90',
+              'border border-border/50',
               'shadow-xl'
             )}
           >
@@ -219,7 +219,7 @@ export function DeviceSelector({
             </div>
 
             {/* Refresh Button */}
-            <div className="border-t border-slate-200 dark:border-slate-700 p-2">
+            <div className="border-t border-border p-2">
               <button
                 onClick={handleRefresh}
                 disabled={isRefreshing}
@@ -231,7 +231,7 @@ export function DeviceSelector({
                   'disabled:opacity-50'
                 )}
               >
-                <RefreshCw className={cn('w-4 h-4', isRefreshing && 'animate-spin')} />
+                <RefreshCw className={cn('w-4 h-4', isRefreshing && 'animate-spin motion-reduce:animate-none')} />
                 <span>Refresh devices</span>
               </button>
             </div>

@@ -4,6 +4,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Mic, AlertTriangle, Home, PhoneOff } from 'lucide-react';
+import { ShellPage } from '@/components/layout';
 
 export default function RecordError({
   error,
@@ -17,7 +18,7 @@ export default function RecordError({
     error.message.includes('NotAllowedError');
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50">
+    <ShellPage className="flex items-center justify-center bg-background" padded={false} contentClassName="flex h-full items-center justify-center p-6">
       <Card className="max-w-lg w-full">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center">
@@ -38,7 +39,7 @@ export default function RecordError({
         </CardHeader>
         <CardContent className="space-y-4">
           {isMicError && (
-            <div className="rounded-md bg-blue-50 dark:bg-blue-950/20 p-3 text-sm text-blue-900 dark:text-blue-100">
+            <div className="rounded-md bg-info/10 p-3 text-sm text-info">
               <p className="font-medium mb-1">How to fix:</p>
               <ol className="list-decimal list-inside space-y-1 text-xs">
                 <li>Click the lock icon in your browser&apos;s address bar</li>
@@ -64,6 +65,6 @@ export default function RecordError({
           </div>
         </CardContent>
       </Card>
-    </div>
+    </ShellPage>
   );
 }

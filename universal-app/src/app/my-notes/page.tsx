@@ -51,7 +51,7 @@ export default function MyNotesPage() {
       <Card
         variant="glass"
         hoverEffect={false}
-        className="p-6 border-none text-white"
+        className="p-6 border-none text-primary-foreground"
         style={{ background: config.theme.gradient }}
       >
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -70,7 +70,7 @@ export default function MyNotesPage() {
             </div>
           </div>
           <Link href="/record">
-            <Button className="bg-white/10 text-white border border-white/30 hover:bg-white/20">
+            <Button className="bg-white/10 text-primary-foreground border border-white/30 hover:bg-white/20">
               New Recording
             </Button>
           </Link>
@@ -78,12 +78,12 @@ export default function MyNotesPage() {
       </Card>
 
       {/* Filters */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-4 items-center">
+      <div className="bg-card p-4 rounded-xl border border-border shadow-sm flex flex-col md:flex-row gap-4 items-center">
         <div className="relative flex-1 w-full">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input 
             placeholder="Search by title, family name, or attendee..." 
-            className="pl-9 bg-slate-50 border-slate-200"
+            className="pl-9 bg-muted border-input"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -92,7 +92,7 @@ export default function MyNotesPage() {
           <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as MeetingStatus | 'all')}>
             <SelectTrigger className="w-[180px]">
               <div className="flex items-center gap-2">
-                <Filter className="w-4 h-4 text-slate-500" />
+                <Filter className="w-4 h-4 text-muted-foreground" />
                 <SelectValue placeholder="Filter by status" />
               </div>
             </SelectTrigger>
@@ -106,7 +106,7 @@ export default function MyNotesPage() {
             </SelectContent>
           </Select>
           <Button variant="outline" size="icon" aria-label="Filter options">
-            <SlidersHorizontal className="w-4 h-4 text-slate-500" />
+            <SlidersHorizontal className="w-4 h-4 text-muted-foreground" />
           </Button>
         </div>
       </div>
@@ -119,11 +119,11 @@ export default function MyNotesPage() {
           ))
         ) : (
           <div className="col-span-full py-12 text-center">
-            <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Search className="w-8 h-8 text-slate-400" />
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+              <Search className="w-8 h-8 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-medium text-slate-900">No notes found</h3>
-            <p className="text-slate-500">{emptyCopy}</p>
+            <h3 className="text-lg font-medium text-foreground">No notes found</h3>
+            <p className="text-muted-foreground">{emptyCopy}</p>
           </div>
         )}
       </div>

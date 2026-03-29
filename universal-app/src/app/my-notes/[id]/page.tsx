@@ -28,36 +28,36 @@ export default function MeetingDetailPage() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-6rem)] -m-6">
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-50/50">
+    <div className="flex min-h-0 min-w-0">
+      {/* Main Content Area — mr-80 makes room for the fixed AI sidebar */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-muted/30 mr-80">
         {/* Header */}
-        <div className="px-8 py-6 border-b border-slate-200 bg-white/80 backdrop-blur-md flex-shrink-0 shadow-sm z-10 animate-in fade-in slide-in-from-top-2 duration-500">
-            <nav className="flex items-center gap-2 text-sm text-slate-500">
-              <Link href="/my-notes" className="hover:text-slate-900 transition-colors flex items-center gap-1">
+        <div className="px-8 py-6 border-b border-border bg-card flex-shrink-0 shadow-sm z-10 animate-in fade-in slide-in-from-top-2 duration-500">
+            <nav className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Link href="/my-notes" className="hover:text-foreground transition-colors flex items-center gap-1">
                 <ArrowLeft className="w-4 h-4" /> My Notes
               </Link>
               <span className="opacity-30">/</span>
-              <span className="font-medium text-slate-900 truncate max-w-[300px]">{meeting.title}</span>
+              <span className="font-medium text-foreground truncate max-w-[300px]">{meeting.title}</span>
             </nav>
             <div className="flex gap-2">
-              <Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200">
+              <Badge variant="outline" className="bg-muted text-muted-foreground border-input">
                 {template?.name || 'General Meeting'}
               </Badge>
               <Badge variant="outline" className={cn(
                 "capitalize",
-                meeting.status === 'draft' ? "bg-yellow-50 text-yellow-700 border-yellow-200" :
-                meeting.status === 'processing' ? "bg-blue-50 text-blue-700 border-blue-200" :
-                meeting.status === 'ready' ? "bg-green-50 text-green-700 border-green-200" :
-                meeting.status === 'flagged' ? "bg-red-50 text-red-700 border-red-200" :
-                "bg-slate-50 text-slate-700 border-slate-200"
+                meeting.status === 'draft' ? "bg-warning/10 text-warning border-warning/20" :
+                meeting.status === 'processing' ? "bg-info/10 text-info border-info/20" :
+                meeting.status === 'ready' ? "bg-success/10 text-success border-success/20" :
+                meeting.status === 'flagged' ? "bg-destructive/10 text-destructive border-destructive/20" :
+                "bg-muted text-foreground border-input"
               )}>
                 {meeting.status === 'flagged' ? 'Changes Requested' : meeting.status.replace('_', ' ')}
               </Badge>
               {meeting.riskScore && (
                 <Badge variant="outline" className={cn(
                   "capitalize",
-                  meeting.riskScore === 'high' ? "bg-red-50 text-red-700 border-red-200" :
+                  meeting.riskScore === 'high' ? "bg-destructive/10 text-destructive border-destructive/20" :
                   meeting.riskScore === 'medium' ? "bg-amber-50 text-amber-700 border-amber-200" :
                   "bg-emerald-50 text-emerald-700 border-emerald-200"
                 )}>
@@ -65,7 +65,7 @@ export default function MeetingDetailPage() {
                 </Badge>
               )}
               {meeting.processingMode && (
-                <Badge variant="outline" className="bg-slate-50 text-slate-700 border-slate-200">
+                <Badge variant="outline" className="bg-muted text-foreground border-input">
                   Mode: {meeting.processingMode === 'fast' ? 'Fast' : 'Economy'}
                 </Badge>
               )}
@@ -74,8 +74,8 @@ export default function MeetingDetailPage() {
 
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-2xl font-display font-bold text-slate-900 mb-2">{meeting.title}</h1>
-              <div className="flex items-center gap-6 text-sm text-slate-500">
+              <h1 className="text-2xl font-display font-bold text-foreground mb-2">{meeting.title}</h1>
+              <div className="flex items-center gap-6 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
                   {formatDate(meeting.date)} at {formatTime(meeting.date)}
@@ -85,14 +85,14 @@ export default function MeetingDetailPage() {
                   {meeting.duration}
                 </div>
                 {(meeting.uploadedAt || meeting.submittedAt) && (
-                  <div className="flex items-center gap-2 text-xs px-2 py-1 bg-slate-100 rounded-full border border-slate-200">
+                  <div className="flex items-center gap-2 text-xs px-2 py-1 bg-muted rounded-full border border-input">
                     Submitted {formatDate(meeting.uploadedAt || meeting.submittedAt || meeting.date)}
                   </div>
                 )}
                 <div className="flex items-center gap-2">
                   <div className="flex -space-x-2">
                     {meeting.attendees.map((a, i) => (
-                      <div key={i} className="w-6 h-6 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-600" title={a}>
+                      <div key={i} className="w-6 h-6 rounded-full bg-muted border-2 border-background flex items-center justify-center text-[10px] font-bold text-muted-foreground" title={a}>
                         {a.charAt(0)}
                       </div>
                     ))}
@@ -116,7 +116,7 @@ export default function MeetingDetailPage() {
 
 
         {/* Custom Tabs Header */}
-        <div className="px-8 pt-6 pb-0 bg-white border-b border-slate-200 flex-shrink-0">
+        <div className="px-8 pt-6 pb-0 bg-card border-b border-border flex-shrink-0">
           <div className="flex gap-8">
             <button 
               onClick={() => {
@@ -126,8 +126,8 @@ export default function MeetingDetailPage() {
               className={cn(
                 "pb-3 text-sm font-medium flex items-center gap-2 transition-colors border-b-2",
                 activeTab === 'summary' 
-                  ? "border-blue-600 text-blue-600" 
-                  : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
+                  ? "border-primary text-primary" 
+                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/50"
               )}
             >
               <FileText className="w-4 h-4" />
@@ -141,8 +141,8 @@ export default function MeetingDetailPage() {
               className={cn(
                 "pb-3 text-sm font-medium flex items-center gap-2 transition-colors border-b-2",
                 activeTab === 'transcript' 
-                  ? "border-blue-600 text-blue-600" 
-                  : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
+                  ? "border-primary text-primary" 
+                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/50"
               )}
             >
               <Mic className="w-4 h-4" />
@@ -156,13 +156,13 @@ export default function MeetingDetailPage() {
               className={cn(
                 "pb-3 text-sm font-medium flex items-center gap-2 transition-colors border-b-2",
                 activeTab === 'tasks' 
-                  ? "border-blue-600 text-blue-600" 
-                  : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
+                  ? "border-primary text-primary" 
+                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/50"
               )}
             >
               <CheckSquare className="w-4 h-4" />
               Tasks
-              <span className="ml-1 bg-slate-100 px-2 py-0.5 rounded-full text-xs font-bold text-slate-600">
+              <span className="ml-1 bg-muted px-2 py-0.5 rounded-full text-xs font-bold text-muted-foreground">
                 {meeting.tasks.length}
               </span>
             </button>
@@ -172,7 +172,7 @@ export default function MeetingDetailPage() {
         {/* Tab Content */}
         <div className="flex-1 overflow-y-auto p-8">
           <div className={cn("max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500", activeTab !== 'summary' && "hidden")}>
-            <Card variant="glass" className="rounded-xl border border-slate-200 shadow-sm p-8 min-h-[600px] bg-white/80" hoverEffect={false}>
+            <Card variant="glass" className="rounded-xl border border-border shadow-sm p-8 min-h-[600px] bg-card/80" hoverEffect={false}>
               {/* Render Summary with Markdown-like parsing for bold headers */}
               {meeting.summary.split('\n\n').map((block, i) => {
                 const isHeader = block.startsWith('**');
@@ -181,13 +181,13 @@ export default function MeetingDetailPage() {
                   if (match) {
                     return (
                       <div key={i} className="mb-8 last:mb-0 group">
-                        <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-3 flex items-center gap-2 font-display text-blue-900">
+                        <h3 className="text-sm font-bold text-foreground uppercase tracking-wider mb-3 flex items-center gap-2 font-display text-primary">
                           {match[1]}
-                          <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 h-6 text-xs text-blue-600 transition-opacity">
+                          <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 h-6 text-xs text-primary transition-opacity">
                             Regenerate
                           </Button>
                         </h3>
-                        <p className="text-slate-700 leading-relaxed whitespace-pre-line">
+                        <p className="text-foreground/80 leading-relaxed whitespace-pre-line">
                           {match[2]}
                         </p>
                       </div>
@@ -197,14 +197,14 @@ export default function MeetingDetailPage() {
                 
                 return (
                   <div key={i} className="mb-8 last:mb-0">
-                      <p className="text-slate-700 leading-relaxed whitespace-pre-line">{block}</p>
+                      <p className="text-foreground/80 leading-relaxed whitespace-pre-line">{block}</p>
                   </div>
                 );
               })}
             </Card>
           </div>
 
-          <div className={cn("w-full h-[calc(100vh-18rem)] pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500", activeTab !== 'transcript' && "hidden")}>
+          <div className={cn("w-full min-h-0 h-full pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500", activeTab !== 'transcript' && "hidden")}>
             <TranscriptTab 
               recordingId={meeting.id} 
               legacyTranscript={meeting.transcript}
@@ -213,24 +213,24 @@ export default function MeetingDetailPage() {
           </div>
 
           <div className={cn("max-w-3xl mx-auto pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500", activeTab !== 'tasks' && "hidden")}>
-            <Card variant="glass" className="rounded-xl border border-slate-200 shadow-sm overflow-hidden bg-white/80" hoverEffect={false}>
+            <Card variant="glass" className="rounded-xl border border-border shadow-sm overflow-hidden bg-card/80" hoverEffect={false}>
               {meeting.tasks.length > 0 ? meeting.tasks.map((task) => (
-                <div key={task.id} className="p-4 border-b border-slate-100 last:border-0 flex items-center gap-4 hover:bg-slate-50 transition-colors group">
-                  <div className={`w-5 h-5 rounded border flex items-center justify-center cursor-pointer transition-colors ${task.status === 'done' ? 'bg-green-500 border-green-500 text-white' : 'border-slate-300 hover:border-blue-500'}`}>
+                <div key={task.id} className="p-4 border-b border-border last:border-0 flex items-center gap-4 hover:bg-muted/50 transition-colors group">
+                  <div className={`w-5 h-5 rounded border flex items-center justify-center cursor-pointer transition-colors ${task.status === 'done' ? 'bg-success border-success text-white' : 'border-input hover:border-primary'}`}>
                     {task.status === 'done' && <CheckSquare className="w-3.5 h-3.5" />}
                   </div>
                   <div className="flex-1">
-                    <p className={`font-medium ${task.status === 'done' ? 'text-slate-400 line-through' : 'text-slate-900'}`}>
+                    <p className={`font-medium ${task.status === 'done' ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
                       {task.title}
                     </p>
-                    <div className="flex items-center gap-3 mt-1 text-xs text-slate-500">
+                    <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
                         Due {formatDate(task.dueDate)}
                       </span>
                       <span>•</span>
                       <span className="flex items-center gap-1">
-                        <div className="w-4 h-4 rounded-full bg-slate-200 flex items-center justify-center text-[8px] font-bold">
+                        <div className="w-4 h-4 rounded-full bg-muted flex items-center justify-center text-[8px] font-bold">
                           {(personas[task.assigneeId]?.name || task.assigneeId).charAt(0).toUpperCase()}
                         </div>
                         Assigned to {personas[task.assigneeId]?.name || task.assigneeId}
@@ -239,15 +239,15 @@ export default function MeetingDetailPage() {
                   </div>
                   <Badge variant="outline" className={cn(
                     "capitalize",
-                    task.status === 'done' ? "bg-green-50 text-green-700 border-green-200" :
-                    task.status === 'in_progress' ? "bg-blue-50 text-blue-700 border-blue-200" :
-                    "bg-slate-50 text-slate-600 border-slate-200"
+                    task.status === 'done' ? "bg-success/10 text-success border-success/30" :
+                    task.status === 'in_progress' ? "bg-info/10 text-info border-info/30" :
+                    "bg-muted text-muted-foreground border-input"
                   )}>
                     {task.status.replace('_', ' ')}
                   </Badge>
                 </div>
               )) : (
-                <div className="p-12 text-center text-slate-500">
+                <div className="p-12 text-center text-muted-foreground">
                   <CheckSquare className="w-12 h-12 mx-auto mb-4 opacity-20" />
                   <p className="mb-4">No tasks assigned for this meeting.</p>
                   <Button variant="outline" size="sm" className="gap-2">
@@ -259,7 +259,7 @@ export default function MeetingDetailPage() {
             </Card>
             
             <div className="mt-6 flex justify-end">
-                <Button className="gap-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900">
+                <Button className="gap-2 bg-card border border-input text-foreground hover:bg-muted hover:text-foreground">
                   + Add New Task
                 </Button>
             </div>

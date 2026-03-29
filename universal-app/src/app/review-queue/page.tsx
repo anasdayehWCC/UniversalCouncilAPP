@@ -4,7 +4,7 @@ import React, { useMemo, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { CheckCircle2, Clock, FileText, AlertCircle } from 'lucide-react';
 import { Meeting } from '@/types/demo';
 import { cn } from '@/lib/utils';
@@ -15,17 +15,17 @@ import { PENDING_REVIEW_STATUSES } from '@/config/constants';
 import dynamic from 'next/dynamic';
 
 const PendingReviews = dynamic(() => import('@/components/review/PendingReviews'), {
-  loading: () => <div className="h-64 bg-slate-50 rounded-lg animate-pulse" />,
+  loading: () => <div className="h-64 bg-muted rounded-lg animate-pulse motion-reduce:animate-none" />,
   ssr: false
 });
 
 const ChangesRequested = dynamic(() => import('@/components/review/ChangesRequested'), {
-  loading: () => <div className="h-64 bg-slate-50 rounded-lg animate-pulse" />,
+  loading: () => <div className="h-64 bg-muted rounded-lg animate-pulse motion-reduce:animate-none" />,
   ssr: false
 });
 
 const ApprovedHistory = dynamic(() => import('@/components/review/ApprovedHistory'), {
-  loading: () => <div className="h-64 bg-slate-50 rounded-lg animate-pulse" />,
+  loading: () => <div className="h-64 bg-muted rounded-lg animate-pulse motion-reduce:animate-none" />,
   ssr: false
 });
 
@@ -33,6 +33,7 @@ export default function ReviewQueuePage() {
   useRoleGuard(['manager', 'admin']);
   const { meetings, currentUser, updateMeetingStatus, config } = useDemo();
   const [filter, setFilter] = useState<'all' | 'flagged' | 'high'>('all');
+  const [activeTab, setActiveTab] = useState<'pending' | 'changes' | 'approved'>('pending');
 
   const queueCandidates = useMemo(
     () => meetings.filter(m => m.domain === currentUser.domain && PENDING_REVIEW_STATUSES.includes(m.status)),
@@ -105,22 +106,22 @@ export default function ReviewQueuePage() {
         </div>
         <div className="info-rail mt-4">
           <span className="info-rail__item">
-            <span className="info-rail__dot" style={{ background: '#ef4444' }} />
+            <span className="info-rail__dot" style={{ background: 'var(--error)' }} />
             Flagged: {flaggedCount}
           </span>
           <span className="info-rail__item">
-            <span className="info-rail__dot" style={{ background: '#f59e0b' }} />
+            <span className="info-rail__dot" style={{ background: 'var(--warning)' }} />
             High risk: {highRiskCount}
           </span>
           <span className="info-rail__item">
-            <span className="info-rail__dot" style={{ background: '#22c55e' }} />
+            <span className="info-rail__dot" style={{ background: 'var(--success)' }} />
             Approved: {approvedItems.length}
           </span>
         </div>
       </Card>
 
       <div className="flex gap-3 items-center">
-        <span className="text-sm font-medium text-slate-700">Filter:</span>
+        <span className="text-sm font-medium text-muted-foreground">Filter:</span>
         <div className="flex gap-2">
           {[
             { key: 'all', label: 'All' },
@@ -131,7 +132,6 @@ export default function ReviewQueuePage() {
               key={f.key}
               variant={filter === f.key ? 'default' : 'outline'}
               size="sm"
-              className={cn(filter === f.key ? "bg-blue-600 text-white" : "border-slate-200")}
               onClick={() => setFilter(f.key as typeof filter)}
             >
               {f.label}
@@ -140,24 +140,38 @@ export default function ReviewQueuePage() {
         </div>
       </div>
 
-      <Tabs defaultValue="pending" className="w-full">
-        <TabsList className="mb-6">
-          <TabsTrigger value="pending" className="gap-2">
-            <Clock className="w-4 h-4" />
-            Pending Review
-            <Badge variant="secondary" className="ml-1 bg-white text-slate-900 shadow-sm">{filteredQueue.length}</Badge>
-          </TabsTrigger>
-          <TabsTrigger value="changes" className="gap-2">
-            <AlertCircle className="w-4 h-4" />
-            Changes Requested
-            <Badge variant="secondary" className="ml-1 bg-white text-slate-900 shadow-sm">{flaggedCount}</Badge>
-          </TabsTrigger>
-          <TabsTrigger value="approved" className="gap-2">
-            <CheckCircle2 className="w-4 h-4" />
-            Approved History
-            <Badge variant="secondary" className="ml-1 bg-white text-slate-900 shadow-sm">{approvedItems.length}</Badge>
-          </TabsTrigger>
-        </TabsList>
+      <Tabs value={activeTab} className="w-full">
+        <div className="flex gap-1 p-1 bg-muted rounded-xl mb-6">
+          {([
+            { key: 'pending' as const, label: 'Pending Review', icon: <Clock className="w-4 h-4" />, count: filteredQueue.length },
+            { key: 'changes' as const, label: 'Changes Requested', icon: <AlertCircle className="w-4 h-4" />, count: flaggedCount },
+            { key: 'approved' as const, label: 'Approved History', icon: <CheckCircle2 className="w-4 h-4" />, count: approvedItems.length },
+          ] as const).map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+                activeTab === tab.key
+                  ? "bg-card text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {tab.icon}
+              {tab.label}
+              {tab.count > 0 && (
+                <span className={cn(
+                  "text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center",
+                  activeTab === tab.key
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted-foreground/20 text-muted-foreground"
+                )}>
+                  {tab.count}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
 
         <TabsContent value="pending" className="space-y-4">
           <PendingReviews items={filteredQueue} onAction={handleAction} />

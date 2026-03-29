@@ -61,7 +61,7 @@ export function RecordingTimer({
         {/* Recording Indicator Dot */}
         {isRecording && !isPaused && (
           <motion.div
-            className="absolute -top-2 -right-4 w-4 h-4 rounded-full bg-red-500"
+            className="absolute -top-2 -right-4 w-4 h-4 rounded-full bg-destructive"
             animate={{ opacity: [1, 0.5, 1], scale: [1, 1.1, 1] }}
             transition={{ duration: 1, repeat: Infinity }}
           />
@@ -72,7 +72,7 @@ export function RecordingTimer({
       <div className="flex items-center gap-2">
         {isRecording && !isPaused && (
           <motion.span
-            className="text-sm font-medium text-red-500"
+            className="text-sm font-medium text-destructive"
             animate={{ opacity: [1, 0.6, 1] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >

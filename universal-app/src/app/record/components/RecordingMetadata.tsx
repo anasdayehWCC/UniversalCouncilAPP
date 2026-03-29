@@ -156,7 +156,7 @@ export function RecordingMetadata({
         >
           <Icon className="w-4 h-4 text-muted-foreground" />
           {field.label}
-          {field.required && <span className="text-red-500">*</span>}
+          {field.required && <span className="text-destructive">*</span>}
         </label>
 
         {field.type === 'text' && (
@@ -262,7 +262,7 @@ export function RecordingMetadata({
             <FileText className="w-5 h-5 text-primary" />
             <span className="font-medium">Meeting Details</span>
             {localMetadata.caseReference && (
-              <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/20 text-green-600 dark:text-green-400">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-success/20 text-success">
                 <Check className="w-3 h-3 inline mr-1" />
                 {localMetadata.caseReference}
               </span>

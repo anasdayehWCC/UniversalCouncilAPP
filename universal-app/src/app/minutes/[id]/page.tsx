@@ -7,7 +7,6 @@ import { useMinutes } from '@/hooks/useMinutes';
 import { MinuteEditor } from '@/components/minutes/MinuteEditor';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
 import { 
   ArrowLeft, 
   Loader2,
@@ -61,12 +60,12 @@ export default function MinuteDetailPage() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+      <div className="min-h-0 bg-background">
         <div className="max-w-5xl mx-auto px-4 py-8">
           <div className="flex items-center justify-center py-24">
             <div className="text-center">
-              <Loader2 className="w-8 h-8 text-[var(--primary)] animate-spin mx-auto mb-4" />
-              <p className="text-slate-500">Loading minute...</p>
+              <Loader2 className="w-8 h-8 text-[var(--primary)] animate-spin motion-reduce:animate-none mx-auto mb-4" />
+              <p className="text-muted-foreground">Loading minute...</p>
             </div>
           </div>
         </div>
@@ -77,14 +76,14 @@ export default function MinuteDetailPage() {
   // Error state
   if (error && !minute) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+      <div className="min-h-0 bg-background">
         <div className="max-w-5xl mx-auto px-4 py-8">
           <Card variant="glass" className="p-12 text-center">
             <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
+            <h2 className="text-xl font-semibold text-foreground mb-2">
               Failed to load minute
             </h2>
-            <p className="text-slate-500 mb-4">{error.message}</p>
+            <p className="text-muted-foreground mb-4">{error.message}</p>
             <div className="flex items-center justify-center gap-3">
               <Button variant="outline" onClick={() => router.back()}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -103,14 +102,14 @@ export default function MinuteDetailPage() {
   // Not found state
   if (!minute) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+      <div className="min-h-0 bg-background">
         <div className="max-w-5xl mx-auto px-4 py-8">
           <Card variant="glass" className="p-12 text-center">
-            <FileText className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
+            <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-foreground mb-2">
               Minute not found
             </h2>
-            <p className="text-slate-500 mb-4">
+            <p className="text-muted-foreground mb-4">
               The minute you are looking for does not exist or has been removed.
             </p>
             <Link href="/minutes">
@@ -126,15 +125,15 @@ export default function MinuteDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+    <div className="min-h-0 bg-background">
       <div className="max-w-5xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-slate-500 mb-6">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
           <Link href="/minutes" className="hover:text-[var(--primary)] transition-colors">
             Minutes
           </Link>
           <span>/</span>
-          <span className="text-slate-700 dark:text-slate-300">{minute.title}</span>
+          <span className="text-foreground">{minute.title}</span>
         </div>
 
         {/* Editor */}

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, AlertTriangle, Home, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
+import { ShellPage } from '@/components/layout';
 
 export default function MinuteError({
   error,
@@ -14,7 +15,7 @@ export default function MinuteError({
   reset: () => void;
 }) {
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50">
+    <ShellPage className="flex items-center justify-center bg-background" padded={false} contentClassName="flex h-full items-center justify-center p-6">
       <Card className="max-w-lg w-full">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center">
@@ -56,6 +57,6 @@ export default function MinuteError({
           </div>
         </CardContent>
       </Card>
-    </div>
+    </ShellPage>
   );
 }

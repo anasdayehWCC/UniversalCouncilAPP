@@ -33,8 +33,8 @@ const QUALITY_ICONS: Record<AudioQuality, React.ElementType> = {
 };
 
 const QUALITY_COLORS: Record<AudioQuality, string> = {
-  low: 'text-green-500',
-  medium: 'text-blue-500',
+  low: 'text-success',
+  medium: 'text-info',
   high: 'text-purple-500',
   ultra: 'text-amber-500',
 };
@@ -111,8 +111,8 @@ export function QualitySettings({
               'absolute z-50 w-72 mt-2',
               'rounded-xl overflow-hidden',
               'backdrop-blur-xl',
-              'bg-white/90 dark:bg-slate-900/90',
-              'border border-white/30 dark:border-slate-700/50',
+              'bg-card/90',
+              'border border-border/50',
               'shadow-xl'
             )}
           >
@@ -164,7 +164,7 @@ export function QualitySettings({
 
             {/* Estimated size for current recording */}
             {estimatedDuration > 0 && (
-              <div className="border-t border-slate-200 dark:border-slate-700 p-3 bg-muted/50">
+              <div className="border-t border-border p-3 bg-muted/50">
                 <p className="text-xs text-muted-foreground">
                   Estimated size for {Math.floor(estimatedDuration / 60)}:
                   {String(estimatedDuration % 60).padStart(2, '0')}:{' '}

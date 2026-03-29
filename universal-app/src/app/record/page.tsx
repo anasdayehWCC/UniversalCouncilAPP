@@ -137,9 +137,9 @@ function RecordingCompleteScreen({
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', delay: 0.2 }}
-          className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto"
+          className="w-20 h-20 bg-success/20 rounded-full flex items-center justify-center mx-auto"
         >
-          <CheckCircle2 className="w-10 h-10 text-green-500" />
+          <CheckCircle2 className="w-10 h-10 text-success" />
         </motion.div>
 
         <div>
@@ -324,7 +324,7 @@ export default function RecordPage() {
   const isPaused = recorder.state === 'paused';
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-0 pb-20">
       {/* Header */}
       <header className="sticky top-0 z-40 backdrop-blur-xl bg-background/80 border-b border-border/50">
         <div className="max-w-4xl mx-auto px-4 py-4">
@@ -333,6 +333,7 @@ export default function RecordPage() {
               <Button
                 variant="ghost"
                 size="icon"
+                aria-label="Go back"
                 onClick={() => {
                   if (isRecordingActive) {
                     if (confirm('Are you sure you want to leave? Recording will be cancelled.')) {
@@ -359,10 +360,10 @@ export default function RecordPage() {
               className={cn(
                 'flex items-center gap-2 px-3 py-1.5 rounded-full text-sm',
                 networkState === 'online'
-                  ? 'bg-green-500/10 text-green-600 dark:text-green-400'
+                  ? 'bg-success/10 text-success'
                   : networkState === 'offline'
-                  ? 'bg-red-500/10 text-red-600 dark:text-red-400'
-                  : 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                  ? 'bg-destructive/10 text-destructive'
+                  : 'bg-warning/10 text-warning'
               )}
             >
               {networkState === 'online' ? (
@@ -491,11 +492,11 @@ export default function RecordPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
             >
-              <Card className="p-4 bg-red-500/10 border-red-500/20">
+              <Card className="p-4 bg-destructive/10 border-destructive/20">
                 <div className="flex items-start gap-3">
-                  <AlertTriangle className="w-5 h-5 text-red-500 mt-0.5" />
+                  <AlertTriangle className="w-5 h-5 text-destructive mt-0.5" />
                   <div className="flex-1">
-                    <p className="font-medium text-red-600 dark:text-red-400">
+                    <p className="font-medium text-destructive">
                       {recorder.error.message}
                     </p>
                     {recorder.error.recoverySuggestion && (

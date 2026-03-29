@@ -131,15 +131,15 @@ export default function MinutesListPage() {
   }), []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+    <div className="min-h-0 bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white font-display">
+            <h1 className="text-3xl font-bold text-foreground font-display">
               Meeting Minutes
             </h1>
-            <p className="text-slate-500 mt-1">
+            <p className="text-muted-foreground mt-1">
               View and manage your generated meeting minutes
             </p>
           </div>
@@ -150,11 +150,11 @@ export default function MinutesListPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {[
-            { label: 'Total Minutes', count: statusCounts.all, icon: FileText, color: 'text-slate-600' },
-            { label: 'Drafts', count: statusCounts.drafts, icon: Clock, color: 'text-amber-600' },
-            { label: 'Pending Review', count: statusCounts.pending, icon: AlertTriangle, color: 'text-blue-600' },
+            { label: 'Total Minutes', count: statusCounts.all, icon: FileText, color: 'text-muted-foreground' },
+            { label: 'Drafts', count: statusCounts.drafts, icon: Clock, color: 'text-warning' },
+            { label: 'Pending Review', count: statusCounts.pending, icon: AlertTriangle, color: 'text-info' },
             { label: 'Completed', count: statusCounts.completed, icon: CheckSquare, color: 'text-emerald-600' }
           ].map((stat) => (
             <Card key={stat.label} variant="glass" className="p-4">
@@ -166,10 +166,10 @@ export default function MinutesListPage() {
                   <stat.icon className={cn('w-5 h-5', stat.color)} />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                  <p className="text-2xl font-bold text-foreground">
                     {stat.count}
                   </p>
-                  <p className="text-xs text-slate-500">{stat.label}</p>
+                  <p className="text-xs text-muted-foreground">{stat.label}</p>
                 </div>
               </div>
             </Card>
@@ -179,7 +179,7 @@ export default function MinutesListPage() {
         {/* Filters and Search */}
         <div className="flex items-center gap-4 mb-6">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
               placeholder="Search minutes by title or case..."
@@ -187,8 +187,8 @@ export default function MinutesListPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className={cn(
                 'w-full pl-10 pr-4 py-2.5 rounded-lg border',
-                'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700',
-                'text-slate-900 dark:text-white placeholder:text-slate-400',
+                'bg-card border-input',
+                'text-foreground placeholder:text-muted-foreground',
                 'focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent'
               )}
             />
@@ -221,8 +221,8 @@ export default function MinutesListPage() {
         <div className="space-y-3">
           {filteredMinutes.length === 0 ? (
             <Card variant="glass" className="p-12 text-center">
-              <FileText className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
-              <p className="text-slate-500">No minutes found matching your criteria</p>
+              <FileText className="w-12 h-12 mx-auto text-muted-foreground/50 mb-4" />
+              <p className="text-muted-foreground">No minutes found matching your criteria</p>
               <Button variant="link" className="mt-2" onClick={() => { setSearchQuery(''); setActiveTab('all'); }}>
                 Clear filters
               </Button>
@@ -251,21 +251,21 @@ export default function MinutesListPage() {
                     {/* Content */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 mb-1">
-                        <h3 className="text-base font-semibold text-slate-900 dark:text-white truncate">
+                        <h3 className="text-base font-semibold text-foreground truncate">
                           {minute.title}
                         </h3>
                         <MinuteStatusBadge status={minute.status} size="sm" />
                         {minute.hasRisks && (
-                          <Badge variant="outline" className="bg-red-50 text-red-600 border-red-200">
+                          <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20">
                             <AlertTriangle className="w-3 h-3 mr-1" />
                             Risks
                           </Badge>
                         )}
                       </div>
-                      <p className="text-sm text-slate-500 mb-2">
+                      <p className="text-sm text-muted-foreground mb-2">
                         {minute.caseName} • {minute.templateName}
                       </p>
-                      <div className="flex items-center gap-4 text-xs text-slate-400">
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground/80">
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
                           {formatDate(minute.date)}
@@ -286,7 +286,7 @@ export default function MinutesListPage() {
                     </div>
 
                     {/* Arrow */}
-                    <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-slate-500 transition-colors" />
+                    <ChevronRight className="w-5 h-5 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors" />
                   </div>
                 </Card>
               </Link>

@@ -217,7 +217,7 @@ function CircleVisualizer({
       <motion.div
         className={cn(
           'w-4 h-4 rounded-full',
-          isRecording && !isPaused ? 'bg-red-500' : 'bg-muted-foreground/30'
+          isRecording && !isPaused ? 'bg-destructive' : 'bg-muted-foreground/30'
         )}
         animate={
           isRecording && !isPaused
@@ -241,8 +241,8 @@ function LevelMeter({ audioLevel }: { audioLevel: AudioLevelData }) {
         <motion.div
           className={cn(
             'h-full rounded-full',
-            audioLevel.isClipping ? 'bg-red-500' : 
-            audioLevel.level > 0.7 ? 'bg-amber-500' : 
+            audioLevel.isClipping ? 'bg-destructive' : 
+            audioLevel.level > 0.7 ? 'bg-warning' : 
             'bg-gradient-to-r from-primary to-accent'
           )}
           animate={{ width: `${Math.min(audioLevel.level * 100, 100)}%` }}
@@ -308,13 +308,13 @@ export function AudioVisualizer({
       {/* Status indicators */}
       <div className="flex items-center gap-4 text-xs text-muted-foreground">
         {audioLevel.isClipping && (
-          <span className="text-red-500 font-medium">⚠ Audio too loud</span>
+          <span className="text-destructive font-medium">⚠ Audio too loud</span>
         )}
         {audioLevel.isTooQuiet && isRecording && !isPaused && (
-          <span className="text-amber-500 font-medium">⚠ Audio too quiet</span>
+          <span className="text-warning font-medium">⚠ Audio too quiet</span>
         )}
         {!audioLevel.isClipping && !audioLevel.isTooQuiet && isRecording && !isPaused && (
-          <span className="text-green-500 font-medium">✓ Good level</span>
+          <span className="text-success font-medium">✓ Good level</span>
         )}
       </div>
     </div>

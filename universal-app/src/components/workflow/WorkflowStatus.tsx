@@ -166,10 +166,10 @@ export function WorkflowStatus({
             'inline-flex items-center gap-1 rounded-full font-medium',
             sizeClasses[size],
             slaInfo.breached
-              ? 'bg-red-100 text-red-700'
+              ? 'bg-destructive/10 text-destructive'
               : slaInfo.remainingMs < 4 * 60 * 60 * 1000 // Less than 4 hours
-              ? 'bg-amber-100 text-amber-700'
-              : 'bg-slate-100 text-slate-600'
+              ? 'bg-warning/10 text-warning'
+              : 'bg-muted text-muted-foreground'
           )}
         >
           {slaInfo.breached ? <Icons.AlertTriangle /> : <Icons.Clock />}
@@ -235,11 +235,11 @@ export function WorkflowProgress({ currentStep, className }: WorkflowProgressPro
             <div
               className={cn(
                 'w-2.5 h-2.5 rounded-full transition-colors',
-                isComplete && 'bg-green-500',
+                isComplete && 'bg-success',
                 isActive && config.bgColor.replace('bg-', 'bg-'),
                 isActive && 'ring-2 ring-offset-2',
                 isActive && config.borderColor.replace('border-', 'ring-'),
-                isPending && 'bg-slate-200'
+                isPending && 'bg-border'
               )}
               title={config.label}
             />
@@ -248,7 +248,7 @@ export function WorkflowProgress({ currentStep, className }: WorkflowProgressPro
               <div
                 className={cn(
                   'w-4 h-0.5',
-                  isComplete ? 'bg-green-500' : 'bg-slate-200'
+                  isComplete ? 'bg-success' : 'bg-border'
                 )}
               />
             )}

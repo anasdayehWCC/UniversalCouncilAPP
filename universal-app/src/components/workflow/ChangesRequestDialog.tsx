@@ -42,13 +42,13 @@ const FEEDBACK_TEMPLATES = [
 // ============================================================================
 
 const AlertCircleIcon = () => (
-  <svg className="w-12 h-12 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <svg className="w-12 h-12 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
   </svg>
 );
 
 const XCircleIcon = () => (
-  <svg className="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <svg className="w-12 h-12 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
   </svg>
 );
@@ -148,7 +148,7 @@ export function ChangesRequestDialog({
               {/* Close Button */}
               <button
                 onClick={handleCancel}
-                className="absolute top-4 right-4 p-1 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors"
+                className="absolute top-4 right-4 p-1 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted transition-colors"
               >
                 <XIcon />
               </button>
@@ -167,19 +167,19 @@ export function ChangesRequestDialog({
                 </div>
 
                 {/* Title */}
-                <h2 className="text-xl font-semibold text-center text-slate-900 mb-2">
+                <h2 className="text-xl font-semibold text-center text-foreground mb-2">
                   {dialogTitle}
                 </h2>
 
                 {/* Description */}
-                <p className="text-center text-slate-600 mb-6">
+                <p className="text-center text-muted-foreground mb-6">
                   {dialogDescription}
                 </p>
 
                 {/* Quick Feedback Templates */}
                 {!isRejection && (
                   <div className="mb-4">
-                    <p className="text-xs font-medium text-slate-500 mb-2">Quick feedback:</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-2">Quick feedback:</p>
                     <div className="flex flex-wrap gap-2">
                       {FEEDBACK_TEMPLATES.map((template) => (
                         <button
@@ -187,8 +187,8 @@ export function ChangesRequestDialog({
                           onClick={() => handleTemplateClick(template.text)}
                           className={cn(
                             'px-2 py-1 text-xs rounded-full border transition-colors',
-                            'border-slate-200 text-slate-600',
-                            'hover:border-amber-300 hover:bg-amber-50 hover:text-amber-700'
+                            'border-border text-muted-foreground',
+                            'hover:border-warning/50 hover:bg-warning/10 hover:text-warning'
                           )}
                         >
                           {template.label}
@@ -202,9 +202,9 @@ export function ChangesRequestDialog({
                 <div className="mb-6">
                   <label
                     htmlFor="feedback-input"
-                    className="block text-sm font-medium text-slate-700 mb-2"
+                    className="block text-sm font-medium text-foreground mb-2"
                   >
-                    {isRejection ? 'Reason for rejection' : 'Feedback'} <span className="text-red-500">*</span>
+                    {isRejection ? 'Reason for rejection' : 'Feedback'} <span className="text-destructive">*</span>
                   </label>
                   <textarea
                     id="feedback-input"
@@ -222,16 +222,16 @@ export function ChangesRequestDialog({
                     className={cn(
                       'w-full px-3 py-2 border rounded-lg',
                       'focus:outline-none focus:ring-2 focus:border-transparent',
-                      'placeholder:text-slate-400 resize-none',
+                      'placeholder:text-muted-foreground resize-none',
                       error
-                        ? 'border-red-300 focus:ring-red-500'
+                        ? 'border-destructive/50 focus:ring-destructive'
                         : isRejection
-                        ? 'border-slate-200 focus:ring-red-500'
-                        : 'border-slate-200 focus:ring-amber-500'
+                        ? 'border-input focus:ring-destructive'
+                        : 'border-input focus:ring-warning'
                     )}
                   />
                   {error && (
-                    <p className="mt-1 text-sm text-red-500">{error}</p>
+                    <p className="mt-1 text-sm text-destructive">{error}</p>
                   )}
                 </div>
 
@@ -249,14 +249,14 @@ export function ChangesRequestDialog({
                     variant={isRejection ? 'destructive' : 'default'}
                     className={cn(
                       'flex-1',
-                      !isRejection && 'bg-amber-500 hover:bg-amber-600'
+                      !isRejection && 'bg-warning hover:bg-warning/90'
                     )}
                     onClick={handleConfirm}
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? (
                       <span className="flex items-center gap-2">
-                        <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 animate-spin motion-reduce:animate-none" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                         </svg>
@@ -275,13 +275,13 @@ export function ChangesRequestDialog({
               <div
                 className={cn(
                   'px-6 py-3 border-t',
-                  isRejection ? 'bg-red-50 border-red-100' : 'bg-amber-50 border-amber-100'
+                  isRejection ? 'bg-destructive/10 border-destructive/20' : 'bg-warning/10 border-warning/20'
                 )}
               >
                 <p
                   className={cn(
                     'text-xs text-center',
-                    isRejection ? 'text-red-700' : 'text-amber-700'
+                    isRejection ? 'text-destructive' : 'text-warning'
                   )}
                 >
                   {isRejection

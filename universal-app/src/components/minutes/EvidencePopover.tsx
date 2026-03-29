@@ -48,7 +48,7 @@ export function EvidencePopover({
       >
         <Quote className="w-3 h-3" />
         <span className="max-w-[100px] truncate">{evidence.text.substring(0, 20)}...</span>
-        <span className="text-slate-400">{evidence.timestamp}</span>
+        <span className="text-muted-foreground">{evidence.timestamp}</span>
       </button>
 
       {/* Popover Content */}
@@ -64,17 +64,17 @@ export function EvidencePopover({
           <div className={cn(
             'absolute z-50 top-full left-0 mt-2 w-80',
             'rounded-xl shadow-xl border',
-            'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700',
+            'bg-card border-border',
             // Glassmorphism
-            'backdrop-blur-xl bg-white/95 dark:bg-slate-900/95',
+            'backdrop-blur-xl bg-card/95',
             'animate-in fade-in-0 zoom-in-95 slide-in-from-top-2',
             'duration-200'
           )}>
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border/50">
               <div className="flex items-center gap-2">
                 <Quote className="w-4 h-4 text-[var(--primary)]" />
-                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                <span className="text-sm font-medium text-foreground">
                   Transcript Citation
                 </span>
               </div>
@@ -91,22 +91,22 @@ export function EvidencePopover({
             {/* Quote Content */}
             <div className="p-4">
               <blockquote className={cn(
-                'relative pl-4 pr-2 py-2 text-sm text-slate-700 dark:text-slate-300',
-                'border-l-2 border-[var(--primary)] bg-slate-50 dark:bg-slate-800/50 rounded-r-lg',
+                'relative pl-4 pr-2 py-2 text-sm text-foreground',
+                'border-l-2 border-[var(--primary)] bg-muted/50 rounded-r-lg',
                 'italic'
               )}>
                 "{evidence.text}"
               </blockquote>
 
               {/* Metadata */}
-              <div className="flex items-center gap-4 mt-3 text-xs text-slate-500">
+              <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <Clock className="w-3 h-3" />
                   <span>{formatTime(evidence.transcriptStart)} - {formatTime(evidence.transcriptEnd)}</span>
                 </div>
                 {evidence.speaker && (
                   <div className="flex items-center gap-1">
-                    <span className="w-4 h-4 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[10px] font-medium">
+                    <span className="w-4 h-4 rounded-full bg-muted flex items-center justify-center text-[10px] font-medium">
                       {evidence.speaker[0]}
                     </span>
                     <span>{evidence.speaker}</span>
@@ -116,7 +116,7 @@ export function EvidencePopover({
             </div>
 
             {/* Actions */}
-            <div className="flex items-center gap-2 px-4 py-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 rounded-b-xl">
+            <div className="flex items-center gap-2 px-4 py-3 border-t border-border/50 bg-muted/30 rounded-b-xl">
               {onPlayAudio && (
                 <Button
                   variant="outline"
@@ -144,7 +144,7 @@ export function EvidencePopover({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="w-8 h-8 text-slate-400 hover:text-red-500 hover:bg-red-50"
+                  className="w-8 h-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                   onClick={() => {
                     onRemove();
                     setIsOpen(false);

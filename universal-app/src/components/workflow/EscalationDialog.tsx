@@ -157,7 +157,7 @@ export function EscalationDialog({
               {/* Close Button */}
               <button
                 onClick={handleCancel}
-                className="absolute top-4 right-4 p-1 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors z-10"
+                className="absolute top-4 right-4 p-1 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted transition-colors z-10"
               >
                 <XIcon />
               </button>
@@ -176,19 +176,19 @@ export function EscalationDialog({
                 </div>
 
                 {/* Title */}
-                <h2 className="text-xl font-semibold text-center text-slate-900 mb-2">
+                <h2 className="text-xl font-semibold text-center text-foreground mb-2">
                   Escalate for Review
                 </h2>
 
                 {/* Description */}
-                <p className="text-center text-slate-600 mb-6">
+                <p className="text-center text-muted-foreground mb-6">
                   Escalate this to a senior manager for additional guidance or decision.
                 </p>
 
                 {/* Reason Selection */}
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-slate-700 mb-3">
-                    Reason for escalation <span className="text-red-500">*</span>
+                  <label className="block text-sm font-medium text-foreground mb-3">
+                    Reason for escalation <span className="text-destructive">*</span>
                   </label>
                   <div className="space-y-2">
                     {(Object.entries(ESCALATION_REASONS) as [EscalationReason, string][]).map(
@@ -202,16 +202,16 @@ export function EscalationDialog({
                           className={cn(
                             'w-full flex items-center gap-3 px-4 py-3 rounded-lg border text-left transition-all',
                             selectedReason === key
-                              ? 'border-violet-500 bg-violet-50 text-violet-900'
-                              : 'border-slate-200 hover:border-violet-300 hover:bg-slate-50'
+                                ? 'border-primary bg-primary/10 text-foreground'
+                                : 'border-input hover:border-primary/50 hover:bg-muted'
                           )}
                         >
                           <div
                             className={cn(
                               'w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors',
                               selectedReason === key
-                                ? 'border-violet-500 bg-violet-500'
-                                : 'border-slate-300'
+                                  ? 'border-primary bg-primary text-primary-foreground'
+                                  : 'border-input'
                             )}
                           >
                             {selectedReason === key && (
@@ -224,13 +224,13 @@ export function EscalationDialog({
                     )}
                   </div>
                   {error && (
-                    <p className="mt-2 text-sm text-red-500">{error}</p>
+                    <p className="mt-2 text-sm text-destructive">{error}</p>
                   )}
                 </div>
 
                 {/* Senior Manager Selection */}
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-slate-700 mb-3">
+                  <label className="block text-sm font-medium text-foreground mb-3">
                     Escalate to (optional)
                   </label>
                   <div className="grid grid-cols-1 gap-2">
@@ -245,16 +245,16 @@ export function EscalationDialog({
                         className={cn(
                           'flex items-center gap-3 px-4 py-3 rounded-lg border text-left transition-all',
                           selectedManager === manager.id
-                            ? 'border-violet-500 bg-violet-50'
-                            : 'border-slate-200 hover:border-violet-300 hover:bg-slate-50'
+                              ? 'border-primary bg-primary/10'
+                              : 'border-input hover:border-primary/50 hover:bg-muted'
                         )}
                       >
                         <div
                           className={cn(
                             'w-10 h-10 rounded-full flex items-center justify-center',
                             selectedManager === manager.id
-                              ? 'bg-violet-100 text-violet-600'
-                              : 'bg-slate-100 text-slate-400'
+                              ? 'bg-primary/20 text-primary'
+                              : 'bg-muted text-muted-foreground'
                           )}
                         >
                           <UserIcon />
@@ -264,17 +264,17 @@ export function EscalationDialog({
                             className={cn(
                               'font-medium text-sm',
                               selectedManager === manager.id
-                                ? 'text-violet-900'
-                                : 'text-slate-900'
+                                ? 'text-foreground'
+                                : 'text-foreground'
                             )}
                           >
                             {manager.name}
                           </p>
-                          <p className="text-xs text-slate-500">{manager.role}</p>
+                          <p className="text-xs text-muted-foreground">{manager.role}</p>
                         </div>
                         {selectedManager === manager.id && (
                           <div className="ml-auto">
-                            <div className="w-5 h-5 rounded-full bg-violet-500 flex items-center justify-center text-white">
+                            <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
                               <CheckIcon />
                             </div>
                           </div>
@@ -282,7 +282,7 @@ export function EscalationDialog({
                       </button>
                     ))}
                   </div>
-                  <p className="mt-2 text-xs text-slate-500">
+                  <p className="mt-2 text-xs text-muted-foreground">
                     Leave empty to notify all available senior managers
                   </p>
                 </div>
@@ -291,7 +291,7 @@ export function EscalationDialog({
                 <div className="mb-6">
                   <label
                     htmlFor="escalation-comment"
-                    className="block text-sm font-medium text-slate-700 mb-2"
+                    className="block text-sm font-medium text-foreground mb-2"
                   >
                     Additional context (optional)
                   </label>
@@ -302,9 +302,9 @@ export function EscalationDialog({
                     placeholder="Provide any additional context that would help with the review..."
                     rows={3}
                     className={cn(
-                      'w-full px-3 py-2 border border-slate-200 rounded-lg',
-                      'focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent',
-                      'placeholder:text-slate-400 resize-none'
+                      'w-full px-3 py-2 border border-input rounded-lg',
+                      'focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent',
+                      'placeholder:text-muted-foreground resize-none'
                     )}
                   />
                 </div>
@@ -321,13 +321,13 @@ export function EscalationDialog({
                   </Button>
                   <Button
                     variant="default"
-                    className="flex-1 bg-violet-600 hover:bg-violet-700"
+                    className="flex-1 bg-primary hover:bg-primary/90"
                     onClick={handleConfirm}
                     disabled={isSubmitting || !selectedReason}
                   >
                     {isSubmitting ? (
                       <span className="flex items-center gap-2">
-                        <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 animate-spin motion-reduce:animate-none" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                         </svg>

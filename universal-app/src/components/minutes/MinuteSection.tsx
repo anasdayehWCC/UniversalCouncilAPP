@@ -90,14 +90,14 @@ export function MinuteSection({
       // Handle list items
       if (line.startsWith('- ')) {
         return (
-          <li key={i} className="ml-4 list-disc text-slate-700 dark:text-slate-300">
+          <li key={i} className="ml-4 list-disc text-foreground/80">
             {renderInlineMarkdown(line.substring(2))}
           </li>
         );
       }
       if (line.match(/^\d+\. /)) {
         return (
-          <li key={i} className="ml-4 list-decimal text-slate-700 dark:text-slate-300">
+          <li key={i} className="ml-4 list-decimal text-foreground/80">
             {renderInlineMarkdown(line.replace(/^\d+\. /, ''))}
           </li>
         );
@@ -106,7 +106,7 @@ export function MinuteSection({
         return <br key={i} />;
       }
       return (
-        <p key={i} className="text-slate-700 dark:text-slate-300 leading-relaxed">
+        <p key={i} className="text-foreground/80 leading-relaxed">
           {renderInlineMarkdown(line)}
         </p>
       );
@@ -133,21 +133,21 @@ export function MinuteSection({
     <div
       className={cn(
         'group relative rounded-xl border transition-all duration-200',
-        'bg-white dark:bg-slate-900',
+        'bg-card',
         isDragging 
           ? 'shadow-lg border-[var(--accent)] ring-2 ring-[var(--accent)]/20' 
-          : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600',
+          : 'border-border hover:border-input',
         isEditing && 'ring-1 ring-[var(--primary)]/10',
         className
       )}
     >
       {/* Section Header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-100 dark:border-slate-800">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-border/50">
         {/* Drag Handle */}
         {isEditing && (
           <div 
             {...dragHandleProps}
-            className="cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+            className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground"
           >
             <GripVertical className="w-4 h-4" />
           </div>
@@ -169,20 +169,20 @@ export function MinuteSection({
             onChange={handleTitleChange}
             className={cn(
               'flex-1 text-base font-semibold bg-transparent border-none outline-none',
-              'text-slate-900 dark:text-white',
-              'placeholder:text-slate-400'
+              'text-foreground',
+              'placeholder:text-muted-foreground'
             )}
             placeholder={typeConfig.label}
           />
         ) : (
-          <h3 className="flex-1 text-base font-semibold text-slate-900 dark:text-white">
+          <h3 className="flex-1 text-base font-semibold text-foreground">
             {section.title}
           </h3>
         )}
 
         {/* Evidence Count */}
         {section.evidence.length > 0 && (
-          <span className="flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-slate-500 bg-slate-100 dark:bg-slate-800 rounded-full">
+          <span className="flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-muted-foreground bg-muted rounded-full">
             <Quote className="w-3 h-3" />
             {section.evidence.length}
           </span>
@@ -194,6 +194,8 @@ export function MinuteSection({
           size="icon"
           className="w-8 h-8"
           onClick={() => setIsCollapsed(!isCollapsed)}
+          aria-label={isCollapsed ? 'Expand section' : 'Collapse section'}
+          aria-expanded={!isCollapsed}
         >
           {isCollapsed ? (
             <ChevronDown className="w-4 h-4" />
@@ -207,8 +209,9 @@ export function MinuteSection({
           <Button
             variant="ghost"
             size="icon"
-            className="w-8 h-8 text-slate-400 hover:text-red-500 hover:bg-red-50"
+            className="w-8 h-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
             onClick={onRemove}
+            aria-label="Remove section"
           >
             <Trash2 className="w-4 h-4" />
           </Button>
@@ -225,9 +228,9 @@ export function MinuteSection({
               onChange={handleContentChange}
               className={cn(
                 'w-full min-h-[100px] p-3 rounded-lg border resize-none',
-                'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700',
-                'text-slate-700 dark:text-slate-300',
-                'placeholder:text-slate-400',
+                'bg-muted border-input',
+                'text-foreground',
+                'placeholder:text-muted-foreground',
                 'focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent',
                 'font-mono text-sm leading-relaxed'
               )}
@@ -241,10 +244,10 @@ export function MinuteSection({
 
           {/* Evidence Citations */}
           {section.evidence.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+            <div className="mt-4 pt-4 border-t border-border/50">
               <div className="flex items-center gap-2 mb-2">
-                <Quote className="w-4 h-4 text-slate-400" />
-                <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                <Quote className="w-4 h-4 text-muted-foreground" />
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                   Supporting Evidence
                 </span>
               </div>

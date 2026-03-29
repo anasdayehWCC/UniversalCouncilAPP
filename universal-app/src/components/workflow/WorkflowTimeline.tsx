@@ -127,7 +127,7 @@ function TimelineItem({ entry, isFirst, isLast, compact }: TimelineItemProps) {
     >
       {/* Timeline Line */}
       {!isLast && (
-        <div className="absolute left-[15px] top-8 bottom-0 w-0.5 bg-slate-200" />
+        <div className="absolute left-[15px] top-8 bottom-0 w-0.5 bg-border" />
       )}
 
       {/* Icon Node */}
@@ -145,17 +145,17 @@ function TimelineItem({ entry, isFirst, isLast, compact }: TimelineItemProps) {
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <p className={cn('font-medium text-slate-900', compact && 'text-sm')}>
+            <p className={cn('font-medium text-foreground', compact && 'text-sm')}>
               {actionConfig.label}
             </p>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-muted-foreground">
               by <span className="font-medium">{entry.actor.name}</span>
               {entry.actor.role && (
-                <span className="text-slate-400"> · {formatRole(entry.actor.role)}</span>
+                <span className="text-muted-foreground/70"> · {formatRole(entry.actor.role)}</span>
               )}
             </p>
           </div>
-          <div className="text-right text-xs text-slate-400 whitespace-nowrap">
+          <div className="text-right text-xs text-muted-foreground whitespace-nowrap">
             <div>{formattedDate}</div>
             <div>{formattedTime}</div>
           </div>
@@ -163,25 +163,25 @@ function TimelineItem({ entry, isFirst, isLast, compact }: TimelineItemProps) {
 
         {/* Comment */}
         {entry.comment && !compact && (
-          <div className="mt-2 p-3 bg-slate-50 rounded-lg border border-slate-100">
-            <p className="text-sm text-slate-700 whitespace-pre-wrap">{entry.comment}</p>
+          <div className="mt-2 p-3 bg-muted rounded-lg border border-border">
+            <p className="text-sm text-foreground whitespace-pre-wrap">{entry.comment}</p>
           </div>
         )}
         {entry.comment && compact && (
-          <p className="mt-1 text-sm text-slate-500 truncate">{entry.comment}</p>
+          <p className="mt-1 text-sm text-muted-foreground truncate">{entry.comment}</p>
         )}
 
         {/* Metadata */}
         {entry.metadata && !compact && (
           <div className="mt-2 flex flex-wrap gap-2">
             {entry.metadata.assigneeName && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-full">
+              <span className="inline-flex items-center gap-1 px-2 py-1 bg-info/10 text-info text-xs rounded-full">
                 <Icons.UserPlus />
                 Assigned to {entry.metadata.assigneeName}
               </span>
             )}
             {entry.metadata.escalationReason && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 bg-amber-50 text-amber-700 text-xs rounded-full">
+              <span className="inline-flex items-center gap-1 px-2 py-1 bg-warning/10 text-warning text-xs rounded-full">
                 <Icons.ArrowUpCircle />
                 Escalated
               </span>
@@ -191,7 +191,7 @@ function TimelineItem({ entry, isFirst, isLast, compact }: TimelineItemProps) {
 
         {/* Step Transition Badge */}
         {!compact && (
-          <div className="mt-2 flex items-center gap-2 text-xs text-slate-400">
+          <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
             <span className={cn('px-2 py-0.5 rounded', WORKFLOW_STEP_CONFIG[entry.fromStep].bgColor)}>
               {WORKFLOW_STEP_CONFIG[entry.fromStep].label}
             </span>
@@ -228,7 +228,7 @@ export function WorkflowTimeline({
 
   if (history.length === 0) {
     return (
-      <div className={cn('p-4 text-center text-slate-500', className)}>
+      <div className={cn('p-4 text-center text-muted-foreground', className)}>
         <Icons.FileEdit />
         <p className="mt-2 text-sm">No workflow history yet</p>
       </div>
@@ -249,7 +249,7 @@ export function WorkflowTimeline({
           {getActionIcon(WORKFLOW_STEP_CONFIG[currentStep].icon)}
           {WORKFLOW_STEP_CONFIG[currentStep].label}
         </div>
-        <span className="text-sm text-slate-500">
+        <span className="text-sm text-muted-foreground">
           {history.length} action{history.length !== 1 ? 's' : ''}
         </span>
       </div>
@@ -271,8 +271,8 @@ export function WorkflowTimeline({
 
       {/* Show More */}
       {hasMore && (
-        <div className="mt-2 pt-2 border-t border-slate-100">
-          <p className="text-sm text-slate-500 text-center">
+        <div className="mt-2 pt-2 border-t border-border">
+          <p className="text-sm text-muted-foreground text-center">
             + {sortedHistory.length - maxItems} more actions
           </p>
         </div>

@@ -78,18 +78,18 @@ function ActionItemRow({ item, isEditing, onUpdate, onRemove }: ActionItemRowPro
     <div
       className={cn(
         'group rounded-lg border transition-all duration-200',
-        'bg-white dark:bg-slate-900',
+        'bg-card',
         item.status === 'completed' 
-          ? 'border-emerald-200 dark:border-emerald-900 bg-emerald-50/30 dark:bg-emerald-950/20'
+          ? 'border-success/30 bg-success/5'
           : item.status === 'cancelled'
-            ? 'border-slate-200 dark:border-slate-800 opacity-60'
-            : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+            ? 'border-border opacity-60'
+            : 'border-border hover:border-input'
       )}
     >
       <div className="flex items-start gap-3 p-3">
         {/* Drag Handle */}
         {isEditing && (
-          <div className="mt-0.5 cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-600">
+          <div className="mt-0.5 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground">
             <GripVertical className="w-4 h-4" />
           </div>
         )}
@@ -125,16 +125,16 @@ function ActionItemRow({ item, isEditing, onUpdate, onRemove }: ActionItemRowPro
               onChange={(e) => onUpdate?.({ description: e.target.value })}
               className={cn(
                 'w-full bg-transparent border-none outline-none text-sm font-medium',
-                'text-slate-900 dark:text-white',
-                'placeholder:text-slate-400',
-                item.status === 'completed' && 'line-through text-slate-500'
+              'text-foreground',
+              'placeholder:text-muted-foreground',
+              item.status === 'completed' && 'line-through text-muted-foreground'
               )}
               placeholder="Enter action item..."
             />
           ) : (
             <p className={cn(
-              'text-sm font-medium text-slate-900 dark:text-white',
-              item.status === 'completed' && 'line-through text-slate-500'
+              'text-sm font-medium text-foreground',
+              item.status === 'completed' && 'line-through text-muted-foreground'
             )}>
               {item.description}
             </p>
@@ -145,7 +145,7 @@ function ActionItemRow({ item, isEditing, onUpdate, onRemove }: ActionItemRowPro
             {/* Assignee */}
             <div className={cn(
               'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs',
-              'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+              'bg-muted text-muted-foreground'
             )}>
               <User className="w-3 h-3" />
               {isEditing ? (
@@ -165,8 +165,8 @@ function ActionItemRow({ item, isEditing, onUpdate, onRemove }: ActionItemRowPro
             <div className={cn(
               'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs',
               dateInfo.isOverdue 
-                ? 'bg-red-100 text-red-600 dark:bg-red-950 dark:text-red-400' 
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                ? 'bg-destructive/10 text-destructive' 
+                : 'bg-muted text-muted-foreground'
             )}>
               <Calendar className="w-3 h-3" />
               {isEditing ? (
@@ -208,8 +208,9 @@ function ActionItemRow({ item, isEditing, onUpdate, onRemove }: ActionItemRowPro
           <Button
             variant="ghost"
             size="icon"
-            className="w-8 h-8 text-slate-400 hover:text-red-500 hover:bg-red-50"
+            className="w-8 h-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
             onClick={onRemove}
+            aria-label="Remove action item"
           >
             <Trash2 className="w-4 h-4" />
           </Button>
@@ -222,6 +223,8 @@ function ActionItemRow({ item, isEditing, onUpdate, onRemove }: ActionItemRowPro
             size="icon"
             className="w-8 h-8"
             onClick={() => setIsExpanded(!isExpanded)}
+            aria-label={isExpanded ? 'Collapse evidence' : 'Expand evidence'}
+            aria-expanded={isExpanded}
           >
             <ChevronDown className={cn('w-4 h-4 transition-transform', isExpanded && 'rotate-180')} />
           </Button>
@@ -230,10 +233,10 @@ function ActionItemRow({ item, isEditing, onUpdate, onRemove }: ActionItemRowPro
 
       {/* Expanded Evidence */}
       {isExpanded && item.evidence && item.evidence.length > 0 && (
-        <div className="px-4 py-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30">
-          <p className="text-xs font-medium text-slate-500 mb-2">Supporting Evidence:</p>
+        <div className="px-4 py-3 border-t border-border/50 bg-muted/30">
+          <p className="text-xs font-medium text-muted-foreground mb-2">Supporting Evidence:</p>
           {item.evidence.map((ev) => (
-            <p key={ev.id} className="text-xs text-slate-600 dark:text-slate-400 italic">
+            <p key={ev.id} className="text-xs text-muted-foreground italic">
               "{ev.text}"
             </p>
           ))}
@@ -271,17 +274,17 @@ export function ActionItemList({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+          <h3 className="text-sm font-semibold text-foreground">
             Action Items
           </h3>
-          <div className="flex items-center gap-2 text-xs text-slate-500">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1">
               <CheckCircle className="w-3 h-3 text-emerald-500" />
               {completedCount} completed
             </span>
             <span>•</span>
             <span className="inline-flex items-center gap-1">
-              <Circle className="w-3 h-3 text-slate-400" />
+              <Circle className="w-3 h-3 text-muted-foreground" />
               {pendingCount} pending
             </span>
           </div>
@@ -301,7 +304,7 @@ export function ActionItemList({
 
       {/* Progress Bar */}
       {items.length > 0 && (
-        <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+        <div className="h-1.5 bg-muted rounded-full overflow-hidden">
           <div 
             className="h-full bg-emerald-500 transition-all duration-300"
             style={{ width: `${(completedCount / items.length) * 100}%` }}
@@ -312,7 +315,7 @@ export function ActionItemList({
       {/* Items List */}
       <div className="space-y-2">
         {items.length === 0 ? (
-          <div className="py-8 text-center text-sm text-slate-500">
+          <div className="py-8 text-center text-sm text-muted-foreground">
             No action items yet.
             {isEditing && (
               <Button

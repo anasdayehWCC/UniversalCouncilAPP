@@ -133,8 +133,8 @@ export function MinuteEditor({
       {/* Header */}
       <div className={cn(
         'sticky top-0 z-10 -mx-4 px-4 py-4',
-        'bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg',
-        'border-b border-slate-200 dark:border-slate-700'
+        'bg-card/80 backdrop-blur-lg',
+        'border-b border-border'
       )}>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4 flex-1 min-w-0">
@@ -147,14 +147,14 @@ export function MinuteEditor({
                 onChange={handleTitleChange}
                 className={cn(
                   'flex-1 text-xl font-bold bg-transparent border-none outline-none',
-                  'text-slate-900 dark:text-white',
-                  'placeholder:text-slate-400',
+                  'text-foreground',
+                  'placeholder:text-muted-foreground',
                   'focus:ring-0'
                 )}
                 placeholder="Enter minute title..."
               />
             ) : (
-              <h1 className="text-xl font-bold text-slate-900 dark:text-white truncate">
+              <h1 className="text-xl font-bold text-foreground truncate">
                 {minute.title}
               </h1>
             )}
@@ -163,13 +163,13 @@ export function MinuteEditor({
           <div className="flex items-center gap-2">
             {/* Save Status */}
             {lastSaved && (
-              <span className="text-xs text-slate-500 flex items-center gap-1">
+              <span className="text-xs text-muted-foreground flex items-center gap-1">
                 <Clock className="w-3 h-3" />
                 Saved {formatLastSaved()}
               </span>
             )}
             {isDirty && (
-              <span className="text-xs text-amber-500 flex items-center gap-1">
+              <span className="text-xs text-warning flex items-center gap-1">
                 <AlertTriangle className="w-3 h-3" />
                 Unsaved changes
               </span>
@@ -247,9 +247,9 @@ export function MinuteEditor({
 
         {/* Changes Requested Banner */}
         {minute.changesRequestedReason && (
-          <div className="mt-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+          <div className="mt-3 p-3 rounded-lg bg-warning/10 border border-warning/30">
             <div className="flex items-start gap-2">
-              <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5" />
+              <AlertTriangle className="w-4 h-4 text-warning mt-0.5" />
               <div>
                 <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
                   Changes Requested
@@ -323,7 +323,7 @@ export function MinuteEditor({
                           onClick={() => handleAddSection(type)}
                           className={cn(
                             'flex items-center gap-3 p-3 rounded-lg text-left',
-                            'hover:bg-slate-100 dark:hover:bg-slate-800',
+                            'hover:bg-muted',
                             'transition-colors'
                           )}
                         >
@@ -331,10 +331,10 @@ export function MinuteEditor({
                             <Icon className="w-4 h-4 text-[var(--primary)]" />
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-slate-900 dark:text-white">
+                            <p className="text-sm font-medium text-foreground">
                               {config.label}
                             </p>
-                            <p className="text-xs text-slate-500">
+                            <p className="text-xs text-muted-foreground">
                               {config.description}
                             </p>
                           </div>
@@ -359,7 +359,7 @@ export function MinuteEditor({
           </Card>
 
           {/* Metadata Info */}
-          <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 text-sm text-slate-500">
+          <div className="p-4 rounded-lg bg-muted/50 text-sm text-muted-foreground">
             <div className="flex items-center flex-wrap gap-4">
               <span>Template: {minute.metadata.templateName || 'Custom'}</span>
               <span>•</span>

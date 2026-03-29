@@ -101,8 +101,8 @@ export default function UploadPage() {
         {uploading ? `Uploading ${file?.name || 'file'}, ${progress}%` : uploadResult === 'success' ? 'Upload succeeded' : uploadResult === 'error' ? 'Upload failed' : ''}
       </div>
       <div>
-        <h1 className="text-2xl font-display font-bold text-slate-900">Upload Audio</h1>
-        <p className="text-slate-500">Import recordings from other devices for transcription.</p>
+        <h1 className="text-2xl font-display font-bold text-foreground">Upload Audio</h1>
+        <p className="text-muted-foreground">Import recordings from other devices for transcription.</p>
       </div>
 
       {!file ? (
@@ -112,7 +112,7 @@ export default function UploadPage() {
           aria-label="Upload audio file"
           className={cn(
             "border-2 border-dashed rounded-xl p-12 text-center transition-all duration-200 cursor-pointer",
-            dragActive ? "border-blue-500 bg-blue-50" : "border-slate-200 hover:border-blue-400 hover:bg-slate-50"
+            dragActive ? "border-primary bg-primary/5" : "border-input hover:border-primary/60 hover:bg-muted/50"
           )}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
@@ -139,11 +139,11 @@ export default function UploadPage() {
               }
             }}
           />
-          <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
             <Upload className="w-8 h-8" />
           </div>
-          <h3 className="text-lg font-bold text-slate-900 mb-2">Click to upload or drag and drop</h3>
-          <p className="text-slate-500 text-sm max-w-xs mx-auto">
+          <h3 className="text-lg font-bold text-foreground mb-2">Click to upload or drag and drop</h3>
+          <p className="text-muted-foreground text-sm max-w-xs mx-auto">
             Supported formats: MP3, M4A, WAV (Max 500MB)
           </p>
         </div>
@@ -151,17 +151,17 @@ export default function UploadPage() {
         <Card className="p-6">
           <div className="flex items-start justify-between mb-6">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-primary/10 text-primary rounded-lg flex items-center justify-center">
                 <FileAudio className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-bold text-slate-900">{file.name}</h3>
-                <p className="text-sm text-slate-500">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
+                <h3 className="font-bold text-foreground">{file.name}</h3>
+                <p className="text-sm text-muted-foreground">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
               </div>
             </div>
             {!uploading && (
               <Button variant="ghost" size="icon" onClick={() => setFile(null)} aria-label="Remove file">
-                <X className="w-5 h-5 text-slate-400" />
+                <X className="w-5 h-5 text-muted-foreground" />
               </Button>
             )}
           </div>
@@ -169,12 +169,12 @@ export default function UploadPage() {
           {uploading ? (
             <div className="space-y-2">
               <div className="flex justify-between text-sm font-medium">
-                <span className="text-blue-600">Uploading...</span>
-                <span className="text-slate-500">{progress}%</span>
+                <span className="text-primary">Uploading...</span>
+                <span className="text-muted-foreground">{progress}%</span>
               </div>
-              <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-blue-600 transition-all duration-300"
+                  className="h-full bg-primary transition-all duration-300"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -187,8 +187,8 @@ export default function UploadPage() {
                   tabIndex={0}
                   aria-pressed={mode === 'fast'}
                   className={cn(
-                    "p-4 border rounded-xl cursor-pointer transition-all focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2",
-                    mode === 'fast' ? "border-blue-500 bg-blue-50 ring-1 ring-blue-500" : "border-slate-200 hover:border-slate-300"
+                    "p-4 border rounded-xl cursor-pointer transition-all focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background",
+                    mode === 'fast' ? "border-info bg-info/10 ring-1 ring-info" : "border-input hover:border-muted-foreground/50"
                   )}
                   onClick={() => setMode('fast')}
                   onKeyDown={(e) => {
@@ -199,10 +199,10 @@ export default function UploadPage() {
                   }}
                 >
                   <div className="flex items-center gap-2 mb-2">
-                    <Zap className={cn("w-4 h-4", mode === 'fast' ? "text-blue-600" : "text-slate-400")} />
-                    <span className={cn("font-bold text-sm", mode === 'fast' ? "text-blue-900" : "text-slate-700")}>Fast Mode</span>
+                    <Zap className={cn("w-4 h-4", mode === 'fast' ? "text-info" : "text-muted-foreground")} />
+                    <span className={cn("font-bold text-sm", mode === 'fast' ? "text-info" : "text-foreground")}>Fast Mode</span>
                   </div>
-                  <p className="text-xs text-slate-500">Quick transcription for standard meetings.</p>
+                  <p className="text-xs text-muted-foreground">Quick transcription for standard meetings.</p>
                 </div>
 
                 <div 
@@ -210,8 +210,8 @@ export default function UploadPage() {
                   tabIndex={0}
                   aria-pressed={mode === 'economy'}
                   className={cn(
-                    "p-4 border rounded-xl cursor-pointer transition-all focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2",
-                    mode === 'economy' ? "border-green-500 bg-green-50 ring-1 ring-green-500" : "border-slate-200 hover:border-slate-300"
+                    "p-4 border rounded-xl cursor-pointer transition-all focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background",
+                    mode === 'economy' ? "border-success bg-success/10 ring-1 ring-success" : "border-input hover:border-muted-foreground/50"
                   )}
                   onClick={() => setMode('economy')}
                   onKeyDown={(e) => {
@@ -222,10 +222,10 @@ export default function UploadPage() {
                   }}
                 >
                   <div className="flex items-center gap-2 mb-2">
-                    <Clock className={cn("w-4 h-4", mode === 'economy' ? "text-green-600" : "text-slate-400")} />
-                    <span className={cn("font-bold text-sm", mode === 'economy' ? "text-green-900" : "text-slate-700")}>Economy</span>
+                    <Clock className={cn("w-4 h-4", mode === 'economy' ? "text-success" : "text-muted-foreground")} />
+                    <span className={cn("font-bold text-sm", mode === 'economy' ? "text-success" : "text-foreground")}>Economy</span>
                   </div>
-                  <p className="text-xs text-slate-500">Slower processing, better for long recordings.</p>
+                  <p className="text-xs text-muted-foreground">Slower processing, better for long recordings.</p>
                 </div>
               </div>
 
@@ -248,7 +248,7 @@ export default function UploadPage() {
                     />
                     Simulate processing error
                   </Label>
-                  <p className="text-xs text-slate-500">Use this to demo failure handling without needing real backends.</p>
+                  <p className="text-xs text-muted-foreground">Use this to demo failure handling without needing real backends.</p>
                 </div> */}
               </div>
 
@@ -267,14 +267,14 @@ export default function UploadPage() {
       )}
 
       {uploadResult === 'success' && queuedMeetingId && (
-        <Card className="p-6 border-green-200 bg-green-50">
+        <Card className="p-6 border-success/30 bg-success/5">
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-full bg-green-100 text-green-700 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-success/10 text-success flex items-center justify-center">
               <CheckCircle2 className="w-5 h-5" />
             </div>
             <div className="flex-1">
-              <h3 className="font-bold text-slate-900">Upload queued for transcription</h3>
-              <p className="text-sm text-slate-600">We created a note with your selected mode ({mode}). You can monitor it in My Notes.</p>
+              <h3 className="font-bold text-foreground">Upload queued for transcription</h3>
+              <p className="text-sm text-muted-foreground">We created a note with your selected mode ({mode}). You can monitor it in My Notes.</p>
               <div className="flex gap-3 mt-3">
                 <Link href={`/my-notes/${queuedMeetingId}`}>
                   <Button variant="outline">Open note</Button>
@@ -289,14 +289,14 @@ export default function UploadPage() {
       )}
 
       {uploadResult === 'error' && (
-        <Card className="p-6 border-red-200 bg-red-50">
+        <Card className="p-6 border-destructive/30 bg-destructive/5">
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-full bg-red-100 text-red-700 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-destructive/10 text-destructive flex items-center justify-center">
               <AlertTriangle className="w-5 h-5" />
             </div>
             <div className="flex-1">
-              <h3 className="font-bold text-slate-900">Upload failed</h3>
-              <p className="text-sm text-slate-600">{errorMessage}</p>
+              <h3 className="font-bold text-foreground">Upload failed</h3>
+              <p className="text-sm text-muted-foreground">{errorMessage}</p>
               <div className="flex gap-3 mt-3">
                 <Button variant="outline" onClick={() => handleUpload()} disabled={uploading || !file}>
                   Retry upload

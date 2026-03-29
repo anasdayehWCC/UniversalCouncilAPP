@@ -65,15 +65,15 @@ export default function TemplatesPage() {
             </p>
             <div className="info-rail mt-3">
               <span className="info-rail__item">
-                <span className="info-rail__dot" style={{ background: '#22c55e' }} />
+                <span className="info-rail__dot" style={{ background: 'var(--success)' }} />
                 Available: {filteredTemplates.length}
               </span>
               <span className="info-rail__item">
-                <span className="info-rail__dot" style={{ background: '#f59e0b' }} />
+                <span className="info-rail__dot" style={{ background: 'var(--warning)' }} />
                 Favorites: {favorites.length}
               </span>
               <span className="info-rail__item">
-                <span className="info-rail__dot" style={{ background: '#3b82f6' }} />
+                <span className="info-rail__dot" style={{ background: 'var(--info)' }} />
                 Recent: {recentlyUsed.length}
               </span>
             </div>
@@ -146,10 +146,10 @@ export default function TemplatesPage() {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25 }}
-              className="w-full max-h-[80vh] overflow-auto bg-white rounded-t-2xl p-4"
+              className="w-full max-h-[80vh] overflow-auto bg-card rounded-t-2xl p-4"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="w-12 h-1 bg-slate-300 rounded-full mx-auto mb-4" />
+              <div className="w-12 h-1 bg-muted rounded-full mx-auto mb-4" />
               <TemplatePreview
                 template={selectedTemplate}
                 onSelect={handleUseTemplate}

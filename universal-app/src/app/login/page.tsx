@@ -34,7 +34,7 @@ export default function LoginPage() {
 
   return (
     <div
-      className="relative min-h-screen flex items-center justify-center px-4 py-12 overflow-hidden bg-slate-950"
+      className="relative min-h-screen flex items-center justify-center px-4 py-12 overflow-hidden bg-background"
     >
       <div
         className="pointer-events-none absolute inset-0"
@@ -61,15 +61,15 @@ export default function LoginPage() {
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-semibold tracking-tight text-white">
               Minute Platform
             </h1>
-            <p className="text-sm sm:text-base text-slate-300">
+            <p className="text-sm sm:text-base text-muted-foreground">
               One App. Multiple Domains.
             </p>
           </div>
-          <p className="max-w-xl text-xs sm:text-sm text-slate-300 text-balance">
+          <p className="max-w-xl text-xs sm:text-sm text-muted-foreground text-balance">
             Select a persona to see how the interface adapts for social workers, managers, and platform admins across councils.
           </p>
           <div
-            className="inline-flex items-center gap-3 rounded-full border px-4 py-2 text-xs sm:text-sm border-white/10 bg-white/5 text-slate-300"
+            className="inline-flex items-center gap-3 rounded-full border px-4 py-2 text-xs sm:text-sm border-white/10 bg-white/5 text-muted-foreground"
           >
             <span
               className="inline-flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-semibold bg-white/20 text-white"
@@ -77,8 +77,8 @@ export default function LoginPage() {
               {config.name[0]}
             </span>
             <span className="font-medium text-white">{config.authorityLabel}</span>
-            <span className="h-1 w-1 rounded-full bg-slate-400" />
-            <span className="text-slate-300">Currently viewing {config.name}</span>
+            <span className="h-1 w-1 rounded-full bg-muted" />
+            <span className="text-muted-foreground">Currently viewing {config.name}</span>
           </div>
         </header>
 
@@ -165,10 +165,10 @@ export default function LoginPage() {
                     </motion.div>
                     <div className="space-y-1.5 text-center">
                       <p className="text-base font-semibold text-white">{persona.name}</p>
-                      <p className="text-[12px] uppercase tracking-wide text-slate-100 font-bold">
+                      <p className="text-[12px] uppercase tracking-wide text-foreground font-bold">
                         {persona.role.replace('_', ' ')}
                       </p>
-                      <p className="text-[12px] text-slate-200 line-clamp-2 font-medium">
+                      <p className="text-[12px] text-muted-foreground line-clamp-2 font-medium">
                         {persona.team}
                       </p>
                     </div>
@@ -203,8 +203,8 @@ export default function LoginPage() {
                       {isActive && (
                         <span className="flex items-center gap-1.5 text-[11px] font-semibold text-white">
                           <span
-                            className="h-2 w-2 rounded-full animate-pulse shadow-lg"
-                            style={{ backgroundColor: '#10b981', boxShadow: '0 0 8px rgba(16, 185, 129, 0.6)' }}
+                            className="h-2 w-2 rounded-full animate-pulse motion-reduce:animate-none shadow-lg bg-success"
+                            style={{ boxShadow: '0 0 8px var(--success)' }}
                           />
                           Active
                         </span>
@@ -227,7 +227,7 @@ export default function LoginPage() {
             Skip for now – continue as {currentUser.name}
           </Button>
           <span>Changes are local to this demo only.</span>
-          <a href="#" className="text-blue-400 hover:text-blue-300 underline mt-2">Forgot Password?</a>
+          <a href="#" className="text-primary/70 hover:text-primary underline mt-2">Forgot Password?</a>
         </div>
       </div>
     </div>

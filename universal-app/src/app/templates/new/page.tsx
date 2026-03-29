@@ -24,11 +24,11 @@ export default function NewTemplatePage() {
     return (
       <div className="space-y-6">
         <Card className="p-12 text-center">
-          <ShieldAlert className="w-12 h-12 mx-auto text-amber-500 mb-4" />
-          <h2 className="text-xl font-bold text-slate-900 mb-2">
+          <ShieldAlert className="w-12 h-12 mx-auto text-warning mb-4" />
+          <h2 className="text-xl font-bold text-foreground mb-2">
             Access Denied
           </h2>
-          <p className="text-slate-500 mb-6">
+          <p className="text-muted-foreground mb-6">
             Only administrators can create new templates.
           </p>
           <Link href="/templates">
@@ -76,8 +76,8 @@ export default function NewTemplatePage() {
 
       {/* Error message */}
       {error && (
-        <Card className="p-4 bg-red-50 border-red-200">
-          <p className="text-red-600 text-sm">{error}</p>
+        <Card className="p-4 bg-destructive/10 border-destructive/30">
+          <p className="text-destructive text-sm">{error}</p>
         </Card>
       )}
 

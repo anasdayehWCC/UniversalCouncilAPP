@@ -14,10 +14,10 @@ export default function AdminLayout({
   useRoleGuard(['admin', 'manager']);
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="flex">
+    <div className="min-h-0 bg-muted">
+      <div className="flex min-h-0">
         {/* Sidebar */}
-        <aside className="w-64 shrink-0 bg-white border-r border-slate-200 min-h-screen sticky top-0">
+        <aside className="w-64 shrink-0 bg-card border-r border-border min-h-0 h-full sticky top-0">
           <div className="p-4">
             <AdminNav />
           </div>

@@ -24,10 +24,10 @@ import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from '@/lib/dates';
 
 const DOMAIN_COLORS: Record<string, string> = {
-  children: 'bg-blue-100 text-blue-700 border-blue-200',
-  adults: 'bg-teal-100 text-teal-700 border-teal-200',
+  children: 'bg-primary/10 text-primary border-primary/30',
+  adults: 'bg-info/10 text-info border-info/30',
   housing: 'bg-amber-100 text-amber-700 border-amber-200',
-  corporate: 'bg-slate-100 text-slate-700 border-slate-200'
+  corporate: 'bg-muted text-muted-foreground border-border'
 };
 
 export default function TemplatesPage() {
@@ -88,7 +88,7 @@ export default function TemplatesPage() {
       <div className="space-y-6">
         {/* Search */}
         <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input 
             placeholder="Search templates..."
             value={search}
@@ -100,7 +100,7 @@ export default function TemplatesPage() {
         {/* Templates by Domain */}
         {Object.entries(groupedTemplates).map(([domain, domainTemplates]) => (
           <div key={domain}>
-            <h3 className="font-semibold text-slate-900 mb-3 capitalize">
+            <h3 className="font-semibold text-foreground mb-3 capitalize">
               {domain === 'children' ? "Children's Services" :
                domain === 'adults' ? 'Adult Social Care' :
                domain === 'housing' ? 'Housing Services' :
@@ -112,21 +112,21 @@ export default function TemplatesPage() {
                 <Card 
                   key={template.id} 
                   variant="glass" 
-                  className="p-4 bg-white/80 hover:shadow-md transition-all"
+                  className="p-4 bg-card/80 hover:shadow-md transition-all"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-slate-100 rounded-lg">
-                        <FileText className="w-5 h-5 text-slate-600" />
+                      <div className="p-2 bg-muted rounded-lg">
+                        <FileText className="w-5 h-5 text-muted-foreground" />
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h4 className="font-medium text-slate-900">{template.name}</h4>
+                          <h4 className="font-medium text-foreground">{template.name}</h4>
                           {template.isDefault && (
                             <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                           )}
                         </div>
-                        <p className="text-xs text-slate-500 mt-0.5">{template.description}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{template.description}</p>
                       </div>
                     </div>
                     
@@ -138,13 +138,13 @@ export default function TemplatesPage() {
                           className="h-8 w-8"
                           onClick={() => setActiveMenu(activeMenu === template.id ? null : template.id)}
                         >
-                          <MoreVertical className="w-4 h-4 text-slate-400" />
+                          <MoreVertical className="w-4 h-4 text-muted-foreground" />
                         </Button>
                         
                         {activeMenu === template.id && (
-                          <div className="absolute right-0 top-full mt-1 w-40 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-10">
+                          <div className="absolute right-0 top-full mt-1 w-40 bg-card rounded-lg shadow-lg border border-border py-1 z-10">
                             <button 
-                              className="w-full px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                              className="w-full px-3 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-2"
                               onClick={() => {
                                 handleEdit(template);
                                 setActiveMenu(null);
@@ -153,7 +153,7 @@ export default function TemplatesPage() {
                               <Edit2 className="w-4 h-4" /> Edit
                             </button>
                             <button 
-                              className="w-full px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                              className="w-full px-3 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-2"
                               onClick={() => {
                                 handleDuplicate(template);
                                 setActiveMenu(null);
@@ -163,7 +163,7 @@ export default function TemplatesPage() {
                             </button>
                             {!template.isDefault && (
                               <button 
-                                className="w-full px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                                className="w-full px-3 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-2"
                                 onClick={() => {
                                   handleSetDefault(template);
                                   setActiveMenu(null);
@@ -174,7 +174,7 @@ export default function TemplatesPage() {
                             )}
                             {!template.isDefault && (
                               <button 
-                                className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                                className="w-full px-3 py-2 text-left text-sm text-destructive hover:bg-destructive/10 flex items-center gap-2"
                                 onClick={() => {
                                   handleDelete(template);
                                   setActiveMenu(null);
@@ -191,15 +191,15 @@ export default function TemplatesPage() {
 
                   {/* Sections */}
                   <div className="mt-4">
-                    <p className="text-xs text-slate-500 mb-2">Sections:</p>
+                    <p className="text-xs text-muted-foreground mb-2">Sections:</p>
                     <div className="flex flex-wrap gap-1.5">
                       {template.sections.slice(0, 3).map((section, i) => (
-                        <Badge key={i} variant="outline" className="text-xs bg-slate-50">
+                        <Badge key={i} variant="outline" className="text-xs bg-muted">
                           {section}
                         </Badge>
                       ))}
                       {template.sections.length > 3 && (
-                        <Badge variant="outline" className="text-xs bg-slate-50">
+                        <Badge variant="outline" className="text-xs bg-muted">
                           +{template.sections.length - 3} more
                         </Badge>
                       )}
@@ -207,7 +207,7 @@ export default function TemplatesPage() {
                   </div>
 
                   {/* Footer */}
-                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+                  <div className="mt-4 pt-3 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
                     <span>Updated {formatDistanceToNow(new Date(template.updatedAt))}</span>
                     <Badge 
                       variant="outline" 
@@ -224,9 +224,9 @@ export default function TemplatesPage() {
 
         {filteredTemplates.length === 0 && (
           <div className="text-center py-12">
-            <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-            <p className="text-slate-500">No templates found</p>
-            <p className="text-sm text-slate-400 mt-1">Try adjusting your search</p>
+            <FileText className="w-12 h-12 text-muted-foreground/50 mx-auto mb-3" />
+            <p className="text-muted-foreground">No templates found</p>
+            <p className="text-sm text-muted-foreground/70 mt-1">Try adjusting your search</p>
           </div>
         )}
       </div>

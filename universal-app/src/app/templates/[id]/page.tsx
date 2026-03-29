@@ -98,7 +98,7 @@ export default function TemplateDetailPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full" />
+        <div className="animate-spin motion-reduce:animate-none w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full" />
       </div>
     );
   }
@@ -107,11 +107,11 @@ export default function TemplateDetailPage() {
     return (
       <div className="space-y-6">
         <Card className="p-12 text-center">
-          <AlertTriangle className="w-12 h-12 mx-auto text-amber-500 mb-4" />
-          <h2 className="text-xl font-bold text-slate-900 mb-2">
+          <AlertTriangle className="w-12 h-12 mx-auto text-warning mb-4" />
+          <h2 className="text-xl font-bold text-foreground mb-2">
             {error || 'Template not found'}
           </h2>
-          <p className="text-slate-500 mb-6">
+          <p className="text-muted-foreground mb-6">
             The template you&apos;re looking for doesn&apos;t exist or has been deleted.
           </p>
           <Link href="/templates">
@@ -148,8 +148,8 @@ export default function TemplateDetailPage() {
             </Button>
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">{template.name}</h1>
-            <p className="text-slate-500">{template.description}</p>
+            <h1 className="text-2xl font-bold text-foreground">{template.name}</h1>
+            <p className="text-muted-foreground">{template.description}</p>
           </div>
         </div>
 
@@ -161,7 +161,7 @@ export default function TemplateDetailPage() {
             </Button>
           )}
           {canEdit && (
-            <Button onClick={() => setIsEditing(true)} className="gap-2 bg-slate-900 text-white">
+            <Button onClick={() => setIsEditing(true)} className="gap-2 bg-foreground text-background">
               <Edit className="w-4 h-4" />
               Edit Template
             </Button>
@@ -170,7 +170,7 @@ export default function TemplateDetailPage() {
             <Button
               variant="outline"
               onClick={() => setShowDeleteConfirm(true)}
-              className="gap-2 text-red-600 border-red-200 hover:bg-red-50"
+              className="gap-2 text-destructive border-destructive/30 hover:bg-destructive/10"
             >
               <Trash2 className="w-4 h-4" />
               Delete
@@ -206,16 +206,16 @@ export default function TemplateDetailPage() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center gap-4 mb-4">
-                <div className="p-3 bg-red-100 rounded-full">
-                  <Trash2 className="w-6 h-6 text-red-600" />
+                <div className="p-3 bg-destructive/10 rounded-full">
+                  <Trash2 className="w-6 h-6 text-destructive" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900">Delete Template</h3>
-                  <p className="text-slate-500 text-sm">This action cannot be undone.</p>
+                  <h3 className="text-lg font-bold text-foreground">Delete Template</h3>
+                  <p className="text-muted-foreground text-sm">This action cannot be undone.</p>
                 </div>
               </div>
               
-              <p className="text-slate-600 mb-6">
+              <p className="text-foreground mb-6">
                 Are you sure you want to delete <strong>{template.name}</strong>? 
                 Any meetings using this template will not be affected, but you won&apos;t be 
                 able to create new meetings with it.
@@ -227,7 +227,7 @@ export default function TemplateDetailPage() {
                 </Button>
                 <Button
                   onClick={handleDelete}
-                  className="bg-red-600 text-white hover:bg-red-700"
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 >
                   Delete Template
                 </Button>

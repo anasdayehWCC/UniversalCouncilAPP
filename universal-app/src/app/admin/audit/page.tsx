@@ -16,7 +16,7 @@ export default function AuditPage() {
         description="Access denied"
       >
         <div className="text-center py-12">
-          <p className="text-slate-500">You do not have permission to view the audit log.</p>
+          <p className="text-muted-foreground">You do not have permission to view the audit log.</p>
         </div>
       </AdminPageWrapper>
     );

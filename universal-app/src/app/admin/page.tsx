@@ -47,77 +47,77 @@ export default function AdminDashboard() {
       <div className="space-y-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card variant="glass" className="p-4 bg-white/80">
+          <Card variant="glass" className="p-4 bg-card/80 dark:bg-card/60">
             <div className="flex items-center justify-between">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Users className="w-5 h-5 text-blue-600" />
+              <div className="p-2 bg-info/10 rounded-lg">
+                <Users className="w-5 h-5 text-info" />
               </div>
               <Badge variant="secondary" className="text-xs">
                 {Math.round((stats.activeUsers / stats.totalUsers) * 100)}% active
               </Badge>
             </div>
-            <h3 className="text-2xl font-bold text-slate-900 mt-3">{stats.totalUsers}</h3>
-            <p className="text-sm text-slate-500">Total Users</p>
-            <div className="mt-2 pt-2 border-t border-slate-100">
-              <Link href="/admin/users" className="text-sm text-blue-600 hover:underline flex items-center gap-1">
+            <h3 className="text-2xl font-bold text-foreground mt-3">{stats.totalUsers}</h3>
+            <p className="text-sm text-muted-foreground">Total Users</p>
+            <div className="mt-2 pt-2 border-t border-border">
+              <Link href="/admin/users" className="text-sm text-primary hover:underline flex items-center gap-1">
                 Manage users <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
           </Card>
 
-          <Card variant="glass" className="p-4 bg-white/80">
+          <Card variant="glass" className="p-4 bg-card/80 dark:bg-card/60">
             <div className="flex items-center justify-between">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <FileText className="w-5 h-5 text-green-600" />
+              <div className="p-2 bg-success/10 rounded-lg">
+                <FileText className="w-5 h-5 text-success" />
               </div>
               <Badge variant="secondary" className="text-xs">
                 +{stats.meetingsThisMonth} this month
               </Badge>
             </div>
-            <h3 className="text-2xl font-bold text-slate-900 mt-3">{stats.totalMeetings}</h3>
-            <p className="text-sm text-slate-500">Total Meetings</p>
-            <div className="mt-2 pt-2 border-t border-slate-100">
-              <span className="text-sm text-slate-500 flex items-center gap-1">
-                <TrendingUp className="w-3 h-3 text-green-500" /> 12% increase
+            <h3 className="text-2xl font-bold text-foreground mt-3">{stats.totalMeetings}</h3>
+            <p className="text-sm text-muted-foreground">Total Meetings</p>
+            <div className="mt-2 pt-2 border-t border-border">
+              <span className="text-sm text-muted-foreground flex items-center gap-1">
+                <TrendingUp className="w-3 h-3 text-success" /> 12% increase
               </span>
             </div>
           </Card>
 
-          <Card variant="glass" className="p-4 bg-white/80">
+          <Card variant="glass" className="p-4 bg-card/80 dark:bg-card/60">
             <div className="flex items-center justify-between">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Clock className="w-5 h-5 text-purple-600" />
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Clock className="w-5 h-5 text-primary" />
               </div>
               <Badge variant="secondary" className="text-xs">
                 AI Processed
               </Badge>
             </div>
-            <h3 className="text-2xl font-bold text-slate-900 mt-3">
+            <h3 className="text-2xl font-bold text-foreground mt-3">
               {Math.floor(stats.transcriptionMinutes / 60)}h {stats.transcriptionMinutes % 60}m
             </h3>
-            <p className="text-sm text-slate-500">Transcription Time</p>
-            <div className="mt-2 pt-2 border-t border-slate-100">
-              <span className="text-sm text-slate-500">
+            <p className="text-sm text-muted-foreground">Transcription Time</p>
+            <div className="mt-2 pt-2 border-t border-border">
+              <span className="text-sm text-muted-foreground">
                 Est. cost: £{(stats.transcriptionMinutes * 0.006).toFixed(2)}
               </span>
             </div>
           </Card>
 
-          <Card variant="glass" className="p-4 bg-white/80">
+          <Card variant="glass" className="p-4 bg-card/80 dark:bg-card/60">
             <div className="flex items-center justify-between">
-              <div className="p-2 bg-amber-100 rounded-lg">
-                <HardDrive className="w-5 h-5 text-amber-600" />
+              <div className="p-2 bg-warning/10 rounded-lg">
+                <HardDrive className="w-5 h-5 text-warning" />
               </div>
               <Badge variant="secondary" className="text-xs">
                 {stats.activeModules}/{stats.totalModules} modules
               </Badge>
             </div>
-            <h3 className="text-2xl font-bold text-slate-900 mt-3">
+            <h3 className="text-2xl font-bold text-foreground mt-3">
               {(stats.storageUsedMb / 1024).toFixed(1)} GB
             </h3>
-            <p className="text-sm text-slate-500">Storage Used</p>
-            <div className="mt-2 pt-2 border-t border-slate-100">
-              <Link href="/admin/modules" className="text-sm text-blue-600 hover:underline flex items-center gap-1">
+            <p className="text-sm text-muted-foreground">Storage Used</p>
+            <div className="mt-2 pt-2 border-t border-border">
+              <Link href="/admin/modules" className="text-sm text-primary hover:underline flex items-center gap-1">
                 Configure modules <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
@@ -127,8 +127,8 @@ export default function AdminDashboard() {
         {/* Quick Actions & System Health */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Quick Actions */}
-          <Card variant="glass" hoverEffect={false} className="p-5 bg-white/80">
-            <h3 className="font-semibold text-slate-900 mb-4">Quick Actions</h3>
+          <Card variant="glass" hoverEffect={false} className="p-5 bg-card/80 dark:bg-card/60">
+            <h3 className="font-semibold text-foreground mb-4">Quick Actions</h3>
             <div className="space-y-2">
               {quickActions.map((action, i) => (
                 action.href ? (
@@ -154,10 +154,10 @@ export default function AdminDashboard() {
           </Card>
 
           {/* System Health */}
-          <Card variant="glass" hoverEffect={false} className="p-5 bg-white/80 lg:col-span-2">
+          <Card variant="glass" hoverEffect={false} className="p-5 bg-card/80 dark:bg-card/60 lg:col-span-2">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-slate-900">System Health</h3>
-              <Badge className="bg-green-100 text-green-700 border-green-200">
+              <h3 className="font-semibold text-foreground">System Health</h3>
+              <Badge className="bg-success/10 text-success border-success/20">
                 <Activity className="w-3 h-3 mr-1" />
                 All systems operational
               </Badge>
@@ -166,26 +166,26 @@ export default function AdminDashboard() {
             <div className="space-y-4">
               <div>
                 <div className="flex items-center justify-between text-sm mb-1">
-                  <span className="text-slate-600">API Response Time</span>
-                  <span className="font-medium text-slate-900">124ms avg</span>
+                  <span className="text-muted-foreground">API Response Time</span>
+                  <span className="font-medium text-foreground">124ms avg</span>
                 </div>
-                <ProgressBar value={88} color="#22c55e" backgroundColor="#dcfce7" />
+                <ProgressBar value={88} variant="success" />
               </div>
               
               <div>
                 <div className="flex items-center justify-between text-sm mb-1">
-                  <span className="text-slate-600">AI Processing Queue</span>
-                  <span className="font-medium text-slate-900">3 pending</span>
+                  <span className="text-muted-foreground">AI Processing Queue</span>
+                  <span className="font-medium text-foreground">3 pending</span>
                 </div>
-                <ProgressBar value={15} color="#3b82f6" backgroundColor="#dbeafe" />
+                <ProgressBar value={15} variant="info" />
               </div>
               
               <div>
                 <div className="flex items-center justify-between text-sm mb-1">
-                  <span className="text-slate-600">Storage Capacity</span>
-                  <span className="font-medium text-slate-900">23.4% used</span>
+                  <span className="text-muted-foreground">Storage Capacity</span>
+                  <span className="font-medium text-foreground">23.4% used</span>
                 </div>
-                <ProgressBar value={23.4} color="#8b5cf6" backgroundColor="#ede9fe" />
+                <ProgressBar value={23.4} variant="default" />
               </div>
             </div>
           </Card>
@@ -194,9 +194,9 @@ export default function AdminDashboard() {
         {/* Module Status & Adoption */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Active Modules */}
-          <Card variant="glass" hoverEffect={false} className="p-5 bg-white/80">
+          <Card variant="glass" hoverEffect={false} className="p-5 bg-card/80 dark:bg-card/60">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-slate-900">Active Modules</h3>
+              <h3 className="font-semibold text-foreground">Active Modules</h3>
               <Link href="/admin/modules">
                 <Button variant="ghost" size="sm">View all</Button>
               </Link>
@@ -204,12 +204,12 @@ export default function AdminDashboard() {
             
             <div className="space-y-3">
               {modules.filter(m => m.enabled).slice(0, 4).map(module => (
-                <div key={module.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                <div key={module.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
                   <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 rounded-full bg-green-500" />
+                    <div className="w-2 h-2 rounded-full bg-success" />
                     <div>
-                      <p className="font-medium text-slate-900 text-sm">{module.name}</p>
-                      <p className="text-xs text-slate-500">{module.category}</p>
+                      <p className="font-medium text-foreground text-sm">{module.name}</p>
+                      <p className="text-xs text-muted-foreground">{module.category}</p>
                     </div>
                   </div>
                   <Badge variant="outline" className="text-xs">Active</Badge>
@@ -217,8 +217,8 @@ export default function AdminDashboard() {
               ))}
               
               {modules.some(m => !m.enabled) && (
-                <div className="flex items-center gap-2 text-sm text-slate-500 pt-2">
-                  <AlertTriangle className="w-4 h-4 text-amber-500" />
+                <div className="flex items-center gap-2 text-sm text-muted-foreground pt-2">
+                  <AlertTriangle className="w-4 h-4 text-warning" />
                   {modules.filter(m => !m.enabled).length} modules disabled
                 </div>
               )}
@@ -226,40 +226,40 @@ export default function AdminDashboard() {
           </Card>
 
           {/* User Adoption */}
-          <Card variant="glass" hoverEffect={false} className="p-5 bg-white/80">
+          <Card variant="glass" hoverEffect={false} className="p-5 bg-card/80 dark:bg-card/60">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-slate-900">Team Adoption</h3>
+              <h3 className="font-semibold text-foreground">Team Adoption</h3>
               <Badge variant="secondary">{stats.activeUsers} active</Badge>
             </div>
             
             <div className="space-y-4">
               <div>
                 <div className="flex items-center justify-between text-sm mb-1">
-                  <span className="text-slate-600">Children&apos;s Services</span>
-                  <span className="font-medium text-slate-900">92%</span>
+                  <span className="text-muted-foreground">Children&apos;s Services</span>
+                  <span className="font-medium text-foreground">92%</span>
                 </div>
-                <ProgressBar value={92} color="#3b82f6" backgroundColor="#dbeafe" />
+                <ProgressBar value={92} variant="info" />
               </div>
               
               <div>
                 <div className="flex items-center justify-between text-sm mb-1">
-                  <span className="text-slate-600">Adult Social Care</span>
-                  <span className="font-medium text-slate-900">78%</span>
+                  <span className="text-muted-foreground">Adult Social Care</span>
+                  <span className="font-medium text-foreground">78%</span>
                 </div>
-                <ProgressBar value={78} color="#06b6d4" backgroundColor="#cffafe" />
+                <ProgressBar value={78} variant="info" />
               </div>
               
               <div>
                 <div className="flex items-center justify-between text-sm mb-1">
-                  <span className="text-slate-600">Housing Services</span>
-                  <span className="font-medium text-amber-600">45%</span>
+                  <span className="text-muted-foreground">Housing Services</span>
+                  <span className="font-medium text-warning">45%</span>
                 </div>
-                <ProgressBar value={45} color="#f59e0b" backgroundColor="#fef3c7" />
+                <ProgressBar value={45} variant="warning" />
               </div>
             </div>
             
-            <div className="mt-4 pt-4 border-t border-slate-100">
-              <p className="text-xs text-slate-500">
+            <div className="mt-4 pt-4 border-t border-border">
+              <p className="text-xs text-muted-foreground">
                 Based on users who logged in within the last 7 days
               </p>
             </div>
@@ -270,7 +270,7 @@ export default function AdminDashboard() {
         {canViewAudit && (
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-slate-900">Recent Admin Activity</h3>
+              <h3 className="font-semibold text-foreground">Recent Admin Activity</h3>
               <Link href="/admin/audit">
                 <Button variant="ghost" size="sm">View full log</Button>
               </Link>

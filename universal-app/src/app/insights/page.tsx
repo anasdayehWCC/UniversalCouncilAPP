@@ -3,13 +3,22 @@
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Card } from '@/components/ui/card';
-import { Clock, CheckCircle2, type LucideIcon, Activity, LayoutDashboard } from 'lucide-react';
+import {
+  Clock,
+  CheckCircle2,
+  Activity,
+  LayoutDashboard,
+  FileText,
+  AlertTriangle,
+  BarChart3,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useDemo } from '@/context/DemoContext';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { FlagGate } from '@/components/ui/flag-gate';
 import { useMeetingMetrics } from '@/hooks/useMeetingMetrics';
+import { cn } from '@/lib/utils';
 
 import { useRoleGuard } from '@/hooks/useRoleGuard';
 import dynamic from 'next/dynamic';
@@ -17,16 +26,16 @@ import dynamic from 'next/dynamic';
 const ChartsArea = dynamic(() => import('@/components/insights/ChartsArea'), {
   loading: () => (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <Card variant="glass" className="p-6 bg-white/80 h-64 animate-pulse">
-        <div className="h-8 w-48 bg-slate-200 rounded mb-6" />
-        <div className="h-full bg-slate-100 rounded" />
+      <Card variant="glass" className="p-6 bg-card/80 h-64 animate-pulse motion-reduce:animate-none">
+        <div className="h-8 w-48 bg-muted rounded mb-6" />
+        <div className="h-full bg-muted rounded" />
       </Card>
-      <Card variant="glass" className="p-6 bg-white/80 h-64 animate-pulse">
-        <div className="h-8 w-48 bg-slate-200 rounded mb-6" />
+      <Card variant="glass" className="p-6 bg-card/80 h-64 animate-pulse motion-reduce:animate-none">
+        <div className="h-8 w-48 bg-muted rounded mb-6" />
         <div className="space-y-4">
-          <div className="h-12 bg-slate-100 rounded" />
-          <div className="h-12 bg-slate-100 rounded" />
-          <div className="h-12 bg-slate-100 rounded" />
+          <div className="h-12 bg-muted rounded" />
+          <div className="h-12 bg-muted rounded" />
+          <div className="h-12 bg-muted rounded" />
         </div>
       </Card>
     </div>
@@ -60,12 +69,12 @@ export default function InsightsPage() {
       m.submittedBy,
       m.domain
     ]);
-    
+
     const csvContent = [
       headers.join(','),
       ...rows.map(r => r.join(','))
     ].join('\n');
-    
+
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -76,6 +85,8 @@ export default function InsightsPage() {
     link.click();
     document.body.removeChild(link);
   };
+
+  const currentScope = scope === 'all' ? 'All domains' : config.name;
 
   return (
     <FlagGate
@@ -92,7 +103,7 @@ export default function InsightsPage() {
 	            </Link>
 	          )}
 	          <Link href="/review-queue">
-	            <Button variant="outline" className="bg-white text-slate-900">Go to Review Queue</Button>
+	            <Button variant="outline" className="bg-card text-foreground">Go to Review Queue</Button>
 	          </Link>
 	        </>
 	      }
@@ -108,7 +119,7 @@ export default function InsightsPage() {
           </div>
           <div className="flex gap-2 items-center">
             <Link href="/insights/dashboard">
-              <Button 
+              <Button
                 variant="ghost"
                 className="bg-white/10 text-white border border-white/30 hover:bg-white/20 font-semibold"
               >
@@ -118,7 +129,7 @@ export default function InsightsPage() {
             </Link>
             {canViewAllScope ? (
               <Select value={scope} onValueChange={(v: 'current' | 'all') => setScope(v)}>
-                <SelectTrigger className="w-[200px] bg-white text-slate-900 border-0 shadow-lg">
+                <SelectTrigger className="w-[200px] bg-card text-foreground border-0 shadow-lg">
                   <SelectValue placeholder="Scope" />
                 </SelectTrigger>
                 <SelectContent>
@@ -129,8 +140,8 @@ export default function InsightsPage() {
             ) : (
               <Badge variant="secondary" className="bg-white/10 text-white border-white/30 backdrop-blur-md">Scope: {config.name}</Badge>
             )}
-            <Button 
-              className="bg-white text-slate-900 hover:bg-white/90 shadow-lg border-0 font-semibold"
+            <Button
+              className="bg-card text-foreground hover:bg-card/90 shadow-lg border-0 font-semibold"
               onClick={handleExport}
             >
               Export Report
@@ -139,64 +150,101 @@ export default function InsightsPage() {
         </div>
         <div className="info-rail mt-6 relative z-10">
           <span className="info-rail__item bg-white/10 border-white/20 text-white backdrop-blur-md">
-            <span className="info-rail__dot" style={{ background: '#22c55e', boxShadow: '0 0 8px #22c55e' }} />
+            <span className="info-rail__dot" style={{ background: 'var(--success)', boxShadow: '0 0 8px var(--success)' }} />
             Approved {counts.approved}
           </span>
           <span className="info-rail__item bg-white/10 border-white/20 text-white backdrop-blur-md">
-            <span className="info-rail__dot" style={{ background: '#f59e0b', boxShadow: '0 0 8px #f59e0b' }} />
+            <span className="info-rail__dot" style={{ background: 'var(--warning)', boxShadow: '0 0 8px var(--warning)' }} />
             Processing {counts.processing}
           </span>
           <span className="info-rail__item bg-white/10 border-white/20 text-white backdrop-blur-md">
-            <span className="info-rail__dot" style={{ background: '#ef4444', boxShadow: '0 0 8px #ef4444' }} />
+            <span className="info-rail__dot" style={{ background: 'var(--error)', boxShadow: '0 0 8px var(--error)' }} />
             High Risk {counts.highRisk}
           </span>
           <span className="info-rail__item bg-white/10 border-white/20 text-white backdrop-blur-md">
-            <span className="info-rail__dot" style={{ background: '#0ea5e9', boxShadow: '0 0 8px #0ea5e9' }} />
+            <span className="info-rail__dot" style={{ background: 'var(--info)', boxShadow: '0 0 8px var(--info)' }} />
             Compliance {counts.complianceRate}%
           </span>
         </div>
       </Card>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <MetricCard 
-          title="Total Notes" 
-          value={counts.total.toString()} 
-          trend={`${counts.processing} processing`} 
-          icon={FileTextIcon} 
-          color="blue"
-        />
-        <MetricCard 
-          title="Avg. Duration" 
-          value={counts.avgDurationMin !== null ? `${counts.avgDurationMin} mins` : '—'} 
-          trend={`${counts.processing} in queue`} 
-          icon={Clock} 
-          color="green"
-        />
-        <MetricCard 
-          title="Ready for Review" 
-          value={counts.ready.toString()} 
-          trend={`${counts.approved} approved`} 
-          icon={CheckCircle2} 
-          color="purple"
-        />
-        <MetricCard 
-          title="High Risk Items" 
-          value={counts.highRisk.toString()} 
-          trend={`${counts.mediumRisk} medium`} 
-          icon={Activity} 
-          color="orange"
-        />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+        {counts.total === 0 ? (
+          <div className="col-span-4 flex flex-col items-center py-12 text-center">
+            <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
+              <BarChart3 className="w-6 h-6 text-muted-foreground" />
+            </div>
+            <p className="text-sm font-medium text-foreground">No data yet</p>
+            <p className="text-xs text-muted-foreground mt-1">Metrics will appear once notes are submitted</p>
+          </div>
+        ) : (
+          <>
+            <MetricCard
+              icon={FileText}
+              value={counts.total}
+              label="Total Notes"
+              colorClass="text-primary"
+              bgClass="bg-primary/10"
+              badge={`${counts.processing} processing`}
+            />
+            <MetricCard
+              icon={Clock}
+              value={counts.avgDurationMin !== null ? `${counts.avgDurationMin} mins` : '—'}
+              label="Avg. Duration"
+              colorClass="text-accent"
+              bgClass="bg-accent/10"
+              badge={`${counts.processing} in queue`}
+            />
+            <MetricCard
+              icon={CheckCircle2}
+              value={counts.ready}
+              label="Ready for Review"
+              colorClass="text-success"
+              bgClass="bg-success/10"
+              badge={`${counts.approved} approved`}
+            />
+            <MetricCard
+              icon={AlertTriangle}
+              value={counts.highRisk}
+              label="High Risk Items"
+              colorClass="text-destructive"
+              bgClass="bg-destructive/10"
+              badge={`${counts.mediumRisk} medium`}
+            />
+          </>
+        )}
       </div>
 
-      <Card variant="glass" className="p-4 flex items-center gap-3 bg-white/80" hoverEffect={false}>
-        <span className="text-sm font-semibold text-slate-700">Risk distribution</span>
-        <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">High {counts.highRisk}</Badge>
-        <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">Med {counts.mediumRisk}</Badge>
-        <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">Low {counts.lowRisk}</Badge>
-        <Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200">None {counts.noneRisk}</Badge>
-        <div className="ml-auto text-xs text-slate-500">Scope: {scope === 'all' ? 'All domains' : config.name}</div>
-      </Card>
+      {/* Risk Distribution */}
+      <div className="bg-card border border-border rounded-xl p-5 mt-4">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-semibold text-foreground">Risk Distribution</h3>
+          <span className="text-xs text-muted-foreground">Scope: {currentScope}</span>
+        </div>
+        <div className="space-y-3">
+          {[
+            { label: 'High', count: counts.highRisk, barClass: 'bg-destructive' },
+            { label: 'Medium', count: counts.mediumRisk, barClass: 'bg-warning' },
+            { label: 'Low', count: counts.lowRisk, barClass: 'bg-success' },
+            { label: 'None', count: counts.noneRisk, barClass: 'bg-muted-foreground/30' },
+          ].map(({ label, count, barClass }) => {
+            const total = (counts.highRisk + counts.mediumRisk + counts.lowRisk + counts.noneRisk) || 1;
+            return (
+              <div key={label} className="flex items-center gap-3">
+                <span className="w-12 text-xs text-muted-foreground text-right shrink-0">{label}</span>
+                <div className="flex-1 bg-muted rounded-full h-2">
+                  <div
+                    className={cn('h-2 rounded-full transition-all', barClass)}
+                    style={{ width: `${(count / total) * 100}%` }}
+                  />
+                </div>
+                <span className="w-6 text-xs font-medium text-foreground text-right shrink-0">{count}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
 
       {/* Charts Area */}
       <ChartsArea counts={counts} templateNameMap={templateNameMap} />
@@ -205,59 +253,37 @@ export default function InsightsPage() {
   );
 }
 
- type MetricColor = 'blue' | 'green' | 'purple' | 'orange';
+interface MetricCardProps {
+  icon: React.ElementType;
+  value: number | string;
+  label: string;
+  colorClass?: string;
+  bgClass?: string;
+  badge?: string;
+}
 
- interface MetricCardProps {
-   title: string;
-   value: string;
-   trend: string;
-   icon: LucideIcon | React.FC<React.SVGProps<SVGSVGElement>>;
-   color: MetricColor;
- }
-
- function MetricCard({ title, value, trend, icon: Icon, color }: MetricCardProps) {
-   const colors = {
-     blue: 'bg-blue-50 text-blue-600',
-     green: 'bg-green-50 text-green-600',
-     purple: 'bg-purple-50 text-purple-600',
-     orange: 'bg-orange-50 text-orange-600',
-   };
-
-   return (
-     <Card variant="glass" className="p-6 hover:shadow-xl transition-all bg-white/80" hoverEffect>
-       <div className="flex justify-between items-start mb-4">
-         <div className={`p-3 rounded-xl ${colors[color as keyof typeof colors]} shadow-sm`}>
-           <Icon className="w-5 h-5" />
-         </div>
-         <span className={`text-xs font-bold px-2 py-1 rounded-full border ${trend.includes('+') ? 'bg-green-100 text-green-700 border-green-200' : 'bg-slate-100 text-slate-600 border-slate-200'}`}>
-           {trend}
-         </span>
-       </div>
-       <h3 className="text-3xl font-bold text-slate-900 mb-1 font-display">{value}</h3>
-       <p className="text-sm text-slate-500 font-medium">{title}</p>
-     </Card>
-   );
- }
-
- const FileTextIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
-   return (
-     <svg
-       {...props}
-       xmlns="http://www.w3.org/2000/svg"
-       width="24"
-       height="24"
-       viewBox="0 0 24 24"
-       fill="none"
-       stroke="currentColor"
-       strokeWidth="2"
-       strokeLinecap="round"
-       strokeLinejoin="round"
-     >
-       <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-       <polyline points="14 2 14 8 20 8" />
-       <line x1="16" x2="8" y1="13" y2="13" />
-       <line x1="16" x2="8" y1="17" y2="17" />
-       <line x1="10" x2="8" y1="9" y2="9" />
-     </svg>
-   );
- };
+function MetricCard({
+  icon: Icon,
+  value,
+  label,
+  colorClass = 'text-primary',
+  bgClass = 'bg-primary/10',
+  badge,
+}: MetricCardProps) {
+  return (
+    <div className="bg-card border border-border rounded-xl p-5 flex flex-col gap-3">
+      <div className="flex items-center justify-between">
+        <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center', bgClass)}>
+          <Icon className={cn('w-5 h-5', colorClass)} />
+        </div>
+        {badge && (
+          <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+            {badge}
+          </span>
+        )}
+      </div>
+      <p className="text-3xl font-bold text-foreground tabular-nums">{value}</p>
+      <p className="text-sm text-muted-foreground">{label}</p>
+    </div>
+  );
+}

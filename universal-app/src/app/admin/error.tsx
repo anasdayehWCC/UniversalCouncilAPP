@@ -4,6 +4,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Shield, AlertTriangle, Home, RefreshCw } from 'lucide-react';
+import { ShellPage } from '@/components/layout';
 
 export default function AdminError({
   error,
@@ -17,7 +18,7 @@ export default function AdminError({
     error.message.includes('permission');
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50">
+    <ShellPage className="flex items-center justify-center bg-background transition-colors" padded={false} contentClassName="flex h-full items-center justify-center p-6">
       <Card className="max-w-lg w-full">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center">
@@ -75,6 +76,6 @@ export default function AdminError({
           </div>
         </CardContent>
       </Card>
-    </div>
+    </ShellPage>
   );
 }

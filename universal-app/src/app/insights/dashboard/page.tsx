@@ -60,7 +60,7 @@ export default function InsightsDashboardPage() {
             </Link>
           )}
           <Link href="/insights">
-            <Button variant="outline" className="bg-white text-slate-900">
+            <Button variant="outline" className="bg-card text-foreground">
               Basic View
             </Button>
           </Link>

@@ -253,9 +253,9 @@ export function FormBuilder<T extends z.ZodRawShape>({
           <div
             role="alert"
             aria-live="polite"
-            className="rounded-md border border-red-200 bg-red-50 p-3"
+            className="rounded-md border border-destructive bg-destructive/10 p-3"
           >
-            <p className="text-sm font-medium text-red-700">
+            <p className="text-sm font-medium text-destructive">
               Please fix {Object.keys(form.state.errors).length} error
               {Object.keys(form.state.errors).length !== 1 ? 's' : ''} before submitting.
             </p>
@@ -422,15 +422,15 @@ function FormBuilderField<T>({ field: fieldConfig }: FormBuilderFieldProps<T>) {
               htmlFor={`field-${fieldConfig.name}`}
               className={cn(
                 'text-sm font-medium cursor-pointer',
-                hasError && 'text-red-600'
+                hasError && 'text-destructive'
               )}
             >
               {fieldConfig.label}
-              {fieldConfig.required && <span className="ml-1 text-red-500">*</span>}
+              {fieldConfig.required && <span className="ml-1 text-destructive">*</span>}
             </Label>
           )}
           {fieldConfig.description && (
-            <p className="text-sm text-slate-500">{fieldConfig.description}</p>
+            <p className="text-sm text-muted-foreground">{fieldConfig.description}</p>
           )}
           {hasError && (
             <FieldError id={`field-${fieldConfig.name}-error`}>
@@ -472,11 +472,11 @@ function FormBuilderField<T>({ field: fieldConfig }: FormBuilderFieldProps<T>) {
           aria-invalid={hasError ? 'true' : undefined}
           aria-describedby={hasError ? `field-${fieldConfig.name}-error` : undefined}
           className={cn(
-            'flex min-h-[80px] w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm',
-            'placeholder:text-slate-500',
+            'flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm',
+            'placeholder:text-muted-foreground',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2',
             'disabled:cursor-not-allowed disabled:opacity-50',
-            hasError && 'border-red-500 focus-visible:ring-red-500'
+            hasError && 'border-destructive focus-visible:ring-destructive'
           )}
         />
       </FormField>
@@ -522,7 +522,7 @@ function FormBuilderField<T>({ field: fieldConfig }: FormBuilderFieldProps<T>) {
         aria-invalid={hasError ? 'true' : undefined}
         aria-describedby={hasError ? `field-${fieldConfig.name}-error` : undefined}
         className={cn(
-          hasError && 'border-red-500 focus-visible:ring-red-500'
+          hasError && 'border-destructive focus-visible:ring-destructive'
         )}
       />
     </FormField>
@@ -566,7 +566,7 @@ export function FormBuilderFooter({
           disabled={isDisabled}
           className={cn(
             'inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium',
-            'text-slate-600 hover:bg-slate-100',
+            'text-muted-foreground hover:bg-muted',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2',
             'disabled:pointer-events-none disabled:opacity-50'
           )}
@@ -581,8 +581,8 @@ export function FormBuilderFooter({
           onClick={onCancel}
           disabled={isDisabled}
           className={cn(
-            'inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium',
-            'text-slate-700 hover:bg-slate-50',
+            'inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium',
+            'text-foreground hover:bg-muted',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2',
             'disabled:pointer-events-none disabled:opacity-50'
           )}
@@ -601,7 +601,7 @@ export function FormBuilderFooter({
           'disabled:pointer-events-none disabled:opacity-50'
         )}
       >
-        {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+        {loading && <Loader2 className="h-4 w-4 animate-spin motion-reduce:animate-none" />}
         {form.state.isSubmitting ? 'Submitting...' : submitLabel}
       </button>
     </div>

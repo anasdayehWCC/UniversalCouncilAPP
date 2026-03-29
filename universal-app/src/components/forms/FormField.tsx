@@ -113,10 +113,10 @@ export function FormField({
                 <Label
                   htmlFor={fieldId}
                   className={cn(
-                    'text-sm font-medium text-slate-700',
+                    'text-sm font-medium text-foreground',
                     size === 'sm' && 'text-xs',
                     size === 'lg' && 'text-base',
-                    hasError && 'text-red-600',
+                    hasError && 'text-destructive',
                     disabled && 'opacity-50',
                     labelClassName
                   )}
@@ -125,10 +125,10 @@ export function FormField({
                 </Label>
               )}
               {required && (
-                <span className="text-red-500" aria-hidden="true">*</span>
+                <span className="text-destructive" aria-hidden="true">*</span>
               )}
               {optional && !required && (
-                <span className="text-xs text-slate-400">(optional)</span>
+                <span className="text-xs text-muted-foreground">(optional)</span>
               )}
               {tooltip && (
                 <button
@@ -141,7 +141,7 @@ export function FormField({
                   aria-label={`Help: ${tooltip}`}
                 >
                   <HelpCircle
-                    className="h-3.5 w-3.5 text-slate-400 hover:text-slate-600"
+                    className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground"
                     aria-hidden="true"
                   />
                   {showTooltip && (
@@ -149,14 +149,14 @@ export function FormField({
                       role="tooltip"
                       className={cn(
                         'absolute left-1/2 top-full z-50 mt-1.5 -translate-x-1/2',
-                        'rounded-md bg-slate-900 px-2.5 py-1.5 text-xs text-white shadow-lg',
+                        'rounded-md bg-popover px-2.5 py-1.5 text-xs text-popover-foreground shadow-lg',
                         'max-w-xs whitespace-normal text-center',
                         'animate-in fade-in-0 zoom-in-95'
                       )}
                     >
                       {tooltip}
                       <div
-                        className="absolute -top-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-b-slate-900"
+                        className="absolute -top-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-b-popover"
                         aria-hidden="true"
                       />
                     </div>
@@ -172,7 +172,7 @@ export function FormField({
           <p
             id={descriptionId}
             className={cn(
-              'text-sm text-slate-500',
+              'text-sm text-muted-foreground',
               size === 'sm' && 'text-xs',
               disabled && 'opacity-50'
             )}
@@ -196,7 +196,7 @@ export function FormField({
           <p
             id={helpTextId}
             className={cn(
-              'flex items-start gap-1.5 text-sm text-slate-500',
+              'flex items-start gap-1.5 text-sm text-muted-foreground',
               size === 'sm' && 'text-xs',
               disabled && 'opacity-50'
             )}
@@ -261,7 +261,7 @@ export function FieldError({
       role="alert"
       aria-live={isNew ? 'polite' : undefined}
       className={cn(
-        'flex items-center gap-1.5 text-sm text-red-600 animate-in fade-in-0 slide-in-from-top-1',
+        'flex items-center gap-1.5 text-sm text-destructive animate-in fade-in-0 slide-in-from-top-1',
         size === 'sm' && 'text-xs gap-1',
         size === 'lg' && 'text-base gap-2',
         className
@@ -320,9 +320,9 @@ export const FormFieldInput = React.forwardRef<HTMLInputElement, FormFieldInputP
     };
     
     const variantClasses = {
-      default: 'border-slate-200 bg-white focus-visible:border-[var(--primary)]',
-      filled: 'border-transparent bg-slate-100 focus-visible:bg-white focus-visible:border-[var(--primary)]',
-      ghost: 'border-transparent bg-transparent hover:bg-slate-50 focus-visible:bg-slate-50',
+      default: 'border-input bg-background focus-visible:border-[var(--primary)]',
+      filled: 'border-transparent bg-muted focus-visible:bg-background focus-visible:border-[var(--primary)]',
+      ghost: 'border-transparent bg-transparent hover:bg-muted focus-visible:bg-muted',
     };
     
     const inputElement = (
@@ -337,7 +337,7 @@ export const FormFieldInput = React.forwardRef<HTMLInputElement, FormFieldInputP
         className={cn(
           sizeClasses[size],
           variantClasses[variant],
-          hasError && 'border-red-500 focus-visible:ring-red-500',
+          hasError && 'border-destructive focus-visible:ring-destructive',
           leftIcon && 'pl-10',
           rightIcon && 'pr-10',
           className
@@ -351,14 +351,14 @@ export const FormFieldInput = React.forwardRef<HTMLInputElement, FormFieldInputP
       return (
         <div className="relative flex">
           {leftAddon && (
-            <span className="inline-flex items-center rounded-l-md border border-r-0 border-slate-200 bg-slate-50 px-3 text-sm text-slate-500">
+            <span className="inline-flex items-center rounded-l-md border border-r-0 border-input bg-muted px-3 text-sm text-muted-foreground">
               {leftAddon}
             </span>
           )}
           
           <div className="relative flex-1">
             {leftIcon && (
-              <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+              <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
                 {leftIcon}
               </span>
             )}
@@ -366,14 +366,14 @@ export const FormFieldInput = React.forwardRef<HTMLInputElement, FormFieldInputP
             {inputElement}
             
             {rightIcon && (
-              <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400">
+              <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground">
                 {rightIcon}
               </span>
             )}
           </div>
           
           {rightAddon && (
-            <span className="inline-flex items-center rounded-r-md border border-l-0 border-slate-200 bg-slate-50 px-3 text-sm text-slate-500">
+            <span className="inline-flex items-center rounded-r-md border border-l-0 border-input bg-muted px-3 text-sm text-muted-foreground">
               {rightAddon}
             </span>
           )}
@@ -426,9 +426,9 @@ export const FormFieldTextarea = React.forwardRef<HTMLTextAreaElement, FormField
     };
     
     const variantClasses = {
-      default: 'border-slate-200 bg-white focus-visible:border-[var(--primary)]',
-      filled: 'border-transparent bg-slate-100 focus-visible:bg-white focus-visible:border-[var(--primary)]',
-      ghost: 'border-transparent bg-transparent hover:bg-slate-50 focus-visible:bg-slate-50',
+      default: 'border-input bg-background focus-visible:border-[var(--primary)]',
+      filled: 'border-transparent bg-muted focus-visible:bg-background focus-visible:border-[var(--primary)]',
+      ghost: 'border-transparent bg-transparent hover:bg-muted focus-visible:bg-muted',
     };
     
     return (
@@ -444,14 +444,14 @@ export const FormFieldTextarea = React.forwardRef<HTMLTextAreaElement, FormField
           aria-invalid={hasError ? 'true' : undefined}
           aria-describedby={hasError ? `${context.id}-error` : undefined}
           className={cn(
-            'flex w-full rounded-md border ring-offset-white',
-            'placeholder:text-slate-500',
+            'flex w-full rounded-md border ring-offset-background',
+            'placeholder:text-muted-foreground',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2',
             'disabled:cursor-not-allowed disabled:opacity-50',
             'resize-y',
             sizeClasses[size],
             variantClasses[variant],
-            hasError && 'border-red-500 focus-visible:ring-red-500',
+            hasError && 'border-destructive focus-visible:ring-destructive',
             showCharCount && maxLength && 'pb-6',
             className
           )}
@@ -462,7 +462,7 @@ export const FormFieldTextarea = React.forwardRef<HTMLTextAreaElement, FormField
           <span
             className={cn(
               'absolute bottom-2 right-3 text-xs',
-              isAtLimit ? 'text-red-500' : isNearLimit ? 'text-amber-500' : 'text-slate-400'
+              isAtLimit ? 'text-destructive' : isNearLimit ? 'text-warning' : 'text-muted-foreground'
             )}
             aria-live="polite"
           >
@@ -502,28 +502,28 @@ export function FormFieldGroup({
   return (
     <fieldset
       className={cn(
-        'space-y-4 rounded-lg border border-slate-200 p-4',
-        hasError && 'border-red-200 bg-red-50/30',
+        'space-y-4 rounded-lg border border-border p-4',
+        hasError && 'border-destructive bg-destructive/10',
         className
       )}
     >
       {legend && (
         <legend
           className={cn(
-            'px-2 text-sm font-medium text-slate-700',
-            hasError && 'text-red-600'
+            'px-2 text-sm font-medium text-foreground',
+            hasError && 'text-destructive'
           )}
         >
           {legend}
           {required && (
-            <span className="ml-1 text-red-500" aria-hidden="true">*</span>
+            <span className="ml-1 text-destructive" aria-hidden="true">*</span>
           )}
           {required && <span className="sr-only">(required)</span>}
         </legend>
       )}
       
       {description && (
-        <p className="text-sm text-slate-500">{description}</p>
+        <p className="text-sm text-muted-foreground">{description}</p>
       )}
       
       <div className="space-y-4">

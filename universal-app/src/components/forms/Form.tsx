@@ -131,8 +131,8 @@ export function FormReset({
       type="button"
       onClick={handleClick}
       className={cn(
-        'inline-flex items-center justify-center rounded-md border border-slate-300 bg-transparent px-4 py-2 text-sm font-medium text-slate-700 transition-colors',
-        'hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2',
+        'inline-flex items-center justify-center rounded-md border border-input bg-transparent px-4 py-2 text-sm font-medium text-foreground transition-colors',
+        'hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2',
         className
       )}
       {...props}
@@ -158,7 +158,7 @@ export function FormStatus({ className }: FormStatusProps) {
       role="alert"
       aria-live="polite"
       className={cn(
-        'rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700',
+        'rounded-md border border-destructive bg-destructive/10 p-3 text-sm text-destructive',
         className
       )}
     >

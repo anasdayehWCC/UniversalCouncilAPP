@@ -101,15 +101,15 @@ export function RadioGroupField({
       {label && (
         <Label
           id={`${groupId}-label`}
-          className={cn(hasError && 'text-red-600')}
+          className={cn(hasError && 'text-destructive')}
         >
           {label}
-          {required && <span className="ml-1 text-red-500">*</span>}
+          {required && <span className="ml-1 text-destructive">*</span>}
         </Label>
       )}
       
       {description && (
-        <p id={descriptionId} className="text-sm text-slate-500">
+        <p id={descriptionId} className="text-sm text-muted-foreground">
           {description}
         </p>
       )}
@@ -144,8 +144,8 @@ export function RadioGroupField({
                   'disabled:cursor-not-allowed disabled:opacity-50',
                   isSelected
                     ? 'border-[var(--primary)]'
-                    : 'border-slate-300',
-                  hasError && 'border-red-500'
+                    : 'border-input',
+                  hasError && 'border-destructive'
                 )}
               >
                 {isSelected && (
@@ -159,14 +159,14 @@ export function RadioGroupField({
                   className={cn(
                     'text-sm font-medium leading-none cursor-pointer',
                     isDisabled && 'cursor-not-allowed opacity-50',
-                    hasError && 'text-red-600'
+                    hasError && 'text-destructive'
                   )}
                 >
                   {option.label}
                 </label>
                 
                 {option.description && (
-                  <p id={`${optionId}-desc`} className="mt-1 text-sm text-slate-500">
+                  <p id={`${optionId}-desc`} className="mt-1 text-sm text-muted-foreground">
                     {option.description}
                   </p>
                 )}
@@ -249,7 +249,7 @@ export function RadioGroup({
                   'disabled:cursor-not-allowed disabled:opacity-50',
                   isSelected
                     ? 'border-[var(--primary)]'
-                    : 'border-slate-300'
+                    : 'border-input'
                 )}
               >
                 {isSelected && (
@@ -269,7 +269,7 @@ export function RadioGroup({
                 </label>
                 
                 {option.description && (
-                  <p className="mt-1 text-sm text-slate-500">
+                  <p className="mt-1 text-sm text-muted-foreground">
                     {option.description}
                   </p>
                 )}

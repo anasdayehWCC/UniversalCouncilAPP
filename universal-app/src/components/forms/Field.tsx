@@ -41,10 +41,10 @@ export const Field = React.forwardRef<HTMLInputElement, FieldProps>(
         {label && (
           <Label 
             htmlFor={fieldId}
-            className={cn(hasError && 'text-red-600')}
+            className={cn(hasError && 'text-destructive')}
           >
             {label}
-            {required && <span className="ml-1 text-red-500">*</span>}
+            {required && <span className="ml-1 text-destructive">*</span>}
           </Label>
         )}
         
@@ -59,7 +59,7 @@ export const Field = React.forwardRef<HTMLInputElement, FieldProps>(
           aria-invalid={hasError ? 'true' : undefined}
           aria-required={required}
           className={cn(
-            hasError && 'border-red-500 focus-visible:ring-red-500',
+            hasError && 'border-destructive focus-visible:ring-destructive',
             className
           )}
           value={fieldProps.value as string ?? ''}
@@ -67,7 +67,7 @@ export const Field = React.forwardRef<HTMLInputElement, FieldProps>(
         />
         
         {description && !hasError && (
-          <p id={descriptionId} className="text-sm text-slate-500">
+          <p id={descriptionId} className="text-sm text-muted-foreground">
             {description}
           </p>
         )}
@@ -118,10 +118,10 @@ export const TextareaField = React.forwardRef<HTMLTextAreaElement, TextareaField
         {label && (
           <Label 
             htmlFor={fieldId}
-            className={cn(hasError && 'text-red-600')}
+            className={cn(hasError && 'text-destructive')}
           >
             {label}
-            {required && <span className="ml-1 text-red-500">*</span>}
+            {required && <span className="ml-1 text-destructive">*</span>}
           </Label>
         )}
         
@@ -139,18 +139,18 @@ export const TextareaField = React.forwardRef<HTMLTextAreaElement, TextareaField
           aria-invalid={hasError ? 'true' : undefined}
           aria-required={required}
           className={cn(
-            'flex min-h-[80px] w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white',
-            'placeholder:text-slate-500',
+            'flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background',
+            'placeholder:text-muted-foreground',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2',
             'disabled:cursor-not-allowed disabled:opacity-50',
-            hasError && 'border-red-500 focus-visible:ring-red-500',
+            hasError && 'border-destructive focus-visible:ring-destructive',
             className
           )}
           {...props}
         />
         
         {description && !hasError && (
-          <p id={descriptionId} className="text-sm text-slate-500">
+          <p id={descriptionId} className="text-sm text-muted-foreground">
             {description}
           </p>
         )}
@@ -180,7 +180,7 @@ export function FieldError({ children, id, className }: FieldErrorProps) {
       id={id}
       role="alert"
       className={cn(
-        'flex items-center gap-1.5 text-sm text-red-600',
+        'flex items-center gap-1.5 text-sm text-destructive',
         className
       )}
     >

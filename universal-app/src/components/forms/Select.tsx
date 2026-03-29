@@ -63,10 +63,10 @@ export function SelectField({
       {label && (
         <Label 
           htmlFor={fieldId}
-          className={cn(hasError && 'text-red-600')}
+          className={cn(hasError && 'text-destructive')}
         >
           {label}
-          {required && <span className="ml-1 text-red-500">*</span>}
+          {required && <span className="ml-1 text-destructive">*</span>}
         </Label>
       )}
       
@@ -85,13 +85,13 @@ export function SelectField({
           aria-invalid={hasError ? 'true' : undefined}
           aria-required={required}
           className={cn(
-            'flex h-10 w-full items-center justify-between rounded-md border bg-white px-3 py-2 text-sm ring-offset-white',
-            'placeholder:text-slate-500',
+            'flex h-10 w-full items-center justify-between rounded-md border bg-background px-3 py-2 text-sm ring-offset-background',
+            'placeholder:text-muted-foreground',
             'focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2',
             'disabled:cursor-not-allowed disabled:opacity-50',
             hasError 
-              ? 'border-red-500 focus:ring-red-500' 
-              : 'border-slate-200 focus:border-[var(--primary)]',
+              ? 'border-destructive focus:ring-destructive' 
+              : 'border-input focus:border-[var(--primary)]',
             '[&>span]:line-clamp-1',
             className
           )}
@@ -105,7 +105,7 @@ export function SelectField({
         <SelectPrimitive.Portal>
           <SelectPrimitive.Content
             className={cn(
-              'relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border border-slate-200 bg-white text-slate-950 shadow-md',
+              'relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border border-input bg-popover text-popover-foreground shadow-md',
               'data-[state=open]:animate-in data-[state=closed]:animate-out',
               'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
               'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
@@ -122,7 +122,7 @@ export function SelectField({
                   disabled={option.disabled}
                   className={cn(
                     'relative flex w-full cursor-pointer select-none items-center rounded-sm py-2 pl-8 pr-2 text-sm outline-none',
-                    'focus:bg-slate-100 focus:text-slate-900',
+                    'focus:bg-accent focus:text-accent-foreground',
                     'data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
                   )}
                 >
@@ -140,7 +140,7 @@ export function SelectField({
       </SelectPrimitive.Root>
       
       {description && !hasError && (
-        <p id={descriptionId} className="text-sm text-slate-500">
+        <p id={descriptionId} className="text-sm text-muted-foreground">
           {description}
         </p>
       )}
@@ -190,10 +190,10 @@ export const NativeSelectField = React.forwardRef<HTMLSelectElement, NativeSelec
         {label && (
           <Label 
             htmlFor={fieldId}
-            className={cn(hasError && 'text-red-600')}
+            className={cn(hasError && 'text-destructive')}
           >
             {label}
-            {required && <span className="ml-1 text-red-500">*</span>}
+            {required && <span className="ml-1 text-destructive">*</span>}
           </Label>
         )}
         
@@ -208,12 +208,12 @@ export const NativeSelectField = React.forwardRef<HTMLSelectElement, NativeSelec
           aria-invalid={hasError ? 'true' : undefined}
           aria-required={required}
           className={cn(
-            'flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm ring-offset-white',
+            'flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2',
             'disabled:cursor-not-allowed disabled:opacity-50',
             hasError 
-              ? 'border-red-500 focus-visible:ring-red-500' 
-              : 'border-slate-200',
+              ? 'border-destructive focus-visible:ring-destructive' 
+              : 'border-input',
             className
           )}
           value={fieldProps.value as string ?? ''}
@@ -234,7 +234,7 @@ export const NativeSelectField = React.forwardRef<HTMLSelectElement, NativeSelec
         </select>
         
         {description && !hasError && (
-          <p id={descriptionId} className="text-sm text-slate-500">
+          <p id={descriptionId} className="text-sm text-muted-foreground">
             {description}
           </p>
         )}

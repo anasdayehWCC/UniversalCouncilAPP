@@ -72,8 +72,8 @@ export function CheckboxField({
             'disabled:cursor-not-allowed disabled:opacity-50',
             isChecked
               ? 'border-[var(--primary)] bg-[var(--primary)] text-white'
-              : 'border-slate-300 bg-white',
-            hasError && 'border-red-500',
+              : 'border-input bg-background',
+            hasError && 'border-destructive',
             className
           )}
         >
@@ -86,15 +86,15 @@ export function CheckboxField({
             className={cn(
               'text-sm font-medium leading-none cursor-pointer',
               disabled && 'cursor-not-allowed opacity-50',
-              hasError && 'text-red-600'
+              hasError && 'text-destructive'
             )}
           >
             {label}
-            {required && <span className="ml-1 text-red-500">*</span>}
+            {required && <span className="ml-1 text-destructive">*</span>}
           </label>
           
           {description && (
-            <p id={descriptionId} className="mt-1 text-sm text-slate-500">
+            <p id={descriptionId} className="mt-1 text-sm text-muted-foreground">
               {description}
             </p>
           )}
@@ -158,7 +158,7 @@ export function Checkbox({
           'disabled:cursor-not-allowed disabled:opacity-50',
           checked
             ? 'border-[var(--primary)] bg-[var(--primary)] text-white'
-            : 'border-slate-300 bg-white',
+            : 'border-input bg-background',
           className
         )}
       >
@@ -177,7 +177,7 @@ export function Checkbox({
         </label>
         
         {description && (
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-muted-foreground">
             {description}
           </p>
         )}

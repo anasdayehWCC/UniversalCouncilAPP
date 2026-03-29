@@ -127,15 +127,15 @@ export function NotificationBell({
         onClick={handleBellClick}
         className={cn(
           'relative p-2 rounded-lg transition-colors',
-          'hover:bg-slate-100 dark:hover:bg-slate-800',
+          'hover:bg-muted',
           'focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2',
-          isDropdownOpen && 'bg-slate-100 dark:bg-slate-800'
+          isDropdownOpen && 'bg-muted'
         )}
         aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
         aria-expanded={isDropdownOpen}
         aria-haspopup="true"
       >
-        <Bell className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+        <Bell className="h-5 w-5 text-muted-foreground" />
         
         {/* Unread Badge */}
         <AnimatePresence>
@@ -148,7 +148,7 @@ export function NotificationBell({
                 'absolute -top-0.5 -right-0.5 flex items-center justify-center',
                 'min-w-[18px] h-[18px] px-1 text-[10px] font-bold',
                 'bg-[var(--accent)] text-white rounded-full',
-                'ring-2 ring-white dark:ring-slate-900'
+                'ring-2 ring-background'
               )}
             >
               {unreadCount > 99 ? '99+' : unreadCount}
@@ -169,27 +169,27 @@ export function NotificationBell({
               transition={{ duration: 0.15 }}
               className={cn(
                 'absolute right-0 mt-2 w-[360px] max-h-[480px]',
-                'bg-white dark:bg-slate-900 rounded-xl shadow-xl',
-                'border border-slate-200 dark:border-slate-700',
+                'bg-card text-card-foreground rounded-xl shadow-xl',
+                'border border-border',
                 'flex flex-col overflow-hidden z-50'
               )}
               role="menu"
               aria-orientation="vertical"
             >
               {/* Header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700">
-                <h3 className="font-semibold text-slate-900 dark:text-slate-100">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                <h3 className="font-semibold text-foreground">
                   Notifications
                 </h3>
                 <div className="flex items-center gap-1">
                   {unreadCount > 0 && (
                     <button
                       onClick={handleMarkAllAsRead}
-                      className="p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                      className="p-1.5 rounded-md hover:bg-muted transition-colors"
                       title="Mark all as read"
                       aria-label="Mark all as read"
                     >
-                      <CheckCheck className="h-4 w-4 text-slate-500" />
+                      <CheckCheck className="h-4 w-4 text-muted-foreground" />
                     </button>
                   )}
                   {onOpenPreferences && (
@@ -198,11 +198,11 @@ export function NotificationBell({
                         setIsDropdownOpen(false);
                         onOpenPreferences();
                       }}
-                      className="p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                      className="p-1.5 rounded-md hover:bg-muted transition-colors"
                       title="Settings"
                       aria-label="Notification settings"
                     >
-                      <Settings className="h-4 w-4 text-slate-500" />
+                      <Settings className="h-4 w-4 text-muted-foreground" />
                     </button>
                   )}
                 </div>
@@ -212,8 +212,8 @@ export function NotificationBell({
               <div className="flex-1 overflow-y-auto">
                 {previewNotifications.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
-                    <Bell className="h-10 w-10 text-slate-300 dark:text-slate-600 mb-3" />
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                    <Bell className="h-10 w-10 text-muted-foreground/40 mb-3" />
+                    <p className="text-sm text-muted-foreground">
                       No notifications yet
                     </p>
                   </div>
@@ -236,7 +236,7 @@ export function NotificationBell({
 
               {/* Footer */}
               {(hasMore || notifications.length > 0) && onOpenCenter && (
-                <div className="border-t border-slate-200 dark:border-slate-700 p-2">
+                <div className="border-t border-border p-2">
                   <button
                     onClick={handleViewAll}
                     className={cn(

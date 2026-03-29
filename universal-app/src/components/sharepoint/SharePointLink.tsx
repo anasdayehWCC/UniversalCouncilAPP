@@ -72,7 +72,7 @@ const FileIcon = ({ mimeType, className }: { mimeType?: string; className?: stri
 };
 
 const SpinnerIcon = () => (
-  <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
+  <svg className="w-4 h-4 animate-spin motion-reduce:animate-none" viewBox="0 0 24 24" fill="none">
     <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeOpacity="0.25" />
     <path d="M12 2C6.47715 2 2 6.47715 2 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
   </svg>
@@ -155,9 +155,9 @@ export function SharePointLink({
 
   const getLinkTypeBadge = () => {
     const badges: Record<string, { label: string; className: string }> = {
-      minute: { label: 'Minute', className: 'bg-blue-100 text-blue-700' },
-      recording: { label: 'Recording', className: 'bg-purple-100 text-purple-700' },
-      attachment: { label: 'Attachment', className: 'bg-slate-100 text-slate-700' },
+  minute: { label: 'Minute', className: 'bg-info/10 text-info' },
+  recording: { label: 'Recording', className: 'bg-info/10 text-info' },
+  attachment: { label: 'Attachment', className: 'bg-muted text-muted-foreground' },
     };
     return badges[document.linkType] || badges.attachment;
   };
@@ -168,7 +168,7 @@ export function SharePointLink({
     return (
       <div
         className={cn(
-          "group flex items-center gap-2 p-2 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer",
+          "group flex items-center gap-2 p-2 rounded-lg hover:bg-muted transition-colors cursor-pointer",
           className
         )}
         onClick={handleOpenInSharePoint}
@@ -193,14 +193,14 @@ export function SharePointLink({
     >
       <div className="flex items-start gap-3 p-4">
         {/* File icon */}
-        <div className="flex-shrink-0 p-2 bg-slate-50 rounded-lg">
+        <div className="flex-shrink-0 p-2 bg-muted rounded-lg">
           <FileIcon mimeType={file.mimeType} className="w-6 h-6" />
         </div>
 
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h4 className="font-medium text-slate-900 truncate">{file.name}</h4>
+            <h4 className="font-medium text-foreground truncate">{file.name}</h4>
             <div className="flex items-center gap-1">
               <SharePointIcon />
               <span className={cn("text-xs px-1.5 py-0.5 rounded", badge.className)}>
@@ -209,14 +209,14 @@ export function SharePointLink({
             </div>
           </div>
           
-          <div className="flex items-center gap-3 mt-1 text-sm text-slate-500">
+          <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
             <span>{formatBytes(file.size)}</span>
             <span>•</span>
             <span>{formatDate(file.lastModifiedDateTime)}</span>
           </div>
 
           {file.createdBy?.user && (
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Added by {file.createdBy.user.displayName}
             </p>
           )}
@@ -234,7 +234,7 @@ export function SharePointLink({
               {/* Open in SharePoint */}
               <button
                 onClick={handleOpenInSharePoint}
-                className="p-2 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-700 transition-colors"
+                className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
                 title="Open in SharePoint"
               >
                 <ExternalLinkIcon />
@@ -245,7 +245,7 @@ export function SharePointLink({
                 <button
                   onClick={handleDownload}
                   disabled={isDownloading}
-                  className="p-2 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-700 transition-colors disabled:opacity-50"
+                  className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
                   title="Download"
                 >
                   {isDownloading ? <SpinnerIcon /> : <DownloadIcon />}
@@ -256,7 +256,7 @@ export function SharePointLink({
               {showUnlink && (
                 <button
                   onClick={handleUnlink}
-                  className="p-2 rounded-lg hover:bg-red-50 text-slate-500 hover:text-red-600 transition-colors"
+                  className="p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
                   title="Unlink from minute"
                 >
                   <UnlinkIcon />
@@ -307,7 +307,7 @@ export function SharePointLinksList({
 
   if (documents.length === 0) {
     return (
-      <div className="text-center py-8 text-slate-400">
+      <div className="text-center py-8 text-muted-foreground">
         <SharePointIcon />
         <p className="mt-2 text-sm">{emptyMessage}</p>
       </div>

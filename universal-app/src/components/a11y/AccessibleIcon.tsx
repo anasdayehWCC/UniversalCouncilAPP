@@ -126,9 +126,9 @@ const BUTTON_SIZES = {
 
 const BUTTON_VARIANTS = {
   default: 'bg-[var(--primary)] text-white hover:opacity-90',
-  ghost: 'hover:bg-slate-100 text-slate-700',
-  outline: 'border border-slate-300 hover:bg-slate-100 text-slate-700',
-  destructive: 'bg-red-500 text-white hover:bg-red-600',
+  ghost: 'hover:bg-muted text-foreground',
+  outline: 'border border-border hover:bg-muted text-foreground',
+  destructive: 'bg-destructive text-white hover:bg-destructive/90',
 } as const;
 
 export function IconButton({
@@ -200,7 +200,7 @@ export function IconLink({
       aria-label={label}
       className={cn(
         'inline-flex items-center justify-center rounded-md',
-        'text-slate-600 hover:text-slate-900',
+        'text-muted-foreground hover:text-foreground',
         'transition-colors duration-150',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2',
         BUTTON_SIZES[size],
@@ -238,7 +238,7 @@ export function LoadingIcon({
       <svg
         aria-hidden="true"
         className={cn(
-          'animate-spin',
+          'animate-spin motion-reduce:animate-none',
           SIZES[size],
           'text-[var(--primary)]'
         )}
@@ -282,7 +282,7 @@ export function StatusIcon({
   const statusConfig = {
     success: {
       label: 'Success',
-      color: 'text-green-600',
+      color: 'text-success',
       icon: (
         <svg viewBox="0 0 20 20" fill="currentColor">
           <path
@@ -295,7 +295,7 @@ export function StatusIcon({
     },
     error: {
       label: 'Error',
-      color: 'text-red-600',
+      color: 'text-destructive',
       icon: (
         <svg viewBox="0 0 20 20" fill="currentColor">
           <path
@@ -321,7 +321,7 @@ export function StatusIcon({
     },
     info: {
       label: 'Information',
-      color: 'text-blue-600',
+      color: 'text-info',
       icon: (
         <svg viewBox="0 0 20 20" fill="currentColor">
           <path
@@ -334,7 +334,7 @@ export function StatusIcon({
     },
     loading: {
       label: 'Loading',
-      color: 'text-slate-600',
+      color: 'text-muted-foreground',
       icon: null,
     },
   };

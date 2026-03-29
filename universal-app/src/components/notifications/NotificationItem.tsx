@@ -54,24 +54,24 @@ interface NotificationItemProps {
 
 const NOTIFICATION_ICONS: Record<NotificationType, React.ReactNode> = {
   approval_needed: <AlertCircle className="h-5 w-5 text-amber-500" />,
-  minute_approved: <CheckCircle className="h-5 w-5 text-green-500" />,
-  minute_rejected: <AlertCircle className="h-5 w-5 text-red-500" />,
-  assignment: <UserPlus className="h-5 w-5 text-blue-500" />,
-  mention: <AtSign className="h-5 w-5 text-purple-500" />,
-  reminder: <Clock className="h-5 w-5 text-orange-500" />,
-  system: <Bell className="h-5 w-5 text-slate-500" />,
+  minute_approved: <CheckCircle className="h-5 w-5 text-success" />,
+  minute_rejected: <AlertCircle className="h-5 w-5 text-destructive" />,
+  assignment: <UserPlus className="h-5 w-5 text-info" />,
+  mention: <AtSign className="h-5 w-5 text-info" />,
+  reminder: <Clock className="h-5 w-5 text-warning" />,
+  system: <Bell className="h-5 w-5 text-muted-foreground" />,
   comment: <MessageSquare className="h-5 w-5 text-teal-500" />,
   export_ready: <Download className="h-5 w-5 text-emerald-500" />,
 };
 
 const NOTIFICATION_COLORS: Record<NotificationType, string> = {
   approval_needed: 'border-l-amber-500 bg-amber-50/50 dark:bg-amber-950/20',
-  minute_approved: 'border-l-green-500 bg-green-50/50 dark:bg-green-950/20',
-  minute_rejected: 'border-l-red-500 bg-red-50/50 dark:bg-red-950/20',
-  assignment: 'border-l-blue-500 bg-blue-50/50 dark:bg-blue-950/20',
-  mention: 'border-l-purple-500 bg-purple-50/50 dark:bg-purple-950/20',
-  reminder: 'border-l-orange-500 bg-orange-50/50 dark:bg-orange-950/20',
-  system: 'border-l-slate-500 bg-slate-50/50 dark:bg-slate-950/20',
+  minute_approved: 'border-l-success bg-success/10 dark:bg-success/20',
+  minute_rejected: 'border-l-destructive bg-destructive/10 dark:bg-destructive/20',
+  assignment: 'border-l-info bg-info/10 dark:bg-info/20',
+  mention: 'border-l-info bg-info/10 dark:bg-info/20',
+  reminder: 'border-l-warning bg-warning/10 dark:bg-warning/20',
+  system: 'border-l-border bg-muted/40 dark:bg-muted/20',
   comment: 'border-l-teal-500 bg-teal-50/50 dark:bg-teal-950/20',
   export_ready: 'border-l-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20',
 };
@@ -156,7 +156,7 @@ export function NotificationItem({
       transition={{ duration: 0.2 }}
       className={cn(
         'group relative flex gap-3 rounded-lg border-l-4 p-3 transition-all cursor-pointer',
-        'hover:bg-slate-100 dark:hover:bg-slate-800',
+        'hover:bg-muted',
         colorClass,
         notification.read && 'opacity-70',
         compact && 'p-2 gap-2',
@@ -185,14 +185,14 @@ export function NotificationItem({
       <div className="flex-1 min-w-0 space-y-1">
         <div className="flex items-start justify-between gap-2">
           <h4 className={cn(
-            'font-medium text-slate-900 dark:text-slate-100 line-clamp-1',
+            'font-medium text-foreground line-clamp-1',
             compact ? 'text-sm' : 'text-base',
             !notification.read && 'font-semibold'
           )}>
             {notification.title}
           </h4>
           <span className={cn(
-            'flex-shrink-0 text-slate-500 dark:text-slate-400',
+            'flex-shrink-0 text-muted-foreground',
             compact ? 'text-xs' : 'text-sm'
           )}>
             {formatRelativeTime(notification.createdAt)}
@@ -200,14 +200,14 @@ export function NotificationItem({
         </div>
 
         {!compact && (
-          <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-2">
+          <p className="text-sm text-muted-foreground line-clamp-2">
             {notification.body}
           </p>
         )}
 
         {/* Actor info */}
         {notification.data?.actorName && !compact && (
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <p className="text-xs text-muted-foreground">
             By {notification.data.actorName}
           </p>
         )}
@@ -222,8 +222,8 @@ export function NotificationItem({
                 className={cn(
                   'inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md transition-colors',
                   action.type === 'primary' && 'bg-[var(--accent)] text-white hover:opacity-90',
-                  action.type === 'secondary' && 'bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-200',
-                  action.type === 'destructive' && 'bg-red-100 text-red-700 hover:bg-red-200'
+                  action.type === 'secondary' && 'bg-muted text-foreground hover:bg-muted/80',
+                  action.type === 'destructive' && 'bg-destructive/10 text-destructive hover:bg-destructive/20'
                 )}
               >
                 {action.label}
@@ -237,26 +237,26 @@ export function NotificationItem({
       {/* Action buttons (shown on hover) */}
       <div className={cn(
         'absolute right-2 top-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity',
-        'bg-white/90 dark:bg-slate-800/90 rounded-md p-0.5 backdrop-blur-sm',
+        'bg-card/90 rounded-md p-0.5 backdrop-blur-sm border border-border/60',
       )}>
         {!notification.read && onMarkAsRead && (
           <button
             onClick={handleMarkAsReadClick}
-            className="p-1.5 rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+            className="p-1.5 rounded-md hover:bg-muted transition-colors"
             title="Mark as read"
             aria-label="Mark as read"
           >
-            <Check className="h-3.5 w-3.5 text-slate-600 dark:text-slate-400" />
+            <Check className="h-3.5 w-3.5 text-muted-foreground" />
           </button>
         )}
         {showDelete && notification.dismissible && onDelete && (
           <button
             onClick={handleDeleteClick}
-            className="p-1.5 rounded-md hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+            className="p-1.5 rounded-md hover:bg-destructive/10 transition-colors"
             title="Delete notification"
             aria-label="Delete notification"
           >
-            <X className="h-3.5 w-3.5 text-slate-600 dark:text-slate-400 hover:text-red-500" />
+            <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
           </button>
         )}
       </div>

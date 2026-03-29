@@ -115,7 +115,7 @@ const RefreshIcon = () => (
 );
 
 const SpinnerIcon = () => (
-  <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg className="w-5 h-5 animate-spin motion-reduce:animate-none" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeOpacity="0.25" />
     <path d="M12 2C6.47715 2 2 6.47715 2 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
   </svg>
@@ -322,16 +322,16 @@ export function SharePointBrowser({
     return (
       <Card className={cn("p-8", className)}>
         <div className="flex flex-col items-center justify-center text-center gap-4">
-          <div className="p-4 bg-slate-100 rounded-full">
-            <svg className="w-8 h-8 text-slate-400" viewBox="0 0 24 24" fill="none">
+          <div className="p-4 bg-muted rounded-full">
+            <svg className="w-8 h-8 text-muted-foreground" viewBox="0 0 24 24" fill="none">
               <circle cx="12" cy="8" r="5" stroke="currentColor" strokeWidth="2" />
               <circle cx="7" cy="14" r="4" stroke="currentColor" strokeWidth="2" />
               <circle cx="16" cy="15" r="3" stroke="currentColor" strokeWidth="2" />
             </svg>
           </div>
           <div>
-            <h3 className="font-semibold text-slate-900">Connect to SharePoint</h3>
-            <p className="text-sm text-slate-500 mt-1">
+            <h3 className="font-semibold text-foreground">Connect to SharePoint</h3>
+            <p className="text-sm text-muted-foreground mt-1">
               Access your SharePoint and OneDrive files
             </p>
           </div>
@@ -347,7 +347,7 @@ export function SharePointBrowser({
       <Card className={cn("p-8", className)}>
         <div className="flex flex-col items-center justify-center gap-4">
           <SpinnerIcon />
-          <p className="text-slate-600">Connecting to SharePoint...</p>
+          <p className="text-muted-foreground">Connecting to SharePoint...</p>
         </div>
       </Card>
     );
@@ -362,14 +362,14 @@ export function SharePointBrowser({
           <div className="flex items-center gap-1.5 text-sm overflow-x-auto">
             <button
               onClick={() => browse('root')}
-              className="text-slate-500 hover:text-slate-700 whitespace-nowrap"
+              className="text-muted-foreground hover:text-foreground whitespace-nowrap"
             >
               {currentDrive?.name || 'My Drive'}
             </button>
             {currentPath.map((part, index) => (
               <React.Fragment key={index}>
-                <span className="text-slate-400">/</span>
-                <span className="text-slate-700 whitespace-nowrap">{part}</span>
+                <span className="text-muted-foreground">/</span>
+                <span className="text-foreground whitespace-nowrap">{part}</span>
               </React.Fragment>
             ))}
           </div>
@@ -378,7 +378,7 @@ export function SharePointBrowser({
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={refresh}
-              className="p-2 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
+              className="p-2 rounded-lg hover:bg-muted text-muted-foreground transition-colors"
               title="Refresh"
             >
               <RefreshIcon />
@@ -388,7 +388,7 @@ export function SharePointBrowser({
                 onClick={() => setViewMode('list')}
                 className={cn(
                   "p-2 transition-colors",
-                  viewMode === 'list' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:bg-slate-50'
+                  viewMode === 'list' ? 'bg-muted text-foreground' : 'text-muted-foreground hover:bg-muted/50'
                 )}
                 title="List view"
               >
@@ -398,7 +398,7 @@ export function SharePointBrowser({
                 onClick={() => setViewMode('grid')}
                 className={cn(
                   "p-2 transition-colors",
-                  viewMode === 'grid' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:bg-slate-50'
+                  viewMode === 'grid' ? 'bg-muted text-foreground' : 'text-muted-foreground hover:bg-muted/50'
                 )}
                 title="Grid view"
               >
@@ -423,7 +423,7 @@ export function SharePointBrowser({
             {searchQuery && (
               <button
                 onClick={handleClearSearch}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
                 ×
               </button>
@@ -447,8 +447,8 @@ export function SharePointBrowser({
 
         {/* Search results indicator */}
         {searchResults && (
-          <div className="flex items-center justify-between bg-slate-50 px-3 py-2 rounded-lg">
-            <span className="text-sm text-slate-600">
+          <div className="flex items-center justify-between bg-muted px-3 py-2 rounded-lg">
+            <span className="text-sm text-muted-foreground">
               Found {searchResults.length} result(s) for "{searchQuery}"
             </span>
             <button
@@ -469,13 +469,13 @@ export function SharePointBrowser({
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center h-48 gap-3">
-            <p className="text-red-600 text-sm">{error.message}</p>
+            <p className="text-destructive text-sm">{error.message}</p>
             <Button variant="outline" onClick={clearError}>
               Dismiss
             </Button>
           </div>
         ) : filteredItems.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-48 text-slate-400">
+          <div className="flex flex-col items-center justify-center h-48 text-muted-foreground">
             <p>No files found</p>
           </div>
         ) : viewMode === 'grid' ? (
@@ -485,10 +485,10 @@ export function SharePointBrowser({
             {currentFolder && !searchResults && (
               <button
                 onClick={navigateUp}
-                className="flex flex-col items-center gap-2 p-4 rounded-lg hover:bg-slate-50 transition-colors"
+                className="flex flex-col items-center gap-2 p-4 rounded-lg hover:bg-muted transition-colors"
               >
                 <FolderIcon className="w-10 h-10 opacity-50" />
-                <span className="text-sm text-slate-500">← Up</span>
+                <span className="text-sm text-muted-foreground">← Up</span>
               </button>
             )}
             
@@ -498,7 +498,7 @@ export function SharePointBrowser({
                 key={folder.id}
                 onClick={() => handleItemClick(folder)}
                 onDoubleClick={() => handleItemDoubleClick(folder)}
-                className="flex flex-col items-center gap-2 p-4 rounded-lg hover:bg-slate-50 transition-colors"
+                className="flex flex-col items-center gap-2 p-4 rounded-lg hover:bg-muted transition-colors"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -514,15 +514,15 @@ export function SharePointBrowser({
                 onClick={() => handleItemClick(file)}
                 onDoubleClick={() => handleItemDoubleClick(file)}
                 className={cn(
-                  "flex flex-col items-center gap-2 p-4 rounded-lg hover:bg-slate-50 transition-colors relative",
-                  selectedItems.has(file.id) && "bg-blue-50 ring-2 ring-blue-500"
+                  "flex flex-col items-center gap-2 p-4 rounded-lg hover:bg-muted transition-colors relative",
+                  selectedItems.has(file.id) && "bg-info/10 ring-2 ring-info"
                 )}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
                 <FileIcon mimeType={file.mimeType} className="w-10 h-10" />
                 <span className="text-sm text-center truncate w-full">{file.name}</span>
-                <span className="text-xs text-slate-400">{formatBytes(file.size)}</span>
+                <span className="text-xs text-muted-foreground">{formatBytes(file.size)}</span>
               </motion.button>
             ))}
           </div>
@@ -533,10 +533,10 @@ export function SharePointBrowser({
             {currentFolder && !searchResults && (
               <button
                 onClick={navigateUp}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors"
+                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted transition-colors"
               >
-                <span className="text-slate-400">←</span>
-                <span className="text-slate-600">Up one level</span>
+                <span className="text-muted-foreground">←</span>
+                <span className="text-muted-foreground">Up one level</span>
               </button>
             )}
             
@@ -546,11 +546,11 @@ export function SharePointBrowser({
                 key={folder.id}
                 onClick={() => handleItemClick(folder)}
                 onDoubleClick={() => handleItemDoubleClick(folder)}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors"
+                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted transition-colors"
               >
                 <FolderIcon />
                 <span className="flex-1 text-left truncate">{folder.name}</span>
-                <span className="text-sm text-slate-400">
+                <span className="text-sm text-muted-foreground">
                   {folder.folder.childCount} items
                 </span>
               </button>
@@ -561,8 +561,8 @@ export function SharePointBrowser({
               <div
                 key={file.id}
                 className={cn(
-                  "w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors group",
-                  selectedItems.has(file.id) && "bg-blue-50"
+                  "w-full flex items-center gap-3 px-4 py-3 hover:bg-muted transition-colors group",
+                  selectedItems.has(file.id) && "bg-info/10"
                 )}
               >
                 <button
@@ -573,7 +573,7 @@ export function SharePointBrowser({
                   <FileIcon mimeType={file.mimeType} />
                   <div className="flex-1 text-left min-w-0">
                     <p className="truncate">{file.name}</p>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-muted-foreground">
                       {formatBytes(file.size)} • {formatDate(file.lastModifiedDateTime)}
                     </p>
                   </div>
@@ -583,7 +583,7 @@ export function SharePointBrowser({
                 <div className="relative">
                   <button
                     onClick={() => setActionMenuId(actionMenuId === file.id ? null : file.id)}
-                    className="p-2 rounded-lg hover:bg-slate-100 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="p-2 rounded-lg hover:bg-muted opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     <MoreIcon />
                   </button>
@@ -598,14 +598,14 @@ export function SharePointBrowser({
                       >
                         <button
                           onClick={() => handleDownload(file)}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-slate-50"
+                          className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted"
                         >
                           <DownloadIcon />
                           Download
                         </button>
                         <button
                           onClick={() => handleDelete(file.id)}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-red-50 text-red-600"
+                          className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-destructive/10 text-destructive"
                         >
                           <TrashIcon />
                           Delete

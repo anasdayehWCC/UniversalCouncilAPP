@@ -102,7 +102,7 @@ const CheckIcon = () => (
 );
 
 const SpinnerIcon = () => (
-  <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg className="w-5 h-5 animate-spin motion-reduce:animate-none" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeOpacity="0.25" />
     <path d="M12 2C6.47715 2 2 6.47715 2 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
   </svg>
@@ -283,7 +283,7 @@ export function SharePointPicker({
               </div>
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-full hover:bg-slate-100 transition-colors"
+                className="p-1.5 rounded-full hover:bg-muted transition-colors"
                 aria-label="Close"
               >
                 <CloseIcon />
@@ -297,11 +297,11 @@ export function SharePointPicker({
                   {isConnecting ? (
                     <>
                       <SpinnerIcon />
-                      <p className="text-slate-600">Connecting to SharePoint...</p>
+                      <p className="text-muted-foreground">Connecting to SharePoint...</p>
                     </>
                   ) : error ? (
                     <>
-                      <div className="p-4 bg-red-50 rounded-lg text-red-700 text-sm">
+                      <div className="p-4 bg-destructive/10 rounded-lg text-destructive text-sm">
                         {error.message}
                       </div>
                       <Button onClick={handleConnect} variant="outline">
@@ -311,7 +311,7 @@ export function SharePointPicker({
                   ) : (
                     <>
                       <SharePointIcon />
-                      <p className="text-slate-600 text-center">
+                      <p className="text-muted-foreground text-center">
                         Connect to your SharePoint or OneDrive to browse files
                       </p>
                       <Button onClick={handleConnect}>
@@ -325,16 +325,16 @@ export function SharePointPicker({
               {/* Site Selection Step */}
               {step === 'site' && (
                 <div className="space-y-4">
-                  <p className="text-sm text-slate-500">Select a SharePoint site</p>
+                  <p className="text-sm text-muted-foreground">Select a SharePoint site</p>
                   <div className="space-y-2">
                     <button
                       onClick={() => setStep('drive')}
-                      className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 transition-colors text-left group"
+                      className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors text-left group"
                     >
                       <DriveIcon />
                       <div className="flex-1">
                         <p className="font-medium">My OneDrive</p>
-                        <p className="text-sm text-slate-500">Personal files</p>
+                        <p className="text-sm text-muted-foreground">Personal files</p>
                       </div>
                       <ChevronRightIcon />
                     </button>
@@ -342,13 +342,13 @@ export function SharePointPicker({
                       <button
                         key={site.id}
                         onClick={() => handleSelectSite(site)}
-                        className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 transition-colors text-left group"
+                        className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors text-left group"
                       >
                         <SiteIcon />
                         <div className="flex-1">
                           <p className="font-medium">{site.displayName}</p>
                           {site.description && (
-                            <p className="text-sm text-slate-500 truncate">{site.description}</p>
+                            <p className="text-sm text-muted-foreground truncate">{site.description}</p>
                           )}
                         </div>
                         <ChevronRightIcon />
@@ -361,10 +361,10 @@ export function SharePointPicker({
               {/* Drive Selection Step */}
               {step === 'drive' && (
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-sm text-slate-500">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <button
                       onClick={() => setStep(sites.length > 0 ? 'site' : 'connect')}
-                      className="hover:text-slate-700"
+                      className="hover:text-foreground"
                     >
                       ← Back
                     </button>
@@ -376,13 +376,13 @@ export function SharePointPicker({
                       <button
                         key={drive.id}
                         onClick={() => handleSelectDrive(drive)}
-                        className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 transition-colors text-left"
+                        className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors text-left"
                       >
                         <DriveIcon />
                         <div className="flex-1">
                           <p className="font-medium">{drive.name}</p>
                           {drive.quota && (
-                            <p className="text-sm text-slate-500">
+                            <p className="text-sm text-muted-foreground">
                               {formatBytes(drive.quota.used)} of {formatBytes(drive.quota.total)} used
                             </p>
                           )}
@@ -401,21 +401,21 @@ export function SharePointPicker({
                   <div className="flex items-center gap-2 text-sm flex-wrap">
                     <button
                       onClick={() => setStep('drive')}
-                      className="text-slate-500 hover:text-slate-700"
+                      className="text-muted-foreground hover:text-foreground"
                     >
                       ← Drives
                     </button>
-                    <span className="text-slate-400">/</span>
+                    <span className="text-muted-foreground">/</span>
                     <button
                       onClick={() => browse('root')}
-                      className="text-slate-500 hover:text-slate-700"
+                      className="text-muted-foreground hover:text-foreground"
                     >
                       {currentDrive?.name || 'Root'}
                     </button>
                     {currentPath.map((part, index) => (
                       <React.Fragment key={index}>
-                        <span className="text-slate-400">/</span>
-                        <span className="text-slate-700">{part}</span>
+                        <span className="text-muted-foreground">/</span>
+                        <span className="text-foreground">{part}</span>
                       </React.Fragment>
                     ))}
                   </div>
@@ -427,7 +427,7 @@ export function SharePointPicker({
                         <SpinnerIcon />
                       </div>
                     ) : folders.length === 0 && !isCreatingFolder ? (
-                      <div className="flex items-center justify-center h-32 text-slate-400">
+                      <div className="flex items-center justify-center h-32 text-muted-foreground">
                         No folders here
                       </div>
                     ) : (
@@ -435,17 +435,17 @@ export function SharePointPicker({
                         {currentFolder && (
                           <button
                             onClick={navigateUp}
-                            className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 transition-colors text-left"
+                            className="w-full flex items-center gap-3 p-3 hover:bg-muted transition-colors text-left"
                           >
-                            <span className="text-slate-400">←</span>
-                            <span className="text-slate-600">Up one level</span>
+                            <span className="text-muted-foreground">←</span>
+                            <span className="text-muted-foreground">Up one level</span>
                           </button>
                         )}
                         {folders.map((folder) => (
                           <button
                             key={folder.id}
                             onClick={() => handleFolderClick(folder)}
-                            className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 transition-colors text-left"
+                            className="w-full flex items-center gap-3 p-3 hover:bg-muted transition-colors text-left"
                           >
                             <FolderIcon />
                             <span className="flex-1 truncate">{folder.name}</span>
@@ -504,13 +504,13 @@ export function SharePointPicker({
                   {/* Recent Locations */}
                   {recentLocations.length > 0 && !currentFolder && (
                     <div className="pt-4 border-t">
-                      <p className="text-sm text-slate-500 mb-2">Recent locations</p>
+                      <p className="text-sm text-muted-foreground mb-2">Recent locations</p>
                       <div className="space-y-1">
                         {recentLocations.slice(0, 3).map((location, index) => (
                           <button
                             key={index}
                             onClick={() => handleSelectRecent(location)}
-                            className="w-full flex items-center gap-2 p-2 text-sm text-left hover:bg-slate-50 rounded-lg transition-colors"
+                            className="w-full flex items-center gap-2 p-2 text-sm text-left hover:bg-muted rounded-lg transition-colors"
                           >
                             <FolderIcon className="w-4 h-4" />
                             <span className="truncate">{location.displayPath}</span>

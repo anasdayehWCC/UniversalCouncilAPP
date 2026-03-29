@@ -17,7 +17,6 @@ import {
   BellOff,
   Volume2,
   VolumeX,
-  Vibrate,
   Moon,
   Clock,
   Mail,
@@ -26,7 +25,6 @@ import {
   ChevronDown,
   ChevronUp,
   CheckCircle,
-  AlertCircle,
   UserPlus,
   AtSign,
   Download,
@@ -76,19 +74,19 @@ const CATEGORY_CONFIG: {
     key: 'assignments',
     label: 'Assignments',
     description: 'New cases or minutes assigned to you',
-    icon: <UserPlus className="h-5 w-5 text-blue-500" />,
+    icon: <UserPlus className="h-5 w-5 text-info" />,
   },
   {
     key: 'mentions',
     label: 'Mentions',
     description: 'When someone mentions you in a comment',
-    icon: <AtSign className="h-5 w-5 text-purple-500" />,
+    icon: <AtSign className="h-5 w-5 text-info" />,
   },
   {
     key: 'reminders',
     label: 'Reminders',
     description: 'Follow-up and deadline reminders',
-    icon: <Clock className="h-5 w-5 text-orange-500" />,
+    icon: <Clock className="h-5 w-5 text-warning" />,
   },
   {
     key: 'comments',
@@ -106,7 +104,7 @@ const CATEGORY_CONFIG: {
     key: 'system',
     label: 'System',
     description: 'Updates and maintenance notifications',
-    icon: <Settings className="h-5 w-5 text-slate-500" />,
+    icon: <Settings className="h-5 w-5 text-muted-foreground" />,
   },
 ];
 
@@ -146,7 +144,7 @@ function Toggle({
         'relative inline-flex flex-shrink-0 cursor-pointer rounded-full',
         'transition-colors duration-200 ease-in-out',
         'focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2',
-        checked ? 'bg-[var(--accent)]' : 'bg-slate-200 dark:bg-slate-700',
+        checked ? 'bg-[var(--accent)]' : 'bg-muted',
         disabled && 'opacity-50 cursor-not-allowed',
         size === 'small' ? 'h-5 w-9' : 'h-6 w-11'
       )}
@@ -186,19 +184,19 @@ function CategoryRow({
   const isEnabled = settings.push || settings.inApp || settings.email;
 
   return (
-    <div className="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
+    <div className="border border-border rounded-lg overflow-hidden bg-card">
       {/* Main Row */}
       <div
-        className="flex items-center justify-between p-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50"
+        className="flex items-center justify-between p-3 cursor-pointer hover:bg-muted/80"
         onClick={onToggleExpand}
       >
         <div className="flex items-center gap-3">
           {config.icon}
           <div>
-            <h4 className="font-medium text-slate-900 dark:text-slate-100">
+            <h4 className="font-medium text-foreground">
               {config.label}
             </h4>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-muted-foreground">
               {config.description}
             </p>
           </div>
@@ -207,15 +205,15 @@ function CategoryRow({
           <span className={cn(
             'text-xs font-medium px-2 py-0.5 rounded',
             isEnabled 
-              ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
-              : 'bg-slate-100 text-slate-500 dark:bg-slate-800'
+              ? 'bg-success/10 text-success dark:bg-success/20 dark:text-success' 
+              : 'bg-muted text-muted-foreground'
           )}>
             {isEnabled ? 'On' : 'Off'}
           </span>
           {expanded ? (
-            <ChevronUp className="h-4 w-4 text-slate-400" />
+            <ChevronUp className="h-4 w-4 text-muted-foreground" />
           ) : (
-            <ChevronDown className="h-4 w-4 text-slate-400" />
+            <ChevronDown className="h-4 w-4 text-muted-foreground" />
           )}
         </div>
       </div>
@@ -228,13 +226,13 @@ function CategoryRow({
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/30"
+            className="border-t border-border bg-muted/40"
           >
             <div className="p-3 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Smartphone className="h-4 w-4 text-slate-400" />
-                  <span className="text-sm text-slate-700 dark:text-slate-300">Push</span>
+                  <Smartphone className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm text-foreground">Push</span>
                 </div>
                 <Toggle
                   checked={settings.push}
@@ -244,8 +242,8 @@ function CategoryRow({
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Bell className="h-4 w-4 text-slate-400" />
-                  <span className="text-sm text-slate-700 dark:text-slate-300">In-app</span>
+                  <Bell className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm text-foreground">In-app</span>
                 </div>
                 <Toggle
                   checked={settings.inApp}
@@ -255,8 +253,8 @@ function CategoryRow({
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-slate-400" />
-                  <span className="text-sm text-slate-700 dark:text-slate-300">Email</span>
+                  <Mail className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm text-foreground">Email</span>
                 </div>
                 <Toggle
                   checked={settings.email}
@@ -379,23 +377,23 @@ export function NotificationPreferences({
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
             className={cn(
               'fixed right-0 top-0 h-full w-full sm:w-[440px]',
-              'bg-white dark:bg-slate-900 shadow-2xl z-50 flex flex-col',
+              'bg-card shadow-2xl z-50 flex flex-col text-card-foreground',
               className
             )}
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
+            <div className="flex items-center justify-between p-4 border-b border-border">
               <div className="flex items-center gap-3">
                 <Settings className="h-5 w-5 text-[var(--accent)]" />
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                <h2 className="text-lg font-semibold text-foreground">
                   Notification Preferences
                 </h2>
               </div>
               <button
                 onClick={onClose}
-                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+                className="p-2 rounded-lg hover:bg-muted"
               >
-                <X className="h-5 w-5 text-slate-500" />
+                <X className="h-5 w-5 text-muted-foreground" />
               </button>
             </div>
 
@@ -404,22 +402,22 @@ export function NotificationPreferences({
               <div className="p-4 space-y-6">
                 {/* Global Settings */}
                 <section>
-                  <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
                     General
                   </h3>
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                    <div className="flex items-center justify-between p-3 bg-muted/40 rounded-lg">
                       <div className="flex items-center gap-3">
                         {localPreferences.globalEnabled ? (
                           <Bell className="h-5 w-5 text-[var(--accent)]" />
                         ) : (
-                          <BellOff className="h-5 w-5 text-slate-400" />
+                          <BellOff className="h-5 w-5 text-muted-foreground" />
                         )}
                         <div>
-                          <h4 className="font-medium text-slate-900 dark:text-slate-100">
+                          <h4 className="font-medium text-foreground">
                             All Notifications
                           </h4>
-                          <p className="text-xs text-slate-500">
+                          <p className="text-xs text-muted-foreground">
                             Master toggle for all notifications
                           </p>
                         </div>
@@ -430,14 +428,14 @@ export function NotificationPreferences({
                       />
                     </div>
 
-                    <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                    <div className="flex items-center justify-between p-3 bg-muted/40 rounded-lg">
                       <div className="flex items-center gap-3">
-                        <Smartphone className="h-5 w-5 text-blue-500" />
+                        <Smartphone className="h-5 w-5 text-info" />
                         <div>
-                          <h4 className="font-medium text-slate-900 dark:text-slate-100">
+                          <h4 className="font-medium text-foreground">
                             Push Notifications
                           </h4>
-                          <p className="text-xs text-slate-500">
+                          <p className="text-xs text-muted-foreground">
                             {pushSupport?.supported
                               ? 'Receive notifications when app is closed'
                               : 'Not supported in this browser'}
@@ -451,18 +449,18 @@ export function NotificationPreferences({
                       />
                     </div>
 
-                    <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                    <div className="flex items-center justify-between p-3 bg-muted/40 rounded-lg">
                       <div className="flex items-center gap-3">
                         {localPreferences.soundEnabled ? (
-                          <Volume2 className="h-5 w-5 text-green-500" />
+                          <Volume2 className="h-5 w-5 text-success" />
                         ) : (
-                          <VolumeX className="h-5 w-5 text-slate-400" />
+                          <VolumeX className="h-5 w-5 text-muted-foreground" />
                         )}
                         <div>
-                          <h4 className="font-medium text-slate-900 dark:text-slate-100">
+                          <h4 className="font-medium text-foreground">
                             Sound
                           </h4>
-                          <p className="text-xs text-slate-500">
+                          <p className="text-xs text-muted-foreground">
                             Play sound for notifications
                           </p>
                         </div>
@@ -477,18 +475,18 @@ export function NotificationPreferences({
 
                 {/* Quiet Hours */}
                 <section>
-                  <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
                     Quiet Hours
                   </h3>
-                  <div className="space-y-4 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                  <div className="space-y-4 p-3 bg-muted/40 rounded-lg">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <Moon className="h-5 w-5 text-indigo-500" />
                         <div>
-                          <h4 className="font-medium text-slate-900 dark:text-slate-100">
+                          <h4 className="font-medium text-foreground">
                             Enable Quiet Hours
                           </h4>
-                          <p className="text-xs text-slate-500">
+                          <p className="text-xs text-muted-foreground">
                             Silence notifications during specified hours
                           </p>
                         </div>
@@ -503,34 +501,34 @@ export function NotificationPreferences({
                       <motion.div
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
-                        className="space-y-4 pt-3 border-t border-slate-200 dark:border-slate-700"
+                        className="space-y-4 pt-3 border-t border-border"
                       >
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-xs font-medium text-slate-500 mb-1">
+                            <label className="block text-xs font-medium text-muted-foreground mb-1">
                               Start Time
                             </label>
                             <input
                               type="time"
                               value={localPreferences.quietHours.startTime}
                               onChange={(e) => handleUpdateQuietHours({ startTime: e.target.value })}
-                              className="w-full px-3 py-2 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+                              className="w-full px-3 py-2 rounded-md border border-border bg-background text-foreground"
                             />
                           </div>
                           <div>
-                            <label className="block text-xs font-medium text-slate-500 mb-1">
+                            <label className="block text-xs font-medium text-muted-foreground mb-1">
                               End Time
                             </label>
                             <input
                               type="time"
                               value={localPreferences.quietHours.endTime}
                               onChange={(e) => handleUpdateQuietHours({ endTime: e.target.value })}
-                              className="w-full px-3 py-2 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+                              className="w-full px-3 py-2 rounded-md border border-border bg-background text-foreground"
                             />
                           </div>
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-slate-500 mb-2">
+                          <label className="block text-xs font-medium text-muted-foreground mb-2">
                             Days
                           </label>
                           <div className="flex flex-wrap gap-2">
@@ -548,7 +546,7 @@ export function NotificationPreferences({
                                   'px-3 py-1.5 text-xs font-medium rounded-md transition-colors',
                                   localPreferences.quietHours.daysOfWeek.includes(day.value)
                                     ? 'bg-[var(--accent)] text-white'
-                                    : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+                                    : 'bg-muted text-muted-foreground'
                                 )}
                               >
                                 {day.label}
@@ -563,7 +561,7 @@ export function NotificationPreferences({
 
                 {/* Categories */}
                 <section>
-                  <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
                     Categories
                   </h3>
                   <div className="space-y-2">
@@ -585,11 +583,11 @@ export function NotificationPreferences({
             </div>
 
             {/* Footer */}
-            <div className="flex-shrink-0 border-t border-slate-200 dark:border-slate-700 p-4">
+            <div className="flex-shrink-0 border-t border-border p-4">
               <div className="flex gap-3">
                 <button
                   onClick={onClose}
-                  className="flex-1 py-2.5 px-4 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                  className="flex-1 py-2.5 px-4 rounded-lg border border-border text-foreground font-medium hover:bg-muted transition-colors"
                 >
                   Cancel
                 </button>

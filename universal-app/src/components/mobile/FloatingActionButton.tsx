@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { usePrefersReducedMotion, useScrollDirection, useSafeAreaInsets } from '@/hooks/useResponsive';
 import type { FABPosition, FABAction } from '@/lib/responsive/types';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ZINDEX_CLASSES } from '@/lib/z-index';
 
 interface FloatingActionButtonProps {
   /** Primary action icon */
@@ -124,7 +125,8 @@ export function FloatingActionButton({
       {/* FAB Container */}
       <motion.div
         className={cn(
-          'fixed z-50',
+          'fixed',
+          ZINDEX_CLASSES.floatingButton,
           positionClasses[position],
           className
         )}
@@ -160,7 +162,7 @@ export function FloatingActionButton({
                   }}
                 >
                   {/* Action label */}
-                  <span className="bg-slate-800 text-white text-sm px-3 py-1.5 rounded-lg shadow-lg whitespace-nowrap">
+                  <span className="bg-popover text-popover-foreground text-sm px-3 py-1.5 rounded-lg shadow-lg whitespace-nowrap">
                     {action.label}
                   </span>
                   
@@ -170,8 +172,8 @@ export function FloatingActionButton({
                     className={cn(
                       'w-12 h-12 rounded-full shadow-lg',
                       'flex items-center justify-center',
-                      'bg-white text-slate-700',
-                      'hover:bg-slate-50 active:scale-95',
+                      'bg-card text-foreground',
+                      'hover:bg-muted active:scale-95',
                       'transition-all duration-200',
                       'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
                     )}

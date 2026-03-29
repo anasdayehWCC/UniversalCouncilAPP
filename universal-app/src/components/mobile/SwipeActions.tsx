@@ -113,7 +113,7 @@ export function SwipeActions({
                 'min-w-[80px] min-h-[44px]',
                 'text-white text-xs font-medium',
                 'transition-transform active:scale-95',
-                action.destructive ? 'bg-red-500' : ''
+                action.destructive ? 'bg-destructive' : ''
               )}
               style={{ backgroundColor: action.color }}
             >
@@ -139,7 +139,7 @@ export function SwipeActions({
                 'min-w-[80px] min-h-[44px]',
                 'text-white text-xs font-medium',
                 'transition-transform active:scale-95',
-                action.destructive ? 'bg-red-500' : ''
+                action.destructive ? 'bg-destructive' : ''
               )}
               style={{ backgroundColor: action.color }}
             >

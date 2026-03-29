@@ -177,7 +177,7 @@ export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
         <div className="flex items-center gap-1 shrink-0">
           {isLoading && (
             <Loader2
-              className={cn(iconSizeClasses[size], 'animate-spin text-muted-foreground')}
+              className={cn(iconSizeClasses[size], 'animate-spin motion-reduce:animate-none text-muted-foreground')}
               aria-hidden="true"
             />
           )}

@@ -175,16 +175,16 @@ export function BottomSheet({
             {/* Handle */}
             {config.showHandle && (
               <div className="flex justify-center pt-3 pb-2">
-                <div className="w-10 h-1 bg-slate-300 rounded-full" />
+                <div className="w-10 h-1 bg-border rounded-full" />
               </div>
             )}
 
             {/* Header */}
             {title && (
-              <div className="px-4 pb-2 border-b border-slate-100">
+              <div className="px-4 pb-2 border-b border-border">
                 <h2
                   id="bottom-sheet-title"
-                  className="text-lg font-semibold text-slate-900"
+                  className="text-lg font-semibold text-foreground"
                 >
                   {title}
                 </h2>
@@ -207,7 +207,7 @@ export function BottomSheet({
                       'w-2 h-2 rounded-full transition-colors',
                       index === currentSnap
                         ? 'bg-primary'
-                        : 'bg-slate-300 hover:bg-slate-400'
+                        : 'bg-muted hover:bg-muted/80'
                     )}
                     aria-label={`Snap to ${Math.round(config.snapPoints[index] * 100)}%`}
                   />

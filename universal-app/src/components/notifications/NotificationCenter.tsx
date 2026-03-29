@@ -25,6 +25,7 @@ import { cn } from '@/lib/utils';
 import { useNotificationContext } from '@/providers/NotificationProvider';
 import { NotificationItem } from './NotificationItem';
 import type { Notification, NotificationType } from '@/lib/notifications/types';
+import { ZINDEX_CLASSES } from '@/lib/z-index';
 
 // ============================================================================
 // Types
@@ -168,7 +169,7 @@ export function NotificationCenter({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40"
+            className={cn('fixed inset-0 bg-black/30 backdrop-blur-sm', ZINDEX_CLASSES.backdrop)}
             onClick={onClose}
             aria-hidden="true"
           />
@@ -180,8 +181,9 @@ export function NotificationCenter({
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
             className={cn(
-              'fixed right-0 top-0 h-full w-full sm:w-[420px] bg-white dark:bg-slate-900',
-              'shadow-2xl z-50 flex flex-col',
+              'fixed right-0 top-0 h-full w-full sm:w-[420px] bg-card text-card-foreground',
+              'shadow-2xl flex flex-col',
+              ZINDEX_CLASSES.modal,
               className
             )}
             role="dialog"
@@ -189,11 +191,11 @@ export function NotificationCenter({
             aria-label="Notification Center"
           >
             {/* Header */}
-            <div className="flex-shrink-0 border-b border-slate-200 dark:border-slate-700">
+            <div className="flex-shrink-0 border-b border-border">
               <div className="flex items-center justify-between p-4">
                 <div className="flex items-center gap-3">
                   <Bell className="h-5 w-5 text-[var(--accent)]" />
-                  <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                  <h2 className="text-lg font-semibold text-foreground">
                     Notifications
                   </h2>
                   {unreadCount > 0 && (
@@ -204,10 +206,10 @@ export function NotificationCenter({
                 </div>
                 <button
                   onClick={onClose}
-                  className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  className="p-2 rounded-lg hover:bg-muted transition-colors"
                   aria-label="Close notifications"
                 >
-                  <X className="h-5 w-5 text-slate-500" />
+                  <X className="h-5 w-5 text-muted-foreground" />
                 </button>
               </div>
 
@@ -219,7 +221,7 @@ export function NotificationCenter({
                     onClick={() => setShowFilterMenu(!showFilterMenu)}
                     className={cn(
                       'flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-colors',
-                      'hover:bg-slate-100 dark:hover:bg-slate-800',
+                      'hover:bg-muted',
                       filter !== 'all' && 'bg-[var(--accent)]/10 text-[var(--accent)]'
                     )}
                   >
@@ -233,7 +235,7 @@ export function NotificationCenter({
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="absolute left-0 mt-1 w-40 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 z-10"
+                        className="absolute left-0 mt-1 w-40 bg-card rounded-lg shadow-lg border border-border z-10"
                       >
                         {FILTER_OPTIONS.map((option) => (
                           <button
@@ -243,7 +245,7 @@ export function NotificationCenter({
                               setShowFilterMenu(false);
                             }}
                             className={cn(
-                              'w-full px-3 py-2 text-sm text-left hover:bg-slate-100 dark:hover:bg-slate-700',
+                              'w-full px-3 py-2 text-sm text-left hover:bg-muted',
                               'first:rounded-t-lg last:rounded-b-lg',
                               filter === option.value && 'text-[var(--accent)] font-medium'
                             )}
@@ -261,40 +263,40 @@ export function NotificationCenter({
                   <button
                     onClick={handleRefresh}
                     disabled={isLoading}
-                    className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
+                    className="p-2 rounded-lg hover:bg-muted transition-colors disabled:opacity-50"
                     title="Refresh"
                     aria-label="Refresh notifications"
                   >
-                    <RefreshCw className={cn('h-4 w-4 text-slate-500', isLoading && 'animate-spin')} />
+                    <RefreshCw className={cn('h-4 w-4 text-muted-foreground', isLoading && 'animate-spin motion-reduce:animate-none')} />
                   </button>
                   {unreadCount > 0 && (
                     <button
                       onClick={handleMarkAllAsRead}
-                      className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                      className="p-2 rounded-lg hover:bg-muted transition-colors"
                       title="Mark all as read"
                       aria-label="Mark all as read"
                     >
-                      <CheckCheck className="h-4 w-4 text-slate-500" />
+                      <CheckCheck className="h-4 w-4 text-muted-foreground" />
                     </button>
                   )}
                   {notifications.length > 0 && (
                     <button
                       onClick={handleClearAll}
-                      className="p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+                      className="p-2 rounded-lg hover:bg-destructive/10 transition-colors"
                       title="Clear all"
                       aria-label="Clear all notifications"
                     >
-                      <Trash2 className="h-4 w-4 text-slate-500 hover:text-red-500" />
+                      <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
                     </button>
                   )}
                   {onOpenPreferences && (
                     <button
                       onClick={onOpenPreferences}
-                      className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                      className="p-2 rounded-lg hover:bg-muted transition-colors"
                       title="Settings"
                       aria-label="Notification settings"
                     >
-                      <Settings className="h-4 w-4 text-slate-500" />
+                      <Settings className="h-4 w-4 text-muted-foreground" />
                     </button>
                   )}
                 </div>
@@ -305,13 +307,13 @@ export function NotificationCenter({
             <div className="flex-1 overflow-y-auto">
               {filteredNotifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center p-8">
-                  <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4">
-                    <Inbox className="h-8 w-8 text-slate-400" />
+                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                    <Inbox className="h-8 w-8 text-muted-foreground" />
                   </div>
-                  <h3 className="text-lg font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <h3 className="text-lg font-medium text-foreground mb-1">
                     {filter === 'all' ? 'No notifications' : 'No notifications found'}
                   </h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                  <p className="text-sm text-muted-foreground">
                     {filter === 'all'
                       ? "You're all caught up!"
                       : `No ${FILTER_OPTIONS.find(opt => opt.value === filter)?.label.toLowerCase()} notifications`}
@@ -330,7 +332,7 @@ export function NotificationCenter({
                   <AnimatePresence mode="popLayout">
                     {groupedNotifications.map((group) => (
                       <div key={group.label} className="mb-4">
-                        <h3 className="px-2 py-1 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                        <h3 className="px-2 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                           {group.label}
                         </h3>
                         <div className="space-y-1">
@@ -353,10 +355,10 @@ export function NotificationCenter({
 
             {/* Footer */}
             {onOpenPreferences && (
-              <div className="flex-shrink-0 border-t border-slate-200 dark:border-slate-700 p-3">
+              <div className="flex-shrink-0 border-t border-border p-3">
                 <button
                   onClick={onOpenPreferences}
-                  className="w-full py-2 text-sm text-slate-600 dark:text-slate-400 hover:text-[var(--accent)] transition-colors"
+                  className="w-full py-2 text-sm text-muted-foreground hover:text-[var(--accent)] transition-colors"
                 >
                   Manage notification preferences
                 </button>

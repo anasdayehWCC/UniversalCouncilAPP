@@ -56,7 +56,7 @@ export interface HighlightTextProps {
 export function HighlightText({
   text,
   query,
-  highlightClassName = 'bg-yellow-200 dark:bg-yellow-800 rounded-sm px-0.5',
+  highlightClassName = 'bg-warning/20 dark:bg-warning/30 rounded-sm px-0.5',
   className,
 }: HighlightTextProps) {
   const segments = React.useMemo(

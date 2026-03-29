@@ -184,7 +184,7 @@ export function DataTable<T extends RowData = RowData>({
                       }
                     }}
                     onChange={table.toggleSelectAll}
-                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
                     aria-label="Select all rows"
                   />
                 </th>
@@ -215,7 +215,7 @@ export function DataTable<T extends RowData = RowData>({
             ) : isLoading ? (
               // Default loading skeleton
               Array.from({ length: 5 }).map((_, i) => (
-                <tr key={i} className="animate-pulse">
+                <tr key={i} className="animate-pulse motion-reduce:animate-none">
                   {selectable && (
                     <td className="px-3 py-3">
                       <div className="h-4 w-4 rounded bg-muted" />

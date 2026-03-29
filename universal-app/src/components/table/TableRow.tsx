@@ -108,7 +108,7 @@ export function TableRow<T extends RowData = RowData>({
             checked={selected}
             onChange={onSelect}
             onClick={(e) => e.stopPropagation()}
-            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+            className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
             aria-label={`Select row ${rowIndex + 1}`}
           />
         </td>
@@ -170,11 +170,11 @@ function renderCellValue(value: unknown): React.ReactNode {
 
   if (typeof value === 'boolean') {
     return value ? (
-      <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
+      <span className="inline-flex items-center rounded-full bg-success/10 px-2 py-0.5 text-xs font-medium text-success dark:bg-success/20 dark:text-success">
         Yes
       </span>
     ) : (
-      <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+      <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground dark:bg-muted dark:text-muted-foreground">
         No
       </span>
     );

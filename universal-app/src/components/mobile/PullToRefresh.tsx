@@ -181,9 +181,9 @@ export function PullToRefresh({
         {config.indicatorStyle === 'spinner' && (
           <div
             className={cn(
-              'w-8 h-8 rounded-full border-2 border-slate-200',
+              'w-8 h-8 rounded-full border-2 border-border',
               pullState === 'refreshing'
-                ? 'border-t-primary animate-spin'
+                ? 'border-t-primary animate-spin motion-reduce:animate-none'
                 : 'border-t-primary'
             )}
             style={{
@@ -231,7 +231,7 @@ export function PullToRefresh({
       {/* Status text */}
       {pullDistance > 0 && (
         <motion.div
-          className="absolute top-2 left-1/2 -translate-x-1/2 text-xs text-slate-500"
+          className="absolute top-2 left-1/2 -translate-x-1/2 text-xs text-muted-foreground"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >

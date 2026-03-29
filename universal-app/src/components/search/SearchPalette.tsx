@@ -337,15 +337,15 @@ export function SearchPalette({
               aria-modal="true"
               aria-label="Search"
               className={cn(
-                'overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700',
-                'bg-white dark:bg-slate-900 shadow-2xl',
+                'overflow-hidden rounded-2xl border border-border',
+                'bg-card shadow-2xl',
                 'ring-1 ring-black/5 dark:ring-white/10',
                 className
               )}
             >
               {/* Search Input */}
-              <div className="flex items-center border-b border-slate-200 dark:border-slate-700 px-4">
-                <Search className="h-5 w-5 text-slate-400 shrink-0" />
+              <div className="flex items-center border-b border-border px-4">
+                <Search className="h-5 w-5 text-muted-foreground shrink-0" />
                 <input
                   ref={inputRef}
                   type="text"
@@ -355,8 +355,8 @@ export function SearchPalette({
                   placeholder={placeholder}
                   className={cn(
                     'flex-1 bg-transparent py-4 px-3 text-base',
-                    'text-slate-900 dark:text-slate-100',
-                    'placeholder:text-slate-400 dark:placeholder:text-slate-500',
+                    'text-foreground',
+                    'placeholder:text-muted-foreground',
                     'focus:outline-none'
                   )}
                   autoComplete="off"
@@ -365,12 +365,12 @@ export function SearchPalette({
                   spellCheck={false}
                 />
                 {isSearching && (
-                  <Loader2 className="h-5 w-5 text-slate-400 animate-spin shrink-0" />
+                  <Loader2 className="h-5 w-5 text-muted-foreground animate-spin motion-reduce:animate-none shrink-0" />
                 )}
                 {query && !isSearching && (
                   <button
                     onClick={() => setQuery('')}
-                    className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                    className="p-1 text-muted-foreground hover:text-foreground transition-colors"
                     aria-label="Clear search"
                   >
                     <X className="h-4 w-4" />
@@ -387,13 +387,13 @@ export function SearchPalette({
                 {showRecentSearches && (
                   <div className="p-2">
                     <div className="flex items-center justify-between px-3 py-2">
-                      <span className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                      <span className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
                         <Clock className="h-3.5 w-3.5" />
                         Recent Searches
                       </span>
                       <button
                         onClick={handleClearRecent}
-                        className="flex items-center gap-1 text-xs text-slate-400 hover:text-red-500 transition-colors"
+                        className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors"
                       >
                         <Trash2 className="h-3 w-3" />
                         Clear
@@ -406,14 +406,14 @@ export function SearchPalette({
                             onClick={() => handleRecentSearchClick(search)}
                             className={cn(
                               'w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left',
-                              'text-slate-700 dark:text-slate-300',
-                              'hover:bg-slate-100 dark:hover:bg-slate-800',
+                              'text-foreground',
+                              'hover:bg-muted',
                               'transition-colors'
                             )}
                           >
-                            <Clock className="h-4 w-4 text-slate-400 shrink-0" />
+                            <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
                             <span className="truncate">{search}</span>
-                            <ArrowRight className="h-4 w-4 text-slate-300 dark:text-slate-600 ml-auto shrink-0" />
+                            <ArrowRight className="h-4 w-4 text-muted-foreground ml-auto shrink-0" />
                           </button>
                         </li>
                       ))}
@@ -424,11 +424,11 @@ export function SearchPalette({
                 {/* Search Results */}
                 {query && !isSearching && results.length === 0 && (
                   <div className="px-4 py-12 text-center">
-                    <Search className="h-10 w-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                    <Search className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+                    <p className="text-sm font-medium text-foreground">
                       No results found
                     </p>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                    <p className="text-sm text-muted-foreground mt-1">
                       Try a different search term
                     </p>
                   </div>
@@ -438,10 +438,10 @@ export function SearchPalette({
                   <div className="p-2">
                     {groupedResults.map((group) => (
                       <div key={group.category} className="mb-2 last:mb-0">
-                        <div className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                        <div className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
                           {group.icon}
                           {group.label}
-                          <span className="text-slate-400 dark:text-slate-500 font-normal">
+                          <span className="text-muted-foreground font-normal">
                             ({group.items.length})
                           </span>
                         </div>
@@ -472,7 +472,7 @@ export function SearchPalette({
                                     'transition-colors',
                                     isSelected
                                       ? 'bg-indigo-600 text-white'
-                                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                      : 'text-foreground hover:bg-muted'
                                   )}
                                 >
                                   {/* Icon */}
@@ -481,7 +481,7 @@ export function SearchPalette({
                                       'flex h-8 w-8 items-center justify-center rounded-lg shrink-0 text-sm',
                                       isSelected
                                         ? 'bg-white/20'
-                                        : 'bg-slate-100 dark:bg-slate-800'
+                                        : 'bg-muted'
                                     )}
                                   >
                                     {item.icon || '📄'}
@@ -498,7 +498,7 @@ export function SearchPalette({
                                           'text-sm truncate',
                                           isSelected
                                             ? 'text-white/70'
-                                            : 'text-slate-500 dark:text-slate-400'
+                                            : 'text-muted-foreground'
                                         )}
                                       >
                                         {item.subtitle || item.description}
@@ -521,7 +521,7 @@ export function SearchPalette({
                                         'h-4 w-4 shrink-0',
                                         isSelected
                                           ? 'text-white/50'
-                                          : 'text-slate-300 dark:text-slate-600'
+                                          : 'text-muted-foreground'
                                       )}
                                     />
                                   )}
@@ -537,24 +537,24 @@ export function SearchPalette({
               </div>
 
               {/* Footer */}
-              <div className="flex items-center justify-between border-t border-slate-200 dark:border-slate-700 px-4 py-2.5 text-xs text-slate-500 dark:text-slate-400">
+              <div className="flex items-center justify-between border-t border-border px-4 py-2.5 text-xs text-muted-foreground">
                 <div className="flex items-center gap-4">
                   <span className="flex items-center gap-1">
-                    <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-mono">↑↓</kbd>
-                    Navigate
+                    <kbd className="px-1.5 py-0.5 rounded bg-muted font-mono">↑↓</kbd>
+                    to navigate
                   </span>
-                  <span className="flex items-center gap-1">
-                    <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-mono">
+                  <span className="flex items-center gap-1.5">
+                    <kbd className="px-1.5 py-0.5 rounded bg-muted font-mono">
                       <CornerDownLeft className="h-3 w-3 inline" />
                     </kbd>
                     Select
                   </span>
                   <span className="flex items-center gap-1">
-                    <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-mono">esc</kbd>
+                    <kbd className="px-1.5 py-0.5 rounded bg-muted font-mono">esc</kbd>
                     Close
                   </span>
                 </div>
-                <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-mono">
+                <kbd className="px-1.5 py-0.5 rounded bg-muted font-mono">
                   ⌘K
                 </kbd>
               </div>

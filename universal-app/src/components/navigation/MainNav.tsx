@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight, Search, Bell } from 'lucide-react';
+import { ZINDEX_CLASSES } from '@/lib/z-index';
 import { NavSection } from './NavSection';
 import { QuickActions } from './QuickActions';
 import { UserMenu } from './UserMenu';
@@ -66,7 +67,7 @@ export function MainNav({
   }, [pathname]);
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-0 flex">
       {/* Desktop Sidebar */}
       <aside
         className={cn(
@@ -187,7 +188,7 @@ export function MainNav({
         )}
       >
         {/* Header */}
-        <header className="sticky top-0 z-30 h-16 flex items-center justify-between px-4 lg:px-6 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
+        <header className={cn('sticky top-0 h-16 flex items-center justify-between px-4 lg:px-6 bg-card/80 backdrop-blur-xl border-b border-border shadow-sm', ZINDEX_CLASSES.header)}>
           {/* Left: Mobile menu + Breadcrumbs */}
           <div className="flex items-center gap-4">
             <MobileNavTrigger onClick={() => setIsMobileNavOpen(true)} />
@@ -202,18 +203,18 @@ export function MainNav({
                   return (
                     <React.Fragment key={index}>
                       {index > 0 && (
-                        <ChevronRight className="h-4 w-4 text-slate-400" />
+                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
                       )}
                       {crumb.href && !isLast ? (
                         <Link
                           href={crumb.href}
-                          className="flex items-center gap-1 text-slate-600 hover:text-slate-900 transition-colors"
+                          className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
                         >
                           {Icon && <Icon className="h-4 w-4" />}
                           {crumb.label}
                         </Link>
                       ) : (
-                        <span className="flex items-center gap-1 text-slate-900 font-medium">
+                        <span className="flex items-center gap-1 text-foreground font-medium">
                           {Icon && <Icon className="h-4 w-4" />}
                           {crumb.label}
                         </span>
@@ -230,15 +231,15 @@ export function MainNav({
             {/* Search */}
             <div className="hidden md:flex items-center">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <input
                   type="text"
                   placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className={cn(
-                    'w-64 h-9 pl-10 pr-4 rounded-lg border border-slate-200/80',
-                    'bg-slate-50 text-sm placeholder:text-slate-400',
+                    'w-64 h-9 pl-10 pr-4 rounded-lg border border-border/80',
+                    'bg-card text-sm placeholder:text-muted-foreground',
                     'focus:outline-none focus:ring-2 focus:ring-offset-2',
                     'transition-all duration-200',
                   )}
@@ -246,7 +247,7 @@ export function MainNav({
                     '--tw-ring-color': domainConfig.theme.primary,
                   } as React.CSSProperties}
                 />
-                <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden lg:flex items-center px-1.5 py-0.5 text-[10px] font-mono text-slate-400 bg-slate-100 rounded">
+                <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden lg:flex items-center px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground bg-muted rounded">
                   /
                 </kbd>
               </div>
@@ -254,11 +255,11 @@ export function MainNav({
 
             {/* Notifications */}
             <button
-              className="relative p-2 rounded-lg hover:bg-slate-100 transition-colors"
+              className="relative p-2 rounded-lg hover:bg-muted transition-colors"
               aria-label="Notifications"
             >
-              <Bell className="h-5 w-5 text-slate-600" />
-              <span className="absolute top-1.5 right-1.5 h-2 w-2 bg-red-500 rounded-full" />
+              <Bell className="h-5 w-5 text-muted-foreground" />
+              <span className="absolute top-1.5 right-1.5 h-2 w-2 bg-destructive rounded-full" />
             </button>
 
             {/* Mobile User Avatar */}
@@ -275,7 +276,7 @@ export function MainNav({
         </header>
 
         {/* Page Content */}
-        <main id="main-content" className="flex-1 p-4 lg:p-6">
+        <main id="main-content" className="flex-1 min-h-0 overflow-hidden p-4 lg:p-6">
           {children}
         </main>
       </div>

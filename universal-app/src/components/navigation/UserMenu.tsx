@@ -64,7 +64,7 @@ function getRoleBadgeColor(role: UserRole): string {
     case 'housing_officer':
       return 'bg-amber-500/20 text-amber-300 border-amber-500/30';
     default:
-      return 'bg-slate-500/20 text-slate-300 border-slate-500/30';
+      return 'bg-muted/20 text-muted-foreground border-border/30';
   }
 }
 
@@ -215,7 +215,7 @@ export function UserMenu({
         {/* Sign Out */}
         <DropdownMenuItem
           onClick={onSignOut}
-          className="flex items-center gap-2 px-4 py-2 cursor-pointer text-red-400 hover:bg-red-500/10 hover:text-red-300"
+          className="flex items-center gap-2 px-4 py-2 cursor-pointer text-destructive hover:bg-destructive/10 hover:text-destructive"
         >
           <LogOut className="h-4 w-4" />
           <span>Sign Out</span>

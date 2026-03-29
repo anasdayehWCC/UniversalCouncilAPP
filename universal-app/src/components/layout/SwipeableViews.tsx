@@ -216,7 +216,7 @@ export function SwipeableViews({
                 'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
                 index === currentIndex
                   ? 'bg-primary w-6'
-                  : 'bg-slate-300 hover:bg-slate-400',
+                  : 'bg-muted hover:bg-muted/80',
                 dotClassName
               )}
               role="tab"

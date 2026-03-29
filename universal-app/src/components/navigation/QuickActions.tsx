@@ -45,8 +45,8 @@ export function QuickActions({
       case 'primary':
         return cn(
           base,
-          'bg-white text-slate-900 shadow-lg shadow-white/20',
-          'hover:bg-white/90 hover:shadow-xl hover:shadow-white/30',
+          'bg-card text-foreground shadow-lg shadow-white/20',
+          'hover:bg-card/90 hover:shadow-xl hover:shadow-white/30',
           'focus:ring-white/50',
         );
       case 'secondary':
@@ -151,7 +151,7 @@ export function QuickActionButton({
   };
 
   const variantStyles = {
-    primary: 'bg-white text-slate-900 hover:bg-white/90 shadow-lg',
+    primary: 'bg-card text-foreground hover:bg-card/90 shadow-lg',
     secondary: 'bg-white/10 text-white hover:bg-white/20 border border-white/20',
     glass: 'bg-white/5 backdrop-blur text-white hover:bg-white/15 border border-white/10',
     ghost: 'text-white/80 hover:bg-white/10 hover:text-white',

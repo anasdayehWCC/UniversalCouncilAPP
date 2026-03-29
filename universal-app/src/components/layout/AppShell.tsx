@@ -8,8 +8,12 @@ import { useDemo } from '@/context/DemoContext';
 import type { ServiceDomain } from '@/config/domains';
 import { cn, hexToRgba } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Bell, Search, Menu, LogOut, ChevronDown } from 'lucide-react';
+import { Bell, Search, Menu, LogOut, ChevronDown, Settings } from 'lucide-react';
 import { getNavForRole } from '@/config/navigation';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { useColorMode } from '@/hooks/useTheme';
+import { ResilienceBanner } from '@/components/ResilienceBanner';
+import { ZINDEX_CLASSES } from '@/lib/z-index';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,8 +27,15 @@ import { AnimatedIcon } from '@/components/ui/AnimatedIcon';
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { config, domain, role, currentUser, switchUser, signOut, featureFlags, personas, isAuthenticated } = useDemo();
   const pathname = usePathname();
-  const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
+  const { isDark } = useColorMode();
+  const [isMounted, setIsMounted] = React.useState(false);
+  // Start with sidebar closed on mobile (will be shown via lg:translate-x-0 on desktop)
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
   const isLogin = pathname === '/login';
+
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   React.useEffect(() => {
     if (!isLogin && !isAuthenticated) {
@@ -42,7 +53,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const isDarkSidebar = true;
 
   const canvasBg = React.useMemo(() => {
-    // Use theme-aware backgrounds with domain color tints for better visual distinction
+    // Dark mode: Use simple dark gradients
+    if (isMounted && isDark) {
+      const darkBase = 'rgba(15, 23, 42, 1)'; // slate-900
+      const darkSubtle = 'rgba(30, 41, 59, 0.5)'; // slate-800/50
+      return `linear-gradient(to bottom, ${darkSubtle}, ${darkBase})`;
+    }
+    
+    // Light mode: Use theme-aware backgrounds with domain color tints
     const social: Record<ServiceDomain, string> = { 
       children: hexToRgba(config.theme.primary, 0.02) + ', rgba(247, 248, 255, 0.98)', // Slight blue tint
       adults: hexToRgba(config.theme.primary, 0.015) + ', rgba(242, 251, 247, 0.98)', // Slight teal tint
@@ -66,7 +84,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     if (role === 'manager') return `linear-gradient(to bottom, ${manager[domain]})`;
     if (role === 'housing_officer') return `linear-gradient(to bottom, ${social[domain]})`;
     return `linear-gradient(to bottom, ${social[domain]})`;
-  }, [domain, role, config.theme]);
+  }, [domain, role, config.theme, isMounted, isDark]);
 
   const navStyle = React.useMemo(() => ({
     '--nav-hover-bg': isDarkSidebar ? 'rgba(255,255,255,0.08)' : 'var(--primary-soft)',
@@ -77,7 +95,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   if (isLogin) {
     return (
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-[100dvh] bg-background text-foreground transition-colors duration-200">
         {children}
       </div>
     );
@@ -85,27 +103,30 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div
-      className="min-h-screen text-slate-900 relative isolate"
+      className="relative isolate h-[100dvh] overflow-hidden bg-background text-foreground transition-colors duration-200"
       style={{
         background: canvasBg,
-        transition: 'background 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+        transition: 'background 0.6s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s',
       }}
     >
-      <div className="min-h-screen flex relative z-10">
+      <div className="flex h-full min-h-0 relative z-10">
       <a href="#main-content" className="skip-link">Skip to main content</a>
-      {!isSidebarOpen && (
+      {/* Mobile overlay - shows when sidebar is open on mobile */}
+      {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm lg:hidden z-40"
-          onClick={() => setIsSidebarOpen(true)}
+          className="fixed inset-0 bg-background/70 backdrop-blur-sm lg:hidden transition-opacity duration-300"
+          onClick={() => setIsSidebarOpen(false)}
+          aria-hidden="true"
         />
       )}
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-[17rem] text-white bg-slate-900 backdrop-blur-lg border-r border-slate-900/20 transform transition-transform duration-300 ease-in-out shadow-2xl lg:translate-x-0 lg:static lg:inset-0 flex flex-col",
-          !isSidebarOpen && "-translate-x-full lg:hidden"
+          "fixed inset-y-0 left-0 w-[17rem] text-white bg-slate-900 backdrop-blur-lg border-r border-border/20 transform transition-transform duration-300 ease-in-out shadow-2xl lg:translate-x-0 lg:static lg:inset-auto lg:h-full lg:sticky lg:top-0 flex flex-col shrink-0",
+          !isSidebarOpen && "-translate-x-full"
         )}
         style={{ backgroundColor: sidebarBg }}
+        aria-label="Main navigation sidebar"
       >
         {/* Logo Area */}
         <div className="h-16 flex items-center px-6 border-b border-white/10">
@@ -117,7 +138,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               M
             </div>
             <span className="font-display font-bold text-xl tracking-tight text-white">
-              Minute<span className="text-slate-300">Platform</span>
+              Minute<span className="text-muted-foreground">Platform</span>
             </span>
           </div>
         </div>
@@ -184,19 +205,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   }}
                   className="gap-2 cursor-pointer"
                 >
-                  <div className="w-6 h-6 rounded-full bg-slate-100 overflow-hidden">
+                  <div className="w-6 h-6 rounded-full bg-muted overflow-hidden">
                     <Image src={user.avatar} alt={user.name} width={24} height={24} className="w-full h-full object-cover" sizes="24px" />
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-medium">{user.name}</span>
-                    <span className="text-[10px] text-slate-500 capitalize">{user.role.replace('_', ' ')}</span>
+                    <span className="text-[10px] text-muted-foreground capitalize">{user.role.replace('_', ' ')}</span>
                   </div>
-                  {currentUser.id === user.id && <div className="ml-auto w-2 h-2 rounded-full bg-green-500" />}
+                  {currentUser.id === user.id && <div className="ml-auto w-2 h-2 rounded-full bg-success" />}
                 </DropdownMenuItem>
               ))}
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                className="text-red-600 gap-2 cursor-pointer"
+                className="text-destructive gap-2 cursor-pointer"
                 onClick={signOut}
               >
                 <LogOut className="w-4 h-4" />
@@ -222,14 +243,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Header */}
-        <header className="h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 px-6 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+      <div className="flex-1 flex flex-col min-w-0 min-h-0">
+        {/* Header - z-50 to appear above overlay (z-40) */}
+        <header className={cn(
+          'shrink-0 sticky top-0 bg-card/80 backdrop-blur-md border-b border-border px-6 flex items-center justify-between shadow-sm',
+          `h-[var(--shell-header-height)]`,
+          ZINDEX_CLASSES.header
+        )}>
+          <div className="flex items-center gap-4 flex-1 min-w-0">
               <Button
                 variant="ghost"
                 size="icon"
-                className="lg:hidden"
+                className="lg:hidden shrink-0"
                 aria-label="Toggle navigation"
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               >
@@ -237,41 +262,54 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   <Menu className="w-5 h-5" />
                 </AnimatedIcon>
               </Button>
-              <div className="hidden sm:flex items-center gap-1 text-[11px] tracking-wide text-slate-400">
-                <span className="h-2 w-2 rounded-full bg-slate-400 animate-pulse" />
+              <div className="hidden sm:flex items-center gap-1 text-[11px] tracking-wide text-muted-foreground shrink-0">
+                <span className="h-2 w-2 rounded-full bg-muted-foreground/70" />
                 <span>Touch-friendly</span>
               </div>
-            
+
             {/* Breadcrumbs / Context */}
-            <div className="hidden md:flex items-center gap-3 text-sm text-slate-500">
-              <span className="font-medium text-slate-900 truncate max-w-[300px]" title={currentUser.authorityLabel || config.authorityLabel}>
+            <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground min-w-0">
+              <span className="font-medium text-foreground truncate max-w-[160px]" title={currentUser.authorityLabel || config.authorityLabel}>
                 {currentUser.authorityLabel || config.authorityLabel}
               </span>
-              <span className="text-slate-300">/</span>
-              <div className="flex items-center gap-2">
-                <span className="font-medium text-slate-900">{config.name}</span>
+              <span className="text-muted-foreground/40 shrink-0">/</span>
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span className="font-medium text-foreground truncate max-w-[160px]" title={config.name}>{config.name}</span>
                 <span
-                  className="px-2 py-1 rounded-full text-[11px] font-semibold text-white shadow-sm"
+                  className="px-2 py-1 rounded-full text-[11px] font-semibold text-white shadow-sm shrink-0"
                   style={{ background: config.theme.gradient }}
                 >
                   {domain.charAt(0).toUpperCase() + domain.slice(1)}
                 </span>
               </div>
-              <span className="text-slate-300">/</span>
-              <span className="truncate max-w-[300px]" title={currentUser.team}>{currentUser.team}</span>
+              <span className="text-muted-foreground/40 shrink-0">/</span>
+              <span className="truncate max-w-[140px]" title={currentUser.team}>{currentUser.team}</span>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             <div className="relative hidden sm:block">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input 
                 type="text" 
                 placeholder="Search minutes, people..." 
-                className="h-9 pl-9 pr-4 rounded-full bg-slate-100 border-none text-sm placeholder:text-slate-500 focus:ring-2 focus:ring-slate-200 w-64 transition-all"
+                className="h-9 pl-9 pr-4 rounded-full bg-muted border border-border text-sm placeholder:text-muted-foreground focus:ring-2 focus:ring-ring w-64 transition-all text-foreground"
               />
             </div>
-            <Button variant="ghost" size="icon" className="relative text-slate-500 hover:text-slate-900" aria-label="Notifications">
+            <Button
+              asChild
+              variant="ghost"
+              size="sm"
+              className="gap-2 px-3 text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Open appearance settings"
+            >
+              <Link href="/settings">
+                <Settings className="w-5 h-5" />
+                <span className="hidden lg:inline">Settings</span>
+              </Link>
+            </Button>
+            <ThemeToggle size="default" />
+            <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground" aria-label="Notifications">
               <Bell className="w-5 h-5" />
               {/* <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span> */}
             </Button>
@@ -282,11 +320,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Page Content */}
-        <main id="main-content" className="flex-1 overflow-y-auto p-6">
-          <div className="max-w-7xl mx-auto animate-in fade-in duration-500">
-            {children}
+        <main id="main-content" className="flex-1 min-h-0 overflow-hidden">
+          <div className="h-full min-h-0 overflow-y-auto p-6">
+            <div className="max-w-7xl mx-auto min-h-full animate-in fade-in duration-500">
+              {children}
+            </div>
           </div>
         </main>
+      </div>
+
+      <div className="pointer-events-none absolute inset-x-0 top-[calc(env(safe-area-inset-top)+var(--shell-header-height)+0.5rem)] z-[45] flex justify-center px-4">
+        <ResilienceBanner position="inline" className="w-full max-w-2xl" />
       </div>
     </div>
   </div>

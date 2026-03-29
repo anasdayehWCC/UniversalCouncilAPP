@@ -368,7 +368,7 @@ function UploadItemRow({
             {upload.file.name}
           </span>
           {isAudio && (
-            <span className="text-xs px-1.5 py-0.5 bg-purple-100 text-purple-700 dark:bg-purple-800/30 dark:text-purple-300 rounded">
+            <span className="text-xs px-1.5 py-0.5 bg-info/10 text-info rounded">
               {ext.toUpperCase()}
             </span>
           )}
@@ -396,7 +396,7 @@ function UploadItemRow({
             <ProgressBar
               value={upload.progress}
               height="6px"
-              color={upload.status === 'paused' ? '#f59e0b' : '#2563eb'}
+              variant={upload.status === 'paused' ? 'warning' : 'default'}
             />
           </div>
         )}

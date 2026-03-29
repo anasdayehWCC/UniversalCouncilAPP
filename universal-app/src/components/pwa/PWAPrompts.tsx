@@ -63,7 +63,7 @@ export function PWAUpdateNotification({
   return (
     <div
       role="alert"
-      className={`fixed ${positionClasses} z-50 flex items-center gap-3 px-4 py-3 bg-white rounded-xl shadow-lg border border-slate-200 animate-in slide-in-from-bottom-5 duration-300`}
+      className={`fixed ${positionClasses} z-50 flex items-center gap-3 px-4 py-3 bg-card rounded-xl shadow-lg border border-border animate-in slide-in-from-bottom-5 duration-300`}
     >
       <div className="flex items-center gap-2">
         <svg
@@ -156,7 +156,7 @@ export function PWAInstallPrompt() {
 
   return (
     <div className="fixed bottom-20 left-4 right-4 md:left-auto md:right-4 md:max-w-sm z-50 animate-in slide-in-from-bottom-5 duration-300">
-      <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-4">
+      <div className="bg-card rounded-2xl shadow-xl border border-border p-4">
         <div className="flex items-start gap-3">
           <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
             <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">

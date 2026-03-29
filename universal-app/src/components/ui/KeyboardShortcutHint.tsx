@@ -55,13 +55,13 @@ const sizeClasses = {
 
 const variantClasses = {
   default:
-    'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shadow-[0_1px_0_1px_rgba(0,0,0,0.05)]',
+    'bg-muted text-muted-foreground border border-border shadow-[0_1px_0_1px_rgba(0,0,0,0.05)]',
   outline:
-    'bg-transparent text-slate-500 dark:text-slate-400 border border-slate-300 dark:border-slate-600',
+    'bg-transparent text-muted-foreground border border-border',
   ghost:
-    'bg-transparent text-slate-400 dark:text-slate-500',
+    'bg-transparent text-muted-foreground',
   solid:
-    'bg-slate-700 dark:bg-slate-600 text-white border border-slate-600 dark:border-slate-500 shadow-sm',
+    'bg-foreground text-background border border-border shadow-sm',
 };
 
 const gapClasses = {
@@ -142,7 +142,7 @@ function KeyboardShortcutHintComponent({
     return formattedKeys.map((key, index) => (
       <span key={index} className="contents">
         {index > 0 && keySeparator && !isMac && (
-          <span className="text-slate-400 dark:text-slate-500 text-xs mx-0.5">
+          <span className="text-muted-foreground text-xs mx-0.5">
             {keySeparator}
           </span>
         )}
@@ -171,7 +171,7 @@ function KeyboardShortcutHintComponent({
       aria-label={`Keyboard shortcut: ${label || formattedKeys.join(' + ')}`}
     >
       {label && (
-        <span className="text-xs text-slate-500 dark:text-slate-400 mr-2">
+        <span className="text-xs text-muted-foreground mr-2">
           {label}
         </span>
       )}

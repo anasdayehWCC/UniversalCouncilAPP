@@ -38,14 +38,14 @@ export const EnhancedInput = React.forwardRef<HTMLTextAreaElement, EnhancedInput
     return (
       <div
         className={cn(
-          "relative rounded-3xl border transition-all duration-300 bg-slate-50",
-          isFocused ? "bg-white border-[var(--primary)] shadow-lg ring-4 ring-[var(--primary-soft)]" : "border-slate-200 hover:border-slate-300",
+          "relative rounded-3xl border transition-all duration-300 bg-muted",
+          isFocused ? "bg-card border-[var(--primary)] shadow-lg ring-4 ring-[var(--primary-soft)]" : "border-border hover:border-border/80",
           className
         )}
       >
         <textarea
           ref={ref}
-          className="w-full bg-transparent border-0 focus:ring-0 resize-none p-4 min-h-[60px] max-h-[200px] text-slate-900 placeholder:text-slate-400 focus-visible:outline-none"
+          className="w-full bg-transparent border-0 focus:ring-0 resize-none p-4 min-h-[60px] max-h-[200px] text-foreground placeholder:text-muted-foreground focus-visible:outline-none"
           placeholder="Ask anything about your cases..."
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
@@ -56,10 +56,10 @@ export const EnhancedInput = React.forwardRef<HTMLTextAreaElement, EnhancedInput
         
         <div className="flex items-center justify-between px-2 pb-2">
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" className="rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100" onClick={onImageClick} aria-label="Upload image">
+            <Button variant="ghost" size="icon" className="rounded-full text-muted-foreground hover:text-foreground hover:bg-muted" onClick={onImageClick} aria-label="Upload image">
               <ImageIcon className="w-5 h-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100" aria-label="Attach file">
+            <Button variant="ghost" size="icon" className="rounded-full text-muted-foreground hover:text-foreground hover:bg-muted" aria-label="Attach file">
               <Paperclip className="w-5 h-5" />
             </Button>
           </div>
@@ -78,7 +78,7 @@ export const EnhancedInput = React.forwardRef<HTMLTextAreaElement, EnhancedInput
                <Button 
                  variant="ghost" 
                  size="icon" 
-                 className="rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 w-10 h-10"
+                 className="rounded-full bg-muted text-muted-foreground hover:bg-muted/80 w-10 h-10"
                  onClick={onMicClick}
                  aria-label="Voice input"
                >

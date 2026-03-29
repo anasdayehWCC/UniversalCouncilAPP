@@ -9,18 +9,18 @@ const Card = React.forwardRef<
   }
 >(({ className, variant = "default", hoverEffect = true, ...props }, ref) => {
   const variants = {
-    default: "bg-card text-card-foreground shadow-sm border",
-    glass: "relative overflow-hidden backdrop-blur-xl bg-white/60 border-white/40 text-foreground shadow-lg",
+    default: "bg-card text-card-foreground shadow-sm border border-border",
+    glass: "relative overflow-hidden backdrop-blur-xl bg-card/60 dark:bg-card/40 border-border/40 text-foreground shadow-lg",
     elevated: "bg-card text-card-foreground shadow-md border-0",
-    gradient: "bg-gradient-to-br from-white to-slate-50 border border-white/50 shadow-sm",
-    hero: "relative overflow-hidden backdrop-blur-2xl bg-gradient-to-b from-white/20 via-white/10 to-white/5 border border-white/30 shadow-2xl ring-1 ring-white/20 after:absolute after:inset-0 after:bg-gradient-to-br after:from-white/15 after:via-white/5 after:to-transparent after:opacity-80 after:pointer-events-none after:content-['']"
+    gradient: "bg-gradient-to-br from-card to-muted border border-border/50 shadow-sm",
+    hero: "relative overflow-hidden backdrop-blur-2xl bg-gradient-to-b from-card/20 via-card/10 to-card/5 border border-border/30 shadow-2xl ring-1 ring-border/20 after:absolute after:inset-0 after:bg-gradient-to-br after:from-card/15 after:via-card/5 after:to-transparent after:opacity-80 after:pointer-events-none after:content-['']"
   }
 
   const hoverClasses = hoverEffect
     ? variant === "hero"
-      ? "hover:-translate-y-1 hover:shadow-[0_25px_80px_-30px_rgba(15,23,42,0.55)] hover:border-white/40"
+      ? "hover:-translate-y-1 hover:shadow-[0_25px_80px_-30px_rgba(15,23,42,0.55)] dark:hover:shadow-[0_25px_80px_-30px_rgba(0,0,0,0.75)] hover:border-border/40"
       : variant === "glass"
-      ? "hover:bg-white/70 hover:-translate-y-1"
+      ? "hover:bg-card/70 dark:hover:bg-card/50 hover:-translate-y-1"
       : "hover:shadow-md"
     : ""
 

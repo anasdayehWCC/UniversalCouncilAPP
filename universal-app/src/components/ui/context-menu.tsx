@@ -89,13 +89,12 @@ const ContextMenuSubContent = React.forwardRef<
   <ContextMenuPrimitive.SubContent
     ref={ref}
     className={cn(
-      "z-50 min-w-[8rem] overflow-hidden rounded-md border border-slate-200 bg-white p-1 text-slate-950 shadow-lg",
+      "z-50 min-w-[8rem] overflow-hidden rounded-md border border-border bg-card p-1 text-foreground shadow-lg",
       "data-[state=open]:animate-in data-[state=closed]:animate-out",
       "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
       "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2",
       "data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-      "dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100",
       className
     )}
     {...props}
@@ -115,13 +114,12 @@ const ContextMenuContent = React.forwardRef<
     <ContextMenuPrimitive.Content
       ref={ref}
       className={cn(
-        "z-50 min-w-[8rem] overflow-hidden rounded-md border border-slate-200 bg-white p-1 text-slate-950 shadow-md",
+        "z-50 min-w-[8rem] overflow-hidden rounded-md border border-border bg-card p-1 text-foreground shadow-md",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
         "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
         "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2",
         "data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-        "dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100",
         className
       )}
       {...props}
@@ -152,9 +150,8 @@ const ContextMenuItem = React.forwardRef<
       "focus:bg-[var(--primary-soft)] focus:text-[var(--text-primary)]",
       "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       variant === 'destructive' && [
-        "text-red-600 dark:text-red-400",
-        "focus:bg-red-50 focus:text-red-700",
-        "dark:focus:bg-red-950 dark:focus:text-red-300",
+        "text-destructive",
+        "focus:bg-destructive/10 focus:text-destructive",
       ],
       inset && "pl-8",
       className
@@ -229,7 +226,7 @@ const ContextMenuLabel = React.forwardRef<
   <ContextMenuPrimitive.Label
     ref={ref}
     className={cn(
-      "px-2 py-1.5 text-sm font-semibold text-slate-900 dark:text-slate-100",
+      "px-2 py-1.5 text-sm font-semibold text-foreground",
       inset && "pl-8",
       className
     )}
@@ -244,7 +241,7 @@ const ContextMenuSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ContextMenuPrimitive.Separator
     ref={ref}
-    className={cn("-mx-1 my-1 h-px bg-slate-200 dark:bg-slate-700", className)}
+    className={cn("-mx-1 my-1 h-px bg-border", className)}
     {...props}
   />
 ))
@@ -264,7 +261,7 @@ const ContextMenuShortcut = ({
   return (
     <span
       className={cn(
-        "ml-auto text-xs tracking-widest text-slate-500 dark:text-slate-400",
+        "ml-auto text-xs tracking-widest text-muted-foreground",
         className
       )}
       {...props}

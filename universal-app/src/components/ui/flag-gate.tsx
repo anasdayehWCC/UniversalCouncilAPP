@@ -15,8 +15,8 @@ interface FlagGateProps {
 }
 
 const toneVariants: Record<NonNullable<FlagGateProps['tone']>, string> = {
-  info: 'border-blue-100 bg-blue-50',
-  warning: 'border-amber-200 bg-amber-50',
+  info: 'border-info/20 bg-info/10',
+  warning: 'border-warning/30 bg-warning/10',
 };
 
 export function FlagGate({
@@ -43,8 +43,8 @@ export function FlagGate({
       <div className="flex items-start gap-3">
         {icon}
         <div>
-          {title && <h3 className="font-bold text-lg text-slate-900 mb-1">{title}</h3>}
-          {message && <p className="text-sm text-slate-600">{message}</p>}
+          {title && <h3 className="font-bold text-lg text-foreground mb-1">{title}</h3>}
+          {message && <p className="text-sm text-muted-foreground">{message}</p>}
           {actions && (
             <div className="mt-4 flex flex-wrap gap-2">
               {actions}

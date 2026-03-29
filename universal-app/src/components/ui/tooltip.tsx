@@ -96,6 +96,7 @@ const TooltipContent = React.forwardRef<
       sideOffset = 4,
       side = 'top',
       align = 'center',
+      collisionPadding = 8,
       showArrow = true,
       maxWidth = 280,
       children,
@@ -108,17 +109,16 @@ const TooltipContent = React.forwardRef<
       sideOffset={sideOffset}
       side={side}
       align={align}
+      collisionPadding={collisionPadding}
       className={cn(
         // Base styles
         'z-[100] overflow-hidden rounded-md px-3 py-2',
-        // Colors
-        'bg-slate-900 text-slate-50',
-        'dark:bg-slate-50 dark:text-slate-900',
+        // Colors - semantic variables
+        'bg-popover text-popover-foreground',
         // Typography
         'text-sm leading-relaxed',
         // Shadow & border
-        'shadow-lg border border-slate-800',
-        'dark:border-slate-200',
+        'shadow-lg border border-border',
         // Animations
         'animate-in fade-in-0 zoom-in-95',
         'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
@@ -264,9 +264,9 @@ export function InfoTooltip({
   };
 
   const variantClasses = {
-    default: 'text-slate-600 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200',
+    default: 'text-muted-foreground hover:text-foreground',
     primary: 'text-[var(--primary)] hover:text-[var(--primary-hover)]',
-    muted: 'text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-400',
+    muted: 'text-muted-foreground hover:text-muted-foreground/80',
   };
 
   return (
@@ -335,8 +335,8 @@ export function ShortcutTooltip({
                 key={i}
                 className={cn(
                   'inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded px-1',
-                  'bg-slate-700 text-[10px] font-medium text-slate-200',
-                  'dark:bg-slate-200 dark:text-slate-700'
+                  'bg-foreground text-[10px] font-medium text-background',
+                  'dark:bg-background dark:text-foreground border dark:border-border'
                 )}
               >
                 {key}

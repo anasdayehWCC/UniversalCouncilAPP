@@ -43,20 +43,19 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     return (
       <textarea
         className={cn(
-          'flex min-h-[80px] w-full rounded-md border bg-white px-3 py-2',
-          'text-sm ring-offset-white placeholder:text-slate-400',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+          'flex min-h-[80px] w-full rounded-md border bg-background px-3 py-2',
+          'text-sm text-foreground ring-offset-background placeholder:text-muted-foreground',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
           'disabled:cursor-not-allowed disabled:opacity-50',
           'transition-colors duration-200',
           variant === 'default' && [
-            'border-slate-300',
-            'focus-visible:ring-[var(--primary,#2563eb)]',
-            'focus-visible:border-[var(--primary,#2563eb)]',
+            'border-input',
+            'focus-visible:border-ring',
           ],
           variant === 'error' && [
-            'border-red-500',
-            'focus-visible:ring-red-500',
-            'focus-visible:border-red-500',
+            'border-error',
+            'focus-visible:ring-error',
+            'focus-visible:border-error',
           ],
           autoResize && 'resize-none overflow-hidden',
           className

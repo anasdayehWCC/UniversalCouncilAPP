@@ -173,7 +173,7 @@ export function PieChart({
             y1={polarToCartesian(center.x, center.y, outerRadius, midAngle).y}
             x2={labelPos.x}
             y2={labelPos.y}
-            stroke={isDarkMode ? '#6B7280' : '#9CA3AF'}
+            stroke="var(--muted-foreground)"
             strokeWidth={1}
           />
 
@@ -181,7 +181,7 @@ export function PieChart({
           <text
             x={labelPos.x + (isRightSide ? 4 : -4)}
             y={labelPos.y}
-            fill={isDarkMode ? '#E5E7EB' : '#374151'}
+            fill="var(--foreground)"
             fontSize={11}
             fontFamily="system-ui, -apple-system, sans-serif"
             textAnchor={isRightSide ? 'start' : 'end'}
@@ -206,7 +206,7 @@ export function PieChart({
         <text
           x={center.x}
           y={center.y - 8}
-          fill={isDarkMode ? '#F9FAFB' : '#1F2937'}
+          fill="var(--foreground)"
           fontSize={24}
           fontWeight={600}
           fontFamily="system-ui, -apple-system, sans-serif"
@@ -220,7 +220,7 @@ export function PieChart({
         <text
           x={center.x}
           y={center.y + 16}
-          fill={isDarkMode ? '#9CA3AF' : '#6B7280'}
+          fill="var(--muted-foreground)"
           fontSize={12}
           fontFamily="system-ui, -apple-system, sans-serif"
           textAnchor="middle"
@@ -262,7 +262,7 @@ export function PieChart({
         <rect
           width={dimensions.width}
           height={dimensions.height}
-          fill={isDarkMode ? '#1F2937' : '#FFFFFF'}
+          fill="var(--card)"
         />
 
         {/* Segments */}

@@ -77,15 +77,14 @@ export function Tooltip({
     >
       <div
         style={{
-          background: darkMode ? 'rgba(17, 24, 39, 0.95)' : 'rgba(255, 255, 255, 0.98)',
-          color: darkMode ? '#F9FAFB' : '#1F2937',
+          background: 'var(--popover)',
+          color: 'var(--popover-foreground)',
           padding: '8px 12px',
           borderRadius: '6px',
           fontSize: '12px',
           fontFamily: 'system-ui, -apple-system, sans-serif',
-          boxShadow: darkMode
-            ? '0 4px 12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1)'
-            : '0 4px 12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05)',
+          boxShadow: 'var(--shadow-lg)',
+          border: '1px solid var(--border)',
           backdropFilter: 'blur(8px)',
           WebkitBackdropFilter: 'blur(8px)',
           maxWidth: '200px',
@@ -129,22 +128,22 @@ export function SVGTooltip({
         width={estimatedWidth}
         height={height}
         rx={4}
-        fill={darkMode ? 'rgba(17, 24, 39, 0.95)' : 'rgba(255, 255, 255, 0.98)'}
-        stroke={darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
+        fill="var(--popover)"
+        stroke="var(--border)"
         strokeWidth={1}
       />
       
       {/* Arrow */}
       <polygon
         points={`${x - 5},${y - 8} ${x + 5},${y - 8} ${x},${y - 2}`}
-        fill={darkMode ? 'rgba(17, 24, 39, 0.95)' : 'rgba(255, 255, 255, 0.98)'}
+        fill="var(--popover)"
       />
       
       {/* Text */}
       <text
         x={x}
         y={y - height / 2 - 4}
-        fill={darkMode ? '#F9FAFB' : '#1F2937'}
+        fill="var(--popover-foreground)"
         fontSize={11}
         fontFamily="system-ui, -apple-system, sans-serif"
         textAnchor="middle"

@@ -27,8 +27,8 @@ export function Axis({
     gridLines = false,
   } = config;
 
-  const textColor = darkMode ? '#9CA3AF' : '#6B7280';
-  const lineColor = darkMode ? '#4B5563' : '#D1D5DB';
+  const textColor = 'var(--muted-foreground)';
+  const lineColor = 'var(--border)';
 
   // Generate tick values
   const ticks = useMemo(() => {

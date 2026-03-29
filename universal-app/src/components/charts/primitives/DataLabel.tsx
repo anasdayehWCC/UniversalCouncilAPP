@@ -19,7 +19,7 @@ export function DataLabel({
   className,
   darkMode = false,
 }: DataLabelProps) {
-  const textColor = darkMode ? '#E5E7EB' : '#374151';
+  const textColor = 'var(--foreground)';
   
   const displayValue = typeof value === 'number' ? formatNumber(value) : value;
 
@@ -57,7 +57,7 @@ export function AnimatedDataLabel({
   delay = 0,
   darkMode = false,
 }: DataLabelProps & { delay?: number }) {
-  const textColor = darkMode ? '#E5E7EB' : '#374151';
+  const textColor = 'var(--foreground)';
   const displayValue = typeof value === 'number' ? formatNumber(value) : value;
 
   return (
@@ -114,7 +114,7 @@ export function PercentageLabel({
 }) {
   if (percentage < showIfAbove) return null;
 
-  const textColor = darkMode ? '#F9FAFB' : '#FFFFFF';
+  const textColor = 'var(--primary-foreground)';
   const displayValue = `${Math.round(percentage * 100)}%`;
 
   return (
@@ -130,7 +130,7 @@ export function PercentageLabel({
       style={{
         pointerEvents: 'none',
         userSelect: 'none',
-        textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+        textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)',
       }}
     >
       {displayValue}

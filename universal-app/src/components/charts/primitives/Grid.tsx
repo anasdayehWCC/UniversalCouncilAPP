@@ -25,7 +25,7 @@ export function Grid({
     vertical = true,
   } = config;
 
-  const lineColor = darkMode ? '#4B5563' : '#E5E7EB';
+  const lineColor = 'var(--border)';
 
   // Generate horizontal lines
   const horizontalLines = useMemo(() => {

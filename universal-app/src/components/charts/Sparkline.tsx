@@ -13,7 +13,7 @@ export function Sparkline({
   data,
   width = 120,
   height = 32,
-  color = '#3B82F6',
+  color = 'var(--primary)',
   fillColor,
   strokeWidth = 1.5,
   showMinMax = false,
@@ -120,7 +120,7 @@ export function Sparkline({
             cx={normalizedPoints[minIndex].x}
             cy={normalizedPoints[minIndex].y}
             r={3}
-            fill="#EF4444"
+            fill="var(--destructive)"
           />
           
           {/* Max point */}
@@ -128,7 +128,7 @@ export function Sparkline({
             cx={normalizedPoints[maxIndex].x}
             cy={normalizedPoints[maxIndex].y}
             r={3}
-            fill="#10B981"
+            fill="var(--success)"
           />
         </>
       )}
@@ -197,7 +197,7 @@ export function SparklineWithTrend({
     return ((last - first) / Math.abs(first)) * 100;
   }, [data]);
 
-  const trendColor = trend >= 0 ? '#10B981' : '#EF4444';
+  const trendColor = trend >= 0 ? 'var(--success)' : 'var(--destructive)';
   const trendIcon = trend >= 0 ? '↑' : '↓';
 
   return (
@@ -231,7 +231,7 @@ export function BarSparkline({
   data,
   width = 120,
   height = 32,
-  color = '#3B82F6',
+  color = 'var(--primary)',
   className,
 }: Omit<SparklineProps, 'curved' | 'fillColor' | 'strokeWidth'>) {
   const bars = useMemo(() => {
@@ -271,7 +271,7 @@ export function BarSparkline({
         y1={height / 2}
         x2={width}
         y2={height / 2}
-        stroke="#E5E7EB"
+        stroke="var(--border)"
         strokeWidth={1}
       />
 
@@ -284,7 +284,7 @@ export function BarSparkline({
           width={bar.width}
           height={bar.height}
           rx={1}
-          fill={bar.isNegative ? '#EF4444' : color}
+          fill={bar.isNegative ? 'var(--destructive)' : color}
           opacity={0.8}
         />
       ))}

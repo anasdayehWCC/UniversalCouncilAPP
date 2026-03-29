@@ -21,8 +21,8 @@ export function Legend({
     orientation = position === 'left' || position === 'right' ? 'vertical' : 'horizontal',
   } = config;
 
-  const textColor = darkMode ? '#E5E7EB' : '#374151';
-  const inactiveColor = darkMode ? '#6B7280' : '#9CA3AF';
+  const textColor = 'var(--foreground)';
+  const inactiveColor = 'var(--muted-foreground)';
 
   if (!show || items.length === 0) return null;
 
@@ -79,7 +79,7 @@ export function Legend({
             }}
             onMouseEnter={(e) => {
               if (onItemClick) {
-                e.currentTarget.style.background = darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)';
+                e.currentTarget.style.background = 'var(--muted)';
               }
             }}
             onMouseLeave={(e) => {

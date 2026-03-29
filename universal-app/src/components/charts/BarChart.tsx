@@ -255,7 +255,7 @@ export function BarChart({
         <rect
           width={dimensions.width}
           height={dimensions.height}
-          fill={isDarkMode ? '#1F2937' : '#FFFFFF'}
+          fill="var(--card)"
         />
 
         {/* Grid */}
@@ -281,7 +281,7 @@ export function BarChart({
               y={isVertical 
                 ? dimensions.height - dimensions.margin.bottom + 20 
                 : dimensions.margin.top + pos}
-              fill={isDarkMode ? '#9CA3AF' : '#6B7280'}
+              fill="var(--muted-foreground)"
               fontSize={11}
               fontFamily="system-ui, -apple-system, sans-serif"
               textAnchor={isVertical ? 'middle' : 'end'}

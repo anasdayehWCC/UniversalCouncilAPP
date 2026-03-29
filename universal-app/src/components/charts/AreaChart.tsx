@@ -160,7 +160,7 @@ export function AreaChart({
             cx={x}
             cy={y}
             r={isHovered ? 6 : 4}
-            fill={isDarkMode ? '#1F2937' : '#FFFFFF'}
+            fill="var(--card)"
             stroke={color}
             strokeWidth={2}
             style={{
@@ -263,7 +263,7 @@ export function AreaChart({
         <rect
           width={dimensions.width}
           height={dimensions.height}
-          fill={isDarkMode ? '#1F2937' : '#FFFFFF'}
+          fill="var(--card)"
         />
 
         {/* Chart area */}

@@ -131,7 +131,7 @@ export function LineChart({
             cx={x}
             cy={y}
             r={radius * animatedProgress}
-            fill={isDarkMode ? '#1F2937' : '#FFFFFF'}
+            fill="var(--card)"
             stroke={color}
             strokeWidth={2}
             style={{
@@ -198,7 +198,7 @@ export function LineChart({
         <rect
           width={dimensions.width}
           height={dimensions.height}
-          fill={isDarkMode ? '#1F2937' : '#FFFFFF'}
+          fill="var(--card)"
         />
 
         {/* Chart area */}
@@ -220,7 +220,7 @@ export function LineChart({
               y1={yScale(0)}
               x2={dimensions.innerWidth}
               y2={yScale(0)}
-              stroke={isDarkMode ? '#4B5563' : '#E5E7EB'}
+              stroke="var(--border)"
               strokeWidth={1}
             />
           )}
@@ -238,7 +238,7 @@ export function LineChart({
             key={`y-label-${i}`}
             x={dimensions.margin.left - 8}
             y={dimensions.margin.top + y}
-            fill={isDarkMode ? '#9CA3AF' : '#6B7280'}
+            fill="var(--muted-foreground)"
             fontSize={11}
             fontFamily="system-ui, -apple-system, sans-serif"
             textAnchor="end"

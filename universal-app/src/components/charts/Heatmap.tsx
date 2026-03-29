@@ -97,8 +97,8 @@ export function Heatmap({
     if (colorScaleProp) return colorScaleProp;
     
     return isDarkMode
-      ? generateColorScale(10, '#1E3A5F', '#3B82F6')
-      : generateColorScale(10, '#E0F2FE', '#1D4ED8');
+      ? generateColorScale(10, 'oklch(25% 0.08 230)', 'var(--primary)')
+      : generateColorScale(10, 'oklch(92% 0.03 230)', 'var(--primary)');
   }, [colorScaleProp, isDarkMode]);
 
   // Calculate cell dimensions
@@ -142,7 +142,7 @@ export function Heatmap({
   const getTextColor = useCallback((bgColor: string) => {
     const rgb = hexToRgb(bgColor);
     const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
-    return brightness > 128 ? '#1F2937' : '#F9FAFB';
+    return brightness > 128 ? 'var(--foreground)' : 'var(--card-foreground)';
   }, []);
 
   // Render cells
@@ -219,7 +219,7 @@ export function Heatmap({
 
   // Render axis labels
   const renderLabels = useCallback(() => {
-    const textColor = isDarkMode ? '#9CA3AF' : '#6B7280';
+    const textColor = 'var(--muted-foreground)';
     
     return (
       <>
@@ -301,7 +301,7 @@ export function Heatmap({
         <text
           x={x}
           y={y + legendHeight + 12}
-          fill={isDarkMode ? '#9CA3AF' : '#6B7280'}
+          fill="var(--muted-foreground)"
           fontSize={9}
           fontFamily="system-ui, -apple-system, sans-serif"
           textAnchor="start"
@@ -311,7 +311,7 @@ export function Heatmap({
         <text
           x={x + legendWidth}
           y={y + legendHeight + 12}
-          fill={isDarkMode ? '#9CA3AF' : '#6B7280'}
+          fill="var(--muted-foreground)"
           fontSize={9}
           fontFamily="system-ui, -apple-system, sans-serif"
           textAnchor="end"
@@ -340,7 +340,7 @@ export function Heatmap({
         <rect
           width={dimensions.width}
           height={dimensions.height}
-          fill={isDarkMode ? '#1F2937' : '#FFFFFF'}
+          fill="var(--card)"
         />
 
         {/* Color scale legend */}

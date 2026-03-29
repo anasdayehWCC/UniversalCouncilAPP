@@ -148,6 +148,7 @@ function SpeakerItem({
               variant="ghost"
               onClick={handleSave}
               className="h-7 w-7"
+              aria-label="Save speaker name"
             >
               <Check className="w-3 h-3 text-emerald-600" />
             </Button>
@@ -159,6 +160,7 @@ function SpeakerItem({
                 setIsEditing(false);
               }}
               className="h-7 w-7"
+              aria-label="Cancel editing speaker name"
             >
               <X className="w-3 h-3 text-red-500" />
             </Button>
@@ -288,6 +290,7 @@ export function SpeakerLegend({
               variant="ghost"
               onClick={() => setIsCollapsed(!isCollapsed)}
               className="h-7 w-7"
+              aria-label={isCollapsed ? "Expand speaker legend" : "Collapse speaker legend"}
             >
               {isCollapsed ? (
                 <ChevronDown className="w-4 h-4" />

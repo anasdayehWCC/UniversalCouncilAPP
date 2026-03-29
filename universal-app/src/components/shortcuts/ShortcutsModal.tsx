@@ -239,7 +239,7 @@ export function ShortcutsModal({
                     'hover:bg-muted hover:text-foreground',
                     'dark:hover:bg-muted dark:hover:text-foreground',
                     'focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2',
-                    'dark:focus:ring-offset-slate-900'
+                    'dark:focus:ring-offset-background'
                   )}
                   aria-label="Close dialog"
                 >

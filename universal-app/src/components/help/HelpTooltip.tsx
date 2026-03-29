@@ -266,8 +266,8 @@ export function HelpTooltip({
               onClick={handleDismiss}
               className={cn(
                 'absolute right-2 top-2 rounded-sm opacity-70 hover:opacity-100',
-                'text-slate-400 hover:text-slate-600',
-                'dark:text-slate-500 dark:hover:text-slate-300',
+                'text-muted-foreground hover:text-foreground',
+                'dark:text-muted-foreground dark:hover:text-foreground',
                 'transition-opacity'
               )}
               aria-label="Don't show again"
@@ -282,11 +282,11 @@ export function HelpTooltip({
               <div className="font-medium text-sm mb-1">{title}</div>
             )}
             {typeof content === 'string' ? (
-              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              <p className="text-sm text-muted-foreground dark:text-muted-foreground leading-relaxed">
                 {content}
               </p>
             ) : (
-              <div className="text-sm text-slate-600 dark:text-slate-300">
+              <div className="text-sm text-muted-foreground dark:text-muted-foreground">
                 {content}
               </div>
             )}
@@ -296,8 +296,8 @@ export function HelpTooltip({
           {docsUrl && (
             <div
               className={cn(
-                'px-3 py-2 border-t border-slate-100 dark:border-slate-700',
-                'bg-slate-50 dark:bg-slate-800/50 rounded-b-md'
+                'px-3 py-2 border-t border-border dark:border-border',
+                'bg-muted dark:bg-muted rounded-b-md'
               )}
             >
               <a
@@ -320,9 +320,9 @@ export function HelpTooltip({
           {dismissKey && (
             <div
               className={cn(
-                'px-3 py-1.5 text-[10px] text-slate-400 dark:text-slate-500',
-                'border-t border-slate-100 dark:border-slate-700',
-                'bg-slate-50/50 dark:bg-slate-800/30 rounded-b-md'
+                'px-3 py-1.5 text-[10px] text-muted-foreground dark:text-muted-foreground',
+                'border-t border-border dark:border-border',
+                'bg-muted dark:bg-muted rounded-b-md'
               )}
             >
               Click × to hide this tip permanently
@@ -380,10 +380,10 @@ export function LabelWithHelp({
     <div className={cn('flex items-center gap-1.5', className)}>
       <label
         htmlFor={htmlFor}
-        className="text-sm font-medium text-slate-700 dark:text-slate-300"
+        className="text-sm font-medium text-foreground dark:text-foreground"
       >
         {label}
-        {required && <span className="text-red-500 ml-0.5">*</span>}
+        {required && <span className="text-destructive ml-0.5">*</span>}
       </label>
       <HelpTooltip
         topicId={helpTopicId}
@@ -431,9 +431,9 @@ export function InlineHelp({
   if (!displayText) return null;
 
   const variantClasses = {
-    default: 'text-slate-500 dark:text-slate-400',
-    warning: 'text-amber-600 dark:text-amber-400',
-    info: 'text-blue-600 dark:text-blue-400',
+    default: 'text-muted-foreground dark:text-muted-foreground',
+    warning: 'text-warning dark:text-warning',
+    info: 'text-info dark:text-info',
   };
 
   return (

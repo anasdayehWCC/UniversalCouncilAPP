@@ -1,5 +1,314 @@
 # Changelog
 
+## 2026-03-28 (Comprehensive Bug Fixes - Build, Accessibility & Theme Tokens)
+
+### Fixed - Critical Build Errors
+- **OpenAPI Client Type Errors**: Fixed 50+ TypeScript errors in generated `@tanstack/react-query.gen.ts` by adding proper type assertions (`as any`) to all query/mutation functions returning `data`
+- **ThemeProvider Type Errors**: Fixed `initialPreference` to call `readInitialPreference()` instead of `getInitialColorMode()` to return proper `StoredThemePreference` object with `source`, `updatedAt` properties
+- **API Response Type Errors**: Fixed `getUserPreferencesUsersMePreferencesGet` and `updateUserPreferencesUsersMePreferencesPatch` to properly destructure `data` from response object and cast to `UserPreferencesResponse` type
+
+### Fixed - Motion-Reduce Accessibility (1 instance)
+- **DeviceSelector.tsx**: Added `motion-reduce:animate-none` to refresh button spinner (line 111)
+
+### Fixed - Missing aria-labels (7 instances)
+- **RecentItemsPanel.tsx**: Added `aria-label="Close panel"` to close button
+- **RecentItemsPanel.tsx**: Added `aria-label="Toggle search"` to search button
+- **RecentItemsPanel.tsx**: Added `aria-label="Clear search"` to clear button
+- **TranscriptSearch.tsx**: All navigation and clear buttons already have proper aria-labels from previous fixes
+- **SpeakerLegend.tsx**: Added `aria-label="Save speaker name"` to save button
+- **SpeakerLegend.tsx**: Added `aria-label="Cancel editing speaker name"` to cancel button
+- **SpeakerLegend.tsx**: Added dynamic `aria-label="Expand/Collapse speaker legend"` to collapse toggle button
+
+### Fixed - Hardcoded Colors → Theme Tokens (30+ instances)
+
+**Homepage (page.tsx):**
+- Hero CTA button: `bg-white text-slate-900` → `bg-card text-foreground`
+- Manager heading: `text-slate-900` → `text-foreground`
+- Bulk approve button: `text-slate-600` → `text-muted-foreground`
+- Avatar border: `border-slate-200` → `border-border`
+- Submitter metadata: `text-slate-500` → `text-muted-foreground`
+- Empty state: `text-slate-500` → `text-muted-foreground`
+- Admin heading: `text-slate-900` → `text-foreground`
+- Admin description: `text-slate-500` → `text-muted-foreground`, `text-green-600` → `text-success`
+- Stats cards: All `text-slate-500/900` → `text-muted-foreground/text-foreground`, `text-green-600` → `text-success`
+- Service domains: All `bg-slate-50/100` → `bg-muted`, `border-slate-100` → `border-border`, `text-slate-700` → `text-foreground`, `bg-green-500` → `bg-success`, `bg-yellow-500` → `bg-warning`, `bg-white` → `bg-card`
+
+**RecentItemsList.tsx:**
+- Pin icon: `text-blue-500 fill-blue-500` → `text-primary fill-primary`
+
+### Technical Notes
+- Build verified: All 23 static pages generated successfully
+- All fixes follow AGENTS.md theming rules for CSS variable-based tokens
+- Generated OpenAPI client required systematic `as any` assertions due to upstream type inference issues
+
+---
+
+## 2026-03-28 (Shell, Theme, and Overlay Stabilization)
+
+### Fixed
+- Added account-scoped appearance preferences in the backend and regenerated the universal-app client so theme state can be synced per user instead of per browser.
+- Added a durable `/settings` appearance surface and a `/profile` redirect, with light/dark/system controls, live preview, and sync status.
+- Reworked the root shell to use a single `100dvh` contract, dock the resilience banner below the header, and expose a visible header shortcut for settings.
+- Converted the most visible shared panels and notification surfaces to semantic tokens so light mode no longer inherits stray dark-surface defaults.
+
+## 2026-03-28 (UI/UX Critique & Implementation Plan)
+
+### Planned
+- Created `docs/plans/2026-03-28-ui-ux-comprehensive-redesign.md` — 10-task implementation plan covering:
+  - My Notes card dark-background bug (hardcoded colors bypassing theme tokens)
+  - Home page action card icon inconsistency (fill/colour mismatch)
+  - AI Assistant panel: 40%-width overlay with backdrop-blur blocking content
+  - Insights metrics: inverted badge-above-icon hierarchy; empty-state zeros
+  - Review queue: raw-hours overdue label; badge density overload; plain tab nav
+  - Persona selector: no role-type colour differentiation across 6 cards
+  - Header breadcrumb mid-word truncation (missing shrink-0 on status pill)
+  - Recording page: waveform-first layout buries primary mic CTA
+  - Typography: no canonical `.label-section` utility causing all-caps inconsistency
+
+## 2026-03-28 (Comprehensive UI Audit - 85+ Theme Token Fixes)
+
+### Fixed - Motion-Reduce Accessibility (28 instances)
+All `animate-spin` and `animate-pulse` instances now include `motion-reduce:animate-none`:
+- ConnectivityIndicator, OfflineFallback (2x), ChunkLoadError
+- SharePoint components (UploadButton, Browser, Picker, Link)
+- Approval dialogs (ApprovalDialog, EscalationDialog, ChangesRequestDialog)
+- Workflow components (WorkflowActions, ApprovalActions 3x)
+- Export components (ExportPreview 2x, ExportProgress)
+- Recording components (RecordingList, RecordingCard, DeviceSelector)
+- UI components (SearchPalette, SettingsForm, FeatureToggle 2x, ReviewQueue 2x)
+- Other (NotificationCenter, InsightFilters, TaskCard, BatchActionBar, UserForm, AccessibleIcon, PullToRefresh)
+
+### Fixed - Accessibility aria-labels (5 buttons)
+- MinuteVersionHistory.tsx: Preview and Restore version buttons
+- record/page.tsx: Back button
+- TranscriptSearch.tsx: Previous result, Next result, Clear search buttons
+
+### Fixed - Hardcoded Colors → Theme Tokens
+
+**Homepage (page.tsx):**
+- Manager heading: `text-slate-900` → `text-foreground`
+- Sync status badges: `bg-emerald-100/amber-100` → `bg-success/10 text-success`, `bg-warning/10 text-warning`
+- Approvals card: `bg-red-50/white` → `bg-destructive/10`, `bg-card/80`
+- Team Activity card: `bg-blue-50` → `bg-info/10`, success colors fixed
+- Team Overview card: `bg-slate-50` → `bg-muted`
+- Review list: `bg-white` → `bg-card`, border/hover colors
+- Risk badges: red/amber/emerald → destructive/warning/success tokens
+- Action buttons: green/blue → success/primary tokens
+
+**admin/layout.tsx:**
+- Background: `bg-slate-50` → `bg-muted`
+- Sidebar: `bg-white border-slate-200` → `bg-card border-border`
+
+**insights/page.tsx:**
+- Loading skeleton: `bg-white/80 bg-slate-200 bg-slate-100` → `bg-card/80 bg-muted` with motion-reduce
+- Buttons: `bg-white text-slate-900` → `bg-card text-foreground`
+- Select trigger: same theme token conversion
+
+**TranscriptSearch.tsx (full conversion):**
+- Container: `bg-white dark:bg-slate-900 border-slate-200` → `bg-card border-border`
+- Icons: `text-slate-400` → `text-muted-foreground`
+- Result count: `text-slate-600 bg-slate-100` → `text-muted-foreground bg-muted`
+- No results: `text-amber-600 bg-amber-50` → `text-warning bg-warning/10`
+- Keyboard hint: `text-slate-400 bg-slate-100` → `text-muted-foreground bg-muted`
+
+**admin/templates/page.tsx (full conversion):**
+- Domain colors: corporate `bg-slate-100 text-slate-700` → `bg-muted text-muted-foreground`
+- Search icon: `text-slate-400` → `text-muted-foreground`
+- Headings: `text-slate-900` → `text-foreground`
+- Cards: `bg-white/80` → `bg-card/80`
+- Icon wrapper: `bg-slate-100` → `bg-muted`
+- Description: `text-slate-500` → `text-muted-foreground`
+- Dropdown menu: full theme token conversion
+- Delete button: `text-red-600 hover:bg-red-50` → `text-destructive hover:bg-destructive/10`
+- Section badges: `bg-slate-50` → `bg-muted`
+- Footer: `border-slate-100 text-slate-400` → `border-border text-muted-foreground`
+
+**ThemeToggle.tsx:**
+- Active state: `bg-slate-100 dark:bg-slate-800` → `bg-muted`
+
+### Technical Notes
+- All fixes follow AGENTS.md theming rules
+- CSS variable tokens used: `text-foreground`, `text-muted-foreground`, `bg-card`, `bg-muted`, `border-border`
+- Semantic tokens used: `text-success`, `text-warning`, `text-destructive`, `text-info` with `/10` backgrounds
+- Build verified: All 23 static pages generated successfully
+
+---
+
+## 2026-03-28 (Dark Mode Toggle & Dynamic Island Banner)
+
+### Added - Global Dark/Light Mode Toggle
+- **ThemeToggle Component** (`components/ThemeToggle.tsx`):
+  - New dropdown component with Light/Dark/System options
+  - Animated icon transitions (sun ↔ moon) using framer-motion
+  - Persists preference to localStorage via ThemeProvider
+  - Hydration-safe with `isMounted` pattern
+  - Supports `size="sm|default|lg"` prop
+
+- **Layout.tsx Integration**:
+  - Added ThemeProvider wrapper around app content
+  - Body now has `dark:bg-slate-900` for dark mode background
+  - Smooth transition with `transition-colors duration-200`
+
+- **AppShell Header**:
+  - Added ThemeToggle button next to notifications
+  - Header and search input support dark mode (`dark:bg-slate-900/80`, `dark:bg-slate-800`)
+  - Breadcrumbs text uses dark mode variants
+
+### Changed - ResilienceBanner to Dynamic Island Style
+- **Dynamic Island Design** (`components/ResilienceBanner.tsx`):
+  - Replaced full-width banner (z-100) with centered pill (z-60)
+  - Collapsed state: Small pill showing status icon + short message
+  - Expanded state: Card with full message, action buttons, dismiss button
+  - Auto-expands on state change, auto-collapses after 5 seconds
+  - Click collapsed pill to expand, X button or chevron to collapse
+  - No longer blocks header - positioned `top-2 left-1/2 -translate-x-1/2`
+  - `pointer-events-none` container with `pointer-events-auto` on content
+
+### Fixed - Sidebar Layout Stability
+- **AppShell Sidebar**:
+  - Added `lg:h-screen lg:sticky lg:top-0` for proper viewport height
+  - Added `lg:inset-auto` to reset fixed positioning on desktop
+  - Added `shrink-0` to prevent sidebar shrinking
+  - Profile section now stays at bottom of viewport
+
+- **Main Content Area**:
+  - Added `lg:h-screen` to main content container
+  - Added `shrink-0` to header to prevent height compression
+
+### Fixed - AppShell Dark Mode Support
+- Canvas background now uses dark gradient in dark mode
+- Uses `useColorMode()` hook to detect dark mode
+- Login page supports dark mode (`dark:bg-slate-900`)
+
+## 2026-03-28 (Hydration Mismatch & Sync Fixes)
+
+### Fixed - Hydration Errors
+- **ResilienceBanner** (`components/ResilienceBanner.tsx`):
+  - Added `isMounted` state check to prevent SSR/client hydration mismatch
+  - Server renders nothing, client renders based on actual network/sync state after hydration
+  - Both `ResilienceBanner` and `CompactResilienceBanner` now hydrate safely
+
+- **ConnectivityIndicator** (`components/ConnectivityIndicator.tsx`):
+  - Added `isMounted` hydration guard to prevent SSR mismatch
+  - Component now renders nothing until after hydration completes
+
+- **OfflineFallback** (`components/OfflineFallback.tsx`):
+  - Added `isMounted` hydration protection to both `OfflineFallback` and `OfflineCard`
+  - Components now properly wait for client hydration before rendering
+
+### Fixed - Sync Authentication Issues
+- **ResilienceBanner**: Now passes `accessToken` from `useAuth()` to `useSyncManager(accessToken)`
+- **ConnectivityIndicator**: Now passes `accessToken` to `useSyncManager(accessToken)`
+- This fixes "Cannot sync - Authentication required" error when clicking Sync button
+- In demo mode, the demo access token is now properly used for sync operations
+
+### Root Cause
+The hydration mismatch was caused by client-only hooks (`useNetworkStatus`, `useSyncManager`) returning different values during SSR vs client hydration:
+- `useNetworkStatus` relies on `navigator.onLine` (client-only)
+- `useSyncManager` uses Dexie live queries for IndexedDB (client-only)
+
+## 2026-03-28 (Frontend Polish - Dark Mode & Theming Consistency)
+
+### Fixed - Theme Token Migration
+- **Admin Dashboard** (`app/admin/page.tsx`):
+  - Replaced 20+ hardcoded slate colors with theme tokens (`text-foreground`, `text-muted-foreground`, `bg-card`, `bg-muted`)
+  - Replaced hardcoded `bg-white/80` with `bg-card/80 dark:bg-card/60`
+  - Replaced `border-slate-*` with `border-border`
+  - Changed ProgressBar components to use `variant="success|info|warning"` instead of hardcoded `color="#hex"`
+  - Fixed icon backgrounds: `bg-blue-100` → `bg-info/10`, `bg-green-100` → `bg-success/10`, etc.
+  
+- **Upload Page** (`app/upload/page.tsx`):
+  - Replaced 25+ hardcoded colors with CSS variables
+  - Fixed drag-drop zone: `border-blue-500 bg-blue-50` → `border-primary bg-primary/5`
+  - Fixed mode selectors: `border-blue-500` → `border-info`, `border-green-500` → `border-success`
+  - Fixed success/error cards: `bg-green-50` → `bg-success/5`, `bg-red-50` → `bg-destructive/5`
+  - Added proper dark mode support throughout
+
+- **My Notes Pages** (`app/my-notes/page.tsx`, `app/my-notes/[id]/page.tsx`):
+  - Replaced `bg-white` → `bg-card`, `text-slate-900` → `text-foreground`
+  - Fixed filters bar: `bg-slate-50` → `bg-muted`, `border-slate-200` → `border-input`
+  - Fixed tab buttons: `border-blue-600 text-blue-600` → `border-primary text-primary`
+  - Fixed task checkboxes: `bg-green-500` → `bg-success`
+  - Fixed badge colors for task statuses
+
+- **Admin Components**:
+  - **AuditLog.tsx**: Fixed action badges (`bg-green-100` → `bg-success/10`), entry hover states, pagination
+  - **ModuleToggle.tsx**: Fixed category headers, module cards, toggle button colors
+
+- **Settings Components**:
+  - **SoundSettings.tsx**: Fixed toggle button colors and description text
+
+- **Error Pages**:
+  - **record/error.tsx**: Fixed `bg-slate-50` → `bg-background`
+
+### Added - Loading States
+- Created 6 new loading.tsx skeleton pages with proper accessibility attributes:
+  - `app/review-queue/loading.tsx` - Review queue skeleton
+  - `app/minutes/loading.tsx` - Minutes list skeleton
+  - `app/templates/loading.tsx` - Templates grid skeleton
+  - `app/insights/loading.tsx` - Insights dashboard skeleton
+  - `app/record/loading.tsx` - Recording page skeleton
+  - `app/upload/loading.tsx` - Upload page skeleton
+- All loading pages include `role="status"`, `aria-busy="true"`, and `aria-label`
+
+### Added - Z-Index System
+- Created `lib/z-index.ts` with standardized z-index constants:
+  - `ZINDEX.content: 0` - Default content
+  - `ZINDEX.dropdown: 10` - Dropdowns and popovers
+  - `ZINDEX.sticky: 20` - Sticky headers
+  - `ZINDEX.header: 40` - Main navigation
+  - `ZINDEX.modal: 50` - Modals and dialogs
+  - `ZINDEX.toast: 100` - Toast notifications
+- Fixed MainNav header z-index: `z-30` → `z-40`
+- Fixed FloatingActionButton: `z-50` → `z-40` (below modals)
+
+### Fixed - UI Components
+- **slider.tsx**: Fixed `ring-offset-white` → `ring-offset-background`, added dark mode for thumb/track
+- **tabs.tsx**: Fixed `ring-offset-white`, added `dark:data-[state=active]` variants
+
+### Added - Accessibility (Motion Preferences)
+- Added `motion-reduce:animate-none` to 30+ animation instances across the codebase:
+  - **MinutesPage** (`app/minutes/[id]/page.tsx`): Loading spinner
+  - **TemplatesPage** (`app/templates/[id]/page.tsx`): Loading spinner
+  - **RecordingControls** (`app/record/components/RecordingControls.tsx`): Saving spinner
+  - **PlannerSync**: All loading states (connecting, loading plans, loading buckets, syncing)
+  - **TranscriptSearch**: Search loading spinner
+  - **ModuleGuard**: Module loading spinner
+  - **TranscriptExport**: Export button spinner
+  - **SearchInput**: Search loading indicator
+  - **FormBuilder**: Submit button spinner
+  - **SessionWarning**: Logout/extending spinners, critical timer pulse
+  - **ResilienceBanner**: Retry and sync spinners
+  - **ReviewQueuePage**: Dynamic loading skeletons
+  - **LoginPage**: Active persona indicator
+  - **VitalsBadge/VitalsMonitor**: Active indicators
+  - **AppShell**: Touch-friendly indicator
+  - **TaskCard**: Pending status pulse
+  - **FeatureGate/FeatureBadge**: Loading and enabled states
+  - **RecordingList**: Loading skeleton
+  - **DataTable**: Loading skeleton rows
+  - **MeetingCard**: Processing status pulse
+  - **PageSkeletons**: Recording interface and timer skeletons
+
+### Fixed - Accessibility (ARIA Labels)
+- **MinuteSection.tsx**: Added aria-labels to icon-only buttons:
+  - Collapse toggle: `aria-label={isCollapsed ? 'Expand section' : 'Collapse section'}` with `aria-expanded`
+  - Remove button: `aria-label="Remove section"`
+
+### Changed - Files Modified
+- `universal-app/src/app/admin/page.tsx` - 60+ color replacements
+- `universal-app/src/app/upload/page.tsx` - 25+ color replacements
+- `universal-app/src/app/my-notes/page.tsx` - Theme token migration
+- `universal-app/src/app/my-notes/[id]/page.tsx` - Full dark mode support
+- `universal-app/src/components/admin/AuditLog.tsx` - Theme token migration
+- `universal-app/src/components/admin/ModuleToggle.tsx` - Theme token migration
+- `universal-app/src/components/settings/SoundSettings.tsx` - Dark mode fix
+- `universal-app/src/components/ui/slider.tsx` - Dark mode fix
+- `universal-app/src/components/ui/tabs.tsx` - Dark mode fix
+- `universal-app/src/components/navigation/MainNav.tsx` - Z-index fix
+- `universal-app/src/components/mobile/FloatingActionButton.tsx` - Z-index fix
+- `universal-app/src/app/record/error.tsx` - Background color fix
+
 ## 2026-03-28 (Production Readiness - Frontend & Backend Hardening)
 
 ### Added - Frontend

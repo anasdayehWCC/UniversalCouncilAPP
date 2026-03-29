@@ -45,6 +45,19 @@
 **RecentItemsList.tsx:**
 - Pin icon: `text-blue-500 fill-blue-500` → `text-primary fill-primary`
 
+**Charts Components (src/components/charts/):**
+- **Grid.tsx**: Grid lines now use `var(--border)` instead of hardcoded `#4B5563/#E5E7EB`
+- **Legend.tsx**: Text uses `var(--foreground)`, inactive items use `var(--muted-foreground)`, hover states use `var(--muted)` instead of rgba colors
+- **Tooltip.tsx**: Background uses `var(--popover)`, text uses `var(--popover-foreground)`, borders use `var(--border)`, shadows use `var(--shadow-lg)` instead of hardcoded dark/light rgba values
+- **Axis.tsx**: Labels use `var(--muted-foreground)`, axis lines use `var(--border)` instead of gray hex colors
+- **DataLabel.tsx**: Labels use `var(--foreground)`, percentage labels use `var(--primary-foreground)` instead of `#E5E7EB/#374151/#F9FAFB/#FFFFFF`
+- **PieChart.tsx**: Connector lines use `var(--muted-foreground)`, labels use `var(--foreground)`, backgrounds use `var(--card)`
+- **BarChart.tsx**: Backgrounds use `var(--card)`, value labels use `var(--muted-foreground)`
+- **LineChart.tsx**: Points and backgrounds use `var(--card)`, crosshair lines use `var(--border)`, hover labels use `var(--muted-foreground)`
+- **AreaChart.tsx**: Point fills use `var(--card)` for proper contrast in both light/dark modes
+- **Heatmap.tsx**: Color scales use OKLCH values, labels use `var(--muted-foreground)`, backgrounds use `var(--card)`, cell text uses theme-aware contrast detection
+- **Sparkline.tsx**: Default color changed to `var(--primary)`, trend indicators use `var(--success)`/`var(--destructive)`, zero lines use `var(--border)`
+
 ### Technical Notes
 - Build verified: All 23 static pages generated successfully
 - All fixes follow AGENTS.md theming rules for CSS variable-based tokens

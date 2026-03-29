@@ -125,7 +125,7 @@ export default function ReviewQueue({
                 size="sm"
                 onClick={handleBulkApprove}
                 disabled={isLoading}
-                className="gap-1 text-green-600 hover:text-green-700 hover:bg-green-50"
+                className="gap-1 text-success hover:bg-success/10"
               >
                 <CheckCircle2 className="w-4 h-4" />
                 Approve
@@ -135,7 +135,7 @@ export default function ReviewQueue({
                 size="sm"
                 onClick={handleBulkReject}
                 disabled={isLoading}
-                className="gap-1 text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+                className="gap-1 text-warning hover:bg-warning/10"
               >
                 <XCircle className="w-4 h-4" />
                 Request Changes
@@ -146,7 +146,7 @@ export default function ReviewQueue({
             </>
           ) : (
             <>
-              <span className="text-sm text-slate-500">
+              <span className="text-sm text-muted-foreground">
                 {filteredItems.length} item{filteredItems.length !== 1 ? 's' : ''}
               </span>
               {filteredItems.length > 0 && (
@@ -161,14 +161,14 @@ export default function ReviewQueue({
         <div className="flex items-center gap-2">
           {/* Sort dropdown */}
           <div className="flex items-center gap-1">
-            <span className="text-xs text-slate-500">Sort:</span>
+            <span className="text-xs text-muted-foreground">Sort:</span>
             {(['priority', 'submittedAt', 'author'] as const).map(field => (
               <Button
                 key={field}
                 variant={sortBy === field ? 'secondary' : 'ghost'}
                 size="sm"
                 onClick={() => handleSort(field)}
-                className={cn('text-xs', sortBy === field && 'bg-slate-200')}
+                className={cn('text-xs', sortBy === field && 'bg-muted')}
               >
                 {field === 'submittedAt' ? 'Date' : field.charAt(0).toUpperCase() + field.slice(1)}
                 {sortBy === field && (
@@ -204,7 +204,7 @@ export default function ReviewQueue({
             size="sm"
             onClick={refresh}
             disabled={isLoading}
-            className={cn(isLoading && 'animate-spin')}
+            className={cn(isLoading && 'animate-spin motion-reduce:animate-none')}
           >
             <RefreshCw className="w-4 h-4" />
           </Button>
@@ -213,8 +213,8 @@ export default function ReviewQueue({
 
       {/* Error state */}
       {error && (
-        <Card className="p-4 border-red-200 bg-red-50">
-          <p className="text-red-700">{error}</p>
+        <Card className="p-4 border-destructive/20 bg-destructive/10">
+          <p className="text-destructive">{error}</p>
         </Card>
       )}
 
@@ -227,11 +227,11 @@ export default function ReviewQueue({
       >
         {filteredItems.length === 0 && !isLoading && (
           <Card className="p-12 text-center border-dashed border-2">
-            <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CheckCircle2 className="w-8 h-8 text-green-500" />
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle2 className="w-8 h-8 text-success" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900">All caught up!</h3>
-            <p className="text-slate-500 mb-4">No items match your current filters.</p>
+            <h3 className="text-lg font-bold text-foreground">All caught up!</h3>
+            <p className="text-muted-foreground mb-4">No items match your current filters.</p>
             <Button variant="outline" onClick={() => setFilter({})}>
               Clear filters
             </Button>
@@ -263,9 +263,9 @@ export default function ReviewQueue({
 
       {/* Loading overlay */}
       {isLoading && filteredItems.length > 0 && (
-        <div className="fixed inset-0 bg-white/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-lg">
-            <RefreshCw className="w-5 h-5 animate-spin text-blue-600" />
+        <div className="fixed inset-0 bg-background/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="flex items-center gap-2 bg-card px-4 py-2 rounded-lg shadow-lg border border-border">
+            <RefreshCw className="w-5 h-5 animate-spin motion-reduce:animate-none text-primary" />
             <span className="text-sm font-medium">Processing...</span>
           </div>
         </div>

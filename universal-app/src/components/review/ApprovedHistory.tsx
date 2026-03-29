@@ -19,32 +19,32 @@ export default function ApprovedHistory({ items, filteredQueueLength }: Approved
     <div className="space-y-4">
       {items.length === 0 && (
         <Card className="p-12 text-center border-dashed border-2">
-          <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle2 className="w-8 h-8 text-slate-300" />
+          <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+            <CheckCircle2 className="w-8 h-8 text-muted-foreground" />
           </div>
-          <h3 className="text-lg font-bold text-slate-900">No approvals yet</h3>
-          <p className="text-slate-500 mb-4">Actions you approve will appear here with timestamps.</p>
+          <h3 className="text-lg font-bold text-foreground">No approvals yet</h3>
+          <p className="text-muted-foreground mb-4">Actions you approve will appear here with timestamps.</p>
         </Card>
       )}
       {items.map(item => (
-        <Card key={item.id} className="p-6 border border-green-200 bg-green-50">
+        <Card key={item.id} className="p-6 border border-success/30 bg-success/10">
           <div className="flex justify-between items-start">
             <div>
-              <h3 className="font-bold text-slate-900">{item.title}</h3>
-              <p className="text-sm text-slate-600">
+              <h3 className="font-bold text-foreground">{item.title}</h3>
+              <p className="text-sm text-muted-foreground">
                 Approved {item.lastActionAt ? formatDateTime(item.lastActionAt) : 'recently'} {item.lastActionBy ? `by ${item.lastActionBy}` : ''}
               </p>
             </div>
-            <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200">Approved</Badge>
+            <Badge variant="secondary" className="bg-success/10 text-success border-success/30">Approved</Badge>
           </div>
         </Card>
       ))}
       {filteredQueueLength === 0 && (
         <Card className="p-8 border-dashed border-2 border-slate-200 text-center bg-white">
-          <div className="w-14 h-14 rounded-full bg-slate-100 mx-auto mb-3 flex items-center justify-center text-slate-400">
+          <div className="w-14 h-14 rounded-full bg-muted mx-auto mb-3 flex items-center justify-center text-muted-foreground">
             <Clock className="w-6 h-6" />
           </div>
-          <h3 className="text-lg font-semibold text-slate-900">No items pending</h3>
+          <h3 className="text-lg font-semibold text-foreground">No items pending</h3>
           <p className="text-sm text-slate-500 mb-4">As soon as your team submits notes, they will appear here.</p>
           <div className="flex justify-center gap-2">
             <Link href="/my-notes">

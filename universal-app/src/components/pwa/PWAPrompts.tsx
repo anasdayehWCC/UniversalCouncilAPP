@@ -79,7 +79,7 @@ export function PWAUpdateNotification({
             d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
           />
         </svg>
-        <span className="text-sm font-medium text-slate-700">{message}</span>
+        <span className="text-sm font-medium text-foreground">{message}</span>
       </div>
       
       <div className="flex items-center gap-2">
@@ -91,7 +91,7 @@ export function PWAUpdateNotification({
         </button>
         <button
           onClick={handleDismiss}
-          className="p-1.5 text-slate-400 hover:text-slate-600 transition-colors"
+          className="p-1.5 text-muted-foreground hover:text-foreground transition-colors"
           aria-label="Dismiss"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -165,15 +165,15 @@ export function PWAInstallPrompt() {
           </div>
           
           <div className="flex-1 min-w-0">
-            <h3 className="text-sm font-semibold text-slate-900">Install Council Minutes</h3>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <h3 className="text-sm font-semibold text-foreground">Install Council Minutes</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">
               Add to your home screen for quick access and offline support.
             </p>
           </div>
           
           <button
             onClick={handleDismiss}
-            className="p-1 text-slate-400 hover:text-slate-600 transition-colors"
+            className="p-1 text-muted-foreground hover:text-foreground transition-colors"
             aria-label="Dismiss"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -185,7 +185,7 @@ export function PWAInstallPrompt() {
         <div className="flex gap-2 mt-4">
           <button
             onClick={handleDismiss}
-            className="flex-1 px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+            className="flex-1 px-4 py-2 text-sm font-medium text-muted-foreground bg-muted rounded-lg hover:bg-muted/80 transition-colors"
           >
             Not now
           </button>

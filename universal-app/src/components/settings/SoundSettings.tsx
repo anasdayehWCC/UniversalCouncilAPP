@@ -87,7 +87,7 @@ function SoundToggle({
         'group flex items-center gap-4 rounded-lg border p-3 transition-all',
         enabled
           ? 'border-[var(--accent)]/20 bg-[var(--accent)]/5'
-          : 'border-slate-200 bg-slate-50',
+          : 'border-input bg-muted',
         disabled && 'opacity-50 pointer-events-none'
       )}
     >
@@ -99,7 +99,7 @@ function SoundToggle({
           'flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-colors',
           enabled
             ? 'bg-[var(--accent)] text-white'
-            : 'bg-slate-200 text-slate-500 hover:bg-slate-300'
+            : 'bg-muted-foreground/20 text-muted-foreground hover:bg-muted-foreground/30'
         )}
         aria-pressed={enabled}
         aria-label={`${enabled ? 'Disable' : 'Enable'} ${name} sound`}
@@ -110,7 +110,7 @@ function SoundToggle({
       {/* Info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className="font-medium capitalize text-slate-900">{name}</span>
+          <span className="font-medium capitalize text-foreground">{name}</span>
           <button
             type="button"
             onClick={onPreview}
@@ -123,7 +123,7 @@ function SoundToggle({
             Preview
           </button>
         </div>
-        <p className="text-xs text-slate-500 truncate">{config.description}</p>
+        <p className="text-xs text-muted-foreground truncate">{config.description}</p>
       </div>
 
       {/* Volume Slider */}
@@ -243,8 +243,8 @@ export function SoundSettings({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-slate-900">Sound Settings</h3>
-          <p className="text-sm text-slate-500">
+          <h3 className="text-lg font-semibold text-foreground">Sound Settings</h3>
+          <p className="text-sm text-muted-foreground">
             Configure notification sounds and volume
           </p>
         </div>
@@ -268,7 +268,7 @@ export function SoundSettings({
               className={cn(
                 'flex h-10 w-10 items-center justify-center rounded-full transition-colors',
                 muted
-                  ? 'bg-red-100 text-red-600'
+                  ? 'bg-destructive/10 text-destructive'
                   : 'bg-[var(--accent)]/10 text-[var(--accent)]'
               )}
             >
@@ -276,7 +276,7 @@ export function SoundSettings({
             </div>
             <div>
               <Label className="font-medium">Sound Effects</Label>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted-foreground">
                 {muted ? 'All sounds are muted' : 'Sounds are enabled'}
               </p>
             </div>
@@ -294,7 +294,7 @@ export function SoundSettings({
         <div className={cn('space-y-2', muted && 'opacity-50')}>
           <div className="flex items-center justify-between">
             <Label>Master Volume</Label>
-            <span className="text-sm font-medium text-slate-600">
+            <span className="text-sm font-medium text-muted-foreground">
               {Math.round(masterVolume * 100)}%
             </span>
           </div>
@@ -349,7 +349,7 @@ export function SoundSettings({
 
       {/* Individual Sound Controls */}
       <div className="space-y-3">
-        <Label className="text-sm font-medium text-slate-700">
+        <Label className="text-sm font-medium text-foreground">
           Individual Sounds
         </Label>
         <div className="space-y-2">
@@ -369,7 +369,7 @@ export function SoundSettings({
       </div>
 
       {/* Footer Note */}
-      <p className="text-xs text-slate-400 text-center">
+      <p className="text-xs text-muted-foreground text-center">
         Sound preferences are stored locally on your device
       </p>
     </div>

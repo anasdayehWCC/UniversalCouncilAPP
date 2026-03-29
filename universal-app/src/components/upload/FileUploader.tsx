@@ -335,10 +335,10 @@ function UploadItemRow({
       className={cn(
         'flex items-center gap-3 p-3 rounded-lg border transition-colors',
         upload.status === 'failed'
-          ? 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20'
+          ? 'border-destructive/30 bg-destructive/10 dark:border-destructive/30 dark:bg-destructive/10'
           : upload.status === 'completed'
-            ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20'
-            : 'border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800'
+            ? 'border-success/30 bg-success/10 dark:border-success/30 dark:bg-success/10'
+            : 'border-border bg-card dark:border-border dark:bg-card'
       )}
     >
       {/* File icon / preview */}
@@ -346,10 +346,10 @@ function UploadItemRow({
         className={cn(
           'w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0',
           upload.status === 'failed'
-            ? 'bg-red-100 text-red-600 dark:bg-red-800/30 dark:text-red-400'
+            ? 'bg-destructive/10 text-destructive dark:bg-destructive/10 dark:text-destructive'
             : upload.status === 'completed'
-              ? 'bg-green-100 text-green-600 dark:bg-green-800/30 dark:text-green-400'
-              : 'bg-blue-100 text-blue-600 dark:bg-blue-800/30 dark:text-blue-400'
+              ? 'bg-success/10 text-success dark:bg-success/10 dark:text-success'
+              : 'bg-primary/10 text-primary dark:bg-primary/10 dark:text-primary'
         )}
       >
         {upload.status === 'completed' ? (
@@ -364,7 +364,7 @@ function UploadItemRow({
       {/* File info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-slate-900 dark:text-white truncate">
+          <span className="text-sm font-medium text-foreground dark:text-foreground truncate">
             {upload.file.name}
           </span>
           {isAudio && (
@@ -374,7 +374,7 @@ function UploadItemRow({
           )}
         </div>
 
-        <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground dark:text-muted-foreground">
           <span>{formatFileSize(upload.file.size)}</span>
           {upload.status === 'uploading' && upload.speed && (
             <>
@@ -385,7 +385,7 @@ function UploadItemRow({
           {upload.error && (
             <>
               <span>•</span>
-              <span className="text-red-500">{upload.error}</span>
+              <span className="text-destructive">{upload.error}</span>
             </>
           )}
         </div>
@@ -445,7 +445,7 @@ function UploadItemRow({
             size="sm"
             variant="ghost"
             onClick={() => onCancel(upload.id)}
-            className="h-7 w-7 p-0 text-slate-400 hover:text-red-500"
+            className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
             aria-label="Cancel upload"
           >
             <XIcon />
@@ -902,11 +902,11 @@ export function FileUploader({
         aria-disabled={disabled}
         className={cn(
           'relative border-2 border-dashed rounded-xl transition-all duration-200 cursor-pointer',
-          'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
+          'focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2',
           isDragOver
-            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 scale-[1.02]'
-            : 'border-slate-200 dark:border-slate-700 hover:border-blue-400 hover:bg-slate-50 dark:hover:bg-slate-800/50',
-          disabled && 'opacity-50 cursor-not-allowed hover:border-slate-200 hover:bg-transparent',
+            ? 'border-primary bg-primary/10 dark:bg-primary/10 scale-[1.02]'
+            : 'border-border dark:border-border hover:border-primary hover:bg-muted dark:hover:bg-muted',
+          disabled && 'opacity-50 cursor-not-allowed hover:border-border hover:bg-transparent',
           compact ? 'p-6' : 'p-10'
         )}
         onDragOver={handleDragOver}
@@ -934,8 +934,8 @@ export function FileUploader({
             className={cn(
               'mb-4 p-3 rounded-full',
               isDragOver
-                ? 'bg-blue-100 text-blue-600 dark:bg-blue-800/30 dark:text-blue-400'
-                : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
+                ? 'bg-primary/10 text-primary dark:bg-primary/10 dark:text-primary'
+                : 'bg-muted text-muted-foreground dark:bg-muted dark:text-muted-foreground'
             )}
           >
             <UploadCloudIcon
@@ -945,20 +945,20 @@ export function FileUploader({
 
           <h3
             className={cn(
-              'font-semibold text-slate-900 dark:text-white mb-1',
+              'font-semibold text-foreground dark:text-foreground mb-1',
               compact ? 'text-base' : 'text-lg'
             )}
           >
             {dropzoneText || (isDragOver ? 'Drop files here' : 'Drag & drop files or click to browse')}
           </h3>
 
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-sm text-muted-foreground dark:text-muted-foreground">
             {multiple
               ? `Up to ${maxFiles} audio files • Max ${formatFileSize(config.maxFileSize)} each`
               : `Single audio file • Max ${formatFileSize(config.maxFileSize)}`}
           </p>
 
-          <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
+          <p className="mt-1 text-xs text-muted-foreground dark:text-muted-foreground">
             MP3, WAV, WebM, M4A, OGG supported
           </p>
         </div>
@@ -971,15 +971,15 @@ export function FileUploader({
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="p-3 rounded-lg bg-red-50 border border-red-200 dark:bg-red-900/20 dark:border-red-800"
+            className="p-3 rounded-lg bg-destructive/10 border border-destructive/30 dark:bg-destructive/10 dark:border-destructive/30"
           >
             <div className="flex items-start gap-2">
-              <ErrorCircleIcon className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <ErrorCircleIcon className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm font-medium text-red-700 dark:text-red-300">
+                <p className="text-sm font-medium text-destructive dark:text-destructive">
                   Some files could not be uploaded
                 </p>
-                <ul className="mt-1 text-xs text-red-600 dark:text-red-400">
+                <ul className="mt-1 text-xs text-destructive dark:text-destructive">
                   {rejectedFiles.map((f, i) => (
                     <li key={i}>
                       {f.name}: {f.errors.join(', ')}
@@ -996,7 +996,7 @@ export function FileUploader({
       {showPreview && hasUploads && (
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+            <span className="text-sm font-medium text-foreground dark:text-foreground">
               Uploads ({uploadList.length})
             </span>
             {uploadList.some((u) => u.status === 'completed' || u.status === 'failed') && (

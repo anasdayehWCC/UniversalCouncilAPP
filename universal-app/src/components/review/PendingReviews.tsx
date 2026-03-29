@@ -4,7 +4,7 @@ import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, XCircle, Clock, FileText, Shield } from 'lucide-react';
+import { CheckCircle2, XCircle, Clock, FileText, Shield, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import { Meeting } from '@/types/demo';
 import { cn } from '@/lib/utils';
@@ -22,7 +22,7 @@ export default function PendingReviews({ items, onAction }: PendingReviewsProps)
         <Card key={item.id} className="p-6 hover:shadow-md transition-all border-slate-200 group">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-start gap-4 flex-1">
-              <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold text-sm border border-blue-100 overflow-hidden relative">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm border border-primary/30 overflow-hidden relative">
                 {(() => {
                    // We need to import PERSONAS or pass it. Since this is a client component, we can import it.
                    // But wait, PERSONAS is in config.
@@ -33,56 +33,78 @@ export default function PendingReviews({ items, onAction }: PendingReviewsProps)
                 })()}
               </div>
               <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-bold text-lg text-slate-900">{item.title}</h3>
-	                  <Badge variant="outline" className={cn(
-	                    item.status === 'flagged'
-	                      ? "bg-red-50 text-red-700 border-red-200"
-	                      : "bg-green-50 text-green-700 border-green-200"
-	                  )}>
-	                    {item.status === 'flagged' ? 'Changes Requested' : 'Ready for Review'}
-	                  </Badge>
-                  {item.riskScore && (
-                    <Badge variant="outline" className={cn(
-                      item.riskScore === 'high' ? "bg-red-50 text-red-700 border-red-200" :
-                      item.riskScore === 'medium' ? "bg-amber-50 text-amber-700 border-amber-200" :
-                      "bg-emerald-50 text-emerald-700 border-emerald-200"
-                    )}>
-                      Risk: {item.riskScore}
-                    </Badge>
-                  )}
-                  {item.processingMode && (
-                    <Badge variant="secondary" className="bg-slate-100 text-slate-700 border-slate-200">
-                      {item.processingMode === 'fast' ? 'Fast Mode' : 'Economy'}
-                    </Badge>
-                  )}
+                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                  <h3 className="font-bold text-lg text-foreground">{item.title}</h3>
+                  {(() => {
+                    const allBadges = [
+                      <Badge key="status" variant="outline" className={cn(
+                        item.status === 'flagged'
+                          ? "bg-destructive/10 text-destructive border-destructive/30"
+                          : "bg-success/10 text-success border-success/30"
+                      )}>
+                        {item.status === 'flagged' ? 'Changes Requested' : 'Ready for Review'}
+                      </Badge>,
+                      ...(item.riskScore ? [
+                        <Badge key="risk" variant="outline" className={cn(
+                          item.riskScore === 'high' ? "bg-destructive/10 text-destructive border-destructive/30" :
+                          item.riskScore === 'medium' ? "bg-amber-50 text-amber-700 border-amber-200" :
+                          "bg-emerald-50 text-emerald-700 border-emerald-200"
+                        )}>
+                          {item.riskScore === 'high' && <AlertTriangle className="w-3 h-3 mr-1" />}
+                          Risk: {item.riskScore}
+                        </Badge>
+                      ] : []),
+                      ...(item.processingMode ? [
+                        <Badge key="mode" variant="secondary" className="bg-muted text-muted-foreground border-border">
+                          {item.processingMode === 'fast' ? 'Fast Mode' : 'Economy'}
+                        </Badge>
+                      ] : []),
+                    ];
+                    const visibleBadges = allBadges.slice(0, 3);
+                    const hiddenCount = allBadges.length - 3;
+                    return (
+                      <>
+                        {visibleBadges}
+                        {hiddenCount > 0 && (
+                          <Badge variant="outline" className="text-muted-foreground text-xs">+{hiddenCount}</Badge>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
-                <p className="text-sm text-slate-500 mb-3">
-                  Submitted by <span className="font-medium text-slate-900">{item.submittedBy || 'Auto-upload'}</span> • {item.submittedAt ? formatDateTime(item.submittedAt) : 'just now'}
+                <p className="text-sm text-muted-foreground mb-3 flex items-center gap-2 flex-wrap">
+                  <span>
+                    Submitted by <span className="font-medium text-foreground">{item.submittedBy || 'Auto-upload'}</span> • {item.submittedAt ? formatDateTime(item.submittedAt) : 'just now'}
+                  </span>
                   {(() => {
                     const sla = getSLAStatus(item.submittedAt);
-                    return (
-                      <span className={cn("ml-2 text-xs font-medium px-1.5 py-0.5 rounded", sla.bg, sla.color)}>
+                    return sla.isOverdue ? (
+                      <span className="inline-flex items-center gap-1 text-xs text-destructive bg-destructive/10 px-2 py-0.5 rounded-full border border-destructive/20">
+                        <Clock className="w-3 h-3" />
+                        {sla.label}
+                      </span>
+                    ) : (
+                      <span className={cn("text-xs font-medium px-1.5 py-0.5 rounded bg-muted", sla.color)}>
                         {sla.label}
                       </span>
                     );
                   })()}
                 </p>
-                <div className="flex items-center gap-4 text-xs text-slate-500">
-                  <span className="flex items-center gap-1 bg-slate-50 px-2 py-1 rounded border border-slate-100">
+                <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1 bg-muted px-2 py-1 rounded border border-border">
                     <Clock className="w-3 h-3" /> {item.duration}
                   </span>
                   <span className="flex items-center gap-1 bg-slate-50 px-2 py-1 rounded border border-slate-100">
                     <FileText className="w-3 h-3" /> {item.templateId}
                   </span>
                   {item.tags && item.tags.length > 0 && (
-                    <span className="flex items-center gap-1 bg-slate-50 px-2 py-1 rounded border border-slate-100">
+                    <span className="flex items-center gap-1 bg-muted px-2 py-1 rounded border border-border">
                       <Shield className="w-3 h-3" /> {item.tags.slice(0,2).join(', ')}
                     </span>
                   )}
                 </div>
                 {item.lastAction && (
-                <p className="text-xs text-slate-500 mt-2">
+                <p className="text-xs text-muted-foreground mt-2">
                     Last action: {item.lastAction} {item.lastActionAt ? formatDateTime(item.lastActionAt) : 'just now'} {item.lastActionBy ? `by ${item.lastActionBy}` : ''}
                   </p>
                 )}
@@ -100,7 +122,7 @@ export default function PendingReviews({ items, onAction }: PendingReviewsProps)
                   aria-label="Approve note"
                   title="Approve note"
                   variant="outline" 
-                  className="flex-1 text-green-600 hover:text-green-700 hover:bg-green-50 border-slate-200"
+                  className="flex-1 text-success hover:text-success hover:bg-success/10 border-border"
                   onClick={() => onAction(item, 'approve')}
                 >
                   <CheckCircle2 className="w-4 h-4" />

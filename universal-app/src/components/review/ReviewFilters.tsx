@@ -121,7 +121,7 @@ export default function ReviewFilters({
       <div className="flex flex-wrap items-center gap-3 mb-4">
         {/* Search */}
         <div className="relative flex-1 min-w-[200px] max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             type="text"
             placeholder="Search by title, author..."
@@ -153,7 +153,7 @@ export default function ReviewFilters({
             variant={filter.isOverdue ? 'default' : 'outline'}
             size="sm"
             onClick={handleOverdueToggle}
-            className={cn('gap-1', filter.isOverdue && 'bg-red-600 hover:bg-red-700')}
+            className={cn('gap-1', filter.isOverdue && 'bg-destructive hover:bg-destructive/90')}
           >
             <AlertTriangle className="w-3 h-3" />
             Overdue ({stats.overdueCount})
@@ -162,7 +162,7 @@ export default function ReviewFilters({
             variant={filter.priority?.includes('urgent') ? 'default' : 'outline'}
             size="sm"
             onClick={() => onFilterChange({ ...filter, priority: ['urgent', 'high'] })}
-            className={cn('gap-1', filter.priority?.includes('urgent') && 'bg-orange-600 hover:bg-orange-700')}
+            className={cn('gap-1', filter.priority?.includes('urgent') && 'bg-warning hover:bg-warning/90')}
           >
             <AlertCircle className="w-3 h-3" />
             Urgent ({stats.urgentCount})
@@ -174,7 +174,7 @@ export default function ReviewFilters({
           variant="ghost"
           size="sm"
           onClick={() => setShowAdvanced(!showAdvanced)}
-          className="gap-1 text-slate-600"
+          className="gap-1 text-muted-foreground"
         >
           <Filter className="w-4 h-4" />
           Filters
@@ -191,7 +191,7 @@ export default function ReviewFilters({
         </Button>
 
         {activeFilterCount > 0 && (
-          <Button variant="ghost" size="sm" onClick={clearFilters} className="text-slate-500">
+          <Button variant="ghost" size="sm" onClick={clearFilters} className="text-muted-foreground">
             <X className="w-4 h-4 mr-1" />
             Clear
           </Button>

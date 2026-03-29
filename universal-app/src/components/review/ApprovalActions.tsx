@@ -130,12 +130,12 @@ function ActionButton({
       disabled={disabled || loading}
       className={cn(
         'gap-2',
-        action === 'approve' && 'bg-green-600 hover:bg-green-700',
-        action === 'reject' && 'bg-red-600 hover:bg-red-700'
+        action === 'approve' && 'bg-success hover:bg-success/90',
+        action === 'reject' && 'bg-destructive hover:bg-destructive/90'
       )}
     >
       {loading ? (
-        <Loader2 className="w-4 h-4 animate-spin" />
+        <Loader2 className="w-4 h-4 animate-spin motion-reduce:animate-none" />
       ) : (
         getIcon()
       )}
@@ -346,7 +346,7 @@ export default function ApprovalActions({
     return showStatus && currentStep ? (
       <div className={cn('flex items-center gap-2', className)}>
         <StatusBadge step={currentStep} />
-        <span className="text-sm text-slate-500">Final</span>
+        <span className="text-sm text-muted-foreground">Final</span>
       </div>
     ) : null;
   }
@@ -364,8 +364,8 @@ export default function ApprovalActions({
   if (isLoading) {
     return (
       <div className={cn('flex items-center gap-2', className)}>
-        <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
-        <span className="text-sm text-slate-500">Loading...</span>
+        <Loader2 className="w-4 h-4 animate-spin motion-reduce:animate-none text-muted-foreground" />
+        <span className="text-sm text-muted-foreground">Loading...</span>
       </div>
     );
   }
@@ -389,7 +389,7 @@ export default function ApprovalActions({
 
         {/* SLA Warning */}
         {slaInfo?.breached && (
-          <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 gap-1">
+          <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/30 gap-1">
             <Clock className="w-3 h-3" />
             SLA Breached
           </Badge>
@@ -411,7 +411,7 @@ export default function ApprovalActions({
 
         {/* Error Display */}
         {error && !dialogState.isOpen && (
-          <span className="text-sm text-red-600 flex items-center gap-1">
+          <span className="text-sm text-destructive flex items-center gap-1">
             <AlertTriangle className="w-4 h-4" />
             {error}
           </span>
@@ -424,10 +424,10 @@ export default function ApprovalActions({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               {dialogState.action === 'approve' && (
-                <CheckCircle2 className="w-5 h-5 text-green-600" />
+                <CheckCircle2 className="w-5 h-5 text-success" />
               )}
               {dialogState.action === 'reject' && (
-                <XCircle className="w-5 h-5 text-red-600" />
+                <XCircle className="w-5 h-5 text-destructive" />
               )}
               {dialogState.action === 'request_changes' && (
                 <MessageSquare className="w-5 h-5 text-amber-600" />
@@ -444,7 +444,7 @@ export default function ApprovalActions({
           {(dialogState.requiresComment || dialogState.action === 'approve') && (
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <label htmlFor="comment" className="text-sm font-medium text-slate-700">
+                <label htmlFor="comment" className="text-sm font-medium text-foreground">
                   {dialogState.requiresComment ? 'Comment (Required)' : 'Comment (Optional)'}
                 </label>
                 <Textarea
@@ -489,7 +489,7 @@ export default function ApprovalActions({
               )}
             >
               {actionLoading ? (
-                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                <Loader2 className="w-4 h-4 animate-spin motion-reduce:animate-none mr-2" />
               ) : null}
               {dialogState.action && WORKFLOW_ACTION_CONFIG[dialogState.action].label}
             </Button>

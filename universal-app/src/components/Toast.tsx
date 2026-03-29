@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useCallback, ReactNode } fr
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ZINDEX_CLASSES } from '@/lib/z-index';
 
 type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -34,10 +35,10 @@ interface ToastContextType {
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 const TOAST_ICONS: Record<ToastType, React.ReactNode> = {
-  success: <CheckCircle className="h-5 w-5 text-green-500" />,
+  success: <CheckCircle className="h-5 w-5 text-success" />,
   error: <AlertCircle className="h-5 w-5 text-destructive" />,
   warning: <AlertTriangle className="h-5 w-5 text-yellow-500" />,
-  info: <Info className="h-5 w-5 text-blue-500" />,
+  info: <Info className="h-5 w-5 text-info" />,
 };
 
 const TOAST_STYLES: Record<ToastType, string> = {
@@ -131,27 +132,49 @@ function ToastContainer({
   return (
     <div
       aria-live="polite"
+      aria-atomic="false"
       aria-label="Notifications"
-      className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"
+      className={cn(
+        "fixed flex flex-col gap-2 pointer-events-none",
+        ZINDEX_CLASSES.toast,
+        // Mobile: full width at bottom with safe area padding
+        "bottom-0 left-0 right-0 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]",
+        // Desktop: fixed width in corner
+        "sm:bottom-4 sm:right-4 sm:left-auto sm:max-w-sm sm:w-full sm:p-0"
+      )}
     >
       <AnimatePresence mode="popLayout">
-        {toasts.map(toast => (
+        {/* Reverse order so newest toasts appear at the top on desktop */}
+        {[...toasts].reverse().map((toast, index) => (
           <motion.div
             key={toast.id}
+            layout
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, x: 100, scale: 0.9 }}
-            transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+            animate={{ 
+              opacity: 1, 
+              y: 0, 
+              scale: 1,
+              // Stack effect: older toasts slightly smaller and more transparent
+              transition: { delay: index * 0.02 }
+            }}
+            exit={{ opacity: 0, x: 100, scale: 0.9, transition: { duration: 0.2 } }}
+            transition={{ type: 'spring', damping: 25, stiffness: 400 }}
             className="pointer-events-auto"
+            style={{
+              // Subtle stacking effect
+              transform: index > 0 ? `scale(${1 - index * 0.02})` : undefined,
+              opacity: index > 2 ? 0.8 : 1,
+            }}
           >
             <div
               role="alert"
               className={cn(
                 'flex items-start gap-3 rounded-lg border p-4 shadow-lg backdrop-blur-sm',
+                'transition-all duration-200',
                 TOAST_STYLES[toast.type]
               )}
             >
-              <div className="flex-shrink-0 mt-0.5">
+              <div className="flex-shrink-0 mt-0.5" aria-hidden="true">
                 {TOAST_ICONS[toast.type]}
               </div>
               
@@ -167,7 +190,7 @@ function ToastContainer({
                 {toast.action && (
                   <button
                     onClick={toast.action.onClick}
-                    className="mt-2 text-sm font-medium text-primary hover:underline"
+                    className="mt-2 text-sm font-medium text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded"
                   >
                     {toast.action.label}
                   </button>
@@ -176,7 +199,7 @@ function ToastContainer({
               
               <button
                 onClick={() => onRemove(toast.id)}
-                className="flex-shrink-0 rounded-md p-1 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                className="flex-shrink-0 rounded-md p-1.5 hover:bg-black/5 dark:hover:bg-white/5 transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
                 aria-label="Dismiss notification"
               >
                 <X className="h-4 w-4 text-muted-foreground" />

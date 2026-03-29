@@ -126,12 +126,12 @@ export default function FeedbackThread({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <MessageCircle className="w-4 h-4 text-slate-400" />
-          <span className="text-sm font-medium text-slate-700">
+          <MessageCircle className="w-4 h-4 text-muted-foreground" />
+          <span className="text-sm font-medium text-foreground">
             Feedback {section && `· ${section}`}
           </span>
           {unresolvedCount > 0 && (
-            <Badge variant="secondary" className="bg-orange-100 text-orange-700">
+            <Badge variant="secondary" className="bg-warning/10 text-warning">
               {unresolvedCount} unresolved
             </Badge>
           )}
@@ -151,7 +151,7 @@ export default function FeedbackThread({
       {showAddForm && (
         <Card
           className={cn(
-            'p-4 border-slate-200',
+            'p-4 border-border',
             !prefersReducedMotion && 'animate-in fade-in slide-in-from-top-2 duration-200'
           )}
         >
@@ -168,9 +168,9 @@ export default function FeedbackThread({
                   onClick={() => setFeedbackType(type)}
                   className={cn(
                     'gap-1',
-                    feedbackType === type && type === 'required' && 'bg-red-600 hover:bg-red-700',
-                    feedbackType === type && type === 'praising' && 'bg-green-600 hover:bg-green-700',
-                    feedbackType === type && type === 'question' && 'bg-purple-600 hover:bg-purple-700'
+                    feedbackType === type && type === 'required' && 'bg-destructive hover:bg-destructive/90',
+                    feedbackType === type && type === 'praising' && 'bg-success hover:bg-success/90',
+                    feedbackType === type && type === 'question' && 'bg-info hover:bg-info/90'
                   )}
                 >
                   <Icon className="w-3 h-3" />
@@ -199,8 +199,8 @@ export default function FeedbackThread({
       {/* Feedback list */}
       {filteredFeedback.length === 0 && !showAddForm && (
         <Card className="p-8 text-center border-dashed border-2">
-          <MessageCircle className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-          <p className="text-sm text-slate-500">No feedback yet</p>
+          <MessageCircle className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+          <p className="text-sm text-muted-foreground">No feedback yet</p>
         </Card>
       )}
 
@@ -215,25 +215,25 @@ export default function FeedbackThread({
             key={item.id}
             className={cn(
               'border-l-4 transition-all',
-              item.resolved ? 'border-l-green-400 bg-green-50/50' : `border-l-${item.type === 'required' ? 'red' : item.type === 'praising' ? 'green' : item.type === 'question' ? 'purple' : 'blue'}-400`,
+              item.resolved ? 'border-l-success bg-success/5' : `border-l-${item.type === 'required' ? 'destructive' : item.type === 'praising' ? 'success' : item.type === 'question' ? 'info' : 'primary'}`,
               !prefersReducedMotion && 'hover:shadow-md'
             )}
           >
             <div className="p-4">
               {/* Feedback header */}
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-medium text-slate-600 flex-shrink-0">
+                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-medium text-foreground flex-shrink-0">
                   {getInitials(item.authorName)}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <span className="font-medium text-slate-900">{item.authorName}</span>
+                    <span className="font-medium text-foreground">{item.authorName}</span>
                     <Badge variant="outline" className={cn(config.bg, config.color, 'text-xs')}>
                       <Icon className="w-3 h-3 mr-1" />
                       {config.label}
                     </Badge>
                     {item.resolved && (
-                      <Badge variant="secondary" className="bg-green-100 text-green-700 text-xs">
+                      <Badge variant="secondary" className="bg-success/10 text-success text-xs">
                         <Check className="w-3 h-3 mr-1" />
                         Resolved
                       </Badge>
@@ -245,13 +245,13 @@ export default function FeedbackThread({
                   
                   {/* Referenced text */}
                   {item.highlightedText && (
-                    <blockquote className="border-l-2 border-slate-200 pl-3 py-1 mb-2 text-sm text-slate-500 italic bg-slate-50 rounded-r">
+                    <blockquote className="border-l-2 border-border pl-3 py-1 mb-2 text-sm text-muted-foreground italic bg-muted rounded-r">
                       &ldquo;{item.highlightedText}&rdquo;
                     </blockquote>
                   )}
                   
                   {/* Comment */}
-                  <p className="text-sm text-slate-700 whitespace-pre-wrap">{item.comment}</p>
+                  <p className="text-sm text-foreground whitespace-pre-wrap">{item.comment}</p>
 
                   {/* Actions */}
                   <div className="flex items-center gap-2 mt-3">
@@ -260,7 +260,7 @@ export default function FeedbackThread({
                         variant="outline"
                         size="sm"
                         onClick={() => onResolveFeedback(item.id)}
-                        className="text-green-600 hover:bg-green-50 gap-1"
+                        className="text-success hover:bg-success/10 gap-1"
                       >
                         <Check className="w-3 h-3" />
                         Mark Resolved
@@ -270,7 +270,7 @@ export default function FeedbackThread({
                       variant="ghost"
                       size="sm"
                       onClick={() => setReplyingTo(replyingTo === item.id ? null : item.id)}
-                      className="gap-1 text-slate-600"
+                      className="gap-1 text-muted-foreground"
                     >
                       <Reply className="w-3 h-3" />
                       Reply
@@ -280,7 +280,7 @@ export default function FeedbackThread({
                         variant="ghost"
                         size="sm"
                         onClick={() => toggleThread(item.id)}
-                        className="gap-1 text-slate-500"
+                        className="gap-1 text-muted-foreground"
                       >
                         {item.replies!.length} repl{item.replies!.length === 1 ? 'y' : 'ies'}
                         {isExpanded ? (
@@ -322,21 +322,21 @@ export default function FeedbackThread({
 
               {/* Replies */}
               {hasReplies && isExpanded && (
-                <div className="mt-3 pl-11 space-y-3 border-l-2 border-slate-100 ml-4">
+                <div className="mt-3 pl-11 space-y-3 border-l-2 border-border ml-4">
                   {item.replies!.map(reply => (
                     <div key={reply.id} className="pl-3 py-2">
                       <div className="flex items-center gap-2 mb-1">
-                        <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs font-medium text-slate-600">
+                        <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs font-medium text-foreground">
                           {getInitials(reply.authorName)}
                         </div>
-                        <span className="text-sm font-medium text-slate-900">
+                        <span className="text-sm font-medium text-foreground">
                           {reply.authorName}
                         </span>
-                        <span className="text-xs text-slate-400">
+                        <span className="text-xs text-muted-foreground">
                           {formatDistanceToNow(reply.createdAt)}
                         </span>
                       </div>
-                      <p className="text-sm text-slate-600 ml-8">{reply.comment}</p>
+                      <p className="text-sm text-muted-foreground ml-8">{reply.comment}</p>
                     </div>
                   ))}
                 </div>

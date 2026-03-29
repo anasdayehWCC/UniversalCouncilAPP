@@ -208,14 +208,14 @@ export function ShortcutsModal({
               aria-modal="true"
               aria-labelledby="shortcuts-modal-title"
               className={cn(
-                'rounded-2xl border border-slate-200 dark:border-slate-700',
-                'bg-white dark:bg-slate-900 shadow-2xl',
+                'rounded-2xl border border-border dark:border-border',
+                'bg-card dark:bg-card shadow-2xl',
                 'max-h-[85vh] overflow-hidden flex flex-col',
                 className
               )}
             >
               {/* Header */}
-              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 px-6 py-4">
+              <div className="flex items-center justify-between border-b border-border dark:border-border px-6 py-4">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/20">
                     <Keyboard className="h-5 w-5 text-white" />
@@ -223,11 +223,11 @@ export function ShortcutsModal({
                   <div>
                     <h2
                       id="shortcuts-modal-title"
-                      className="text-lg font-semibold text-slate-900 dark:text-slate-100"
+                      className="text-lg font-semibold text-foreground dark:text-foreground"
                     >
                       {title}
                     </h2>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                    <p className="text-sm text-muted-foreground dark:text-muted-foreground">
                       {description || `${platform.isMac ? 'Mac' : 'Windows/Linux'} keyboard shortcuts`}
                     </p>
                   </div>
@@ -235,9 +235,9 @@ export function ShortcutsModal({
                 <button
                   onClick={handleClose}
                   className={cn(
-                    'rounded-lg p-2 text-slate-400 transition-all',
-                    'hover:bg-slate-100 hover:text-slate-600',
-                    'dark:hover:bg-slate-800 dark:hover:text-slate-300',
+                    'rounded-lg p-2 text-muted-foreground transition-all',
+                    'hover:bg-muted hover:text-foreground',
+                    'dark:hover:bg-muted dark:hover:text-foreground',
                     'focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2',
                     'dark:focus:ring-offset-slate-900'
                   )}
@@ -248,10 +248,10 @@ export function ShortcutsModal({
               </div>
 
               {/* Search and Filter */}
-              <div className="border-b border-slate-200 dark:border-slate-700 px-6 py-4 space-y-3">
+              <div className="border-b border-border dark:border-border px-6 py-4 space-y-3">
                 {/* Search Input */}
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <input
                     id="shortcuts-search-input"
                     type="text"
@@ -259,10 +259,10 @@ export function ShortcutsModal({
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className={cn(
-                      'w-full rounded-lg border border-slate-200 dark:border-slate-700',
-                      'bg-slate-50 dark:bg-slate-800/50 py-2.5 pl-10 pr-4',
-                      'text-sm text-slate-900 dark:text-slate-100',
-                      'placeholder:text-slate-400 dark:placeholder:text-slate-500',
+                      'w-full rounded-lg border border-input dark:border-input',
+                      'bg-muted dark:bg-muted py-2.5 pl-10 pr-4',
+                      'text-sm text-foreground dark:text-foreground',
+                      'placeholder:text-muted-foreground dark:placeholder:text-muted-foreground',
                       'focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent',
                       'transition-shadow'
                     )}
@@ -270,7 +270,7 @@ export function ShortcutsModal({
                   {searchQuery && (
                     <button
                       onClick={() => setSearchQuery('')}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground dark:hover:text-foreground"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -287,8 +287,8 @@ export function ShortcutsModal({
                         className={cn(
                           'rounded-full px-3 py-1.5 text-xs font-medium transition-all',
                           selectedContext === ctx.value
-                            ? 'bg-indigo-600 text-white shadow-sm'
-                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
+                            ? 'bg-[var(--primary)] text-[var(--primary-foreground)] shadow-sm'
+                            : 'bg-muted text-foreground hover:bg-muted/80 dark:bg-muted dark:text-foreground dark:hover:bg-muted/80'
                         )}
                       >
                         {ctx.icon && <span className="mr-1">{ctx.icon}</span>}
@@ -319,8 +319,8 @@ export function ShortcutsModal({
               </div>
 
               {/* Footer */}
-              <div className="border-t border-slate-200 dark:border-slate-700 px-6 py-3">
-                <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+              <div className="border-t border-border dark:border-border px-6 py-3">
+                <div className="flex items-center justify-between text-xs text-muted-foreground dark:text-muted-foreground">
                   <div className="flex items-center gap-4">
                     <span className="flex items-center gap-1.5">
                       Press <KeyboardShortcutHint shortcutKey="Escape" size="xs" /> to close
@@ -349,13 +349,13 @@ export function ShortcutsModal({
 function EmptyState({ searchQuery }: { searchQuery: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center">
-      <div className="mb-4 rounded-full bg-slate-100 dark:bg-slate-800 p-4">
-        <Search className="h-8 w-8 text-slate-400" />
+      <div className="mb-4 rounded-full bg-muted dark:bg-muted p-4">
+        <Search className="h-8 w-8 text-muted-foreground" />
       </div>
-      <h3 className="text-sm font-medium text-slate-900 dark:text-slate-100 mb-1">
+      <h3 className="text-sm font-medium text-foreground dark:text-foreground mb-1">
         No shortcuts found
       </h3>
-      <p className="text-sm text-slate-500 dark:text-slate-400 max-w-[250px]">
+      <p className="text-sm text-muted-foreground dark:text-muted-foreground max-w-[250px]">
         {searchQuery
           ? `No shortcuts match "${searchQuery}". Try a different search term.`
           : 'No shortcuts available for the selected context.'}
@@ -392,10 +392,10 @@ function ShortcutGroupSection({
     <div>
       <div className="mb-3 flex items-center gap-2">
         {group.icon && <span className="text-base">{group.icon}</span>}
-        <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wide">
+        <h3 className="text-sm font-semibold text-foreground dark:text-foreground uppercase tracking-wide">
           {group.label}
         </h3>
-        <span className="text-xs text-slate-400 dark:text-slate-500">
+        <span className="text-xs text-muted-foreground dark:text-muted-foreground">
           ({group.shortcuts.length})
         </span>
       </div>
@@ -412,19 +412,19 @@ function ShortcutGroupSection({
                 'w-full flex items-center justify-between rounded-lg px-3 py-2.5',
                 'transition-all duration-150 text-left',
                 isHighlighted
-                  ? 'bg-indigo-50 dark:bg-indigo-500/10 ring-1 ring-indigo-500/30'
-                  : 'hover:bg-slate-50 dark:hover:bg-slate-800/50',
-                hasConflict && 'border-l-2 border-amber-500'
+                  ? 'bg-[var(--primary)]/10 dark:bg-[var(--primary)]/10 ring-1 ring-[var(--primary)]/30'
+                  : 'hover:bg-muted dark:hover:bg-muted',
+                hasConflict && 'border-l-2 border-warning'
               )}
             >
               <div className="flex-1 min-w-0 pr-4">
                 <div className="flex items-center gap-2">
-                  <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">
+                  <p className="text-sm font-medium text-foreground dark:text-foreground truncate">
                     {shortcut.label}
                   </p>
                   {hasConflict && (
                     <span
-                      className="inline-flex items-center text-amber-600 dark:text-amber-500"
+                      className="inline-flex items-center text-warning dark:text-warning"
                       title="This shortcut has conflicts with other shortcuts"
                     >
                       <Info className="h-3.5 w-3.5" />
@@ -432,7 +432,7 @@ function ShortcutGroupSection({
                   )}
                 </div>
                 {shortcut.description && (
-                  <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                  <p className="text-xs text-muted-foreground dark:text-muted-foreground truncate mt-0.5">
                     {shortcut.description}
                   </p>
                 )}

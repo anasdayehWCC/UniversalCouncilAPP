@@ -104,18 +104,18 @@ function getPositionStyles(position: OverlayPosition): React.CSSProperties {
  * Get FPS color based on value
  */
 function getFpsColor(fps: number): string {
-  if (fps >= 55) return 'text-green-400';
-  if (fps >= 30) return 'text-amber-400';
-  return 'text-red-400';
+  if (fps >= 55) return 'text-success';
+  if (fps >= 45) return 'text-warning';
+  return 'text-destructive';
 }
 
 /**
  * Get memory color based on usage
  */
 function getMemoryColor(usagePercent: number): string {
-  if (usagePercent < 50) return 'text-green-400';
-  if (usagePercent < 75) return 'text-amber-400';
-  return 'text-red-400';
+  if (usagePercent < 50) return 'text-success';
+  if (usagePercent < 75) return 'text-warning';
+  return 'text-destructive';
 }
 
 /**
@@ -366,7 +366,7 @@ const BudgetDisplay = memo(function BudgetDisplay() {
 
   return (
     <div className="space-y-1">
-      <div className="text-red-400 text-xs font-medium mb-1">
+      <div className="text-destructive text-xs font-medium mb-1">
         ✗ Budget Violations ({violations.length})
       </div>
       {violations.slice(0, 3).map((v) => (
@@ -376,7 +376,7 @@ const BudgetDisplay = memo(function BudgetDisplay() {
           </span>
           <span
             className={`font-mono text-xs ${
-              v.status === 'error' ? 'text-red-400' : 'text-amber-400'
+              v.status === 'error' ? 'text-destructive' : 'text-warning'
             }`}
           >
             {v.value?.toFixed(v.type === 'score' ? 3 : 0)}
@@ -446,7 +446,7 @@ function PerformanceOverlayInternal({
             {/* Header */}
             <div className="flex items-center justify-between px-3 py-2 border-b border-gray-700 bg-gray-800/50">
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse motion-reduce:animate-none" />
                 <span className="text-gray-300 text-xs font-medium">
                   Performance
                 </span>

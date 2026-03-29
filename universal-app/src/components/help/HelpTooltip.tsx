@@ -118,12 +118,12 @@ const HelpIcon = React.forwardRef<HTMLButtonElement, HelpIconProps>(
 
     const variantClasses = {
       default: cn(
-        'text-slate-500 hover:text-[var(--primary)]',
-        'dark:text-slate-400 dark:hover:text-[var(--primary)]'
+        'text-muted-foreground hover:text-[var(--primary)]',
+        'dark:text-muted-foreground dark:hover:text-[var(--primary)]'
       ),
       subtle: cn(
-        'text-slate-400 hover:text-slate-600',
-        'dark:text-slate-500 dark:hover:text-slate-300'
+        'text-muted-foreground hover:text-foreground',
+        'dark:text-muted-foreground dark:hover:text-foreground'
       ),
       inline: cn(
         'text-[var(--primary)] opacity-70 hover:opacity-100'
@@ -254,9 +254,9 @@ export function HelpTooltip({
           align={align}
           sideOffset={8}
           className={cn(
-            'relative max-w-xs p-0 bg-white dark:bg-slate-800',
-            'border border-slate-200 dark:border-slate-700',
-            'text-slate-900 dark:text-slate-100'
+            'relative max-w-xs p-0 bg-card dark:bg-card',
+            'border border-border dark:border-border',
+            'text-foreground dark:text-foreground'
           )}
           showArrow={false}
         >

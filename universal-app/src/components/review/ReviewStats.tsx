@@ -45,35 +45,35 @@ export default function ReviewStats({ stats, className, compact = false }: Revie
       label: 'Pending Review',
       value: stats.totalPending,
       icon: Clock,
-      color: 'text-amber-600',
-      bg: 'bg-amber-50',
-      border: 'border-amber-200',
+      color: 'text-warning',
+      bg: 'bg-warning/10',
+      border: 'border-warning/30',
     },
     {
       label: 'Urgent',
       value: stats.urgentCount,
       icon: AlertTriangle,
-      color: 'text-red-600',
-      bg: 'bg-red-50',
-      border: 'border-red-200',
+      color: 'text-destructive',
+      bg: 'bg-destructive/10',
+      border: 'border-destructive/30',
       highlight: stats.urgentCount > 0,
     },
     {
       label: 'Overdue',
       value: stats.overdueCount,
       icon: Timer,
-      color: 'text-orange-600',
-      bg: 'bg-orange-50',
-      border: 'border-orange-200',
+      color: 'text-warning',
+      bg: 'bg-warning/10',
+      border: 'border-warning/30',
       highlight: stats.overdueCount > 0,
     },
     {
       label: 'Approved Today',
       value: stats.totalApprovedToday,
       icon: CheckCircle2,
-      color: 'text-green-600',
-      bg: 'bg-green-50',
-      border: 'border-green-200',
+      color: 'text-success',
+      bg: 'bg-success/10',
+      border: 'border-success/30',
     },
   ];
 
@@ -90,8 +90,8 @@ export default function ReviewStats({ stats, className, compact = false }: Revie
             )}
           >
             <card.icon className={cn('w-4 h-4', card.color)} />
-            <span className="text-sm font-medium text-slate-900">{card.value}</span>
-            <span className="text-xs text-slate-500">{card.label}</span>
+            <span className="text-sm font-medium text-foreground">{card.value}</span>
+            <span className="text-xs text-muted-foreground">{card.label}</span>
           </div>
         ))}
       </div>
@@ -109,7 +109,7 @@ export default function ReviewStats({ stats, className, compact = false }: Revie
               'p-4 border',
               card.border,
               card.highlight && 'ring-2 ring-offset-2',
-              card.highlight && card.value > 0 && 'ring-red-300',
+              card.highlight && card.value > 0 && 'ring-destructive/30',
               !prefersReducedMotion && 'transition-all duration-300 hover:shadow-md'
             )}
             style={
@@ -123,13 +123,13 @@ export default function ReviewStats({ stats, className, compact = false }: Revie
                 <card.icon className={cn('w-5 h-5', card.color)} />
               </div>
               {card.highlight && card.value > 0 && (
-                <Badge variant="secondary" className="bg-red-100 text-red-700 text-xs">
+                <Badge variant="secondary" className="bg-destructive/10 text-destructive text-xs">
                   Needs attention
                 </Badge>
               )}
             </div>
-            <p className="text-2xl font-bold text-slate-900">{card.value}</p>
-            <p className="text-sm text-slate-500">{card.label}</p>
+            <p className="text-2xl font-bold text-foreground">{card.value}</p>
+            <p className="text-sm text-muted-foreground">{card.label}</p>
           </Card>
         ))}
       </div>
@@ -137,16 +137,16 @@ export default function ReviewStats({ stats, className, compact = false }: Revie
       {/* Secondary stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Average review time */}
-        <Card className="p-4 border-slate-200">
+        <Card className="p-4 border-border">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-blue-50">
-              <Timer className="w-5 h-5 text-blue-600" />
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Timer className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <p className="text-lg font-bold text-slate-900">
+              <p className="text-lg font-bold text-foreground">
                 {formatDuration(stats.avgReviewTimeMs)}
               </p>
-              <p className="text-sm text-slate-500">Avg. review time</p>
+              <p className="text-sm text-muted-foreground">Avg. review time</p>
             </div>
           </div>
         </Card>
@@ -154,17 +154,17 @@ export default function ReviewStats({ stats, className, compact = false }: Revie
         {/* Weekly throughput */}
         <Card className="p-4 border-slate-200">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-purple-50">
-              <BarChart3 className="w-5 h-5 text-purple-600" />
+            <div className="p-2 rounded-lg bg-info/10">
+              <BarChart3 className="w-5 h-5 text-info" />
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <p className="text-lg font-bold text-slate-900">{stats.throughputThisWeek}</p>
+                <p className="text-lg font-bold text-foreground">{stats.throughputThisWeek}</p>
                 {throughputTrend !== 0 && (
                   <span
                     className={cn(
                       'flex items-center text-xs font-medium',
-                      throughputTrend > 0 ? 'text-green-600' : 'text-red-600'
+                      throughputTrend > 0 ? 'text-success' : 'text-destructive'
                     )}
                   >
                     {throughputTrend > 0 ? (
@@ -176,20 +176,20 @@ export default function ReviewStats({ stats, className, compact = false }: Revie
                   </span>
                 )}
               </div>
-              <p className="text-sm text-slate-500">This week&apos;s throughput</p>
+              <p className="text-sm text-muted-foreground">This week&apos;s throughput</p>
             </div>
           </div>
         </Card>
 
         {/* In review */}
-        <Card className="p-4 border-slate-200">
+        <Card className="p-4 border-border">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-slate-100">
-              <FileText className="w-5 h-5 text-slate-600" />
+            <div className="p-2 rounded-lg bg-muted">
+              <FileText className="w-5 h-5 text-muted-foreground" />
             </div>
             <div>
-              <p className="text-lg font-bold text-slate-900">{stats.totalInReview}</p>
-              <p className="text-sm text-slate-500">Currently in review</p>
+              <p className="text-lg font-bold text-foreground">{stats.totalInReview}</p>
+              <p className="text-sm text-muted-foreground">Currently in review</p>
             </div>
           </div>
         </Card>
@@ -197,10 +197,10 @@ export default function ReviewStats({ stats, className, compact = false }: Revie
 
       {/* By author breakdown */}
       {Object.keys(stats.byAuthor).length > 0 && (
-        <Card className="p-4 border-slate-200">
+        <Card className="p-4 border-border">
           <div className="flex items-center gap-2 mb-3">
-            <Users className="w-4 h-4 text-slate-400" />
-            <h3 className="text-sm font-medium text-slate-700">Pending by Author</h3>
+            <Users className="w-4 h-4 text-muted-foreground" />
+            <h3 className="text-sm font-medium text-foreground">Pending by Author</h3>
           </div>
           <div className="flex flex-wrap gap-2">
             {Object.entries(stats.byAuthor)
@@ -210,7 +210,7 @@ export default function ReviewStats({ stats, className, compact = false }: Revie
                 <Badge
                   key={author}
                   variant="secondary"
-                  className="bg-slate-100 text-slate-700"
+                  className="bg-muted text-foreground"
                 >
                   {author}: {count}
                 </Badge>

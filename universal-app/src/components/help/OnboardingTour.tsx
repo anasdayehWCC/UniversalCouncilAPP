@@ -179,8 +179,8 @@ function TourCard({
       transition={{ duration: 0.2, ease: 'easeOut' }}
       className={cn(
         'fixed w-80 max-w-[calc(100vw-2rem)]',
-        'bg-white dark:bg-slate-800 rounded-xl shadow-2xl',
-        'border border-slate-200 dark:border-slate-700',
+        'bg-card dark:bg-card rounded-xl shadow-2xl',
+        'border border-border dark:border-border',
         'overflow-hidden'
       )}
       style={{
@@ -192,11 +192,11 @@ function TourCard({
       {/* Header */}
       <div className="flex items-start justify-between p-4 pb-2">
         <div>
-          <h3 className="font-semibold text-slate-900 dark:text-white">
+          <h3 className="font-semibold text-foreground dark:text-foreground">
             {step.title}
           </h3>
           {showProgress && (
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-0.5">
               Step {stepIndex + 1} of {totalSteps}
             </p>
           )}
@@ -205,8 +205,8 @@ function TourCard({
           onClick={onSkip}
           className={cn(
             'p-1 -mr-1 -mt-1 rounded-md transition-colors',
-            'text-slate-400 hover:text-slate-600 hover:bg-slate-100',
-            'dark:text-slate-500 dark:hover:text-slate-300 dark:hover:bg-slate-700'
+            'text-muted-foreground hover:text-foreground hover:bg-muted',
+            'dark:text-muted-foreground dark:hover:text-foreground dark:hover:bg-muted'
           )}
           aria-label="Skip tour"
         >
@@ -216,7 +216,7 @@ function TourCard({
 
       {/* Content */}
       <div className="px-4 pb-4">
-        <div className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+        <div className="text-sm text-muted-foreground dark:text-muted-foreground leading-relaxed">
           {step.content}
         </div>
       </div>
@@ -233,7 +233,7 @@ function TourCard({
                   ? 'w-6 bg-[var(--primary)]'
                   : i < stepIndex
                     ? 'w-1.5 bg-[var(--primary)] opacity-50'
-                    : 'w-1.5 bg-slate-200 dark:bg-slate-600'
+                    : 'w-1.5 bg-border dark:bg-border'
               )}
             />
           ))}
@@ -244,15 +244,15 @@ function TourCard({
       <div
         className={cn(
           'flex items-center justify-between gap-2 px-4 py-3',
-          'bg-slate-50 dark:bg-slate-800/50',
-          'border-t border-slate-100 dark:border-slate-700'
+          'bg-muted dark:bg-muted',
+          'border-t border-border dark:border-border'
         )}
       >
         <button
           onClick={onSkip}
           className={cn(
-            'text-sm text-slate-500 hover:text-slate-700',
-            'dark:text-slate-400 dark:hover:text-slate-200',
+            'text-sm text-muted-foreground hover:text-foreground',
+            'dark:text-muted-foreground dark:hover:text-foreground',
             'transition-colors'
           )}
         >
@@ -265,8 +265,8 @@ function TourCard({
               onClick={onBack}
               className={cn(
                 'inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-lg',
-                'text-slate-600 hover:bg-slate-100',
-                'dark:text-slate-300 dark:hover:bg-slate-700',
+                'text-foreground hover:bg-muted',
+                'dark:text-foreground dark:hover:bg-muted',
                 'transition-colors'
               )}
             >

@@ -101,7 +101,7 @@ export default function ReviewDetail({
           </Link>
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <h1 className="text-2xl font-bold text-slate-900">{item.minute.title}</h1>
+              <h1 className="text-2xl font-bold text-foreground">{item.minute.title}</h1>
               <Badge variant="outline" className={cn(statusConfig.bg, statusConfig.color, statusConfig.border)}>
                 {statusConfig.label}
               </Badge>
@@ -112,7 +112,7 @@ export default function ReviewDetail({
                 </Badge>
               )}
             </div>
-            <div className="flex items-center gap-4 text-sm text-slate-600">
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <span className="flex items-center gap-1">
                 <User className="w-4 h-4" />
                 {item.author.name}
@@ -121,7 +121,7 @@ export default function ReviewDetail({
                 <Calendar className="w-4 h-4" />
                 {formatDateTime(item.submittedAt)}
               </span>
-              <span className={cn('flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium', slaStatus.color, slaStatus.isOverdue ? 'bg-red-50' : 'bg-slate-50')}>
+              <span className={cn('flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium', slaStatus.color, slaStatus.isOverdue ? 'bg-destructive/10' : 'bg-muted')}>
                 <Clock className="w-3 h-3" />
                 {slaStatus.label}
               </span>
@@ -144,14 +144,14 @@ export default function ReviewDetail({
 
       {/* Alert for required changes */}
       {requiredChanges.length > 0 && (
-        <Card className="p-4 border-red-200 bg-red-50">
+        <Card className="p-4 border-destructive/30 bg-destructive/10">
           <div className="flex items-center gap-2 mb-2">
-            <AlertTriangle className="w-5 h-5 text-red-600" />
-            <span className="font-medium text-red-800">
+            <AlertTriangle className="w-5 h-5 text-destructive" />
+            <span className="font-medium text-destructive">
               {requiredChanges.length} required change{requiredChanges.length !== 1 ? 's' : ''} before approval
             </span>
           </div>
-          <ul className="text-sm text-red-700 pl-7 space-y-1">
+          <ul className="text-sm text-destructive pl-7 space-y-1">
             {requiredChanges.map(f => (
               <li key={f.id}>{f.comment}</li>
             ))}
@@ -163,14 +163,14 @@ export default function ReviewDetail({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Minute content - 2/3 width */}
         <div className="lg:col-span-2 space-y-4">
-          <Card className="border-slate-200 overflow-hidden">
+          <Card className="border-border overflow-hidden">
             {/* Minute header */}
-            <div className="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+            <div className="p-4 border-b border-border bg-muted flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <FileText className="w-5 h-5 text-slate-400" />
+                <FileText className="w-5 h-5 text-muted-foreground" />
                 <div>
-                  <p className="font-medium text-slate-900">{item.minute.templateId}</p>
-                  <p className="text-xs text-slate-500">{item.minute.duration} · {item.minute.attendees?.length || 0} attendees</p>
+                  <p className="font-medium text-foreground">{item.minute.templateId}</p>
+                  <p className="text-xs text-muted-foreground">{item.minute.duration} · {item.minute.attendees?.length || 0} attendees</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -202,14 +202,14 @@ export default function ReviewDetail({
                     className={cn(
                       'p-4 rounded-lg border transition-all',
                       selectedSection === section.id
-                        ? 'border-blue-300 bg-blue-50/50'
+                        ? 'border-primary/30 bg-primary/5'
                         : hasUnresolved
-                        ? 'border-orange-200 bg-orange-50/30'
-                        : 'border-slate-100 hover:border-slate-200'
+                        ? 'border-warning/30 bg-warning/10'
+                        : 'border-border hover:border-border'
                     )}
                   >
                     <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-semibold text-slate-900">{section.title}</h3>
+                      <h3 className="font-semibold text-foreground">{section.title}</h3>
                       <div className="flex items-center gap-2">
                         {sectionFeedback.length > 0 && (
                           <Badge
@@ -217,8 +217,8 @@ export default function ReviewDetail({
                             className={cn(
                               'text-xs',
                               hasUnresolved
-                                ? 'bg-orange-50 text-orange-700 border-orange-200'
-                                : 'bg-green-50 text-green-700 border-green-200'
+                                ? 'bg-warning/10 text-warning border-warning/30'
+                                : 'bg-success/10 text-success border-success/30'
                             )}
                           >
                             <MessageCircle className="w-3 h-3 mr-1" />
@@ -231,7 +231,7 @@ export default function ReviewDetail({
                           onClick={() => handleSectionFeedback(section.id)}
                           className={cn(
                             'gap-1 text-xs',
-                            selectedSection === section.id && 'bg-blue-100 text-blue-700'
+                            selectedSection === section.id && 'bg-primary/10 text-primary'
                           )}
                         >
                           <Edit3 className="w-3 h-3" />
@@ -239,13 +239,13 @@ export default function ReviewDetail({
                         </Button>
                       </div>
                     </div>
-                    <p className="text-sm text-slate-600 leading-relaxed">{section.content}</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{section.content}</p>
 
                     {/* Inline feedback for section */}
                     {selectedSection === section.id && (
                       <div
                         className={cn(
-                          'mt-4 pt-4 border-t border-slate-200',
+                          'mt-4 pt-4 border-t border-border',
                           !prefersReducedMotion && 'animate-in fade-in slide-in-from-top-2 duration-200'
                         )}
                       >
@@ -272,16 +272,16 @@ export default function ReviewDetail({
                   {item.minute.riskScore && (
                     <div className={cn(
                       'flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm',
-                      item.minute.riskScore === 'high' ? 'bg-red-50 text-red-700' :
-                      item.minute.riskScore === 'medium' ? 'bg-amber-50 text-amber-700' :
-                      'bg-emerald-50 text-emerald-700'
+                      item.minute.riskScore === 'high' ? 'bg-destructive/10 text-destructive' :
+                      item.minute.riskScore === 'medium' ? 'bg-warning/10 text-warning' :
+                      'bg-success/10 text-success'
                     )}>
                       <Shield className="w-4 h-4" />
                       Risk: {item.minute.riskScore}
                     </div>
                   )}
                   {item.minute.tags?.map(tag => (
-                    <Badge key={tag} variant="secondary" className="bg-slate-100">
+                    <Badge key={tag} variant="secondary" className="bg-muted">
                       {tag}
                     </Badge>
                   ))}
@@ -294,12 +294,12 @@ export default function ReviewDetail({
         {/* Sidebar - 1/3 width */}
         <div className="space-y-4">
           {/* Decision panel */}
-          <Card className="p-4 border-slate-200">
-            <h3 className="font-semibold text-slate-900 mb-4">Review Decision</h3>
+          <Card className="p-4 border-border">
+            <h3 className="font-semibold text-foreground mb-4">Review Decision</h3>
 
             {unresolvedCount > 0 && item.status !== 'approved' && (
-              <div className="mb-4 p-3 rounded-lg bg-orange-50 border border-orange-200">
-                <p className="text-sm text-orange-700">
+              <div className="mb-4 p-3 rounded-lg bg-warning/10 border border-warning/30">
+                <p className="text-sm text-warning">
                   {unresolvedCount} unresolved feedback item{unresolvedCount !== 1 ? 's' : ''} 
                   {requiredChanges.length > 0 && ` (${requiredChanges.length} required)`}
                 </p>
@@ -308,7 +308,7 @@ export default function ReviewDetail({
 
             <div className="space-y-2">
               <Button
-                className="w-full gap-2 bg-green-600 hover:bg-green-700"
+                className="w-full gap-2 bg-success hover:bg-success/90"
                 onClick={onApprove}
                 disabled={isLoading || requiredChanges.length > 0}
               >
@@ -317,7 +317,7 @@ export default function ReviewDetail({
               </Button>
               <Button
                 variant="outline"
-                className="w-full gap-2 text-orange-600 hover:bg-orange-50 hover:text-orange-700"
+                className="w-full gap-2 text-warning hover:bg-warning/10 hover:text-warning"
                 onClick={onRequestChanges}
                 disabled={isLoading}
               >
@@ -326,7 +326,7 @@ export default function ReviewDetail({
               </Button>
               <Button
                 variant="outline"
-                className="w-full gap-2 text-red-600 hover:bg-red-50 hover:text-red-700"
+                className="w-full gap-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
                 onClick={onReject}
                 disabled={isLoading}
               >
@@ -337,26 +337,26 @@ export default function ReviewDetail({
           </Card>
 
           {/* Author info */}
-          <Card className="p-4 border-slate-200">
-            <h3 className="font-semibold text-slate-900 mb-3">Submitted By</h3>
+          <Card className="p-4 border-border">
+            <h3 className="font-semibold text-foreground mb-3">Submitted By</h3>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-medium">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
                 {item.author.name.split(' ').map(n => n[0]).join('')}
               </div>
               <div>
-                <p className="font-medium text-slate-900">{item.author.name}</p>
-                <p className="text-sm text-slate-500">{item.author.team}</p>
+                <p className="font-medium text-foreground">{item.author.name}</p>
+                <p className="text-sm text-muted-foreground">{item.author.team}</p>
               </div>
             </div>
-            <div className="mt-3 pt-3 border-t border-slate-100 text-sm text-slate-600">
+            <div className="mt-3 pt-3 border-t border-border text-sm text-muted-foreground">
               <p>Submitted {formatDistanceToNow(item.submittedAt)}</p>
             </div>
           </Card>
 
           {/* All feedback */}
-          <Card className="p-4 border-slate-200">
+          <Card className="p-4 border-border">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold text-slate-900">All Feedback</h3>
+              <h3 className="font-semibold text-foreground">All Feedback</h3>
               <Badge variant="secondary">{feedback.length}</Badge>
             </div>
             <FeedbackThread

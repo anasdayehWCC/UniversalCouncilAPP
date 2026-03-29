@@ -39,13 +39,13 @@ interface InsightsDashboardProps {
 function LoadingSkeleton() {
   return (
     <div className="space-y-6">
-      <Card variant="glass" className="p-6 bg-white/80">
+      <Card variant="glass" className="p-6 bg-card">
         <Skeleton className="h-8 w-48 mb-2" />
         <Skeleton className="h-4 w-64" />
       </Card>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {[1, 2, 3, 4].map(i => (
-          <Card key={i} variant="glass" className="p-6 bg-white/80">
+          <Card key={i} variant="glass" className="p-6 bg-card">
             <Skeleton className="h-10 w-10 rounded-xl mb-4" />
             <Skeleton className="h-8 w-20 mb-2" />
             <Skeleton className="h-4 w-24" />
@@ -84,10 +84,10 @@ export function InsightsDashboard({
 
   if (!data) {
     return (
-      <Card variant="glass" className="p-12 text-center bg-white/80 dark:bg-slate-900/80">
-        <Activity className="w-12 h-12 mx-auto mb-4 text-slate-300 dark:text-slate-600" />
-        <h3 className="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">No Data Available</h3>
-        <p className="text-sm text-slate-500 dark:text-slate-400">
+      <Card variant="glass" className="p-12 text-center bg-card">
+        <Activity className="w-12 h-12 mx-auto mb-4 text-muted-foreground/40" />
+        <h3 className="text-lg font-semibold text-foreground mb-2">No Data Available</h3>
+        <p className="text-sm text-muted-foreground">
           There are no records for the selected period and filters.
         </p>
       </Card>
@@ -121,19 +121,19 @@ export function InsightsDashboard({
           {/* Quick Stats Rail */}
           <div className="info-rail mt-6">
             <span className="info-rail__item bg-white/10 border-white/20 text-white backdrop-blur-md">
-              <span className="info-rail__dot" style={{ background: '#22c55e', boxShadow: '0 0 8px #22c55e' }} />
+              <span className="info-rail__dot" style={{ background: 'var(--success)', boxShadow: '0 0 8px var(--success)' }} />
               Completion {teamMetrics.completionRate}%
             </span>
             <span className="info-rail__item bg-white/10 border-white/20 text-white backdrop-blur-md">
-              <span className="info-rail__dot" style={{ background: '#3b82f6', boxShadow: '0 0 8px #3b82f6' }} />
+              <span className="info-rail__dot" style={{ background: 'var(--info)', boxShadow: '0 0 8px var(--info)' }} />
               Active Users {teamMetrics.activeUsers}
             </span>
             <span className="info-rail__item bg-white/10 border-white/20 text-white backdrop-blur-md">
-              <span className="info-rail__dot" style={{ background: '#f59e0b', boxShadow: '0 0 8px #f59e0b' }} />
+              <span className="info-rail__dot" style={{ background: 'var(--warning)', boxShadow: '0 0 8px var(--warning)' }} />
               Avg Turnaround {teamMetrics.avgTurnaroundTime}h
             </span>
             <span className="info-rail__item bg-white/10 border-white/20 text-white backdrop-blur-md">
-              <span className="info-rail__dot" style={{ background: '#8b5cf6', boxShadow: '0 0 8px #8b5cf6' }} />
+              <span className="info-rail__dot" style={{ background: 'var(--accent)', boxShadow: '0 0 8px var(--accent)' }} />
               Audio Minutes {teamMetrics.totalAudioMinutes}
             </span>
           </div>

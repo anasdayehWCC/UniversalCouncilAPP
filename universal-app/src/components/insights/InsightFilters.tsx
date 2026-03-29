@@ -49,16 +49,16 @@ export function InsightFilters({
   };
 
   return (
-    <Card variant="glass" className={`p-4 bg-white/80 dark:bg-slate-900/80 ${className}`} hoverEffect={false}>
+    <Card variant="glass" className={`p-4 bg-card/80 ${className}`} hoverEffect={false}>
       <div className="flex flex-col lg:flex-row lg:items-center gap-4">
         {/* Period Filter */}
         <div className="flex items-center gap-2">
-          <Calendar className="w-4 h-4 text-slate-400" />
+          <Calendar className="w-4 h-4 text-muted-foreground" />
           <Select
             value={filters.period}
             onValueChange={(value: InsightPeriod) => onFiltersChange({ period: value })}
           >
-            <SelectTrigger className="w-[140px] bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+            <SelectTrigger className="w-[140px] bg-background border-input">
               <SelectValue placeholder="Select period" />
             </SelectTrigger>
             <SelectContent>
@@ -77,7 +77,7 @@ export function InsightFilters({
             value={filters.domain || 'all'}
             onValueChange={(value) => onFiltersChange({ domain: value === 'all' ? null : value })}
           >
-            <SelectTrigger className="w-40 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+            <SelectTrigger className="w-40 bg-background border-input">
               <SelectValue placeholder="All Domains" />
             </SelectTrigger>
             <SelectContent>
@@ -97,7 +97,7 @@ export function InsightFilters({
             value={filters.team || 'all'}
             onValueChange={(value) => onFiltersChange({ team: value === 'all' ? null : value })}
           >
-            <SelectTrigger className="w-40 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+            <SelectTrigger className="w-40 bg-background border-input">
               <SelectValue placeholder="All Teams" />
             </SelectTrigger>
             <SelectContent>
@@ -117,7 +117,7 @@ export function InsightFilters({
             value={filters.userId || 'all'}
             onValueChange={(value) => onFiltersChange({ userId: value === 'all' ? null : value })}
           >
-            <SelectTrigger className="w-40 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+            <SelectTrigger className="w-40 bg-background border-input">
               <SelectValue placeholder="All Users" />
             </SelectTrigger>
             <SelectContent>
@@ -141,7 +141,7 @@ export function InsightFilters({
               variant="ghost"
               size="sm"
               onClick={clearFilters}
-              className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+              className="text-muted-foreground hover:text-foreground"
             >
               <Filter className="w-3.5 h-3.5 mr-1" />
               Clear
@@ -154,9 +154,9 @@ export function InsightFilters({
               size="sm"
               onClick={onRefresh}
               disabled={isLoading}
-              className="border-slate-200 dark:border-slate-700"
+              className="border-input"
             >
-              <RefreshCw className={`w-3.5 h-3.5 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 mr-1 ${isLoading ? 'animate-spin motion-reduce:animate-none' : ''}`} />
               Refresh
             </Button>
           )}
@@ -166,7 +166,6 @@ export function InsightFilters({
               variant="default"
               size="sm"
               onClick={onExport}
-              className="bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900"
             >
               <Download className="w-3.5 h-3.5 mr-1" />
               Export CSV

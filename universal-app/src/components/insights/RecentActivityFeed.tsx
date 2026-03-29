@@ -30,14 +30,14 @@ const ACTIVITY_CONFIG: Record<ActivityItem['type'], {
 }> = {
   recording: {
     icon: Mic,
-    color: 'text-blue-600 dark:text-blue-400',
-    bgColor: 'bg-blue-50 dark:bg-blue-950/50 border-blue-100 dark:border-blue-900',
+    color: 'text-primary',
+    bgColor: 'bg-primary/10 border-primary/20',
     label: 'New Recording',
   },
   approval: {
     icon: CheckCircle2,
-    color: 'text-green-600 dark:text-green-400',
-    bgColor: 'bg-green-50 dark:bg-green-950/50 border-green-100 dark:border-green-900',
+    color: 'text-success',
+    bgColor: 'bg-success/10 border-success/20',
     label: 'Approved',
   },
   completion: {
@@ -54,8 +54,8 @@ const ACTIVITY_CONFIG: Record<ActivityItem['type'], {
   },
   returned: {
     icon: RotateCcw,
-    color: 'text-red-600 dark:text-red-400',
-    bgColor: 'bg-red-50 dark:bg-red-950/50 border-red-100 dark:border-red-900',
+    color: 'text-destructive',
+    bgColor: 'bg-destructive/10 border-destructive/20',
     label: 'Returned',
   },
 };
@@ -67,7 +67,7 @@ function ActivityRow({ activity, onClick }: { activity: ActivityItem; onClick?: 
 
   return (
     <div
-      className={`flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${
+      className={`flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors ${
         onClick ? 'cursor-pointer' : ''
       }`}
       onClick={onClick}
@@ -77,13 +77,13 @@ function ActivityRow({ activity, onClick }: { activity: ActivityItem; onClick?: 
         <div className={`p-2 rounded-lg border ${config.bgColor}`}>
           <Icon className={`w-4 h-4 ${config.color}`} />
         </div>
-        <div className="w-px h-full bg-slate-100 dark:bg-slate-800 mt-2" />
+        <div className="w-px h-full bg-border mt-2" />
       </div>
 
       {/* Content */}
       <div className="flex-1 min-w-0 pt-0.5">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="font-medium text-slate-900 dark:text-slate-100 truncate">
+          <span className="font-medium text-foreground truncate">
             {activity.title}
           </span>
           <Badge
@@ -93,20 +93,20 @@ function ActivityRow({ activity, onClick }: { activity: ActivityItem; onClick?: 
             {config.label}
           </Badge>
         </div>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
+        <p className="text-sm text-muted-foreground mt-0.5 line-clamp-1">
           {activity.description}
         </p>
         <div className="flex items-center gap-2 mt-1.5">
           <div className="flex items-center gap-1.5">
-            <div className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-[10px] font-bold text-slate-600 dark:text-slate-400">
+            <div className="w-5 h-5 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold text-muted-foreground">
               {activity.userName.charAt(0).toUpperCase()}
             </div>
-            <span className="text-xs text-slate-500 dark:text-slate-400">
+            <span className="text-xs text-muted-foreground">
               {activity.userName}
             </span>
           </div>
-          <span className="text-slate-300 dark:text-slate-600">·</span>
-          <span className="text-xs text-slate-400 dark:text-slate-500">
+          <span className="text-border">·</span>
+          <span className="text-xs text-muted-foreground">
             {formattedTime}
           </span>
         </div>
@@ -125,9 +125,9 @@ export function RecentActivityFeed({
   const displayActivities = activities.slice(0, maxItems);
 
   return (
-    <Card variant="glass" className={`p-6 bg-white/80 dark:bg-slate-900/80 ${className}`} hoverEffect={false}>
+    <Card variant="glass" className={`p-6 bg-card/80 ${className}`} hoverEffect={false}>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100 font-display">{title}</h3>
+        <h3 className="font-bold text-lg text-foreground font-display">{title}</h3>
         {activities.length > 0 && (
           <Badge variant="secondary" className="text-xs">
             {activities.length} total
@@ -145,7 +145,7 @@ export function RecentActivityFeed({
             />
           ))
         ) : (
-          <div className="text-center py-8 text-slate-500 dark:text-slate-400">
+          <div className="text-center py-8 text-muted-foreground">
             <Clock className="w-8 h-8 mx-auto mb-2 opacity-50" />
             <p className="text-sm">No recent activity</p>
           </div>
@@ -153,8 +153,8 @@ export function RecentActivityFeed({
       </div>
 
       {activities.length > maxItems && (
-        <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 text-center">
-          <button className="text-xs text-blue-600 dark:text-blue-400 hover:underline">
+        <div className="mt-4 pt-4 border-t border-border text-center">
+          <button className="text-xs text-primary hover:underline">
             View all {activities.length} activities →
           </button>
         </div>

@@ -45,10 +45,10 @@ export function TeamActivityChart({ data, title = 'Team Activity', className = '
   const config = METRIC_CONFIG[activeMetric];
 
   return (
-    <Card variant="glass" className={`p-6 bg-white/80 dark:bg-slate-900/80 ${className}`} hoverEffect={false}>
+    <Card variant="glass" className={`p-6 bg-card/80 ${className}`} hoverEffect={false}>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100 font-display">{title}</h3>
-        <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
+        <h3 className="font-bold text-lg text-foreground font-display">{title}</h3>
+        <div className="flex gap-1 bg-muted rounded-lg p-1">
           {(Object.keys(METRIC_CONFIG) as MetricToggle[]).map(metric => (
             <Button
               key={metric}
@@ -57,8 +57,8 @@ export function TeamActivityChart({ data, title = 'Team Activity', className = '
               onClick={() => setActiveMetric(metric)}
               className={`text-xs px-3 ${
                 activeMetric === metric
-                  ? 'bg-white dark:bg-slate-700 shadow-sm'
-                  : 'hover:bg-white/50 dark:hover:bg-slate-700/50'
+                  ? 'bg-background shadow-sm'
+                  : 'hover:bg-background/50'
               }`}
             >
               {METRIC_CONFIG[metric].label}
@@ -69,7 +69,7 @@ export function TeamActivityChart({ data, title = 'Team Activity', className = '
 
       <div className="relative" style={{ height: chartHeight + 40 }}>
         {/* Y-axis labels */}
-        <div className="absolute left-0 top-0 bottom-8 w-10 flex flex-col justify-between text-xs text-slate-400 dark:text-slate-500">
+        <div className="absolute left-0 top-0 bottom-8 w-10 flex flex-col justify-between text-xs text-muted-foreground">
           <span>{maxValue}</span>
           <span>{Math.round(maxValue / 2)}</span>
           <span>0</span>
@@ -80,7 +80,7 @@ export function TeamActivityChart({ data, title = 'Team Activity', className = '
           {[0, 0.5, 1].map(pct => (
             <div
               key={pct}
-              className="absolute w-full border-t border-slate-100 dark:border-slate-800"
+              className="absolute w-full border-t border-border"
               style={{ top: `${pct * 100}%` }}
             />
           ))}
@@ -105,12 +105,12 @@ export function TeamActivityChart({ data, title = 'Team Activity', className = '
               >
                 {/* Tooltip */}
                 {isHovered && (
-                  <div className="absolute bottom-full mb-2 z-10 bg-slate-900 dark:bg-slate-700 text-white text-xs px-3 py-2 rounded-lg shadow-lg whitespace-nowrap">
+                  <div className="absolute bottom-full mb-2 z-10 bg-popover text-popover-foreground text-xs px-3 py-2 rounded-lg shadow-lg whitespace-nowrap border border-border">
                     <div className="font-semibold">{point.label}</div>
-                    <div className="text-slate-300">
+                    <div className="text-muted-foreground">
                       {values[i]} {config.label.toLowerCase()}
                     </div>
-                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900 dark:bg-slate-700" />
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-popover border-r border-b border-border" />
                   </div>
                 )}
 
@@ -138,8 +138,8 @@ export function TeamActivityChart({ data, title = 'Team Activity', className = '
               key={point.date}
               className={`text-xs text-center transition-colors ${
                 hoveredIndex === i
-                  ? 'text-slate-900 dark:text-slate-100 font-medium'
-                  : 'text-slate-400 dark:text-slate-500'
+                  ? 'text-foreground font-medium'
+                  : 'text-muted-foreground'
               }`}
               style={{ width: barWidth }}
             >
@@ -150,17 +150,17 @@ export function TeamActivityChart({ data, title = 'Team Activity', className = '
       </div>
 
       {/* Summary */}
-      <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+      <div className="mt-6 pt-4 border-t border-border flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div
             className="w-3 h-3 rounded-full"
             style={{ backgroundColor: config.color }}
           />
-          <span className="text-sm text-slate-600 dark:text-slate-400">
-            Total {config.label}: <span className="font-semibold text-slate-900 dark:text-slate-100">{values.reduce((a, b) => a + b, 0)}</span>
+          <span className="text-sm text-muted-foreground">
+            Total {config.label}: <span className="font-semibold text-foreground">{values.reduce((a, b) => a + b, 0)}</span>
           </span>
         </div>
-        <div className="text-xs text-slate-400 dark:text-slate-500">
+        <div className="text-xs text-muted-foreground">
           {data.length} data points
         </div>
       </div>

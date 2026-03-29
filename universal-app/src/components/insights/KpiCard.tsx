@@ -26,8 +26,8 @@ interface KpiCardProps {
 }
 
 const colorStyles: Record<KpiColor, { bg: string; text: string; fill: string; border: string }> = {
-  blue: { bg: 'bg-blue-50 dark:bg-blue-950/50', text: 'text-blue-600 dark:text-blue-400', fill: '#3b82f6', border: 'border-blue-100 dark:border-blue-900' },
-  green: { bg: 'bg-green-50 dark:bg-green-950/50', text: 'text-green-600 dark:text-green-400', fill: '#22c55e', border: 'border-green-100 dark:border-green-900' },
+  blue: { bg: 'bg-primary/10', text: 'text-primary', fill: '#3b82f6', border: 'border-primary/20' },
+  green: { bg: 'bg-success/10', text: 'text-success', fill: '#22c55e', border: 'border-success/20' },
   purple: { bg: 'bg-purple-50 dark:bg-purple-950/50', text: 'text-purple-600 dark:text-purple-400', fill: '#a855f7', border: 'border-purple-100 dark:border-purple-900' },
   orange: { bg: 'bg-orange-50 dark:bg-orange-950/50', text: 'text-orange-600 dark:text-orange-400', fill: '#f97316', border: 'border-orange-100 dark:border-orange-900' },
   emerald: { bg: 'bg-emerald-50 dark:bg-emerald-950/50', text: 'text-emerald-600 dark:text-emerald-400', fill: '#10b981', border: 'border-emerald-100 dark:border-emerald-900' },
@@ -104,15 +104,15 @@ export function KpiCard({
 
   const TrendIcon = isPositive ? TrendingUp : isNeutral ? Minus : TrendingDown;
   const trendColor = isPositive
-    ? 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/50 border-green-200 dark:border-green-900'
+    ? 'text-success bg-success/10 border-success/20'
     : isNeutral
-    ? 'text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700'
-    : 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/50 border-red-200 dark:border-red-900';
+    ? 'text-muted-foreground bg-muted border-border'
+    : 'text-destructive bg-destructive/10 border-destructive/20';
 
   return (
     <Card
       variant="glass"
-      className={`p-6 hover:shadow-xl transition-all bg-white/80 dark:bg-slate-900/80 ${onClick ? 'cursor-pointer' : ''} ${className}`}
+      className={`p-6 hover:shadow-xl transition-all bg-card/80 ${onClick ? 'cursor-pointer' : ''} ${className}`}
       hoverEffect={!!onClick}
       onClick={onClick}
     >
@@ -132,12 +132,12 @@ export function KpiCard({
 
       <div className="flex items-end justify-between">
         <div className="flex-1">
-          <h3 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1 font-display">
+          <h3 className="text-3xl font-bold text-foreground mb-1 font-display">
             {value}
           </h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">{title}</p>
+          <p className="text-sm text-muted-foreground font-medium">{title}</p>
           {(subtitle || trendLabel) && (
-            <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               {subtitle || trendLabel}
             </p>
           )}

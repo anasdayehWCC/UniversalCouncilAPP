@@ -94,8 +94,8 @@ export function SentimentPieChart({
   const innerRadius = 50;
 
   return (
-    <Card variant="glass" className={`p-6 bg-white/80 dark:bg-slate-900/80 ${className}`} hoverEffect={false}>
-      <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100 mb-6 font-display">{title}</h3>
+    <Card variant="glass" className={`p-6 bg-card/80 ${className}`} hoverEffect={false}>
+      <h3 className="font-bold text-lg text-foreground mb-6 font-display">{title}</h3>
 
       <div className="flex flex-col lg:flex-row items-center gap-6">
         {/* Pie Chart */}
@@ -109,7 +109,7 @@ export function SentimentPieChart({
               fill="transparent"
               stroke="currentColor"
               strokeWidth="1"
-              className="text-slate-100 dark:text-slate-800"
+              className="text-border"
             />
 
             {/* Segments */}
@@ -145,8 +145,7 @@ export function SentimentPieChart({
               cx={center}
               cy={center}
               r={innerRadius}
-              fill="white"
-              className="dark:fill-slate-900"
+              className="fill-card"
             />
 
             {/* Center text */}
@@ -154,7 +153,7 @@ export function SentimentPieChart({
               x={center}
               y={center - 8}
               textAnchor="middle"
-              className="text-2xl font-bold fill-slate-900 dark:fill-slate-100"
+              className="text-2xl font-bold fill-foreground"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               {total}
@@ -163,7 +162,7 @@ export function SentimentPieChart({
               x={center}
               y={center + 12}
               textAnchor="middle"
-              className="text-xs fill-slate-500 dark:fill-slate-400"
+              className="text-xs fill-muted-foreground"
             >
               Total
             </text>
@@ -177,8 +176,8 @@ export function SentimentPieChart({
               key={segment.key}
               className={`flex items-center gap-3 p-3 rounded-lg transition-all cursor-pointer ${
                 hoveredSegment === segment.key
-                  ? 'bg-slate-100 dark:bg-slate-800'
-                  : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                  ? 'bg-muted'
+                  : 'hover:bg-muted/50'
               }`}
               onMouseEnter={() => setHoveredSegment(segment.key)}
               onMouseLeave={() => setHoveredSegment(null)}
@@ -190,14 +189,14 @@ export function SentimentPieChart({
               />
               <div className="flex-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <span className="text-sm font-medium text-foreground">
                     {segment.label}
                   </span>
-                  <span className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                  <span className="text-sm font-bold text-foreground">
                     {segment.percentage}%
                   </span>
                 </div>
-                <div className="mt-1 h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                <div className="mt-1 h-1.5 bg-muted rounded-full overflow-hidden">
                   <div
                     className="h-full rounded-full transition-all duration-500"
                     style={{
@@ -207,7 +206,7 @@ export function SentimentPieChart({
                   />
                 </div>
               </div>
-              <span className="text-xs text-slate-400 dark:text-slate-500 ml-2 w-8 text-right">
+              <span className="text-xs text-muted-foreground ml-2 w-8 text-right">
                 {segment.value}
               </span>
             </div>
@@ -217,18 +216,18 @@ export function SentimentPieChart({
 
       {/* Insights */}
       {total > 0 && (
-        <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
-          <div className="text-sm text-slate-600 dark:text-slate-400">
+        <div className="mt-6 pt-4 border-t border-border">
+          <div className="text-sm text-muted-foreground">
             {data.positive > data.negative ? (
-              <span className="text-green-600 dark:text-green-400">
+              <span className="text-success">
                 ✓ Overall positive sentiment ({Math.round((data.positive / total) * 100)}%)
               </span>
             ) : data.negative > data.positive ? (
-              <span className="text-red-600 dark:text-red-400">
+              <span className="text-destructive">
                 ⚠ Elevated negative sentiment ({Math.round((data.negative / total) * 100)}%)
               </span>
             ) : (
-              <span className="text-slate-500 dark:text-slate-400">
+              <span className="text-muted-foreground">
                 Balanced sentiment distribution
               </span>
             )}

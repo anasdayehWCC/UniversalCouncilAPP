@@ -238,7 +238,7 @@ export default function FeedbackThread({
                         Resolved
                       </Badge>
                     )}
-                    <span className="text-xs text-slate-400">
+                    <span className="text-xs text-muted-foreground">
                       {formatDistanceToNow(item.createdAt)}
                     </span>
                   </div>

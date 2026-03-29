@@ -208,7 +208,7 @@ export default function ReviewFilters({
         >
           {/* Status filter */}
           <div>
-            <label className="text-xs font-medium text-slate-700 uppercase tracking-wide mb-2 block">
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 block">
               Status
             </label>
             <div className="flex flex-wrap gap-1.5">
@@ -223,7 +223,7 @@ export default function ReviewFilters({
                       'cursor-pointer transition-colors',
                       isActive
                         ? cn(config.bg, config.color, config.border)
-                        : 'bg-white hover:bg-slate-50'
+                        : 'bg-card hover:bg-muted'
                     )}
                     onClick={() => handleStatusToggle(status)}
                   >
@@ -236,7 +236,7 @@ export default function ReviewFilters({
 
           {/* Priority filter */}
           <div>
-            <label className="text-xs font-medium text-slate-700 uppercase tracking-wide mb-2 block">
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 block">
               Priority
             </label>
             <div className="flex flex-wrap gap-1.5">
@@ -251,7 +251,7 @@ export default function ReviewFilters({
                       'cursor-pointer transition-colors',
                       isActive
                         ? cn(config.bg, config.color)
-                        : 'bg-white hover:bg-slate-50'
+                        : 'bg-card hover:bg-muted'
                     )}
                     onClick={() => handlePriorityToggle(priority)}
                   >
@@ -264,7 +264,7 @@ export default function ReviewFilters({
 
           {/* Domain filter */}
           <div>
-            <label className="text-xs font-medium text-slate-700 uppercase tracking-wide mb-2 block">
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 block">
               Service Domain
             </label>
             <div className="flex flex-wrap gap-1.5">
@@ -278,8 +278,8 @@ export default function ReviewFilters({
                     className={cn(
                       'cursor-pointer transition-colors',
                       isActive
-                        ? 'bg-blue-50 text-blue-700 border-blue-200'
-                        : 'bg-white hover:bg-slate-50'
+                        ? 'bg-primary/10 text-primary border-primary/20'
+                        : 'bg-card hover:bg-muted'
                     )}
                     onClick={() => handleDomainToggle(domain)}
                   >
@@ -292,7 +292,7 @@ export default function ReviewFilters({
 
           {/* Additional toggles */}
           <div>
-            <label className="text-xs font-medium text-slate-700 uppercase tracking-wide mb-2 block">
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 block">
               Options
             </label>
             <div className="flex flex-col gap-2">
@@ -301,7 +301,7 @@ export default function ReviewFilters({
                   type="checkbox"
                   checked={filter.hasUnresolvedFeedback || false}
                   onChange={handleUnresolvedToggle}
-                  className="w-4 h-4 rounded border-slate-300"
+                  className="w-4 h-4 rounded border-border"
                 />
                 Has unresolved feedback
               </label>
@@ -310,7 +310,7 @@ export default function ReviewFilters({
                   type="checkbox"
                   checked={filter.isOverdue || false}
                   onChange={handleOverdueToggle}
-                  className="w-4 h-4 rounded border-slate-300"
+                  className="w-4 h-4 rounded border-border"
                 />
                 Overdue items only
               </label>
@@ -326,7 +326,7 @@ export default function ReviewFilters({
             <Badge
               key={status}
               variant="secondary"
-              className="cursor-pointer hover:bg-slate-200"
+              className="cursor-pointer hover:bg-muted"
               onClick={() => handleStatusToggle(status)}
             >
               {REVIEW_STATUS_CONFIG[status].label}
@@ -337,7 +337,7 @@ export default function ReviewFilters({
             <Badge
               key={priority}
               variant="secondary"
-              className="cursor-pointer hover:bg-slate-200"
+              className="cursor-pointer hover:bg-muted"
               onClick={() => handlePriorityToggle(priority)}
             >
               {PRIORITY_CONFIG[priority].label}
@@ -347,7 +347,7 @@ export default function ReviewFilters({
           {filter.isOverdue && (
             <Badge
               variant="secondary"
-              className="cursor-pointer hover:bg-slate-200"
+              className="cursor-pointer hover:bg-muted"
               onClick={handleOverdueToggle}
             >
               Overdue
@@ -357,7 +357,7 @@ export default function ReviewFilters({
           {filter.searchQuery && (
             <Badge
               variant="secondary"
-              className="cursor-pointer hover:bg-slate-200"
+              className="cursor-pointer hover:bg-muted"
               onClick={() => handleSearchChange('')}
             >
               &ldquo;{filter.searchQuery}&rdquo;

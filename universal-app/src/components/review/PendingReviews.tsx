@@ -94,7 +94,7 @@ export default function PendingReviews({ items, onAction }: PendingReviewsProps)
                   <span className="flex items-center gap-1 bg-muted px-2 py-1 rounded border border-border">
                     <Clock className="w-3 h-3" /> {item.duration}
                   </span>
-                  <span className="flex items-center gap-1 bg-slate-50 px-2 py-1 rounded border border-slate-100">
+                  <span className="flex items-center gap-1 bg-muted px-2 py-1 rounded border border-border">
                     <FileText className="w-3 h-3" /> {item.templateId}
                   </span>
                   {item.tags && item.tags.length > 0 && (
@@ -131,7 +131,7 @@ export default function PendingReviews({ items, onAction }: PendingReviewsProps)
                   aria-label="Return for changes"
                   title="Return for changes"
                   variant="outline" 
-                  className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50 border-slate-200"
+                  className="flex-1 text-destructive hover:text-destructive hover:bg-destructive/10 border-border"
                   onClick={() => onAction(item, 'return')}
                 >
                   <XCircle className="w-4 h-4" />
@@ -143,8 +143,8 @@ export default function PendingReviews({ items, onAction }: PendingReviewsProps)
       ))}
       {items.length === 0 && (
         <Card className="p-12 text-center border-dashed border-2">
-          <h3 className="text-lg font-bold text-slate-900">No items match this filter</h3>
-          <p className="text-slate-500">Try switching filters or wait for new submissions.</p>
+          <h3 className="text-lg font-bold text-foreground">No items match this filter</h3>
+          <p className="text-muted-foreground">Try switching filters or wait for new submissions.</p>
         </Card>
       )}
     </div>

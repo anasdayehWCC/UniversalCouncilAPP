@@ -463,7 +463,7 @@ export default function ApprovalActions({
                   variant={actionError ? 'error' : 'default'}
                 />
                 {actionError && (
-                  <p className="text-sm text-red-600 flex items-center gap-1">
+                  <p className="text-sm text-destructive flex items-center gap-1">
                     <AlertTriangle className="w-3 h-3" />
                     {actionError}
                   </p>
@@ -485,7 +485,7 @@ export default function ApprovalActions({
               onClick={handleDialogConfirm}
               disabled={!!actionLoading}
               className={cn(
-                dialogState.action === 'approve' && 'bg-green-600 hover:bg-green-700'
+                dialogState.action === 'approve' && 'bg-success hover:bg-success/90'
               )}
             >
               {actionLoading ? (

@@ -40,12 +40,12 @@ export default function ApprovedHistory({ items, filteredQueueLength }: Approved
         </Card>
       ))}
       {filteredQueueLength === 0 && (
-        <Card className="p-8 border-dashed border-2 border-slate-200 text-center bg-white">
+        <Card className="p-8 border-dashed border-2 border-border text-center bg-card">
           <div className="w-14 h-14 rounded-full bg-muted mx-auto mb-3 flex items-center justify-center text-muted-foreground">
             <Clock className="w-6 h-6" />
           </div>
           <h3 className="text-lg font-semibold text-foreground">No items pending</h3>
-          <p className="text-sm text-slate-500 mb-4">As soon as your team submits notes, they will appear here.</p>
+          <p className="text-sm text-muted-foreground mb-4">As soon as your team submits notes, they will appear here.</p>
           <div className="flex justify-center gap-2">
             <Link href="/my-notes">
               <Button>View team notes</Button>

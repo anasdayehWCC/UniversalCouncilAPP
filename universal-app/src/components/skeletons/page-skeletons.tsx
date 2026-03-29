@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { type SkeletonProps } from '@/components/ui/skeleton';
 import { NavigationSkeleton, SidebarSkeleton, BreadcrumbSkeleton } from './NavigationSkeleton';
 import { RecordingListSkeleton } from './RecordingCardSkeleton';
-import { DashboardSkeleton, DashboardHeaderSkeleton, ChartSkeleton } from './DashboardSkeleton';
+import { DashboardSkeleton, DashboardHeaderSkeleton } from './DashboardSkeleton';
 import { TableSkeleton } from './TableSkeleton';
 import { FormSkeleton } from './FormSkeleton';
 import { MinuteSkeleton } from './MinuteSkeleton';
@@ -28,7 +28,7 @@ function PageLayout({
   className 
 }: PageSkeletonProps & { children: React.ReactNode }) {
   return (
-    <div className={cn('min-h-screen flex flex-col', className)}>
+    <div className={cn('min-h-0 flex flex-col', className)}>
       {withHeader && <NavigationSkeleton shimmer={shimmer} />}
       
       <div className="flex flex-1">
@@ -76,7 +76,7 @@ export function RecordPageSkeleton({ shimmer, className, ...props }: PageSkeleto
                 <div
                   key={i}
                   className={cn(
-                    'w-2 bg-muted rounded-full animate-pulse',
+                    'w-2 bg-muted rounded-full animate-pulse motion-reduce:animate-none',
                     { 'h-8': i % 4 === 0, 'h-12': i % 4 === 1, 'h-6': i % 4 === 2, 'h-16': i % 4 === 3 }
                   )}
                   style={{ animationDelay: `${i * 50}ms` }}
@@ -87,18 +87,18 @@ export function RecordPageSkeleton({ shimmer, className, ...props }: PageSkeleto
 
           {/* Controls */}
           <div className="flex items-center justify-center gap-4">
-            <div className="h-16 w-16 rounded-full bg-muted animate-pulse" />
+            <div className="h-16 w-16 rounded-full bg-muted animate-pulse motion-reduce:animate-none" />
           </div>
 
           {/* Timer */}
           <div className="text-center">
-            <div className="h-10 w-32 rounded-lg bg-muted animate-pulse mx-auto" />
+            <div className="h-10 w-32 rounded-lg bg-muted animate-pulse motion-reduce:animate-none mx-auto" />
           </div>
         </div>
 
         {/* Recent recordings */}
         <div className="space-y-4">
-          <div className="h-6 w-40 rounded bg-muted animate-pulse" />
+          <div className="h-6 w-40 rounded bg-muted animate-pulse motion-reduce:animate-none" />
           <RecordingListSkeleton shimmer={shimmer} count={3} compact />
         </div>
       </div>
@@ -131,7 +131,7 @@ export function MinutesPageSkeleton({
             {/* Filter bar */}
             <div className="flex flex-wrap items-center gap-3">
               {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="h-10 w-28 rounded-lg bg-muted animate-pulse" />
+                <div key={i} className="h-10 w-28 rounded-lg bg-muted animate-pulse motion-reduce:animate-none" />
               ))}
             </div>
             
@@ -160,7 +160,7 @@ export function AdminPageSkeleton({ shimmer, className, ...props }: PageSkeleton
 
         {/* Users table */}
         <div className="space-y-4">
-          <div className="h-6 w-24 rounded bg-muted animate-pulse" />
+          <div className="h-6 w-24 rounded bg-muted animate-pulse motion-reduce:animate-none" />
           <TableSkeleton shimmer={shimmer} rows={8} cols={5} />
         </div>
       </div>
@@ -181,8 +181,8 @@ export function InsightsPageSkeleton({ shimmer, className, ...props }: PageSkele
 
         {/* Date range selector */}
         <div className="flex items-center gap-3">
-          <div className="h-10 w-48 rounded-lg bg-muted animate-pulse" />
-          <div className="h-10 w-32 rounded-lg bg-muted animate-pulse" />
+          <div className="h-10 w-48 rounded-lg bg-muted animate-pulse motion-reduce:animate-none" />
+          <div className="h-10 w-32 rounded-lg bg-muted animate-pulse motion-reduce:animate-none" />
         </div>
 
         {/* Metrics */}
@@ -211,15 +211,15 @@ export function TranscriptPageSkeleton({ shimmer, className, ...props }: PageSke
         {/* Header */}
         <div className="flex items-start justify-between">
           <div className="space-y-2">
-            <div className="h-8 w-64 rounded bg-muted animate-pulse" />
+            <div className="h-8 w-64 rounded bg-muted animate-pulse motion-reduce:animate-none" />
             <div className="flex items-center gap-3">
-              <div className="h-6 w-20 rounded-full bg-muted animate-pulse" />
-              <div className="h-4 w-32 rounded bg-muted animate-pulse" />
+              <div className="h-6 w-20 rounded-full bg-muted animate-pulse motion-reduce:animate-none" />
+              <div className="h-4 w-32 rounded bg-muted animate-pulse motion-reduce:animate-none" />
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <div className="h-10 w-24 rounded-lg bg-muted animate-pulse" />
-            <div className="h-10 w-10 rounded-lg bg-muted animate-pulse" />
+            <div className="h-10 w-24 rounded-lg bg-muted animate-pulse motion-reduce:animate-none" />
+            <div className="h-10 w-10 rounded-lg bg-muted animate-pulse motion-reduce:animate-none" />
           </div>
         </div>
 
@@ -252,20 +252,20 @@ export function ReviewPageSkeleton({ shimmer, className, ...props }: PageSkeleto
           {/* Review sidebar */}
           <div className="space-y-4">
             <div className="p-4 rounded-xl border bg-card space-y-4">
-              <div className="h-6 w-24 rounded bg-muted animate-pulse" />
+              <div className="h-6 w-24 rounded bg-muted animate-pulse motion-reduce:animate-none" />
               <div className="space-y-2">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <div key={i} className="flex items-center justify-between">
-                    <div className="h-4 w-28 rounded bg-muted animate-pulse" />
-                    <div className="h-5 w-5 rounded bg-muted animate-pulse" />
+                    <div className="h-4 w-28 rounded bg-muted animate-pulse motion-reduce:animate-none" />
+                    <div className="h-5 w-5 rounded bg-muted animate-pulse motion-reduce:animate-none" />
                   </div>
                 ))}
               </div>
             </div>
             
             <div className="flex gap-2">
-              <div className="h-10 flex-1 rounded-lg bg-muted animate-pulse" />
-              <div className="h-10 flex-1 rounded-lg bg-muted animate-pulse" />
+              <div className="h-10 flex-1 rounded-lg bg-muted animate-pulse motion-reduce:animate-none" />
+              <div className="h-10 flex-1 rounded-lg bg-muted animate-pulse motion-reduce:animate-none" />
             </div>
           </div>
         </div>
@@ -291,16 +291,16 @@ export function SettingsPageSkeleton({ shimmer, className, ...props }: PageSkele
 /**
  * Error page skeleton (generic)
  */
-export function ErrorPageSkeleton({ shimmer, className }: SkeletonProps) {
+export function ErrorPageSkeleton({ className }: SkeletonProps) {
   return (
     <div className={cn(
-      'min-h-screen flex flex-col items-center justify-center p-6 text-center',
+      'min-h-0 flex flex-col items-center justify-center p-6 text-center',
       className
     )}>
-      <div className="h-24 w-24 rounded-full bg-muted animate-pulse mb-6" />
-      <div className="h-8 w-48 rounded bg-muted animate-pulse mb-3" />
-      <div className="h-4 w-72 rounded bg-muted animate-pulse mb-6" />
-      <div className="h-10 w-32 rounded-lg bg-muted animate-pulse" />
+      <div className="h-24 w-24 rounded-full bg-muted animate-pulse motion-reduce:animate-none mb-6" />
+      <div className="h-8 w-48 rounded bg-muted animate-pulse motion-reduce:animate-none mb-3" />
+      <div className="h-4 w-72 rounded bg-muted animate-pulse motion-reduce:animate-none mb-6" />
+      <div className="h-10 w-32 rounded-lg bg-muted animate-pulse motion-reduce:animate-none" />
     </div>
   );
 }
@@ -308,16 +308,16 @@ export function ErrorPageSkeleton({ shimmer, className }: SkeletonProps) {
 /**
  * Empty state skeleton
  */
-export function EmptyStateSkeleton({ shimmer, className }: SkeletonProps) {
+export function EmptyStateSkeleton({ className }: SkeletonProps) {
   return (
     <div className={cn(
       'flex flex-col items-center justify-center py-16 px-6 text-center',
       className
     )}>
-      <div className="h-16 w-16 rounded-xl bg-muted animate-pulse mb-4" />
-      <div className="h-6 w-40 rounded bg-muted animate-pulse mb-2" />
-      <div className="h-4 w-56 rounded bg-muted animate-pulse mb-6" />
-      <div className="h-10 w-36 rounded-lg bg-muted animate-pulse" />
+      <div className="h-16 w-16 rounded-xl bg-muted animate-pulse motion-reduce:animate-none mb-4" />
+      <div className="h-6 w-40 rounded bg-muted animate-pulse motion-reduce:animate-none mb-2" />
+      <div className="h-4 w-56 rounded bg-muted animate-pulse motion-reduce:animate-none mb-6" />
+      <div className="h-10 w-36 rounded-lg bg-muted animate-pulse motion-reduce:animate-none" />
     </div>
   );
 }

@@ -26,7 +26,7 @@ export function Skeleton({ className, shimmer = false, duration, style }: Skelet
         'rounded-md bg-muted motion-reduce:animate-none',
         shimmer 
           ? 'skeleton-shimmer'
-          : 'animate-pulse',
+          : 'animate-pulse motion-reduce:animate-none',
         className
       )}
       style={computedStyle}

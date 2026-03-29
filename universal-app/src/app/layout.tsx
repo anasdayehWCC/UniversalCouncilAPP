@@ -4,13 +4,15 @@ import { inter, spaceGrotesk } from "./fonts";
 import "./globals.css";
 import { DemoProvider } from "@/context/DemoContext";
 import { ThemeSetter } from "@/components/ThemeSetter";
+import { ThemeProvider } from "@/providers/ThemeProvider";
+import { AuthProvider } from "@/providers/AuthProvider";
 import { AppShell } from "@/components/layout/AppShell";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ToastProvider } from "@/components/Toast";
 import { ConnectivityIndicator } from "@/components/ConnectivityIndicator";
-import { ResilienceBanner } from "@/components/ResilienceBanner";
 import { ServiceWorkerRegistration } from "@/lib/pwa";
 import { SkipLinks } from "@/components/a11y/SkipLinks";
+import { getThemeInitScript } from "@/lib/themes/theme-init";
 
 export const viewport: Viewport = {
   themeColor: [
@@ -66,6 +68,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <script
+          id="theme-init"
+          dangerouslySetInnerHTML={{ __html: getThemeInitScript() }}
+        />
         {/* PWA Meta Tags */}
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -87,20 +93,23 @@ export default function RootLayout({
       </head>
       <body
         suppressHydrationWarning
-        className={`${inter.variable} ${spaceGrotesk.variable} font-sans bg-slate-50`}
+        className={`${inter.variable} ${spaceGrotesk.variable} font-sans bg-background text-foreground transition-colors duration-200`}
       >
         <SkipLinks />
         <ServiceWorkerRegistration />
         <ErrorBoundary showDetails={process.env.NODE_ENV === 'development'}>
           <ToastProvider>
-            <DemoProvider>
-              <ThemeSetter />
-              <ResilienceBanner position="fixed" />
-              <AppShell>
-                {children}
-              </AppShell>
-              <ConnectivityIndicator position="bottom-right" hideWhenOnline />
-            </DemoProvider>
+            <AuthProvider skipAuthGate>
+              <DemoProvider>
+                <ThemeProvider>
+                  <ThemeSetter />
+                  <AppShell>
+                    {children}
+                  </AppShell>
+                  <ConnectivityIndicator position="bottom-right" hideWhenOnline />
+                </ThemeProvider>
+              </DemoProvider>
+            </AuthProvider>
           </ToastProvider>
         </ErrorBoundary>
       </body>

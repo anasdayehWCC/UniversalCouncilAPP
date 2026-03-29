@@ -31,26 +31,26 @@ export default function Dashboard() {
     return (
       <div className="space-y-8 animate-in fade-in duration-500">
         {/* Hero */}
-        <Card variant="glass" className="p-6 border-none text-white relative overflow-hidden" style={{ background: config.theme.gradient }} hoverEffect={false}>
-          <div className="absolute top-0 right-0 p-32 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
+        <Card variant="glass" className="p-6 border-none text-primary-foreground relative overflow-hidden" style={{ background: config.theme.gradient }} hoverEffect={false}>
+          <div className="absolute top-0 right-0 p-32 bg-foreground/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 relative z-10">
             <div>
               <p className="text-sm uppercase tracking-wide opacity-80 font-medium">{personaStrings.heroRole}</p>
               <h1 className="text-4xl font-display font-bold mt-1 mb-2">Hi {currentUser.name.split(' ')[0]}</h1>
               <p className="text-base opacity-90">{personaStrings.heroGreeting}</p>
-              <p className="text-xs uppercase tracking-wide text-white/60 mt-4 font-semibold">{personaStrings.heroSubtext}</p>
+              <p className="text-xs uppercase tracking-wide text-primary-foreground/60 mt-4 font-semibold">{personaStrings.heroSubtext}</p>
             </div>
             <div className="flex flex-col gap-4 items-end">
               <div className="info-rail justify-end">
-                <span className="info-rail__item bg-white/10 border-white/20 text-white backdrop-blur-md">
+                <span className="info-rail__item bg-foreground/10 border-foreground/20 text-primary-foreground backdrop-blur-md">
                   <span className="info-rail__dot" style={{ background: '#f59e0b', boxShadow: '0 0 8px #f59e0b' }} />
                   Drafts: {drafts}
                 </span>
-                <span className="info-rail__item bg-white/10 border-white/20 text-white backdrop-blur-md">
+                <span className="info-rail__item bg-foreground/10 border-foreground/20 text-primary-foreground backdrop-blur-md">
                   <span className="info-rail__dot" style={{ background: '#22c55e', boxShadow: '0 0 8px #22c55e' }} />
                   Due today: {dueToday}
                 </span>
-                <span className="info-rail__item bg-white/10 border-white/20 text-white backdrop-blur-md">
+                <span className="info-rail__item bg-foreground/10 border-foreground/20 text-primary-foreground backdrop-blur-md">
                   <span className="info-rail__dot" style={{ background: '#38bdf8', boxShadow: '0 0 8px #38bdf8' }} />
                   Domain: {config.name}
                 </span>

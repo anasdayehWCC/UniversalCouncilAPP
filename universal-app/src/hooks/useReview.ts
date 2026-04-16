@@ -325,10 +325,14 @@ export function useReview(options: UseReviewOptions = {}): UseReviewReturn {
       const newStatus = decision === 'approve'
         ? 'approved'
         : decision === 'reject'
-        ? 'flagged'
+        ? 'rejected'
         : 'flagged';
 
-      const action = decision === 'approve' ? 'approved' : 'returned';
+      const action = decision === 'approve'
+        ? 'approved'
+        : decision === 'reject'
+        ? 'rejected'
+        : 'returned';
 
       updateMeetingStatus(itemId, newStatus, {
         action,

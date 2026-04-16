@@ -19,7 +19,7 @@ interface DemoContextType {
   updateMeetingStatus: (
     meetingId: string,
     status: MeetingStatus,
-    meta?: { action?: 'approved' | 'returned'; by?: string; timestamp?: string }
+    meta?: { action?: 'approved' | 'returned' | 'rejected'; by?: string; timestamp?: string }
   ) => void;
   featureFlags: FeatureFlags;
   setFeatureFlags: (flags: FeatureFlags) => void;
@@ -138,13 +138,13 @@ export function DemoProvider({
   const updateMeetingStatus = useCallback((
     meetingId: string,
     status: MeetingStatus,
-    meta?: { action?: 'approved' | 'returned'; by?: string; timestamp?: string }
+    meta?: { action?: 'approved' | 'returned' | 'rejected'; by?: string; timestamp?: string }
   ) => {
     const at = meta?.timestamp || new Date().toISOString();
     setMeetings(prev => sortMeetings(prev.map(m => m.id === meetingId ? {
       ...m,
       status,
-      lastAction: meta?.action ?? (status === 'approved' ? 'approved' : 'returned'),
+      lastAction: meta?.action ?? (status === 'approved' ? 'approved' : status === 'rejected' ? 'rejected' : 'returned'),
       lastActionAt: at,
       lastActionBy: meta?.by,
       submittedAt: m.submittedAt || at,

@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-04-16 (Orchestration Run 2 — Critical Backlog Fixes)
+
+### Fixed — Critical Bugs
+
+- **#5 Review queue routing**: PendingReviews "Review Note" button now links to `/review-queue/[id]` instead of `/my-notes/[id]`
+- **#12 Reject vs Request Changes**: `useReview.ts` now maps `'reject'` to distinct `'rejected'` status instead of sharing `'flagged'` with `'request_changes'`
+- **#1 Consent persistence**: Consent now required per recording session (not one-time localStorage flag), attached to Meeting record with `consentGiven` + `consentTimestamp`
+- **#41 Network timeout**: Fixed `useNetworkStatus` timeout race — was a no-op (Promise.race against resolved Response)
+- **#43 Triple polling**: Created `NetworkStatusProvider` so one polling loop serves all consumers (was 3 independent intervals)
+
+### Fixed — A11y (7 items)
+
+- **#6**: Added `aria-label` to header search input
+- **#7**: Replaced `div onClick` with keyboard-operable `button` for admin feature toggles
+- **#20**: Removed duplicate skip link from AppShell.tsx
+- **#21**: Added ARIA tab roles to review-queue tab bar
+- **#22**: Added labels to UserTable checkboxes
+- **#24**: Added label to SharePoint search input, hid decorative icon
+- **#27**: Added programmatic label to admin Organisation Name input
+
+### Added
+
+- `universal-app/src/providers/NetworkStatusProvider.tsx` — shared network status context
+
 ## 2026-04-16 (Review Board + Orchestration Run)
 
 ### Added — Production Review Board

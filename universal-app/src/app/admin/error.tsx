@@ -13,7 +13,11 @@ export default function AdminError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  const isPermissionError = error.message.includes('403') || 
+  React.useEffect(() => {
+    console.error('[admin/error.tsx] Error caught:', error);
+  }, [error]);
+
+  const isPermissionError = error.message.includes('403') ||
     error.message.includes('Forbidden') ||
     error.message.includes('permission');
 
@@ -23,30 +27,30 @@ export default function AdminError({
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center">
             {isPermissionError ? (
-              <Shield className="h-6 w-6 text-destructive" />
+              <Shield className="h-6 w-6 text-destructive" aria-hidden="true" />
             ) : (
-              <AlertTriangle className="h-6 w-6 text-destructive" />
+              <AlertTriangle className="h-6 w-6 text-destructive" aria-hidden="true" />
             )}
           </div>
           <CardTitle>
             {isPermissionError ? 'Access Denied' : 'Admin Panel Error'}
           </CardTitle>
           <CardDescription>
-            {isPermissionError 
+            {isPermissionError
               ? 'You don\'t have permission to access this admin feature.'
               : 'An error occurred in the admin panel.'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {isPermissionError && (
-            <div className="rounded-md bg-amber-50 dark:bg-amber-950/20 p-3 text-sm text-amber-900 dark:text-amber-100">
+            <div className="rounded-md bg-warning/10 p-3 text-sm text-warning-foreground">
               <p className="font-medium mb-1">What happened?</p>
               <p className="text-xs">
                 This feature requires admin privileges. Please contact your system administrator if you believe this is an error.
               </p>
             </div>
           )}
-          
+
           {process.env.NODE_ENV === 'development' && !isPermissionError && (
             <details className="rounded-md bg-muted p-3 text-sm">
               <summary className="cursor-pointer font-medium">
@@ -57,11 +61,11 @@ export default function AdminError({
               </pre>
             </details>
           )}
-          
+
           <div className="flex flex-col sm:flex-row gap-2">
             {!isPermissionError && (
               <Button variant="outline" className="flex-1" onClick={reset}>
-                <RefreshCw className="mr-2 h-4 w-4" />
+                <RefreshCw className="mr-2 h-4 w-4" aria-hidden="true" />
                 Try again
               </Button>
             )}
@@ -70,7 +74,7 @@ export default function AdminError({
               className="flex-1"
               onClick={() => window.location.href = '/'}
             >
-              <Home className="mr-2 h-4 w-4" />
+              <Home className="mr-2 h-4 w-4" aria-hidden="true" />
               Go home
             </Button>
           </div>

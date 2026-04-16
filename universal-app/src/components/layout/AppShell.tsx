@@ -8,7 +8,7 @@ import { useDemo } from '@/context/DemoContext';
 import type { ServiceDomain } from '@/config/domains';
 import { cn, hexToRgba } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Bell, Search, Menu, LogOut, ChevronDown, Settings } from 'lucide-react';
+import { Bell, Search, Menu, LogOut, ChevronDown, Settings, X } from 'lucide-react';
 import { getNavForRole } from '@/config/navigation';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useColorMode } from '@/hooks/useTheme';
@@ -26,7 +26,7 @@ import {
 import { AnimatedIcon } from '@/components/ui/AnimatedIcon';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const { config, domain, role, currentUser, switchUser, signOut, featureFlags, personas, isAuthenticated, isSessionHydrated } = useDemo();
+  const { config, domain, role, currentUser, switchUser, signOut, featureFlags, personas, isAuthenticated, isSessionHydrated, meetings } = useDemo();
   const pathname = usePathname();
   const router = useRouter();
   const { isDark } = useColorMode();
@@ -41,11 +41,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   React.useEffect(() => {
     if (isSessionHydrated && !isLogin && !isAuthenticated) {
-      router.replace('/login');
+      router.push('/login');
     }
   }, [isAuthenticated, isLogin, isSessionHydrated, router]);
 
   const navItems = React.useMemo(() => getNavForRole(domain, role, featureFlags), [domain, role, featureFlags]);
+
+  // Count pending review items (ready or flagged) for the Review Queue badge
+  const pendingReviewCount = React.useMemo(
+    () => meetings.filter((m) => m.status === 'ready' || m.status === 'flagged').length,
+    [meetings]
+  );
 
   const sidebarBg = config.theme.primary;
   const isDarkSidebar = true;
@@ -136,7 +142,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         aria-label="Main navigation sidebar"
       >
         {/* Logo Area */}
-        <div className="h-16 flex items-center px-6 border-b border-white/10">
+        <div className="h-16 flex items-center justify-between px-6 border-b border-white/10">
           <div className="flex items-center gap-2">
             <div
               className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold shadow-lg"
@@ -148,6 +154,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               Minute<span className="text-muted-foreground">Platform</span>
             </span>
           </div>
+          {/* Mobile close button */}
+          <button
+            className="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+            onClick={() => setIsSidebarOpen(false)}
+            aria-label="Close navigation"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Navigation */}
@@ -159,7 +173,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-            
+            const showBadge = item.href === '/review-queue' && pendingReviewCount > 0;
+
             return (
               <Link
                 key={item.href}
@@ -169,9 +184,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   isActive && "nav-link--active"
                 )}
                 style={navStyle}
+                onClick={() => setIsSidebarOpen(false)}
               >
                 <Icon className="w-5 h-5" style={{ strokeWidth: isActive ? 2.6 : 2.2 }} />
-                {item.label}
+                <span className="flex-1">{item.label}</span>
+                {showBadge && (
+                  <span className="ml-auto inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-destructive text-destructive-foreground text-[11px] font-semibold leading-none">
+                    {pendingReviewCount}
+                  </span>
+                )}
               </Link>
             );
           })}
@@ -320,7 +341,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground" aria-label="Notifications">
               <Bell className="w-5 h-5" />
             </Button>
-            <Button variant="outline" size="sm" onClick={() => window.location.href = '/login'}>
+            <Button variant="outline" size="sm" onClick={() => router.push('/login')}>
               Switch persona
             </Button>
           </div>

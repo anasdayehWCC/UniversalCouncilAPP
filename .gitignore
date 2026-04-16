@@ -195,3 +195,6 @@ Desktop.ini
 local/
 *.local
 .claude/worktrees/
+
+universal-app/playwright-report/
+universal-app/test-results/

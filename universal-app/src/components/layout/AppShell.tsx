@@ -110,7 +110,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       }}
     >
       <div className="flex h-full min-h-0 relative z-10">
-      <a href="#main-content" className="skip-link">Skip to main content</a>
       {/* Mobile overlay - shows when sidebar is open on mobile */}
       {isSidebarOpen && (
         <div
@@ -290,9 +289,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-3">
             <div className="relative hidden sm:block">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input 
-                type="text" 
-                placeholder="Search minutes, people..." 
+              <input
+                type="text"
+                placeholder="Search minutes, people..."
+                aria-label="Search minutes, people"
                 className="h-9 pl-9 pr-4 rounded-full bg-muted border border-border text-sm placeholder:text-muted-foreground focus:ring-2 focus:ring-ring w-64 transition-all text-foreground"
               />
             </div>

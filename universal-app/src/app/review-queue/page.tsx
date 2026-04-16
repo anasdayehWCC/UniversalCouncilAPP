@@ -141,7 +141,7 @@ export default function ReviewQueuePage() {
       </div>
 
       <Tabs value={activeTab} className="w-full">
-        <div className="flex gap-1 p-1 bg-muted rounded-xl mb-6">
+        <div role="tablist" aria-label="Review queue tabs" className="flex gap-1 p-1 bg-muted rounded-xl mb-6">
           {([
             { key: 'pending' as const, label: 'Pending Review', icon: <Clock className="w-4 h-4" />, count: filteredQueue.length },
             { key: 'changes' as const, label: 'Changes Requested', icon: <AlertCircle className="w-4 h-4" />, count: flaggedCount },
@@ -149,6 +149,10 @@ export default function ReviewQueuePage() {
           ] as const).map(tab => (
             <button
               key={tab.key}
+              role="tab"
+              aria-selected={activeTab === tab.key}
+              aria-controls={`tabpanel-${tab.key}`}
+              id={`tab-${tab.key}`}
               onClick={() => setActiveTab(tab.key)}
               className={cn(
                 "flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors",
@@ -173,18 +177,18 @@ export default function ReviewQueuePage() {
           ))}
         </div>
 
-        <TabsContent value="pending" className="space-y-4">
+        <TabsContent value="pending" className="space-y-4" role="tabpanel" id="tabpanel-pending" aria-labelledby="tab-pending">
           <PendingReviews items={filteredQueue} onAction={handleAction} />
         </TabsContent>
 
-        <TabsContent value="changes">
-          <ChangesRequested 
-            items={queueCandidates.filter(m => m.status === 'flagged')} 
-            onAction={handleAction} 
+        <TabsContent value="changes" role="tabpanel" id="tabpanel-changes" aria-labelledby="tab-changes">
+          <ChangesRequested
+            items={queueCandidates.filter(m => m.status === 'flagged')}
+            onAction={handleAction}
           />
         </TabsContent>
 
-        <TabsContent value="approved">
+        <TabsContent value="approved" role="tabpanel" id="tabpanel-approved" aria-labelledby="tab-approved">
           <ApprovedHistory items={approvedItems} filteredQueueLength={filteredQueue.length} />
         </TabsContent>
       </Tabs>

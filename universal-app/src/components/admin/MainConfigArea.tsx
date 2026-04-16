@@ -27,11 +27,11 @@ export default function MainConfigArea() {
         <div className="space-y-6">
           <div className="flex items-center justify-between pb-6 border-b border-border">
             <div>
-              <h3 className="font-bold text-foreground">Organization Name</h3>
+              <label htmlFor="org-name" className="font-bold text-foreground block">Organization Name</label>
               <p className="text-sm text-muted-foreground">Visible on all reports and exports.</p>
             </div>
             <div className="w-64">
-              <input type="text" className="w-full p-2 border border-input rounded-md text-sm text-foreground" defaultValue="Westminster City Council" />
+              <input id="org-name" type="text" className="w-full p-2 border border-input rounded-md text-sm text-foreground" defaultValue="Westminster City Council" />
             </div>
           </div>
 
@@ -53,9 +53,9 @@ export default function MainConfigArea() {
                   <p className="text-xs text-muted-foreground">Advanced analytics for team managers.</p>
                 </div>
               </div>
-              <div onClick={() => toggleFeature('aiInsights')} className="cursor-pointer">
+              <button type="button" onClick={() => toggleFeature('aiInsights')} className="cursor-pointer" aria-label="Toggle AI Insights feature">
                  {featureFlags.aiInsights ? <ToggleRight className="w-8 h-8 text-[var(--primary)]" /> : <ToggleLeft className="w-8 h-8 text-muted-foreground" />}
-              </div>
+              </button>
             </div>
 
             <div className="flex items-center justify-between">
@@ -68,9 +68,9 @@ export default function MainConfigArea() {
                 <p className="text-xs text-muted-foreground">Enable housing templates and workflows.</p>
               </div>
               </div>
-              <div onClick={() => toggleFeature('housingPilot')} className="cursor-pointer">
+              <button type="button" onClick={() => toggleFeature('housingPilot')} className="cursor-pointer" aria-label="Toggle Housing Pilot Module feature">
                  {featureFlags.housingPilot ? <ToggleRight className="w-8 h-8 text-[var(--primary)]" /> : <ToggleLeft className="w-8 h-8 text-muted-foreground" />}
-              </div>
+              </button>
             </div>
             
             <div className="flex items-center justify-between">
@@ -83,9 +83,9 @@ export default function MainConfigArea() {
                   <p className="text-xs text-muted-foreground">Enable real-time transcription.</p>
                 </div>
               </div>
-              <div onClick={() => toggleFeature('smartCapture')} className="cursor-pointer">
+              <button type="button" onClick={() => toggleFeature('smartCapture')} className="cursor-pointer" aria-label="Toggle Smart Capture AI feature">
                  {featureFlags.smartCapture ? <ToggleRight className="w-8 h-8 text-[var(--primary)]" /> : <ToggleLeft className="w-8 h-8 text-muted-foreground" />}
-              </div>
+              </button>
             </div>
           </div>
 

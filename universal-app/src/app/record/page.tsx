@@ -52,7 +52,7 @@ function ConsentScreen({
   onAccept: () => void;
   onDecline: () => void;
 }) {
-  const [consentGiven, setConsentGiven] = useState(false);
+  const [consentChecked, setConsentChecked] = useState(false);
 
   return (
     <motion.div
@@ -76,14 +76,17 @@ function ConsentScreen({
           </p>
         </div>
 
-        <div className="bg-muted/50 p-4 rounded-xl text-left border border-muted">
-          <label className="flex items-start gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              className="mt-1 w-4 h-4 text-primary rounded-sm border-muted-foreground focus:ring-primary"
-              checked={consentGiven}
-              onChange={(e) => setConsentGiven(e.target.checked)}
-            />
+        <div className="bg-muted/50 rounded-xl text-left border border-muted">
+          {/* 44px minimum touch target via min-h-[44px] and full-row tap area */}
+          <label className="flex items-center gap-3 cursor-pointer p-4 min-h-11">
+            <span className="flex items-center justify-center w-6 h-6 shrink-0">
+              <input
+                type="checkbox"
+                className="w-5 h-5 text-primary rounded-sm border-muted-foreground focus:ring-primary"
+                checked={consentChecked}
+                onChange={(e) => setConsentChecked(e.target.checked)}
+              />
+            </span>
             <span className="text-sm text-muted-foreground">
               I confirm that I have obtained permission from all attendees to
               record this session. I understand this recording will be processed
@@ -97,15 +100,10 @@ function ConsentScreen({
             Cancel
           </Button>
           <Button
-            disabled={!consentGiven}
-            onClick={() => {
-              if (typeof window !== 'undefined') {
-                window.localStorage.setItem('recordingConsentGiven', 'true');
-              }
-              onAccept();
-            }}
+            disabled={!consentChecked}
+            onClick={onAccept}
           >
-            I Understand, Continue
+            I Confirm, Start Session
           </Button>
         </div>
       </Card>
@@ -189,13 +187,9 @@ export default function RecordPage() {
   const { currentUser, addMeeting } = useDemo();
   const { state: networkState } = useNetworkStatus();
 
-  // Consent state
-  const [showConsent, setShowConsent] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return window.localStorage.getItem('recordingConsentGiven') !== 'true';
-    }
-    return true;
-  });
+  // Consent state — per-session, never persisted to localStorage
+  const [showConsent, setShowConsent] = useState(true);
+  const [consentTimestamp, setConsentTimestamp] = useState<string | null>(null);
 
   // Quality settings
   const [quality, setQuality] = useState<AudioQuality>('high');
@@ -244,6 +238,8 @@ export default function RecordPage() {
         submittedById: currentUser.id,
         submittedBy: currentUser.name,
         submittedAt: now,
+        consentGiven: true,
+        consentTimestamp: consentTimestamp ?? now,
       };
 
       addMeeting(meeting);
@@ -274,10 +270,12 @@ export default function RecordPage() {
     }
   }, [recorder]);
 
-  // Handle new recording
+  // Handle new recording — reset consent so it is required per-session
   const handleNewRecording = useCallback(() => {
     setIsComplete(false);
     setCompletedMeetingId(null);
+    setShowConsent(true);
+    setConsentTimestamp(null);
     setCaseMetadata({
       serviceDomain: currentUser.domain,
       recorderName: currentUser.name,
@@ -300,7 +298,10 @@ export default function RecordPage() {
     return (
       <div className="min-h-[80vh] flex items-center justify-center p-4">
         <ConsentScreen
-          onAccept={() => setShowConsent(false)}
+          onAccept={() => {
+            setConsentTimestamp(new Date().toISOString());
+            setShowConsent(false);
+          }}
           onDecline={() => router.push('/')}
         />
       </div>

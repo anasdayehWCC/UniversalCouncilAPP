@@ -101,27 +101,37 @@ export function DemoProvider({
     { id: initialUser.id, switchedAt: new Date().toISOString() },
   ]);
 
+  // Single hydration effect: localStorage (sync) first, then API (async).
+  // The persisted user ID is already restored via the useState initialiser above.
+  // The API fetch only updates persona metadata, meetings, and templates.
+  // If a valid persisted user exists in the fresh persona map we refresh its
+  // metadata (avatar, team, etc.) without changing the user selection.
   useEffect(() => {
     let cancelled = false;
-    const hydrateFromApi = async () => {
+    async function hydrate() {
       try {
         const res = await fetch('/api/demos/personas', { cache: 'no-store' });
-        if (!res.ok) return;
+        if (!res.ok || cancelled) return;
         const json = await res.json();
         if (cancelled) return;
+
         if (json?.personas) {
-           setPersonas(json.personas);
+          setPersonas(json.personas);
+
+          // Keep the persisted user selection but refresh their metadata from API
+          setCurrentUser((prev: User) => {
+            const refreshed = json.personas[prev.id];
+            return refreshed ?? prev;
+          });
         }
         if (json?.meetings) setMeetings(sortMeetings(json.meetings));
         if (json?.templates) setTemplates(json.templates);
-      } catch (err) {
-        console.warn('Falling back to local persona config', err);
+      } catch {
+        // API unavailable — local persona config is already loaded via useState seed
       }
-    };
-    hydrateFromApi();
-    return () => {
-      cancelled = true;
-    };
+    }
+    hydrate();
+    return () => { cancelled = true; };
   }, []);
 
   const addMeeting = useCallback((meeting: Meeting) => {
@@ -152,7 +162,6 @@ export function DemoProvider({
   }, []);
 
   const setFeatureFlags = useCallback((flags: FeatureFlags) => {
-    console.log('Saving feature flags:', flags);
     setFeatureFlagsState(flags);
     if (typeof window !== 'undefined') {
       window.localStorage.setItem('demo_feature_flags', JSON.stringify(flags));
@@ -162,14 +171,9 @@ export function DemoProvider({
   const router = useRouter();
 
   const switchUser = useCallback((userId: string) => {
-    console.log('[DemoContext] Switching to user:', userId);
     const user = personas[userId];
-    if (!user) {
-      console.error('[DemoContext] User not found:', userId);
-      return;
-    }
+    if (!user) return;
 
-    console.log('[DemoContext] User data:', user);
     setCurrentUser(user);
     setDomain(user.domain);
     setRole(user.role);
@@ -185,7 +189,6 @@ export function DemoProvider({
       ...prev.slice(0, 9),
     ]);
 
-    console.log('[DemoContext] Navigation to dashboard');
     // Use setTimeout to ensure state updates complete before navigation
     setTimeout(() => {
       router.push('/');

@@ -1,15 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { TranscriptTab } from './components';
 import { AIEditSidebar } from '@/components/AIEditSidebar';
+import { ShellPage } from '@/components/layout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  ArrowLeft, Calendar, Clock, Share2, Download, 
+import {
+  ArrowLeft, Calendar, Clock, Share2, Download,
   FileText, Mic, CheckSquare
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -23,8 +24,74 @@ export default function MeetingDetailPage() {
   const template = templates.find(t => t.id === meeting?.templateId);
   const [activeTab, setActiveTab] = useState<'summary' | 'transcript' | 'tasks'>('summary');
 
+  const handleExport = useCallback(() => {
+    if (!meeting) return;
+
+    const dateStr = formatDate(meeting.date);
+    const timeStr = formatTime(meeting.date);
+    const templateName = template?.name || 'General Meeting';
+
+    const lines: string[] = [
+      `# ${meeting.title}`,
+      '',
+      `**Date:** ${dateStr} at ${timeStr}`,
+      `**Duration:** ${meeting.duration}`,
+      `**Template:** ${templateName}`,
+      `**Status:** ${meeting.status.replace('_', ' ')}`,
+      `**Attendees:** ${meeting.attendees.join(', ')}`,
+      '',
+      '---',
+      '',
+      '## Summary',
+      '',
+      meeting.summary,
+    ];
+
+    if (meeting.tasks.length > 0) {
+      lines.push('', '---', '', '## Tasks', '');
+      for (const task of meeting.tasks) {
+        const checkbox = task.status === 'done' ? '[x]' : '[ ]';
+        const assignee = personas[task.assigneeId]?.name || task.assigneeId;
+        lines.push(`- ${checkbox} ${task.title} (Assigned to: ${assignee}, Due: ${formatDate(task.dueDate)})`);
+      }
+    }
+
+    const content = lines.join('\n');
+    const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+
+    const safeName = meeting.title.replace(/[^a-zA-Z0-9-_ ]/g, '').replace(/\s+/g, '_');
+    const safeDate = meeting.date.split('T')[0] || dateStr.replace(/\s+/g, '_');
+    const filename = `${safeName}_${safeDate}.md`;
+
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+    URL.revokeObjectURL(url);
+  }, [meeting, template, personas]);
+
   if (!meeting) {
-    return <div className="p-12 text-center">Meeting not found</div>;
+    return (
+      <ShellPage>
+        <Card className="max-w-md mx-auto mt-12 p-8 text-center bg-card border border-border rounded-xl">
+          <FileText className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-40" />
+          <h2 className="text-xl font-semibold text-foreground mb-2">Meeting not found</h2>
+          <p className="text-sm text-muted-foreground mb-6">
+            The meeting you are looking for does not exist or may have been removed.
+          </p>
+          <Link
+            href="/my-notes"
+            className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to My Notes
+          </Link>
+        </Card>
+      </ShellPage>
+    );
   }
 
   return (
@@ -107,7 +174,7 @@ export default function MeetingDetailPage() {
                 <Share2 className="w-4 h-4" />
                 Share
               </Button>
-	              <Button className="gap-2 shadow-sm">
+	              <Button className="gap-2 shadow-sm" onClick={handleExport}>
                 <Download className="w-4 h-4" />
                 Export
               </Button>

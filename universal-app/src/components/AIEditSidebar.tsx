@@ -76,10 +76,11 @@ export function AIEditSidebar() {
       <div className="px-4 pt-1 pb-6">
         <SectionHeader label="Custom Instruction" />
         <div className="pt-3 flex flex-col gap-2">
-          <label className="text-xs font-medium text-muted-foreground">
+          <label htmlFor="ai-custom-instruction" className="text-xs font-medium text-muted-foreground">
             Custom instruction
           </label>
           <textarea
+            id="ai-custom-instruction"
             placeholder="e.g. 'Rewrite this to focus on the child's voice'"
             className="w-full min-h-[80px] px-3 py-2 text-sm bg-muted/50 border border-border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground placeholder:text-muted-foreground"
           />

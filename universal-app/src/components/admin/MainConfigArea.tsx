@@ -1,32 +1,33 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Database, Activity, ToggleRight, ToggleLeft, Mic 
+import { Button } from '@/components/ui/button';
+import {
+  Database, Activity, ToggleRight, ToggleLeft, Mic, Save, Check
 } from 'lucide-react';
 import { useDemo } from '@/context/DemoContext';
+import { useAdmin } from '@/hooks/useAdmin';
 import type { FeatureFlags } from '@/types/flags';
-import { useConfirmDialog } from '@/hooks/useConfirmDialog';
-import { ConfirmDialogRenderer } from '@/components/ui/ConfirmDialogRenderer';
 
 export default function MainConfigArea() {
   const { featureFlags, setFeatureFlags } = useDemo();
-  const { confirm, confirmDialogState, handleConfirm, handleCancel } = useConfirmDialog();
+  const { settings, updateSettings } = useAdmin();
+  const [orgName, setOrgName] = useState(settings.name);
+  const [isSaved, setIsSaved] = useState(false);
 
-  const toggleFeature = async (key: keyof FeatureFlags) => {
-    const isCurrentlyEnabled = featureFlags[key];
-    const action = isCurrentlyEnabled ? 'disable' : 'enable';
-    const ok = await confirm({
-      title: `${action.charAt(0).toUpperCase() + action.slice(1)} this feature?`,
-      description: isCurrentlyEnabled
-        ? 'Users will immediately lose access to this feature.'
-        : 'This feature will become available to all users immediately.',
-      confirmLabel: action.charAt(0).toUpperCase() + action.slice(1),
-      variant: isCurrentlyEnabled ? 'destructive' : 'default',
-    });
-    if (ok) {
+  const orgNameDirty = orgName !== settings.name;
+
+  const handleSaveOrgName = () => {
+    updateSettings({ name: orgName });
+    setIsSaved(true);
+    setTimeout(() => setIsSaved(false), 2000);
+  };
+
+  const toggleFeature = (key: keyof FeatureFlags) => {
+    const action = featureFlags[key] ? 'disable' : 'enable';
+    if (confirm(`Are you sure you want to ${action} this feature?`)) {
       const next = { ...featureFlags, [key]: !featureFlags[key] };
       setFeatureFlags(next);
     }
@@ -34,21 +35,44 @@ export default function MainConfigArea() {
 
   return (
     <div className="lg:col-span-2 space-y-6">
-      <ConfirmDialogRenderer
-        {...confirmDialogState}
-        onConfirm={handleConfirm}
-        onCancel={handleCancel}
-      />
       <Card variant="glass" hoverEffect={false} className="p-6 bg-card/80">
         <h2 className="text-xl font-bold text-foreground mb-6 font-display">Configuration</h2>
         <div className="space-y-6">
           <div className="flex items-center justify-between pb-6 border-b border-border">
             <div>
-              <label htmlFor="org-name" className="font-bold text-foreground block">Organization Name</label>
+              <h3 className="font-bold text-foreground">Organization Name</h3>
               <p className="text-sm text-muted-foreground">Visible on all reports and exports.</p>
             </div>
-            <div className="w-64">
-              <input id="org-name" type="text" className="w-full p-2 border border-input rounded-md text-sm text-foreground" defaultValue="Westminster City Council" />
+            <div className="flex items-center gap-2">
+              <div className="w-64">
+                <input
+                  type="text"
+                  className="w-full p-2 border border-input rounded-md text-sm text-foreground bg-background"
+                  value={orgName}
+                  onChange={(e) => {
+                    setOrgName(e.target.value);
+                    setIsSaved(false);
+                  }}
+                />
+              </div>
+              <Button
+                size="sm"
+                disabled={!orgNameDirty}
+                onClick={handleSaveOrgName}
+                className="gap-1.5"
+              >
+                {isSaved ? (
+                  <>
+                    <Check className="w-3.5 h-3.5" />
+                    Saved
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-3.5 h-3.5" />
+                    Save
+                  </>
+                )}
+              </Button>
             </div>
           </div>
 
@@ -70,9 +94,9 @@ export default function MainConfigArea() {
                   <p className="text-xs text-muted-foreground">Advanced analytics for team managers.</p>
                 </div>
               </div>
-              <button type="button" onClick={() => toggleFeature('aiInsights')} className="cursor-pointer" aria-label="Toggle AI Insights feature">
+              <div onClick={() => toggleFeature('aiInsights')} className="cursor-pointer">
                  {featureFlags.aiInsights ? <ToggleRight className="w-8 h-8 text-[var(--primary)]" /> : <ToggleLeft className="w-8 h-8 text-muted-foreground" />}
-              </button>
+              </div>
             </div>
 
             <div className="flex items-center justify-between">
@@ -85,9 +109,9 @@ export default function MainConfigArea() {
                 <p className="text-xs text-muted-foreground">Enable housing templates and workflows.</p>
               </div>
               </div>
-              <button type="button" onClick={() => toggleFeature('housingPilot')} className="cursor-pointer" aria-label="Toggle Housing Pilot Module feature">
+              <div onClick={() => toggleFeature('housingPilot')} className="cursor-pointer">
                  {featureFlags.housingPilot ? <ToggleRight className="w-8 h-8 text-[var(--primary)]" /> : <ToggleLeft className="w-8 h-8 text-muted-foreground" />}
-              </button>
+              </div>
             </div>
             
             <div className="flex items-center justify-between">
@@ -100,9 +124,9 @@ export default function MainConfigArea() {
                   <p className="text-xs text-muted-foreground">Enable real-time transcription.</p>
                 </div>
               </div>
-              <button type="button" onClick={() => toggleFeature('smartCapture')} className="cursor-pointer" aria-label="Toggle Smart Capture AI feature">
+              <div onClick={() => toggleFeature('smartCapture')} className="cursor-pointer">
                  {featureFlags.smartCapture ? <ToggleRight className="w-8 h-8 text-[var(--primary)]" /> : <ToggleLeft className="w-8 h-8 text-muted-foreground" />}
-              </button>
+              </div>
             </div>
           </div>
 

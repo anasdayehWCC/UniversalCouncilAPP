@@ -114,7 +114,7 @@ function ToggleSwitch({ enabled, onChange, disabled = false, size = 'md' }: Togg
         transition-colors duration-200 ease-in-out
         focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2
         ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
-        ${enabled ? 'bg-primary' : 'bg-gray-200 dark:bg-gray-700'}
+        ${enabled ? 'bg-primary' : 'bg-muted'}
       `}
     >
       <span
@@ -152,7 +152,7 @@ function FlagToggleRow({
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="border-b border-gray-100 dark:border-gray-800 last:border-0">
+    <div className="border-b border-border last:border-0">
       <div
         className={`
           flex items-center justify-between gap-4 py-3 px-4
@@ -162,12 +162,12 @@ function FlagToggleRow({
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <button
             onClick={() => setExpanded(!expanded)}
-            className="p-0.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
+            className="p-0.5 hover:bg-muted rounded"
           >
             {expanded ? (
-              <ChevronDown className="w-4 h-4 text-gray-400" />
+              <ChevronDown className="w-4 h-4 text-muted-foreground" />
             ) : (
-              <ChevronRight className="w-4 h-4 text-gray-400" />
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
             )}
           </button>
 
@@ -183,7 +183,7 @@ function FlagToggleRow({
               )}
             </div>
             {!compact && flag.description && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
+              <p className="text-xs text-muted-foreground truncate mt-0.5">
                 {flag.description}
               </p>
             )}
@@ -194,7 +194,7 @@ function FlagToggleRow({
           {hasOverride && (
             <button
               onClick={onClearOverride}
-              className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded"
+              className="p-1 text-muted-foreground hover:text-foreground rounded"
               title="Clear override"
             >
               <Undo className="w-4 h-4" />
@@ -216,20 +216,20 @@ function FlagToggleRow({
             <div className="px-4 pb-3 pl-12 space-y-2 text-xs">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <span className="text-gray-500">ID:</span>
+                  <span className="text-muted-foreground">ID:</span>
                   <span className="ml-2 font-mono">{flag.id}</span>
                 </div>
                 <div>
-                  <span className="text-gray-500">Status:</span>
+                  <span className="text-muted-foreground">Status:</span>
                   <span className="ml-2 capitalize">{flag.status}</span>
                 </div>
                 <div>
-                  <span className="text-gray-500">Default:</span>
+                  <span className="text-muted-foreground">Default:</span>
                   <span className="ml-2">{flag.defaultEnabled ? 'Enabled' : 'Disabled'}</span>
                 </div>
                 {flag.owner && (
                   <div>
-                    <span className="text-gray-500">Owner:</span>
+                    <span className="text-muted-foreground">Owner:</span>
                     <span className="ml-2">{flag.owner}</span>
                   </div>
                 )}
@@ -237,11 +237,11 @@ function FlagToggleRow({
 
               {flag.tags && flag.tags.length > 0 && (
                 <div className="flex items-center gap-2 flex-wrap">
-                  <Tag className="w-3 h-3 text-gray-400" />
+                  <Tag className="w-3 h-3 text-muted-foreground" />
                   {flag.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-1.5 py-0.5 text-[10px] rounded bg-gray-100 dark:bg-gray-800"
+                      className="px-1.5 py-0.5 text-[10px] rounded bg-muted"
                     >
                       {tag}
                     </span>
@@ -250,8 +250,8 @@ function FlagToggleRow({
               )}
 
               {flag.conditions && flag.conditions.length > 0 && (
-                <div className="text-gray-500">
-                  <span className="text-gray-400">Conditions:</span>{' '}
+                <div className="text-muted-foreground">
+                  <span className="text-muted-foreground">Conditions:</span>{' '}
                   {flag.conditions.map((c) => c.type).join(', ')}
                 </div>
               )}
@@ -340,20 +340,20 @@ export function FeatureToggle({
       {/* Search */}
       {showSearch && (
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search flags..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/50"
+            className="w-full pl-9 pr-4 py-2 text-sm border border-input rounded-lg bg-card focus:outline-none focus:ring-2 focus:ring-primary/50"
           />
           {search && (
             <button
               onClick={() => setSearch('')}
               className="absolute right-3 top-1/2 -translate-y-1/2"
             >
-              <X className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+              <X className="w-4 h-4 text-muted-foreground hover:text-foreground" />
             </button>
           )}
         </div>
@@ -376,7 +376,7 @@ export function FeatureToggle({
                 ${
                   selectedStatus.includes(s)
                     ? 'bg-primary text-white border-primary'
-                    : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 hover:border-primary'
+                    : 'bg-card border-input hover:border-primary'
                 }
               `}
             >
@@ -387,9 +387,9 @@ export function FeatureToggle({
       )}
 
       {/* Flag list */}
-      <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-900">
+      <div className="border border-input rounded-lg overflow-hidden bg-card">
         {filteredFlags.length === 0 ? (
-          <div className="py-8 text-center text-gray-500">
+          <div className="py-8 text-center text-muted-foreground">
             No feature flags found
           </div>
         ) : (
@@ -408,7 +408,7 @@ export function FeatureToggle({
       </div>
 
       {/* Footer stats */}
-      <div className="flex items-center justify-between text-xs text-gray-500">
+      <div className="flex items-center justify-between text-xs text-muted-foreground">
         <span>
           {filteredFlags.length} of {getAllFlags().length} flags
         </span>
@@ -442,20 +442,20 @@ export function FeatureTogglePanel({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div className="bg-card rounded-xl shadow-sm border border-input overflow-hidden">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+      <div className="px-4 py-3 border-b border-border">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white">{title}</h3>
-            <p className="text-xs text-gray-500 mt-0.5">{description}</p>
+            <h3 className="font-semibold text-foreground">{title}</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
           </div>
           <div className="flex items-center gap-2">
             {showSync && (
               <button
                 onClick={handleSync}
                 disabled={syncing}
-                className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50"
+                className="p-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted disabled:opacity-50"
                 title="Sync from PostHog"
               >
                 <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin motion-reduce:animate-none' : ''}`} />
@@ -474,7 +474,7 @@ export function FeatureTogglePanel({
 
         {/* Last synced info */}
         {state.lastSyncedAt && (
-          <div className="flex items-center gap-1 text-[10px] text-gray-400 mt-2">
+          <div className="flex items-center gap-1 text-[10px] text-muted-foreground mt-2">
             <Clock className="w-3 h-3" />
             <span>
               Last synced: {new Date(state.lastSyncedAt).toLocaleTimeString()}
@@ -487,7 +487,7 @@ export function FeatureTogglePanel({
       <div className="p-4">
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
-            <RefreshCw className="w-6 h-6 animate-spin motion-reduce:animate-none text-gray-400" />
+            <RefreshCw className="w-6 h-6 animate-spin motion-reduce:animate-none text-muted-foreground" />
           </div>
         ) : (
           <FeatureToggle />

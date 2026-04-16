@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-04-16 (Review Board + Orchestration Run)
+
+### Added — Production Review Board
+
+- Launched `/review-board` with 5 persona agents testing the live app at localhost:3000
+- Sarah (SW): 9 findings — consent not persisted (critical), export button dead, no sync indicator
+- David (TM): 8 findings — Review Note wrong route (critical), reject/request-changes same status
+- Priya (Admin): 9 findings — all admin state mock/ephemeral (critical), audit log in-memory, no tenant onboarding
+- Alex (A11y): 13 findings — unlabelled search input (critical), non-keyboard toggles, missing ARIA roles
+- Dev: 10 findings — useNetworkStatus timeout no-op, triple polling, auth guard ordering
+- **50 total findings** written to `docs/production-backlog.md` (7 critical, 20 high, 22 medium, 1 low)
+
 ## 2026-04-16 (Orchestration Run — Build Fixes, Error Boundaries, A11y CI)
 
 ### Fixed — Build Blockers

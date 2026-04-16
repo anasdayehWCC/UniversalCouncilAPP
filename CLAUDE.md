@@ -75,3 +75,12 @@
 - Trigger: Running the a11y audit script (`audit:a11y`).
   Rule: The script at `universal-app/scripts/audit-a11y-ci.mjs` checks hardcoded colors, motion-reduce, and aria-labels. Files with intentional branded colors must be added to `HARDCODED_COLOR_ALLOWLIST` in the script. CI workflow at `.github/workflows/a11y.yml` runs both this and the premium UI audit.
   Verify: `node universal-app/scripts/audit-a11y-ci.mjs` exits 0; new components use semantic tokens.
+- Trigger: Review board finds admin state is all ephemeral in-memory mock data.
+  Rule: All admin hooks (`useAdmin`, `useReview`) use `useState` with `MOCK_*` seed data and no API calls. Every write mutates only local React state. A page refresh silently discards all changes. Do not ship admin features without a persistence layer.
+  Verify: Search `useAdmin.ts` and `useReview.ts` for actual API calls (`fetch`, `api-client`); if none exist, the feature is mock-only.
+- Trigger: Review queue "Review Note" button links to the wrong route.
+  Rule: `PendingReviews.tsx` line 115 links to `/my-notes/${item.id}` (worker's personal view) instead of `/review-queue/${item.id}` (manager approval view). This breaks the core manager approval flow.
+  Verify: Check that `PendingReviews.tsx` action button href uses `/review-queue/` prefix, not `/my-notes/`.
+- Trigger: Multiple components independently calling `useNetworkStatus()`.
+  Rule: `useNetworkStatus` creates its own `setInterval` per caller. Three components (ResilienceBanner, ConnectivityIndicator, record/page.tsx) each poll the backend independently. Lift network status into a shared context/provider so only one polling loop runs.
+  Verify: Grep for `useNetworkStatus()` calls; there should be exactly one (in a provider), not per-component.

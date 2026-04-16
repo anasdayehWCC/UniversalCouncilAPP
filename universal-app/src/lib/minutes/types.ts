@@ -219,9 +219,9 @@ export const MINUTE_STATUS_CONFIG: Record<MinuteStatus, {
   },
   published: {
     label: 'Published',
-    color: 'text-slate-700',
-    bgColor: 'bg-slate-100',
-    borderColor: 'border-slate-200',
+    color: 'text-foreground',
+    bgColor: 'bg-muted',
+    borderColor: 'border-border',
     icon: 'Globe'
   }
 };
@@ -237,9 +237,9 @@ export const ACTION_PRIORITY_CONFIG: Record<ActionPriority, {
 }> = {
   low: {
     label: 'Low',
-    color: 'text-slate-600',
-    bgColor: 'bg-slate-50',
-    borderColor: 'border-slate-200'
+    color: 'text-muted-foreground',
+    bgColor: 'bg-muted',
+    borderColor: 'border-border'
   },
   medium: {
     label: 'Medium',
@@ -271,8 +271,8 @@ export const ACTION_STATUS_CONFIG: Record<ActionStatus, {
 }> = {
   pending: {
     label: 'Pending',
-    color: 'text-slate-600',
-    bgColor: 'bg-slate-100'
+    color: 'text-muted-foreground',
+    bgColor: 'bg-muted'
   },
   in_progress: {
     label: 'In Progress',
@@ -286,7 +286,7 @@ export const ACTION_STATUS_CONFIG: Record<ActionStatus, {
   },
   cancelled: {
     label: 'Cancelled',
-    color: 'text-slate-400',
-    bgColor: 'bg-slate-50'
+    color: 'text-muted-foreground',
+    bgColor: 'bg-muted/50'
   }
 };

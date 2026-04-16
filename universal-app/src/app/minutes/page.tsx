@@ -155,7 +155,7 @@ export default function MinutesListPage() {
             { label: 'Total Minutes', count: statusCounts.all, icon: FileText, color: 'text-muted-foreground' },
             { label: 'Drafts', count: statusCounts.drafts, icon: Clock, color: 'text-warning' },
             { label: 'Pending Review', count: statusCounts.pending, icon: AlertTriangle, color: 'text-info' },
-            { label: 'Completed', count: statusCounts.completed, icon: CheckSquare, color: 'text-emerald-600' }
+            { label: 'Completed', count: statusCounts.completed, icon: CheckSquare, color: 'text-success' }
           ].map((stat) => (
             <Card key={stat.label} variant="glass" className="p-4">
               <div className="flex items-center gap-3">

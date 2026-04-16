@@ -33,6 +33,8 @@ export interface Meeting {
   lastAction?: 'approved' | 'returned';
   lastActionAt?: string;
   lastActionBy?: string;
+  consentGiven?: boolean;
+  consentTimestamp?: string;
 }
 
 export interface Template {

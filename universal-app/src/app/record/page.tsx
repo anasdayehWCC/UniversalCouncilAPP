@@ -21,6 +21,8 @@ import {
   WifiOff,
   Clock,
   Upload,
+  HardDrive,
+  CloudUpload,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -77,10 +79,10 @@ function ConsentScreen({
         </div>
 
         <div className="bg-muted/50 p-4 rounded-xl text-left border border-muted">
-          <label className="flex items-start gap-3 cursor-pointer">
+          <label className="flex items-start gap-3 cursor-pointer min-h-[44px] py-2">
             <input
               type="checkbox"
-              className="mt-1 w-4 h-4 text-primary rounded-sm border-muted-foreground focus:ring-primary"
+              className="mt-0.5 w-5 h-5 shrink-0 text-primary rounded-sm border-muted-foreground focus:ring-primary"
               checked={consentGiven}
               onChange={(e) => setConsentGiven(e.target.checked)}
             />
@@ -182,12 +184,22 @@ function RecordingCompleteScreen({
 // Main Recording Page
 // ============================================================================
 
+const ALLOWED_ROLES: Array<'social_worker' | 'housing_officer'> = ['social_worker', 'housing_officer'];
+
 export default function RecordPage() {
-  useRoleGuard(['social_worker', 'housing_officer']);
+  useRoleGuard(ALLOWED_ROLES);
 
   const router = useRouter();
-  const { currentUser, addMeeting } = useDemo();
+  const { currentUser, addMeeting, role } = useDemo();
   const { state: networkState } = useNetworkStatus();
+
+  // Authorization gate: block ALL rendering until role is confirmed.
+  // useRoleGuard redirects via useEffect, but that fires AFTER first render.
+  // Without this early return, unauthorized users briefly see the consent screen.
+  const isAuthorized = ALLOWED_ROLES.includes(role);
+  if (!isAuthorized) {
+    return null;
+  }
 
   // Consent state
   const [showConsent, setShowConsent] = useState(() => {
@@ -211,12 +223,18 @@ export default function RecordPage() {
   const [isComplete, setIsComplete] = useState(false);
   const [completedMeetingId, setCompletedMeetingId] = useState<string | null>(null);
 
+  // Save status indicator: tracks post-recording save/upload state
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'uploaded'>('idle');
+
   // Recorder hook
   const recorder = useRecorder({
     quality,
     autoSave: true,
     caseMetadata: caseMetadata as CaseMetadata,
     onComplete: (recording) => {
+      // Show "saved to device" immediately
+      setSaveStatus('saving');
+
       // Create meeting record
       const now = new Date().toISOString();
       const meeting: Meeting = {
@@ -248,7 +266,16 @@ export default function RecordPage() {
 
       addMeeting(meeting);
       setCompletedMeetingId(meeting.id);
-      setIsComplete(true);
+
+      // Transition through save statuses before showing complete screen
+      setSaveStatus('saved');
+      setTimeout(() => {
+        setSaveStatus('uploaded');
+        setTimeout(() => {
+          setIsComplete(true);
+          setSaveStatus('idle');
+        }, 1200);
+      }, 1500);
     },
     onError: (error) => {
       console.error('Recording error:', error);
@@ -278,6 +305,7 @@ export default function RecordPage() {
   const handleNewRecording = useCallback(() => {
     setIsComplete(false);
     setCompletedMeetingId(null);
+    setSaveStatus('idle');
     setCaseMetadata({
       serviceDomain: currentUser.domain,
       recorderName: currentUser.name,
@@ -423,6 +451,37 @@ export default function RecordPage() {
               disabled={recorder.permission.state === 'denied'}
             />
           </div>
+
+          {/* Save/Upload Status Indicator */}
+          <AnimatePresence>
+            {saveStatus !== 'idle' && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="flex items-center justify-center gap-2 text-sm font-medium"
+              >
+                {saveStatus === 'saving' && (
+                  <span className="flex items-center gap-2 text-muted-foreground">
+                    <HardDrive className="w-4 h-4 animate-pulse motion-reduce:animate-none" />
+                    Saving recording...
+                  </span>
+                )}
+                {saveStatus === 'saved' && (
+                  <span className="flex items-center gap-2 text-success">
+                    <HardDrive className="w-4 h-4" />
+                    Recording saved to device
+                  </span>
+                )}
+                {saveStatus === 'uploaded' && (
+                  <span className="flex items-center gap-2 text-success">
+                    <CloudUpload className="w-4 h-4" />
+                    Uploaded
+                  </span>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Settings (only when not recording) */}

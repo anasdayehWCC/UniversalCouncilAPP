@@ -17,7 +17,7 @@ import { useState, useEffect, useRef, useSyncExternalStore } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Wifi, WifiOff, AlertTriangle, RefreshCw, X, Clock, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useNetworkStatus, type ConnectionState } from '@/hooks/useNetworkStatus';
+import { useNetworkStatus, type ConnectionState } from '@/providers/NetworkStatusProvider';
 import { useSyncManager } from '@/hooks/useSyncManager';
 import { useAuth } from '@/hooks/useAuth';
 import { ZINDEX_CLASSES } from '@/lib/z-index';

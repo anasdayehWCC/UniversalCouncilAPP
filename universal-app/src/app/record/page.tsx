@@ -27,7 +27,7 @@ import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { useDemo } from '@/context/DemoContext';
 import { useRoleGuard } from '@/hooks/useRoleGuard';
-import { useNetworkStatus } from '@/hooks/useNetworkStatus';
+import { useNetworkStatus } from '@/providers/NetworkStatusProvider';
 import { useRecorder, QUALITY_PRESETS } from '@/hooks/useRecorder';
 import type { AudioQuality, CaseMetadata } from '@/lib/audio/types';
 import type { Meeting } from '@/types/demo';

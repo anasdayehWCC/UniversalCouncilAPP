@@ -144,28 +144,26 @@ export function useNetworkStatus(options?: {
       abortControllerRef.current.abort();
     }
 
-    abortControllerRef.current = new AbortController();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
     setIsChecking(true);
 
     const startTime = performance.now();
 
+    // Abort the fetch after PING_TIMEOUT ms so slow backends don't hang forever
+    const timeoutId = setTimeout(() => controller.abort(), PING_TIMEOUT);
+
     try {
       const response = await fetch(healthEndpoint, {
         method: 'GET',
-        signal: abortControllerRef.current.signal,
+        signal: controller.signal,
         cache: 'no-store',
         headers: {
           Accept: 'application/json',
         },
       });
 
-      // Create timeout promise
-      const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error('Request timeout')), PING_TIMEOUT);
-      });
-
-      // Race against timeout
-      await Promise.race([response, timeoutPromise]);
+      clearTimeout(timeoutId);
 
       if (response.ok) {
         const endTime = performance.now();
@@ -178,8 +176,21 @@ export function useNetworkStatus(options?: {
         throw new Error(`Health check failed: ${response.status}`);
       }
     } catch (err) {
+      clearTimeout(timeoutId);
+
       if (err instanceof Error && err.name === 'AbortError') {
-        // Request was cancelled, don't update state
+        // A newer checkBackendHealth call replaced our controller — this is a
+        // manual cancellation, not a timeout. Skip state updates.
+        if (abortControllerRef.current !== controller) {
+          return;
+        }
+        // Our controller is still current — this was a timeout abort
+        failureCountRef.current++;
+        if (failureCountRef.current >= FAILURES_BEFORE_DEGRADED) {
+          setIsBackendReachable(false);
+          setErrorMessage('Request timeout');
+          setLatencyMs(null);
+        }
         return;
       }
 

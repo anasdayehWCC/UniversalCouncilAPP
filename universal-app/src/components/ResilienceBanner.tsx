@@ -14,7 +14,7 @@ import { useState, useEffect, useCallback, useRef, useSyncExternalStore } from '
 import { motion, AnimatePresence } from 'framer-motion';
 import { WifiOff, CloudOff, RefreshCw, AlertTriangle, CheckCircle, X, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useNetworkStatus, type ConnectionState } from '@/hooks/useNetworkStatus';
+import { useNetworkStatus, type ConnectionState } from '@/providers/NetworkStatusProvider';
 import { useSyncManager } from '@/hooks/useSyncManager';
 import { useAuth } from '@/hooks/useAuth';
 

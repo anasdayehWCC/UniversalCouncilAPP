@@ -1,5 +1,120 @@
 # Changelog
 
+## 2026-04-16 (Orchestration Run — Build Fixes, Error Boundaries, A11y CI)
+
+### Fixed — Build Blockers
+
+- Added missing `@radix-ui/react-dialog` dependency to `universal-app/package.json` (imported by `dialog.tsx` but not listed)
+- Made `InspectorPanel` `children` prop optional in `PageHeader.tsx` (was required but `AIEditSidebar` passed none)
+- Fixed `.claude/settings.json` hook paths from relative to absolute (hooks failed when CWD was `universal-app/` subdirectory)
+
+### Added — Route Error Boundaries (Phase 24A)
+
+- Created `error.tsx` for: `insights`, `my-notes/[id]`, `review-queue`, `review-queue/[id]`
+- Fixed existing `error.tsx` in: `admin` (hardcoded amber → semantic warning tokens), `record` (added offline queue messaging), `minutes/[id]` (added error digest display)
+- All boundaries: client component, contextual messaging, try-again + fallback nav, `console.error` for Sentry pickup, semantic theme tokens, accessible icons
+- Detail routes (`[id]`) detect 404s for friendlier "not found" messaging
+
+### Added — Accessibility CI Gate (Phase 17B)
+
+- `universal-app/scripts/audit-a11y-ci.mjs` — enforces 3 WCAG rules: no hardcoded Tailwind colors, motion-reduce on animations, aria-label on icon buttons
+- `.github/workflows/a11y.yml` — runs on push to main and PRs touching `universal-app/src/`
+- `package.json` script: `audit:a11y` for local/CI execution
+- Initial run found 153 pre-existing violations across 33 files (tracked for future cleanup)
+
+### Research — Architecture & Gap Analysis
+
+- Dispatched 2 research agents: comprehensive architecture exploration and foundations gap analysis
+- Key gaps identified: tenant config validation not enforced, module registry unused by nav, testing infra disabled in CI
+- Phase 15A/15B doc agents crashed (socket errors) — architecture doc deferred to next run
+
+### Orchestrator Infrastructure
+
+- First successful `/orchestrate` run: assessed 41 roadmap phases, dispatched 4 parallel agents in worktrees
+- 2/4 agents succeeded, 2/4 crashed from transient socket errors
+- Created integration branch `feature/orchestrate-2026-04-16`
+
+## 2026-04-16 (Development Automation Infrastructure)
+
+### Added — Orchestrator Skill (`/orchestrate`)
+- Created `.claude/skills/orchestrate/SKILL.md` — autonomous development driver that reads the roadmap, identifies independent parallelizable work items, dispatches sub-agents in isolated git worktrees, reviews/critiques output, merges branches, updates docs, and creates PRs (never direct commits to main)
+- 8-phase workflow: Assess → Identify → Plan → Dispatch → Review → Integrate → Document → PR
+- Safety rails: max 5 sub-agents per run, mandatory review before merge, scope boundaries per agent, independence verification (no agent depends on another's output)
+
+### Added — Supporting Skills
+- `.claude/skills/roadmap-status/SKILL.md` — quick status checker: scans ROADMAP, CHANGELOG, and git history to produce a done/partial/remaining table with recommended next batch
+- `.claude/skills/dev-frontend/SKILL.md` — context loader for frontend sub-agents: theme tokens, a11y rules, layout system, z-index scale, hydration safety, testing commands
+- `.claude/skills/dev-backend/SKILL.md` — context loader for backend sub-agents: FastAPI patterns, config system, queue/storage abstraction, migration workflow, worker architecture
+- `.claude/skills/audit-quality/SKILL.md` — comprehensive quality audit: theme tokens, motion-reduce, aria-labels, z-index, hydration safety, premium UI audit, build/lint checks
+
+### Added — Project Hooks (`.claude/settings.json`)
+- **PreToolUse (Edit/Write)**: blocks edits to `.env.local`, `.env.production`, lock files, and generated API client code
+- **PostToolUse (Edit/Write)**: warns about hardcoded Tailwind colors in components/routes; checks for missing `motion-reduce:animate-none` and `aria-label` on icon buttons
+- Hook scripts in `.claude/hooks/`: `block-sensitive-files.py`, `check-theme-tokens.py`, `check-a11y.py`
+
+### Added — Adversarial Review Board (`/review-board`)
+- Created `.claude/skills/review-board/SKILL.md` — dispatches 5 persona-based adversarial agents that test the running app via Chrome DevTools MCP, report findings with confidence scores (0-100), cross-validate medium-confidence findings, and write a prioritized backlog
+- 5 personas: Sarah (social worker), David (team manager), Priya (digital admin), Dev (senior developer), Alex (a11y auditor)
+- Confidence filtering: findings below 70 are discarded; findings 70-85 are cross-validated by a separate agent
+- Output: structured backlog in `docs/production-backlog.md` consumed by the orchestrator
+
+### Added — Persona Agent Definitions (`.claude/agents/`)
+- `social-worker-reviewer.md` — tests capture, recording, note editing, export flows
+- `team-manager-reviewer.md` — tests review queue, approvals, dashboard, team visibility
+- `digital-admin-reviewer.md` — tests admin console, config, modules, audit logs
+- `developer-reviewer.md` — checks console errors, network failures, hydration, performance
+- `a11y-auditor.md` — tests WCAG 2.2 AA: keyboard nav, contrast, focus, tap targets
+
+### Added — Task Discovery Protocol
+- Orchestrator sub-agents now report "Discovered Tasks" outside their scope using structured format
+- Orchestrator Phase 7c collects discoveries and appends to `docs/production-backlog.md`
+- Orchestrator Phase 1 reads backlog and incorporates critical/high items into work selection
+
+### Added — Production Backlog (`docs/production-backlog.md`)
+- Shared backlog file written by review board and orchestrator, read by orchestrator during ASSESS
+- Structured format with category, severity, confidence, and status columns
+
+### Added — Project Permissions
+- Pre-approved bash commands for lint, test, build, audit, git, and gh operations in `.claude/settings.json`
+
+## 2026-04-02 (Demo Session Hydration & Guard Regression Fix)
+
+### Fixed
+- Added `isSessionHydrated` to the real demo session provider so persisted persona, auth, feature flags, and persona history are restored together before client-only redirects run.
+- Reconciled persisted persona IDs against `/api/demos/personas` results so refreshed manager/admin sessions keep the correct role even after the API-backed persona map replaces local seed data.
+- Updated `useRoleGuard` to wait for hydrated session state and return readiness/authorization metadata, then gated `/admin`, `/review-queue`, `/review-queue/[id]`, `/insights`, `/insights/dashboard`, and `/record` rendering on that contract to stop wrong-role flashes and bad redirects.
+- Switched the app shell login redirect to wait for hydrated session state before redirecting unauthenticated users, preventing persisted demo sessions from being bounced to `/login` on refresh or deep link.
+
+### Added
+- Added focused Vitest regressions for `DemoProvider` hydration, `useRoleGuard` redirect timing, and `AppShell` session redirect timing.
+- Added Playwright regressions covering manager/admin protected-route refresh persistence and unauthenticated protected-route redirect behavior.
+
+## 2026-04-01 (Phase 2 Premium UX Hardening — Complete)
+
+### Fixed
+- **z-index**: `SortableList` drag ghost `z-[9999]` → `z-[100]` (audit: 0 violations now)
+- **Audit close-out**: `insights/page.tsx` `text-slate-900` → `text-neutral-900`
+- **Native dialogs (alert)**: Replaced `alert()` with `useToast` `info()` in `admin/page.tsx` and `MeetingCard.tsx`
+- **Native dialogs (confirm) — 9 files**: Replaced all `confirm()`/`window.confirm()` with `useConfirmDialog` hook + `ConfirmDialogRenderer` (Radix AlertDialog) in: `admin/modules`, `admin/templates`, `admin/modules/ModuleToggle`, `admin/UserTable`, `notifications/NotificationCenter`, `recording/RecordingList`, `admin/MainConfigArea`, `sharepoint/SharePointBrowser`, `workflow/WorkflowActions`
+- **Semantic tokens — 6 files**: Converted all `amber-*` warning states to `warning/*` semantic tokens in: `admin/templates` (DOMAIN_COLORS), `admin/ModuleToggle` (CATEGORY_CONFIG), `minutes/[id]/components/MinuteInfoSidebar`, `minutes/[id]/page`, `record/RecordingTimer`, `record/DeviceSelector`, `record/RecordingMetadata`
+- **ARIA a11y**: Added `role="tablist"`, `role="tab"`, `aria-selected`, `role="tabpanel"` to custom tab buttons in `my-notes/[id]/page.tsx`
+- **ARIA a11y**: Added `aria-pressed` to filter `<Button>` components in `review-queue/page.tsx`
+
+### Added
+- `src/hooks/useConfirmDialog.ts` — Promise-based confirm hook backed by Radix AlertDialog; supports `title`, `description`, `confirmLabel`, `cancelLabel`, `variant` (`default`|`destructive`)
+- `src/components/ui/ConfirmDialogRenderer.tsx` — Stateless render companion for `useConfirmDialog`
+
+## 2026-03-29 (Universal App Premium UX Stabilization)
+
+### Fixed
+- Moved the premium shell toward a single authored layout contract by expanding `ShellPage`, docking overlays through `AppShell`, and converting the AI assistant from a fixed right rail into a shell-managed inspector surface.
+- Rebuilt the high-friction `/templates`, `/record`, `/review-queue`, `/insights`, `/my-notes/[id]`, `/`, and `/login` routes onto the shared page-header and surface grammar so they stop composing bespoke heroes, hover-only previews, sticky headers, and margin hacks.
+- Replaced browser-native confirmation flows in the review and record journeys with product-grade dialogs, and aligned the resilience banner/indicator behavior with the shell-owned overlay model.
+- Added `universal-app/scripts/audit-premium-ui.mjs` plus `pnpm --filter universal-app audit:premium-ui` to block regressions such as browser-native `alert/confirm`, arbitrary z-index utilities, fixed right rails, and raw gray/slate/red/amber/emerald utilities across the stabilized premium routes.
+
+### Validation
+- `pnpm --filter universal-app exec eslint src/components/layout/ShellPage.tsx src/components/layout/AppShell.tsx src/components/ResilienceBanner.tsx src/components/ConnectivityIndicator.tsx src/components/AIEditSidebar.tsx src/components/templates/TemplateSelector.tsx src/app/templates/page.tsx src/app/review-queue/page.tsx src/app/record/page.tsx 'src/app/my-notes/[id]/page.tsx' src/app/insights/page.tsx src/app/page.tsx src/app/login/page.tsx`
+
 ## 2026-03-28 (Massive Theme Token Migration - Subagent-Driven Development)
 
 ### Fixed - Motion-Reduce Accessibility (28 instances total)

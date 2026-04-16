@@ -48,3 +48,30 @@
 - Trigger: Sidebar instability (profile section falls below visible area).
   Rule: The shell should own the viewport with `h-[100dvh]` and `min-h-0` children, the header should use `--shell-header-height`, and banners should dock below the header safe area instead of covering it.
   Verify: AppShell keeps the sidebar and main content inside one `100dvh` contract; route content scrolls internally; the resilience banner never overlaps the header.
+
+# Automation Infrastructure
+
+- Trigger: Starting a development session or wanting to advance the project.
+  Rule: Use `/orchestrate` to launch the development orchestrator. It reads the roadmap, identifies independent work, dispatches parallel sub-agents in worktrees, reviews output, and creates PRs. Use `/roadmap-status` for a quick check of what's done vs remaining.
+  Verify: Orchestrator creates feature branches (never commits to main), dispatches max 5 sub-agents, and produces a PR with CHANGELOG updates.
+- Trigger: Sub-agents working on frontend code in universal-app.
+  Rule: The `dev-frontend` skill is auto-loaded as context. Sub-agents must follow theme token rules, accessibility patterns, z-index scale, and hydration safety patterns documented in that skill.
+  Verify: Sub-agent output passes `pnpm --filter universal-app audit:premium-ui` and `pnpm --filter universal-app lint`.
+- Trigger: Editing .tsx/.ts files in universal-app components or routes.
+  Rule: PostToolUse hooks automatically check for hardcoded color tokens and accessibility issues (missing motion-reduce, missing aria-labels). PreToolUse hooks block edits to .env files, lock files, and generated API client code.
+  Verify: Hooks are defined in `.claude/settings.json`; scripts are in `.claude/hooks/`.
+- Trigger: Wanting to find gaps, UX issues, or missing features from a stakeholder perspective.
+  Rule: Use `/review-board` to launch 5 adversarial persona agents (social worker, manager, admin, developer, a11y auditor) that test the running app via Chrome DevTools, report findings with confidence scores, and write a prioritized backlog to `docs/production-backlog.md`. The orchestrator reads this backlog during its ASSESS phase.
+  Verify: Dev server is running at localhost:3000 before dispatch; findings below 70 confidence are filtered; backlog file is appended not overwritten.
+- Trigger: Sub-agent discovers a task outside its assigned scope during orchestration.
+  Rule: Report it in the "Discovered Tasks" section of the agent report using the format: `DISCOVERED: [category] [severity] / Description / Location / Suggested action`. The orchestrator collects these and appends them to `docs/production-backlog.md`.
+  Verify: Sub-agent briefs include the discovered tasks protocol; orchestrator Phase 7c writes discoveries to backlog.
+- Trigger: Hook commands in `.claude/settings.json` fail with "no such file or directory".
+  Rule: Always use absolute paths for hook commands (e.g., `python3 /absolute/path/.claude/hooks/script.py`), not relative paths. Hooks execute relative to CWD, which may be a subdirectory when agents or the user work inside `universal-app/`.
+  Verify: All `command` fields in `.claude/settings.json` hooks use absolute paths or `$PROJECT_ROOT`-relative expansion.
+- Trigger: Creating route-level error boundaries in Next.js 16 App Router.
+  Rule: Detail routes (`/[id]/error.tsx`) should detect 404 patterns in the error message and show friendlier "not found" messaging with a link back to the parent list route, not just home.
+  Verify: Detail-route error boundaries check `error.message` for 404/not-found and render contextual "Back to [list]" links.
+- Trigger: Running the a11y audit script (`audit:a11y`).
+  Rule: The script at `universal-app/scripts/audit-a11y-ci.mjs` checks hardcoded colors, motion-reduce, and aria-labels. Files with intentional branded colors must be added to `HARDCODED_COLOR_ALLOWLIST` in the script. CI workflow at `.github/workflows/a11y.yml` runs both this and the premium UI audit.
+  Verify: `node universal-app/scripts/audit-a11y-ci.mjs` exits 0; new components use semantic tokens.

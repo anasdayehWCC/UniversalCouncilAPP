@@ -306,6 +306,8 @@ export function meetingStatusToReviewStatus(status: MeetingStatus): ReviewStatus
       return 'changes_requested';
     case 'approved':
       return 'approved';
+    case 'rejected':
+      return 'rejected';
     case 'draft':
     default:
       return 'pending';

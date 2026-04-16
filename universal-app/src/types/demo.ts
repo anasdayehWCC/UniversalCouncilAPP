@@ -1,6 +1,6 @@
 import { ServiceDomain, UserRole } from '@/config/domains';
 
-export type MeetingStatus = 'draft' | 'processing' | 'ready' | 'approved' | 'flagged';
+export type MeetingStatus = 'draft' | 'processing' | 'ready' | 'approved' | 'flagged' | 'rejected';
 export type ProcessingMode = 'fast' | 'economy';
 
 export interface Task {

@@ -30,6 +30,7 @@ export function MeetingCard({ meeting, compact = false }: MeetingCardProps) {
     ready: 'bg-success/10 text-success border-success/30',
     approved: 'bg-muted text-muted-foreground border-input',
     flagged: 'bg-destructive/10 text-destructive border-destructive/30',
+    rejected: 'bg-destructive/10 text-destructive border-destructive/30',
   };
 
   const statusLabels = {
@@ -38,6 +39,7 @@ export function MeetingCard({ meeting, compact = false }: MeetingCardProps) {
     ready: 'Ready for Review',
     approved: 'Approved',
     flagged: 'Changes Requested',
+    rejected: 'Rejected',
   };
   const riskColors = {
     low: 'bg-success/10 text-success border-success/30',

@@ -9,7 +9,7 @@
  * @module app/record
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -17,19 +17,22 @@ import {
   ArrowLeft,
   CheckCircle2,
   AlertTriangle,
+  Wifi,
+  WifiOff,
   Clock,
   Upload,
+  HardDrive,
+  CloudUpload,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import { useDemo } from '@/context/DemoContext';
 import { useRoleGuard } from '@/hooks/useRoleGuard';
-import { useNetworkStatus } from '@/providers/NetworkStatusProvider';
+import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { useRecorder, QUALITY_PRESETS } from '@/hooks/useRecorder';
 import type { AudioQuality, CaseMetadata } from '@/lib/audio/types';
 import type { Meeting } from '@/types/demo';
-import { ConfirmDialog } from '@/components/ui/alert-dialog';
-import { PageHeader, ShellPage } from '@/components/layout';
 
 import {
   RecordingTimer,
@@ -51,7 +54,7 @@ function ConsentScreen({
   onAccept: () => void;
   onDecline: () => void;
 }) {
-  const [consentChecked, setConsentChecked] = useState(false);
+  const [consentGiven, setConsentGiven] = useState(false);
 
   return (
     <motion.div
@@ -60,8 +63,8 @@ function ConsentScreen({
       className="max-w-2xl mx-auto"
     >
       <Card variant="glass" className="p-8 text-center space-y-6">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-warning/18">
-          <AlertTriangle className="w-8 h-8 text-warning" />
+        <div className="w-16 h-16 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto">
+          <AlertTriangle className="w-8 h-8 text-amber-500" />
         </div>
 
         <div>
@@ -75,17 +78,14 @@ function ConsentScreen({
           </p>
         </div>
 
-        <div className="bg-muted/50 rounded-xl text-left border border-muted">
-          {/* 44px minimum touch target via min-h-[44px] and full-row tap area */}
-          <label className="flex items-center gap-3 cursor-pointer p-4 min-h-11">
-            <span className="flex items-center justify-center w-6 h-6 shrink-0">
-              <input
-                type="checkbox"
-                className="w-5 h-5 text-primary rounded-sm border-muted-foreground focus:ring-primary"
-                checked={consentChecked}
-                onChange={(e) => setConsentChecked(e.target.checked)}
-              />
-            </span>
+        <div className="bg-muted/50 p-4 rounded-xl text-left border border-muted">
+          <label className="flex items-start gap-3 cursor-pointer min-h-[44px] py-2">
+            <input
+              type="checkbox"
+              className="mt-0.5 w-5 h-5 shrink-0 text-primary rounded-sm border-muted-foreground focus:ring-primary"
+              checked={consentGiven}
+              onChange={(e) => setConsentGiven(e.target.checked)}
+            />
             <span className="text-sm text-muted-foreground">
               I confirm that I have obtained permission from all attendees to
               record this session. I understand this recording will be processed
@@ -99,10 +99,15 @@ function ConsentScreen({
             Cancel
           </Button>
           <Button
-            disabled={!consentChecked}
-            onClick={onAccept}
+            disabled={!consentGiven}
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                window.localStorage.setItem('recordingConsentGiven', 'true');
+              }
+              onAccept();
+            }}
           >
-            I Confirm, Start Session
+            I Understand, Continue
           </Button>
         </div>
       </Card>
@@ -179,16 +184,30 @@ function RecordingCompleteScreen({
 // Main Recording Page
 // ============================================================================
 
+const ALLOWED_ROLES: Array<'social_worker' | 'housing_officer'> = ['social_worker', 'housing_officer'];
+
 export default function RecordPage() {
-  const { isReady, isAuthorized } = useRoleGuard(['social_worker', 'housing_officer']);
+  useRoleGuard(ALLOWED_ROLES);
 
   const router = useRouter();
-  const { currentUser, addMeeting } = useDemo();
+  const { currentUser, addMeeting, role } = useDemo();
   const { state: networkState } = useNetworkStatus();
 
-  // Consent state — per-session, never persisted to localStorage
-  const [showConsent, setShowConsent] = useState(true);
-  const [consentTimestamp, setConsentTimestamp] = useState<string | null>(null);
+  // Authorization gate: block ALL rendering until role is confirmed.
+  // useRoleGuard redirects via useEffect, but that fires AFTER first render.
+  // Without this early return, unauthorized users briefly see the consent screen.
+  const isAuthorized = ALLOWED_ROLES.includes(role);
+  if (!isAuthorized) {
+    return null;
+  }
+
+  // Consent state
+  const [showConsent, setShowConsent] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.localStorage.getItem('recordingConsentGiven') !== 'true';
+    }
+    return true;
+  });
 
   // Quality settings
   const [quality, setQuality] = useState<AudioQuality>('high');
@@ -203,7 +222,9 @@ export default function RecordPage() {
   // Recording completion
   const [isComplete, setIsComplete] = useState(false);
   const [completedMeetingId, setCompletedMeetingId] = useState<string | null>(null);
-  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+
+  // Save status indicator: tracks post-recording save/upload state
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'uploaded'>('idle');
 
   // Recorder hook
   const recorder = useRecorder({
@@ -211,10 +232,13 @@ export default function RecordPage() {
     autoSave: true,
     caseMetadata: caseMetadata as CaseMetadata,
     onComplete: (recording) => {
+      // Show "saved to device" immediately
+      setSaveStatus('saving');
+
       // Create meeting record
       const now = new Date().toISOString();
       const meeting: Meeting = {
-        id: recording.id,
+        id: `r-${Date.now().toString(36)}`,
         title: caseMetadata.caseReference
           ? `Recording - ${caseMetadata.caseReference}`
           : 'New Recording',
@@ -238,13 +262,20 @@ export default function RecordPage() {
         submittedById: currentUser.id,
         submittedBy: currentUser.name,
         submittedAt: now,
-        consentGiven: true,
-        consentTimestamp: consentTimestamp ?? now,
       };
 
       addMeeting(meeting);
       setCompletedMeetingId(meeting.id);
-      setIsComplete(true);
+
+      // Transition through save statuses before showing complete screen
+      setSaveStatus('saved');
+      setTimeout(() => {
+        setSaveStatus('uploaded');
+        setTimeout(() => {
+          setIsComplete(true);
+          setSaveStatus('idle');
+        }, 1200);
+      }, 1500);
     },
     onError: (error) => {
       console.error('Recording error:', error);
@@ -264,27 +295,17 @@ export default function RecordPage() {
   // Handle start recording
   const handleStart = useCallback(async () => {
     try {
-      setCaseMetadata((prev) => {
-        if (prev.recordedAt) {
-          return prev;
-        }
-        return {
-          ...prev,
-          recordedAt: new Date(),
-        };
-      });
       await recorder.start();
     } catch (error) {
       console.error('Failed to start recording:', error);
     }
   }, [recorder]);
 
-  // Handle new recording — reset consent so it is required per-session
+  // Handle new recording
   const handleNewRecording = useCallback(() => {
     setIsComplete(false);
     setCompletedMeetingId(null);
-    setShowConsent(true);
-    setConsentTimestamp(null);
+    setSaveStatus('idle');
     setCaseMetadata({
       serviceDomain: currentUser.domain,
       recorderName: currentUser.name,
@@ -292,98 +313,112 @@ export default function RecordPage() {
     });
   }, [currentUser]);
 
+  // Update case metadata timestamp when recording starts
+  useEffect(() => {
+    if (recorder.state === 'recording' && !caseMetadata.recordedAt) {
+      setCaseMetadata((prev) => ({
+        ...prev,
+        recordedAt: new Date(),
+      }));
+    }
+  }, [recorder.state, caseMetadata.recordedAt]);
+
   // Show consent screen
   if (showConsent) {
     return (
-      <ShellPage
-        className="animate-in fade-in duration-300"
-        padded={false}
-        contentClassName="flex h-full items-center justify-center p-4"
-      >
+      <div className="min-h-[80vh] flex items-center justify-center p-4">
         <ConsentScreen
-          onAccept={() => {
-            setConsentTimestamp(new Date().toISOString());
-            setShowConsent(false);
-          }}
+          onAccept={() => setShowConsent(false)}
           onDecline={() => router.push('/')}
         />
-      </ShellPage>
+      </div>
     );
   }
 
   // Show completion screen
   if (isComplete) {
     return (
-      <ShellPage
-        className="animate-in fade-in duration-300"
-        padded={false}
-        contentClassName="flex h-full items-center justify-center p-4"
-      >
+      <div className="min-h-[80vh] flex items-center justify-center p-4">
         <RecordingCompleteScreen
           duration={recorder.formattedDuration}
           meetingId={completedMeetingId}
           onNewRecording={handleNewRecording}
         />
-      </ShellPage>
+      </div>
     );
   }
 
   const isRecordingActive = recorder.state === 'recording' || recorder.state === 'paused';
   const isPaused = recorder.state === 'paused';
-  const networkTone =
-    networkState === 'online'
-      ? 'success'
-      : networkState === 'offline'
-      ? 'destructive'
-      : 'warning';
-  const networkLabel =
-    networkState === 'online'
-      ? 'Online'
-      : networkState === 'offline'
-      ? 'Offline'
-      : 'Degraded';
-  const handleNavigateBack = () => {
-    if (isRecordingActive) {
-      setShowLeaveDialog(true);
-      return;
-    }
-    router.push('/');
-  };
-
-  if (!isReady || !isAuthorized) {
-    return null;
-  }
 
   return (
-    <ShellPage
-      padded={false}
-      header={
-        <PageHeader
-          eyebrow="Capture"
-          title="Record Meeting"
-          description={`${currentUser.name} • ${currentUser.domain}`}
-          metrics={[
-            { label: 'Connection', value: networkLabel, tone: networkTone },
-            { label: 'Quality', value: QUALITY_PRESETS[quality].label, tone: 'info' },
-          ]}
-          actions={
-            <Button
-              variant="outline"
-              className="gap-2"
-              aria-label="Go back"
-              onClick={handleNavigateBack}
+    <div className="min-h-0 pb-20">
+      {/* Header */}
+      <header className="sticky top-0 z-40 backdrop-blur-xl bg-background/80 border-b border-border/50">
+        <div className="max-w-4xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Go back"
+                onClick={() => {
+                  if (isRecordingActive) {
+                    if (confirm('Are you sure you want to leave? Recording will be cancelled.')) {
+                      recorder.cancel();
+                      router.push('/');
+                    }
+                  } else {
+                    router.push('/');
+                  }
+                }}
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+              <div>
+                <h1 className="text-lg font-semibold">Record Meeting</h1>
+                <p className="text-sm text-muted-foreground">
+                  {currentUser.name} • {currentUser.domain}
+                </p>
+              </div>
+            </div>
+
+            {/* Network Status */}
+            <div
+              className={cn(
+                'flex items-center gap-2 px-3 py-1.5 rounded-full text-sm',
+                networkState === 'online'
+                  ? 'bg-success/10 text-success'
+                  : networkState === 'offline'
+                  ? 'bg-destructive/10 text-destructive'
+                  : 'bg-warning/10 text-warning'
+              )}
             >
-              <ArrowLeft className="w-4 h-4" />
-              Back
-            </Button>
-          }
-        />
-      }
-      contentClassName="space-y-8"
-    >
-      <div className="mx-auto max-w-4xl space-y-8 pb-16">
+              {networkState === 'online' ? (
+                <>
+                  <Wifi className="w-4 h-4" />
+                  <span>Online</span>
+                </>
+              ) : networkState === 'offline' ? (
+                <>
+                  <WifiOff className="w-4 h-4" />
+                  <span>Offline</span>
+                </>
+              ) : (
+                <>
+                  <Wifi className="w-4 h-4" />
+                  <span>Degraded</span>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-4xl mx-auto px-4 py-8 space-y-8">
         {/* Recording Interface */}
-        <Card variant="glass" className="space-y-8 p-6 sm:p-8" hoverEffect={false}>
+        <div className="space-y-6">
           {/* Timer */}
           <div className="flex justify-center">
             <RecordingTimer
@@ -416,7 +451,38 @@ export default function RecordPage() {
               disabled={recorder.permission.state === 'denied'}
             />
           </div>
-        </Card>
+
+          {/* Save/Upload Status Indicator */}
+          <AnimatePresence>
+            {saveStatus !== 'idle' && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="flex items-center justify-center gap-2 text-sm font-medium"
+              >
+                {saveStatus === 'saving' && (
+                  <span className="flex items-center gap-2 text-muted-foreground">
+                    <HardDrive className="w-4 h-4 animate-pulse motion-reduce:animate-none" />
+                    Saving recording...
+                  </span>
+                )}
+                {saveStatus === 'saved' && (
+                  <span className="flex items-center gap-2 text-success">
+                    <HardDrive className="w-4 h-4" />
+                    Recording saved to device
+                  </span>
+                )}
+                {saveStatus === 'uploaded' && (
+                  <span className="flex items-center gap-2 text-success">
+                    <CloudUpload className="w-4 h-4" />
+                    Uploaded
+                  </span>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
         {/* Settings (only when not recording) */}
         <AnimatePresence>
@@ -513,11 +579,11 @@ export default function RecordPage() {
 
         {/* Offline Notice */}
         {networkState === 'offline' && !isRecordingActive && (
-          <Card className="border-warning/20 bg-warning/10 p-4">
+          <Card className="p-4 bg-amber-500/10 border-amber-500/20">
             <div className="flex items-center gap-3">
-              <Upload className="w-5 h-5 text-warning" />
+              <Upload className="w-5 h-5 text-amber-500" />
               <div>
-                <p className="font-medium text-warning">
+                <p className="font-medium text-amber-600 dark:text-amber-400">
                   You&apos;re offline
                 </p>
                 <p className="text-sm text-muted-foreground">
@@ -527,21 +593,7 @@ export default function RecordPage() {
             </div>
           </Card>
         )}
-
-        <ConfirmDialog
-          open={showLeaveDialog}
-          onOpenChange={setShowLeaveDialog}
-          title="Leave recording?"
-          description="Leaving now will cancel the active recording and discard the in-progress capture."
-          confirmText="Leave and discard"
-          cancelText="Keep recording"
-          destructive
-          onConfirm={() => {
-            recorder.cancel();
-            router.push('/');
-          }}
-        />
-      </div>
-    </ShellPage>
+      </main>
+    </div>
   );
 }

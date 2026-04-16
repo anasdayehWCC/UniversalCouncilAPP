@@ -196,7 +196,7 @@ export default function RecordPage() {
   // Authorization gate: block ALL rendering until role is confirmed.
   // useRoleGuard redirects via useEffect, but that fires AFTER first render.
   // Without this early return, unauthorized users briefly see the consent screen.
-  const isAuthorized = ALLOWED_ROLES.includes(role);
+  const isAuthorized = (ALLOWED_ROLES as readonly string[]).includes(role);
   if (!isAuthorized) {
     return null;
   }

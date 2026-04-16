@@ -190,6 +190,8 @@ These journeys exist for every persona and are reused across departments via con
 1. Shell renders at `100dvh` and keeps the header fixed in the layout.
 2. Route content scrolls inside the main content area instead of changing the overall page height.
 3. Resilience banner appears in a docked overlay below the header and can be expanded or dismissed without hiding primary navigation.
+4. Contextual assistant tools dock through the page shell as inspector panels; they must not use fixed rails that force route-level margin hacks.
+5. Selection-heavy journeys such as templates rely on explicit selection with a stable preview panel, not hover-only preview behavior.
 
 ---
 

@@ -17,6 +17,7 @@ import { cn } from '@/lib/utils';
 import { useNetworkStatus, type ConnectionState } from '@/providers/NetworkStatusProvider';
 import { useSyncManager } from '@/hooks/useSyncManager';
 import { useAuth } from '@/hooks/useAuth';
+import { ZINDEX_CLASSES } from '@/lib/z-index';
 
 // ============================================================================
 // Configuration
@@ -35,24 +36,24 @@ const BANNER_CONFIG: Record<
 > = {
   online: {
     show: false,
-    bgClass: 'bg-emerald-600',
-    bgClassDark: 'dark:bg-emerald-700',
+    bgClass: 'bg-success',
+    bgClassDark: '',
     icon: CheckCircle,
     message: 'Connected',
     shortMessage: 'Online',
   },
   degraded: {
     show: true,
-    bgClass: 'bg-amber-500',
-    bgClassDark: 'dark:bg-amber-600',
+    bgClass: 'bg-warning',
+    bgClassDark: '',
     icon: CloudOff,
     message: 'Limited connectivity — some features may be unavailable',
     shortMessage: 'Limited',
   },
   offline: {
     show: true,
-    bgClass: 'bg-red-600',
-    bgClassDark: 'dark:bg-red-700',
+    bgClass: 'bg-destructive',
+    bgClassDark: '',
     icon: WifiOff,
     message: "You're offline — changes will sync when reconnected",
     shortMessage: 'Offline',
@@ -201,13 +202,13 @@ export function ResilienceBanner({
   if (!shouldShow) return null;
 
   const statusBgClass = state === 'online' && pendingCount > 0
-    ? 'bg-amber-500 dark:bg-amber-600'
+    ? 'bg-warning'
     : `${config.bgClass} ${config.bgClassDark}`;
 
   return (
     <div
       className={cn(
-        position === 'fixed' && 'fixed top-[calc(env(safe-area-inset-top)+var(--shell-header-height)+0.5rem)] left-1/2 -translate-x-1/2 z-[45]',
+        position === 'fixed' && `fixed top-[calc(env(safe-area-inset-top)+var(--shell-header-height)+0.5rem)] left-1/2 -translate-x-1/2 ${ZINDEX_CLASSES.floatingAction}`,
         'pointer-events-none',
         className
       )}
@@ -224,8 +225,8 @@ export function ResilienceBanner({
             statusBgClass,
             'backdrop-blur-md'
           )}
-          onClick={!isExpanded ? handleToggleExpand : undefined}
-          style={{ cursor: !isExpanded ? 'pointer' : 'default' }}
+          role="status"
+          aria-live="polite"
         >
           <motion.div
             variants={contentVariants}
@@ -274,7 +275,7 @@ export function ResilienceBanner({
                     </span>
                   )}
                   {failedCount > 0 && (
-                    <span className="text-xs bg-red-700/50 rounded-full px-2 py-0.5 flex items-center gap-1 text-white">
+                    <span className="flex items-center gap-1 rounded-full bg-black/20 px-2 py-0.5 text-xs text-white">
                       <AlertTriangle className="w-3 h-3" />
                       {failedCount} failed
                     </span>
@@ -310,7 +311,7 @@ export function ResilienceBanner({
                       className={cn(
                         'flex items-center gap-1.5 px-3 py-1.5 rounded-lg',
                         'text-xs font-medium',
-                        'bg-white text-amber-700',
+                        'bg-white text-foreground',
                         'hover:bg-white/90 transition-colors',
                         'disabled:opacity-50 disabled:cursor-not-allowed'
                       )}
@@ -348,7 +349,13 @@ export function ResilienceBanner({
               </div>
             ) : (
               // Collapsed pill view
-              <div className="flex items-center gap-2 px-3 py-2 text-white">
+              <button
+                type="button"
+                className="flex items-center gap-2 px-3 py-2 text-white"
+                onClick={handleToggleExpand}
+                aria-expanded={isExpanded}
+                aria-label="Expand sync and connectivity details"
+              >
                 <motion.div
                   animate={state === 'offline' ? { scale: [1, 1.1, 1] } : {}}
                   transition={{ repeat: Infinity, duration: 2 }}
@@ -361,7 +368,7 @@ export function ResilienceBanner({
                     : config.shortMessage}
                 </span>
                 <ChevronDown className="w-3 h-3 opacity-70" />
-              </div>
+              </button>
             )}
           </motion.div>
         </motion.div>
@@ -407,9 +414,9 @@ export function CompactResilienceBanner({ className }: CompactResilienceBannerPr
       exit={{ opacity: 0, scale: 0.95 }}
       className={cn(
         'inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium cursor-pointer',
-        state === 'offline' && 'bg-red-600 dark:bg-red-700 text-white hover:bg-red-700 dark:hover:bg-red-600',
-        state === 'degraded' && 'bg-amber-500 dark:bg-amber-600 text-white hover:bg-amber-600 dark:hover:bg-amber-500',
-        state === 'online' && pendingCount > 0 && 'bg-amber-500 dark:bg-amber-600 text-white hover:bg-amber-600 dark:hover:bg-amber-500',
+        state === 'offline' && 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+        state === 'degraded' && 'bg-warning text-white hover:opacity-90',
+        state === 'online' && pendingCount > 0 && 'bg-warning text-white hover:opacity-90',
         'transition-colors shadow-md',
         className
       )}

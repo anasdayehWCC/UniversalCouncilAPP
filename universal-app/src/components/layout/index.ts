@@ -9,3 +9,17 @@ export { ShowAbove, HideAbove, MobileOnly, TabletOnly, DesktopOnly, TouchDeviceO
 export { SwipeableViews, SwipeableTab } from './SwipeableViews';
 export { AppShell } from './AppShell';
 export { ShellPage } from './ShellPage';
+export {
+  HeroSurface,
+  PrimaryPanel,
+  SecondaryPanel,
+  InspectorSurface,
+  EmptyStatePanel,
+  ListRow,
+} from './PageSurface';
+export {
+  PageHeader,
+  MetricStrip,
+  PageSection,
+  InspectorPanel,
+} from './PageHeader';

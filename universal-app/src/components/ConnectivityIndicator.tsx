@@ -37,22 +37,22 @@ const STATUS_CONFIG: Record<
   }
 > = {
   online: {
-    color: 'bg-emerald-500',
-    bgColor: 'bg-emerald-500/10',
+    color: 'bg-success',
+    bgColor: 'bg-success/10',
     icon: Wifi,
     label: 'Connected',
     description: 'All systems operational',
   },
   degraded: {
-    color: 'bg-amber-500',
-    bgColor: 'bg-amber-500/10',
+    color: 'bg-warning',
+    bgColor: 'bg-warning/10',
     icon: AlertTriangle,
     label: 'Degraded',
     description: 'Backend connectivity issues',
   },
   offline: {
-    color: 'bg-red-500',
-    bgColor: 'bg-red-500/10',
+    color: 'bg-destructive',
+    bgColor: 'bg-destructive/10',
     icon: WifiOff,
     label: 'Offline',
     description: 'No network connection',
@@ -66,6 +66,8 @@ const STATUS_CONFIG: Record<
 interface ConnectivityIndicatorProps {
   /** Position on screen */
   position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
+  /** Whether the indicator is fixed to the viewport or owned by a shell container */
+  anchored?: 'fixed' | 'absolute';
   /** Show expanded details by default */
   defaultExpanded?: boolean;
   /** Hide when online (only show problems) */
@@ -76,6 +78,7 @@ interface ConnectivityIndicatorProps {
 
 export function ConnectivityIndicator({
   position = 'bottom-right',
+  anchored = 'fixed',
   defaultExpanded = false,
   hideWhenOnline = false,
   className,
@@ -152,7 +155,7 @@ export function ConnectivityIndicator({
   return (
     <div
       className={cn(
-        'fixed',
+        anchored === 'absolute' ? 'absolute' : 'fixed',
         ZINDEX_CLASSES.notification,
         positionClasses[position],
         className
@@ -316,7 +319,7 @@ export function ConnectivityIndicator({
               <motion.span
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-bold text-white bg-amber-500 rounded-full px-1"
+                className="absolute -top-1 -right-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-warning px-1 text-[10px] font-bold text-white"
               >
                 {pendingCount > 99 ? '99+' : pendingCount}
               </motion.span>

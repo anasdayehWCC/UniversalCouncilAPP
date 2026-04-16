@@ -11,7 +11,11 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   // Protect entire admin section
-  useRoleGuard(['admin', 'manager']);
+  const { isReady, isAuthorized } = useRoleGuard(['admin', 'manager']);
+
+  if (!isReady || !isAuthorized) {
+    return null;
+  }
 
   return (
     <div className="min-h-0 bg-muted">

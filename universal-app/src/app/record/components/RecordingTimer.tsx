@@ -80,7 +80,7 @@ export function RecordingTimer({
           </motion.span>
         )}
         {isPaused && (
-          <span className="text-sm font-medium text-amber-500">
+          <span className="text-sm font-medium text-warning">
             ⏸ Paused
           </span>
         )}
@@ -102,7 +102,7 @@ export function RecordingTimer({
             <motion.div
               className={cn(
                 'h-full rounded-full transition-colors',
-                isNearLimit ? 'bg-amber-500' : 'bg-primary',
+                isNearLimit ? 'bg-warning' : 'bg-primary',
                 isAtLimit && 'bg-error'
               )}
               initial={{ width: 0 }}
@@ -113,7 +113,7 @@ export function RecordingTimer({
           {isNearLimit && (
             <p className={cn(
               'text-xs mt-1 text-center',
-              isAtLimit ? 'text-error' : 'text-amber-500'
+              isAtLimit ? 'text-error' : 'text-warning'
             )}>
               {isAtLimit
                 ? 'Maximum duration reached'

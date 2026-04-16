@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useDemo } from '@/context/DemoContext';
 import type { ServiceDomain } from '@/config/domains';
 import { cn, hexToRgba } from '@/lib/utils';
@@ -13,6 +13,7 @@ import { getNavForRole } from '@/config/navigation';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useColorMode } from '@/hooks/useTheme';
 import { ResilienceBanner } from '@/components/ResilienceBanner';
+import { ConnectivityIndicator } from '@/components/ConnectivityIndicator';
 import { ZINDEX_CLASSES } from '@/lib/z-index';
 import {
   DropdownMenu,
@@ -25,8 +26,9 @@ import {
 import { AnimatedIcon } from '@/components/ui/AnimatedIcon';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const { config, domain, role, currentUser, switchUser, signOut, featureFlags, personas, isAuthenticated } = useDemo();
+  const { config, domain, role, currentUser, switchUser, signOut, featureFlags, personas, isAuthenticated, isSessionHydrated } = useDemo();
   const pathname = usePathname();
+  const router = useRouter();
   const { isDark } = useColorMode();
   const [isMounted, setIsMounted] = React.useState(false);
   // Start with sidebar closed on mobile (will be shown via lg:translate-x-0 on desktop)
@@ -38,14 +40,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   React.useEffect(() => {
-    if (!isLogin && !isAuthenticated) {
-      // Use window.location to ensure a clean state if needed, or router for speed.
-      // Since this is a demo app, router is fine.
-      // But we can't use router here because we didn't import it.
-      // Let's use window.location.href for now to be safe.
-      window.location.href = '/login';
+    if (isSessionHydrated && !isLogin && !isAuthenticated) {
+      router.replace('/login');
     }
-  }, [isLogin, isAuthenticated]);
+  }, [isAuthenticated, isLogin, isSessionHydrated, router]);
 
   const navItems = React.useMemo(() => getNavForRole(domain, role, featureFlags), [domain, role, featureFlags]);
 
@@ -98,6 +96,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className="min-h-[100dvh] bg-background text-foreground transition-colors duration-200">
         {children}
       </div>
+    );
+  }
+
+  if (!isSessionHydrated) {
+    return (
+      <div
+        className="min-h-[100dvh] bg-background text-foreground transition-colors duration-200"
+        aria-busy="true"
+        role="status"
+      />
     );
   }
 
@@ -242,7 +250,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 min-h-0">
+      <div className="relative flex min-h-0 min-w-0 flex-1 flex-col">
         {/* Header - z-50 to appear above overlay (z-40) */}
         <header className={cn(
           'shrink-0 sticky top-0 bg-card/80 backdrop-blur-md border-b border-border px-6 flex items-center justify-between shadow-sm',
@@ -311,7 +319,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <ThemeToggle size="default" />
             <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground" aria-label="Notifications">
               <Bell className="w-5 h-5" />
-              {/* <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span> */}
             </Button>
             <Button variant="outline" size="sm" onClick={() => window.location.href = '/login'}>
               Switch persona
@@ -327,10 +334,29 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </main>
-      </div>
 
-      <div className="pointer-events-none absolute inset-x-0 top-[calc(env(safe-area-inset-top)+var(--shell-header-height)+0.5rem)] z-[45] flex justify-center px-4">
-        <ResilienceBanner position="inline" className="w-full max-w-2xl" />
+        <div
+          className={cn(
+            'pointer-events-none absolute inset-x-0 flex justify-center px-4 sm:px-6 lg:px-8',
+            ZINDEX_CLASSES.floatingAction
+          )}
+          style={{
+            top: 'calc(env(safe-area-inset-top) + var(--shell-header-height) + 0.5rem)',
+          }}
+        >
+          <ResilienceBanner position="inline" className="w-full max-w-xl" />
+        </div>
+
+        <div className="pointer-events-none absolute inset-0">
+          <div className="relative mx-auto h-full max-w-7xl">
+            <ConnectivityIndicator
+              position="bottom-right"
+              anchored="absolute"
+              hideWhenOnline
+              className="pointer-events-auto"
+            />
+          </div>
+        </div>
       </div>
     </div>
   </div>

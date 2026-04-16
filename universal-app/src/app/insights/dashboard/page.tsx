@@ -17,7 +17,7 @@ import { DOMAINS } from '@/config/domains';
  * and workload distribution visualizations for managers and admins.
  */
 export default function InsightsDashboardPage() {
-  useRoleGuard(['manager', 'admin']);
+  const { isReady, isAuthorized } = useRoleGuard(['manager', 'admin']);
   
   const { meetings, domain, config, featureFlags, role, personas } = useDemo();
   
@@ -42,6 +42,10 @@ export default function InsightsDashboardPage() {
       label: p.name,
     }));
   }, [personas]);
+
+  if (!isReady || !isAuthorized) {
+    return null;
+  }
 
   return (
     <FlagGate

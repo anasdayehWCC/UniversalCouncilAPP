@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { Sparkles, Wand2, AlignLeft, Star, EyeOff, Pen, Send } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { InspectorPanel, InspectorSurface } from '@/components/layout';
 
 interface ActionButtonProps {
   icon: React.ReactNode;
@@ -38,57 +40,63 @@ function SectionHeader({ label }: SectionHeaderProps) {
   );
 }
 
-export function AIEditSidebar() {
+export function AIEditSidebar({ className }: { className?: string }) {
   return (
-    <aside className="w-80 shrink-0 fixed right-0 top-[var(--shell-header-height)] h-[calc(100dvh-var(--shell-header-height))] flex flex-col bg-card border-l border-border shadow-xl overflow-y-auto z-30">
-      {/* Panel header */}
-      <div className="px-4 py-4 border-b border-border shrink-0">
-        <div className="flex items-center gap-2 text-primary mb-1">
-          <Sparkles className="w-4 h-4" />
-          <span className="text-xs font-bold uppercase tracking-wider">AI Assistant</span>
-        </div>
-        <p className="text-base font-semibold text-foreground">Edit with AI</p>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          Select text in the summary to see context-aware actions.
-        </p>
-      </div>
+    <InspectorSurface
+      className={cn(
+        'flex min-h-[28rem] flex-col overflow-hidden p-0',
+        className
+      )}
+    >
+      <InspectorPanel
+        title="Edit with AI"
+        description="Select text in the summary to unlock context-aware guidance and drafting actions."
+        className="px-5 pt-5"
+        actions={
+          <div className="flex items-center gap-2 text-primary">
+            <Sparkles className="w-4 h-4" />
+            <span className="text-[11px] font-bold uppercase tracking-[0.18em]">AI Assistant</span>
+          </div>
+        }
+      >
 
-      {/* Quick Actions */}
-      <div className="px-4 pt-2">
-        <SectionHeader label="Quick Actions" />
-        <div className="flex flex-col gap-1.5 pt-2">
-          <ActionButton icon={<Wand2 className="w-4 h-4" />} label="Make more professional" />
-          <ActionButton icon={<AlignLeft className="w-4 h-4" />} label="Summarize selection" />
-          <ActionButton icon={<Pen className="w-4 h-4" />} label="Fix grammar & spelling" />
-        </div>
-      </div>
+      </InspectorPanel>
 
-      {/* Social Care Specific */}
-      <div className="px-4 pt-1">
-        <SectionHeader label="Social Care Specific" />
-        <div className="flex flex-col gap-1.5 pt-2">
-          <ActionButton icon={<Star className="w-4 h-4" />} label="Make strengths-based" />
-          <ActionButton icon={<EyeOff className="w-4 h-4" />} label="Anonymize names" />
+      <div className="flex-1 space-y-1 overflow-y-auto px-5 pb-5">
+        <div className="pt-2">
+          <SectionHeader label="Quick Actions" />
+          <div className="flex flex-col gap-1.5 pt-2">
+            <ActionButton icon={<Wand2 className="w-4 h-4" />} label="Make more professional" />
+            <ActionButton icon={<AlignLeft className="w-4 h-4" />} label="Summarize selection" />
+            <ActionButton icon={<Pen className="w-4 h-4" />} label="Fix grammar & spelling" />
+          </div>
         </div>
-      </div>
 
-      {/* Custom Instruction */}
-      <div className="px-4 pt-1 pb-6">
-        <SectionHeader label="Custom Instruction" />
-        <div className="pt-3 flex flex-col gap-2">
-          <label className="text-xs font-medium text-muted-foreground">
-            Custom instruction
-          </label>
-          <textarea
-            placeholder="e.g. 'Rewrite this to focus on the child's voice'"
-            className="w-full min-h-[80px] px-3 py-2 text-sm bg-muted/50 border border-border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground placeholder:text-muted-foreground"
-          />
-          <button className="flex items-center justify-center gap-2 w-full px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
-            <Send className="w-3.5 h-3.5" />
-            Apply
-          </button>
+        <div className="pt-1">
+          <SectionHeader label="Social Care Specific" />
+          <div className="flex flex-col gap-1.5 pt-2">
+            <ActionButton icon={<Star className="w-4 h-4" />} label="Make strengths-based" />
+            <ActionButton icon={<EyeOff className="w-4 h-4" />} label="Anonymize names" />
+          </div>
+        </div>
+
+        <div className="pt-1 pb-2">
+          <SectionHeader label="Custom Instruction" />
+          <div className="flex flex-col gap-2 pt-3">
+            <label className="text-xs font-medium text-muted-foreground">
+              Custom instruction
+            </label>
+            <textarea
+              placeholder="e.g. 'Rewrite this to focus on the child's voice'"
+              className="min-h-[96px] w-full resize-none rounded-lg border border-border bg-muted/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+            />
+            <button className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">
+              <Send className="w-3.5 h-3.5" />
+              Apply
+            </button>
+          </div>
         </div>
       </div>
-    </aside>
+    </InspectorSurface>
   );
 }

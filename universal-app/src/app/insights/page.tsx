@@ -6,7 +6,6 @@ import { Card } from '@/components/ui/card';
 import {
   Clock,
   CheckCircle2,
-  Activity,
   LayoutDashboard,
   FileText,
   AlertTriangle,
@@ -19,6 +18,7 @@ import { Badge } from '@/components/ui/badge';
 import { FlagGate } from '@/components/ui/flag-gate';
 import { useMeetingMetrics } from '@/hooks/useMeetingMetrics';
 import { cn } from '@/lib/utils';
+import { PageHeader, ShellPage } from '@/components/layout';
 
 import { useRoleGuard } from '@/hooks/useRoleGuard';
 import dynamic from 'next/dynamic';
@@ -44,7 +44,7 @@ const ChartsArea = dynamic(() => import('@/components/insights/ChartsArea'), {
 });
 
 export default function InsightsPage() {
-  useRoleGuard(['manager', 'admin']);
+  const { isReady, isAuthorized } = useRoleGuard(['manager', 'admin']);
   const { meetings, domain, config, featureFlags, role, personas, templates } = useDemo();
   const canViewAllScope = role !== 'social_worker';
   const [scope, setScope] = useState<'current' | 'all'>('current');
@@ -88,6 +88,10 @@ export default function InsightsPage() {
 
   const currentScope = scope === 'all' ? 'All domains' : config.name;
 
+  if (!isReady || !isAuthorized) {
+    return null;
+  }
+
   return (
     <FlagGate
       flag="aiInsights"
@@ -108,65 +112,59 @@ export default function InsightsPage() {
 	        </>
 	      }
     >
-      <div className="space-y-8">
-      <Card variant="glass" className="p-6 border-none text-white relative overflow-hidden" style={{ background: config.theme.gradient }} hoverEffect={false}>
-        <div className="absolute top-0 right-0 p-32 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 relative z-10">
-          <div>
-            <p className="text-sm uppercase tracking-wide opacity-80 font-medium">Analytics</p>
-            <h1 className="text-3xl font-display font-bold mt-1 mb-2">Team Insights</h1>
-            <p className="text-base opacity-90">Performance metrics and usage analytics for {config.name}.</p>
-          </div>
-          <div className="flex gap-2 items-center">
-            <Link href="/insights/dashboard">
-              <Button
-                variant="ghost"
-                className="bg-white/10 text-white border border-white/30 hover:bg-white/20 font-semibold"
-              >
-                <LayoutDashboard className="w-4 h-4 mr-2" />
-                Full Dashboard
-              </Button>
-            </Link>
-            {canViewAllScope ? (
-              <Select value={scope} onValueChange={(v: 'current' | 'all') => setScope(v)}>
-                <SelectTrigger className="w-[200px] bg-card text-foreground border-0 shadow-lg">
-                  <SelectValue placeholder="Scope" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="current">{config.name} only</SelectItem>
-                  <SelectItem value="all">All domains</SelectItem>
-                </SelectContent>
-              </Select>
-            ) : (
-              <Badge variant="secondary" className="bg-white/10 text-white border-white/30 backdrop-blur-md">Scope: {config.name}</Badge>
-            )}
-            <Button
-              className="bg-card text-foreground hover:bg-card/90 shadow-lg border-0 font-semibold"
-              onClick={handleExport}
-            >
-              Export Report
-            </Button>
-          </div>
-        </div>
-        <div className="info-rail mt-6 relative z-10">
-          <span className="info-rail__item bg-white/10 border-white/20 text-white backdrop-blur-md">
-            <span className="info-rail__dot" style={{ background: 'var(--success)', boxShadow: '0 0 8px var(--success)' }} />
-            Approved {counts.approved}
-          </span>
-          <span className="info-rail__item bg-white/10 border-white/20 text-white backdrop-blur-md">
-            <span className="info-rail__dot" style={{ background: 'var(--warning)', boxShadow: '0 0 8px var(--warning)' }} />
-            Processing {counts.processing}
-          </span>
-          <span className="info-rail__item bg-white/10 border-white/20 text-white backdrop-blur-md">
-            <span className="info-rail__dot" style={{ background: 'var(--error)', boxShadow: '0 0 8px var(--error)' }} />
-            High Risk {counts.highRisk}
-          </span>
-          <span className="info-rail__item bg-white/10 border-white/20 text-white backdrop-blur-md">
-            <span className="info-rail__dot" style={{ background: 'var(--info)', boxShadow: '0 0 8px var(--info)' }} />
-            Compliance {counts.complianceRate}%
-          </span>
-        </div>
-      </Card>
+      <ShellPage
+        padded={false}
+        header={
+          <PageHeader
+            eyebrow="Analytics"
+            title="Team Insights"
+            description={`Performance metrics and usage analytics for ${config.name}.`}
+            gradient={config.theme.gradient}
+            inverted
+            metrics={[
+              { label: 'Approved', value: counts.approved, tone: 'success' },
+              { label: 'Processing', value: counts.processing, tone: 'warning' },
+              { label: 'High risk', value: counts.highRisk, tone: 'destructive' },
+              { label: 'Compliance', value: `${counts.complianceRate}%`, tone: 'info' },
+            ]}
+            actions={
+              <>
+                <Link href="/insights/dashboard">
+                  <Button
+                    variant="ghost"
+                    className="border border-white/22 bg-white/12 font-semibold text-white hover:bg-white/20"
+                  >
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    Full Dashboard
+                  </Button>
+                </Link>
+                {canViewAllScope ? (
+                  <Select value={scope} onValueChange={(v: 'current' | 'all') => setScope(v)}>
+                    <SelectTrigger className="w-[200px] border-white/22 bg-white/95 text-neutral-900 shadow-lg">{/* Intentional: fixed-dark text inside inverted header input */}
+                      <SelectValue placeholder="Scope" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="current">{config.name} only</SelectItem>
+                      <SelectItem value="all">All domains</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Badge variant="secondary" className="border-white/22 bg-white/12 text-white backdrop-blur-md">
+                    Scope: {config.name}
+                  </Badge>
+                )}
+                <Button
+                  className="border-0 bg-white text-foreground font-semibold shadow-lg hover:bg-white/90"
+                  onClick={handleExport}
+                >
+                  Export Report
+                </Button>
+              </>
+            }
+          />
+        }
+        contentClassName="space-y-8"
+      >
 
       {/* Key Metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
@@ -248,7 +246,7 @@ export default function InsightsPage() {
 
       {/* Charts Area */}
       <ChartsArea counts={counts} templateNameMap={templateNameMap} />
-    </div>
+      </ShellPage>
     </FlagGate>
   );
 }

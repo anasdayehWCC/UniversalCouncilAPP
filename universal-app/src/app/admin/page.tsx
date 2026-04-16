@@ -23,14 +23,16 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { formatDistanceToNow } from '@/lib/dates';
+import { useToast } from '@/components/Toast';
 
 export default function AdminDashboard() {
   const { stats, auditLog, modules, users, tenantConfig, canViewAudit } = useAdmin();
+  const { info } = useToast();
 
   const quickActions = [
     { label: 'Add User', href: '/admin/users', icon: <Users className="w-4 h-4" /> },
     { label: 'Configure Modules', href: '/admin/modules', icon: <Puzzle className="w-4 h-4" /> },
-    { label: 'Export Report', action: () => alert('Export coming soon'), icon: <Download className="w-4 h-4" /> },
+    { label: 'Export Report', action: () => info('Export', 'Export is not yet available in this version.'), icon: <Download className="w-4 h-4" /> },
   ];
 
   return (

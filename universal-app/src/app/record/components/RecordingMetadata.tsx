@@ -330,14 +330,14 @@ export function RecordingMetadata({
       </div>
 
       {/* Consent checkbox */}
-      <div className="flex items-start gap-3 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
+      <div className="flex items-start gap-3 p-4 rounded-xl bg-warning/10 border border-warning/20">
         <input
           type="checkbox"
           id="consent"
           checked={localMetadata.consentAcknowledged ?? false}
           onChange={(e) => handleChange('consentAcknowledged', e.target.checked)}
           disabled={disabled}
-          className="mt-0.5 w-4 h-4 rounded border-amber-500/50 text-amber-500 focus:ring-amber-500/50"
+          className="mt-0.5 w-4 h-4 rounded border-warning/50 text-warning focus:ring-warning/50"
         />
         <label htmlFor="consent" className="text-sm text-foreground/80">
           I confirm that all participants have been informed that this meeting will be

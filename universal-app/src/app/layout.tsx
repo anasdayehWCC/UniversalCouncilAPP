@@ -14,6 +14,7 @@ import { NetworkStatusProvider } from "@/providers/NetworkStatusProvider";
 import { ServiceWorkerRegistration } from "@/lib/pwa";
 import { SkipLinks } from "@/components/a11y/SkipLinks";
 import { getThemeInitScript } from "@/lib/themes/theme-init";
+import Script from "next/script";
 
 export const viewport: Viewport = {
   themeColor: [
@@ -69,8 +70,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script
+        <Script
           id="theme-init"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: getThemeInitScript() }}
         />
         {/* PWA Meta Tags */}

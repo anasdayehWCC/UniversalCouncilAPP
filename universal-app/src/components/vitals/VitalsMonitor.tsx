@@ -88,7 +88,7 @@ export function VitalsMonitor({
     return (
       <button
         onClick={showMonitor}
-        className="fixed bottom-4 right-4 z-[9999] w-8 h-8 rounded-full bg-gray-900/80 text-white text-xs flex items-center justify-center hover:bg-gray-800 transition-colors"
+        className="fixed bottom-4 right-4 z-[100] w-8 h-8 rounded-full bg-gray-900/80 text-white text-xs flex items-center justify-center hover:bg-gray-800 transition-colors"
         title="Show Vitals Monitor"
       >
         📊
@@ -105,7 +105,7 @@ export function VitalsMonitor({
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      className={`fixed ${positionClasses[position]} z-[9999] font-mono text-xs`}
+      className={`fixed ${positionClasses[position]} z-[100] font-mono text-xs`}
     >
       <div className="bg-gray-900/95 backdrop-blur-sm rounded-lg shadow-xl border border-gray-700 overflow-hidden min-w-[200px]">
         {/* Header */}

@@ -8,13 +8,25 @@ import {
 } from 'lucide-react';
 import { useDemo } from '@/context/DemoContext';
 import type { FeatureFlags } from '@/types/flags';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
+import { ConfirmDialogRenderer } from '@/components/ui/ConfirmDialogRenderer';
 
 export default function MainConfigArea() {
   const { featureFlags, setFeatureFlags } = useDemo();
+  const { confirm, confirmDialogState, handleConfirm, handleCancel } = useConfirmDialog();
 
-  const toggleFeature = (key: keyof FeatureFlags) => {
-    const action = featureFlags[key] ? 'disable' : 'enable';
-    if (confirm(`Are you sure you want to ${action} this feature?`)) {
+  const toggleFeature = async (key: keyof FeatureFlags) => {
+    const isCurrentlyEnabled = featureFlags[key];
+    const action = isCurrentlyEnabled ? 'disable' : 'enable';
+    const ok = await confirm({
+      title: `${action.charAt(0).toUpperCase() + action.slice(1)} this feature?`,
+      description: isCurrentlyEnabled
+        ? 'Users will immediately lose access to this feature.'
+        : 'This feature will become available to all users immediately.',
+      confirmLabel: action.charAt(0).toUpperCase() + action.slice(1),
+      variant: isCurrentlyEnabled ? 'destructive' : 'default',
+    });
+    if (ok) {
       const next = { ...featureFlags, [key]: !featureFlags[key] };
       setFeatureFlags(next);
     }
@@ -22,6 +34,11 @@ export default function MainConfigArea() {
 
   return (
     <div className="lg:col-span-2 space-y-6">
+      <ConfirmDialogRenderer
+        {...confirmDialogState}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+      />
       <Card variant="glass" hoverEffect={false} className="p-6 bg-card/80">
         <h2 className="text-xl font-bold text-foreground mb-6 font-display">Configuration</h2>
         <div className="space-y-6">

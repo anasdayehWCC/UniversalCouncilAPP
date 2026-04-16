@@ -8,6 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useToast } from '@/components/Toast';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
+import { ConfirmDialogRenderer } from '@/components/ui/ConfirmDialogRenderer';
 import { AdminTemplate } from '@/types/admin';
 import { 
   Plus, 
@@ -26,13 +28,14 @@ import { formatDistanceToNow } from '@/lib/dates';
 const DOMAIN_COLORS: Record<string, string> = {
   children: 'bg-primary/10 text-primary border-primary/30',
   adults: 'bg-info/10 text-info border-info/30',
-  housing: 'bg-amber-100 text-amber-700 border-amber-200',
+  housing: 'bg-warning/10 text-warning border-warning/20',
   corporate: 'bg-muted text-muted-foreground border-border'
 };
 
 export default function TemplatesPage() {
   const { templates, deleteTemplate, canManageTemplates, tenantConfig } = useAdmin();
   const { success, info, error } = useToast();
+  const { confirm, confirmDialogState, handleConfirm, handleCancel } = useConfirmDialog();
   const [search, setSearch] = useState('');
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
 
@@ -49,12 +52,18 @@ export default function TemplatesPage() {
     return acc;
   }, {} as Record<string, AdminTemplate[]>);
 
-  const handleDelete = (template: AdminTemplate) => {
+  const handleDelete = async (template: AdminTemplate) => {
     if (template.isDefault) {
       error('Cannot delete the default template');
       return;
     }
-    if (confirm(`Delete template "${template.name}"?`)) {
+    const ok = await confirm({
+      title: `Delete "${template.name}"?`,
+      description: 'This action cannot be undone.',
+      confirmLabel: 'Delete template',
+      variant: 'destructive',
+    });
+    if (ok) {
       deleteTemplate(template.id);
       success('Template deleted');
     }
@@ -85,6 +94,11 @@ export default function TemplatesPage() {
         )
       }
     >
+      <ConfirmDialogRenderer
+        {...confirmDialogState}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+      />
       <div className="space-y-6">
         {/* Search */}
         <div className="relative max-w-md">

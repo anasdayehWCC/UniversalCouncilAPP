@@ -79,7 +79,7 @@ export default function MinuteDetailPage() {
       <div className="min-h-0 bg-background">
         <div className="max-w-5xl mx-auto px-4 py-8">
           <Card variant="glass" className="p-12 text-center">
-            <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+            <AlertTriangle className="w-12 h-12 text-warning mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-foreground mb-2">
               Failed to load minute
             </h2>

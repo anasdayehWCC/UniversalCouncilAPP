@@ -30,7 +30,7 @@ export interface Meeting {
   submittedById?: string;
   submittedBy?: string;
   submittedAt?: string;
-  lastAction?: 'approved' | 'returned';
+  lastAction?: 'approved' | 'returned' | 'rejected';
   lastActionAt?: string;
   lastActionBy?: string;
   consentGiven?: boolean;

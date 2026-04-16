@@ -306,7 +306,7 @@ function DragPreview<T>({
 
   return (
     <div
-      className="fixed pointer-events-none z-[9999]"
+      className="fixed pointer-events-none z-[100]"
       style={{
         left: position.x - offset.x,
         top: position.y - offset.y,

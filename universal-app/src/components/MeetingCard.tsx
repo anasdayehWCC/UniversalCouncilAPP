@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Edit, Trash2, Eye, Download } from 'lucide-react';
+import { useToast } from '@/components/Toast';
 
 interface MeetingCardProps {
   meeting: Meeting;
@@ -24,6 +25,7 @@ interface MeetingCardProps {
 }
 
 export function MeetingCard({ meeting, compact = false }: MeetingCardProps) {
+  const { info } = useToast();
   const statusColors = {
     draft: 'bg-warning/10 text-warning border-warning/30',
     processing: 'bg-info/10 text-info border-info/30',
@@ -83,16 +85,16 @@ export function MeetingCard({ meeting, compact = false }: MeetingCardProps) {
                   View Details
                 </DropdownMenuItem>
               </Link>
-              <DropdownMenuItem className="cursor-pointer" onClick={() => alert('Edit functionality coming soon')}>
+              <DropdownMenuItem className="cursor-pointer" onClick={() => info('Edit', 'Editing is not yet available in this view.')}>
                 <Edit className="w-4 h-4 mr-2 text-muted-foreground" />
                 Edit Note
               </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer" onClick={() => alert('PDF generation started...')}>
+              <DropdownMenuItem className="cursor-pointer" onClick={() => info('Generating PDF', 'Your PDF will be ready shortly.')}>
                 <Download className="w-4 h-4 mr-2 text-muted-foreground" />
                 Download PDF
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10" onClick={() => alert('Delete functionality restricted in demo')}>
+              <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10" onClick={() => info('Delete', 'Delete is restricted in demo mode.')}>
                 <Trash2 className="w-4 h-4 mr-2" />
                 Delete
               </DropdownMenuItem>

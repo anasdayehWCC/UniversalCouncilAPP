@@ -126,14 +126,14 @@ export function MinuteInfoSidebar({ minute, className }: MinuteInfoSidebarProps)
 
       {/* Risks Indicator */}
       {minute.sections.some(s => s.type === 'risks' && s.content.trim() !== '') && (
-        <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+        <div className="p-3 rounded-lg bg-warning/10 border border-warning/20">
           <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-amber-500" />
-            <span className="text-sm font-medium text-amber-700 dark:text-amber-300">
+            <AlertTriangle className="w-4 h-4 text-warning" />
+            <span className="text-sm font-medium text-warning">
               Risks Identified
             </span>
           </div>
-          <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+          <p className="text-xs text-warning/80 mt-1">
             Review the risks section for important concerns.
           </p>
         </div>

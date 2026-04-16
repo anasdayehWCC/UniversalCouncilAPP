@@ -26,6 +26,8 @@ import { useNotificationContext } from '@/providers/NotificationProvider';
 import { NotificationItem } from './NotificationItem';
 import type { Notification, NotificationType } from '@/lib/notifications/types';
 import { ZINDEX_CLASSES } from '@/lib/z-index';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
+import { ConfirmDialogRenderer } from '@/components/ui/ConfirmDialogRenderer';
 
 // ============================================================================
 // Types
@@ -145,15 +147,23 @@ export function NotificationCenter({
     }
   }, [onNavigate, onClose]);
 
+  const { confirm, confirmDialogState, handleConfirm, handleCancel } = useConfirmDialog();
+
   const handleMarkAllAsRead = useCallback(async () => {
     await markAllAsRead();
   }, [markAllAsRead]);
 
   const handleClearAll = useCallback(async () => {
-    if (window.confirm('Are you sure you want to clear all notifications?')) {
+    const ok = await confirm({
+      title: 'Clear all notifications?',
+      description: 'This will permanently remove all notifications from your feed.',
+      confirmLabel: 'Clear all',
+      variant: 'destructive',
+    });
+    if (ok) {
       await clearAll();
     }
-  }, [clearAll]);
+  }, [clearAll, confirm]);
 
   const handleRefresh = useCallback(async () => {
     await refreshNotifications();
@@ -163,6 +173,11 @@ export function NotificationCenter({
     <AnimatePresence>
       {isOpen && (
         <>
+          <ConfirmDialogRenderer
+            {...confirmDialogState}
+            onConfirm={handleConfirm}
+            onCancel={handleCancel}
+          />
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}

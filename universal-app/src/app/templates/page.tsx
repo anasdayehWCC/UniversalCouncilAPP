@@ -4,15 +4,19 @@ import React, { useState, useCallback } from 'react';
 import { useDemo } from '@/context/DemoContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, ArrowRight, LayoutGrid, Settings } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { FlagGate } from '@/components/ui/flag-gate';
 import { TemplateSelector } from '@/components/templates';
 import { TemplatePreview } from '@/components/templates';
 import { useTemplates } from '@/hooks/useTemplates';
 import { Template } from '@/lib/templates/types';
-import { motion, AnimatePresence } from 'framer-motion';
+import {
+  EmptyStatePanel,
+  InspectorPanel,
+  PageHeader,
+  ShellPage,
+} from '@/components/layout';
 
 export default function TemplatesPage() {
   const router = useRouter();
@@ -23,7 +27,6 @@ export default function TemplatesPage() {
     filteredTemplates, 
     getFavorites, 
     getRecentlyUsed,
-    isLoading 
   } = useTemplates({
     initialFilters: { domain: currentUser.domain as 'children' | 'adults' | 'housing' | 'corporate' },
   });
@@ -49,121 +52,73 @@ export default function TemplatesPage() {
   const recentlyUsed = getRecentlyUsed(5);
 
   const content = (
-    <div className="space-y-6">
-      {/* Header Card */}
-      <Card
-        variant="hero"
-        hoverEffect={false}
-        className="p-6 border-none text-white relative overflow-hidden"
-        style={{ background: config.theme.gradient }}
-      >
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-display font-bold">Meeting Templates</h1>
-            <p className="text-sm opacity-80 mt-1">
-              Standardized structures for {currentUser.domain === 'children' ? "children's services" : currentUser.domain} meetings
-            </p>
-            <div className="info-rail mt-3">
-              <span className="info-rail__item">
-                <span className="info-rail__dot" style={{ background: 'var(--success)' }} />
-                Available: {filteredTemplates.length}
-              </span>
-              <span className="info-rail__item">
-                <span className="info-rail__dot" style={{ background: 'var(--warning)' }} />
-                Favorites: {favorites.length}
-              </span>
-              <span className="info-rail__item">
-                <span className="info-rail__dot" style={{ background: 'var(--info)' }} />
-                Recent: {recentlyUsed.length}
-              </span>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            {currentUser.role === 'admin' && (
+    <ShellPage
+      padded={false}
+      header={
+        <PageHeader
+          eyebrow="Template Library"
+          title="Meeting Templates"
+          description={`Standardized structures for ${currentUser.domain === 'children' ? "children's services" : currentUser.domain} meetings.`}
+          gradient={config.theme.gradient}
+          inverted
+          metrics={[
+            { label: 'Available', value: filteredTemplates.length, tone: 'success' },
+            { label: 'Favorites', value: favorites.length, tone: 'warning' },
+            { label: 'Recent', value: recentlyUsed.length, tone: 'info' },
+          ]}
+          actions={
+            currentUser.role === 'admin' ? (
               <Link href="/templates/new">
-                <Button className="gap-2 bg-white/10 text-white border border-white/20 hover:bg-white/20">
+                <Button className="gap-2 border border-white/16 bg-white/12 text-white hover:bg-white/20">
                   <Plus className="w-4 h-4" />
                   Create Template
                 </Button>
               </Link>
-            )}
-          </div>
-        </div>
-        
-        {/* Decorative elements */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
-      </Card>
-
-      {/* Main content */}
-      <div className="flex gap-6">
-        {/* Template selector */}
-        <div className="flex-1">
-          <TemplateSelector
-            onSelect={handleSelectTemplate}
-            selectedId={selectedTemplate?.id}
-            domain={currentUser.domain}
+            ) : undefined
+          }
+        />
+      }
+      contentClassName="space-y-6"
+      inspector={
+        selectedTemplate ? (
+          <TemplatePreview
+            template={selectedTemplate}
+            onSelect={handleUseTemplate}
+            onEdit={
+              currentUser.role === 'admin' && !selectedTemplate.isSystem
+                ? () => router.push(`/templates/${selectedTemplate.id}`)
+                : undefined
+            }
+            showFullDetails
           />
-        </div>
-
-        {/* Preview sidebar (when template selected) */}
-        <AnimatePresence>
-          {selectedTemplate && (
-            <motion.div
-              initial={{ opacity: 0, x: 20, width: 0 }}
-              animate={{ opacity: 1, x: 0, width: 380 }}
-              exit={{ opacity: 0, x: 20, width: 0 }}
-              className="hidden lg:block flex-shrink-0"
+        ) : (
+          <EmptyStatePanel className="text-left">
+            <InspectorPanel
+              title="Template preview"
+              description="Select a template to review its sections, duration, and governance details before starting a recording."
             >
-              <div className="sticky top-4">
-                <TemplatePreview
-                  template={selectedTemplate}
-                  onSelect={handleUseTemplate}
-                  onEdit={currentUser.role === 'admin' && !selectedTemplate.isSystem ? 
-                    () => router.push(`/templates/${selectedTemplate.id}`) : 
-                    undefined
-                  }
-                  showFullDetails
-                />
+              <div className="flex items-center gap-3 rounded-[20px] border border-border/70 bg-background/70 px-4 py-4">
+                <div className="rounded-full bg-muted p-3 text-muted-foreground">
+                  <Search className="w-5 h-5" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-foreground">Nothing selected yet</p>
+                  <p className="text-sm text-muted-foreground">
+                    Choose a template from the library to lock the preview and compare options without relying on hover.
+                  </p>
+                </div>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* Mobile preview modal */}
-      <AnimatePresence>
-        {selectedTemplate && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="lg:hidden fixed inset-0 bg-black/50 z-50 flex items-end"
-            onClick={() => setSelectedTemplate(null)}
-          >
-            <motion.div
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ type: 'spring', damping: 25 }}
-              className="w-full max-h-[80vh] overflow-auto bg-card rounded-t-2xl p-4"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="w-12 h-1 bg-muted rounded-full mx-auto mb-4" />
-              <TemplatePreview
-                template={selectedTemplate}
-                onSelect={handleUseTemplate}
-                onEdit={currentUser.role === 'admin' && !selectedTemplate.isSystem ? 
-                  () => router.push(`/templates/${selectedTemplate.id}`) : 
-                  undefined
-                }
-                showFullDetails
-              />
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+            </InspectorPanel>
+          </EmptyStatePanel>
+        )
+      }
+    >
+      <TemplateSelector
+        onSelect={handleSelectTemplate}
+        selectedId={selectedTemplate?.id}
+        domain={currentUser.domain}
+      />
+    </ShellPage>
   );
 
   if (currentUser.domain === 'housing') {
@@ -178,7 +133,7 @@ export default function TemplatesPage() {
           <>
             {role === 'admin' && (
               <Link href="/admin">
-                <Button className="bg-amber-600 hover:bg-amber-700 text-white">Open Admin</Button>
+                <Button className="bg-warning text-white hover:opacity-90">Open Admin</Button>
               </Link>
             )}
             <Link href="/">

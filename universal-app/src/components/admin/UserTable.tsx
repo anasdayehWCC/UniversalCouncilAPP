@@ -26,6 +26,8 @@ import {
 import { AdminUser } from '@/types/admin';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from '@/lib/dates';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
+import { ConfirmDialogRenderer } from '@/components/ui/ConfirmDialogRenderer';
 
 type SortField = 'name' | 'email' | 'role' | 'status' | 'lastLogin';
 type SortDirection = 'asc' | 'desc';
@@ -59,6 +61,7 @@ export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTable
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const { confirm, confirmDialogState, handleConfirm, handleCancel } = useConfirmDialog();
 
   const filteredUsers = useMemo(() => {
     return users
@@ -350,10 +353,9 @@ export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTable
                               </button>
                               <button 
                                 className="w-full px-3 py-2 text-left text-sm text-destructive hover:bg-destructive/10 flex items-center gap-2"
-                                onClick={() => {
-                                  if (confirm(`Delete ${user.name}?`)) {
-                                    onDelete(user.id);
-                                  }
+                                onClick={async () => {
+                                  const ok = await confirm({ title: `Delete ${user.name}?`, description: 'This action cannot be undone.', confirmLabel: 'Delete user', variant: 'destructive' });
+                                  if (ok) { onDelete(user.id); }
                                   setActiveMenu(null);
                                 }}
                               >
@@ -378,6 +380,12 @@ export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTable
           </div>
         )}
       </div>
+
+      <ConfirmDialogRenderer
+        {...confirmDialogState}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+      />
 
       {/* Footer */}
       <div className="px-4 py-3 border-t border-border bg-muted/50 text-sm text-muted-foreground">

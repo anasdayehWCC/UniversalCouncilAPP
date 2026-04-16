@@ -69,6 +69,13 @@ Assumptions/constraints
 - The canonical local developer workflow is direct-process: `pnpm dev:web` at the repo root, `poetry run uvicorn backend.main:app --reload --port 8080` in `minute-main`, and local PostgreSQL on the MacBook.
 - Historical references below to `frontend/...` describe the legacy `minute-main/frontend` path unless they explicitly point at `universal-app/`.
 
+## 2026-03-29 Premium UX Stabilization Baseline
+
+- `universal-app` now has an explicit shell grammar for premium routes: `AppShell` owns the viewport, `ShellPage` owns page composition, and contextual inspectors must dock through the shell instead of using fixed rails.
+- The resilience overlay model is now a shell-owned top status capsule plus shell-owned connectivity indicator, preventing banners and indicators from obscuring the header.
+- Critical practitioner and manager journeys (`/`, `/templates`, `/record`, `/review-queue`, `/insights`, `/my-notes/[id]`, `/login`) have been refactored onto the shared page-header/surface system to reduce hero duplication, hover-only interactions, and route-specific layout hacks.
+- `universal-app/scripts/audit-premium-ui.mjs` is now the static guardrail for premium-shell regressions across the stabilized routes and shared shell components.
+
 Vagueness watchlist (keep honest)
 
 - Ensure “domain-aware UX” means UI copy, templates, export targets, retention, and lexicons are all domain-driven config—not just template lists.

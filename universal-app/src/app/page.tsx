@@ -17,6 +17,15 @@ import { PENDING_REVIEW_STATUSES } from '@/config/constants';
 import Image from 'next/image';
 import { personaCopy } from '@/copy/strings';
 import { formatDate, getSLAStatus } from '@/lib/dates';
+import {
+  EmptyStatePanel,
+  ListRow,
+  PageHeader,
+  PageSection,
+  PrimaryPanel,
+  SecondaryPanel,
+  ShellPage,
+} from '@/components/layout';
 
 export default function Dashboard() {
   const { role, currentUser, meetings, config, personas, updateMeetingStatus } = useDemo();
@@ -29,127 +38,140 @@ export default function Dashboard() {
     const recentNotes = domainMeetings.slice(0, 3);
     
     return (
-      <div className="space-y-8 animate-in fade-in duration-500">
-        {/* Hero */}
-        <Card variant="glass" className="p-6 border-none text-primary-foreground relative overflow-hidden" style={{ background: config.theme.gradient }} hoverEffect={false}>
-          <div className="absolute top-0 right-0 p-32 bg-foreground/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 relative z-10">
-            <div>
-              <p className="text-sm uppercase tracking-wide opacity-80 font-medium">{personaStrings.heroRole}</p>
-              <h1 className="text-4xl font-display font-bold mt-1 mb-2">Hi {currentUser.name.split(' ')[0]}</h1>
-              <p className="text-base opacity-90">{personaStrings.heroGreeting}</p>
-              <p className="text-xs uppercase tracking-wide text-primary-foreground/60 mt-4 font-semibold">{personaStrings.heroSubtext}</p>
-            </div>
-            <div className="flex flex-col gap-4 items-end">
-              <div className="info-rail justify-end">
-                <span className="info-rail__item bg-foreground/10 border-foreground/20 text-primary-foreground backdrop-blur-md">
-                  <span className="info-rail__dot" style={{ background: '#f59e0b', boxShadow: '0 0 8px #f59e0b' }} />
-                  Drafts: {drafts}
-                </span>
-                <span className="info-rail__item bg-foreground/10 border-foreground/20 text-primary-foreground backdrop-blur-md">
-                  <span className="info-rail__dot" style={{ background: '#22c55e', boxShadow: '0 0 8px #22c55e' }} />
-                  Due today: {dueToday}
-                </span>
-                <span className="info-rail__item bg-foreground/10 border-foreground/20 text-primary-foreground backdrop-blur-md">
-                  <span className="info-rail__dot" style={{ background: '#38bdf8', boxShadow: '0 0 8px #38bdf8' }} />
-                  Domain: {config.name}
-                </span>
+      <ShellPage
+        padded={false}
+        header={
+          <PageHeader
+            eyebrow={personaStrings.heroRole}
+            title={`Hi ${currentUser.name.split(' ')[0]}`}
+            description={
+              <>
+                <p>{personaStrings.heroGreeting}</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/68">
+                  {personaStrings.heroSubtext}
+                </p>
+              </>
+            }
+            gradient={config.theme.gradient}
+            inverted
+            metrics={[
+              { label: 'Drafts', value: drafts, tone: 'warning' },
+              { label: 'Due today', value: dueToday, tone: 'success' },
+              { label: 'Domain', value: config.name, tone: 'info' },
+            ]}
+            actions={
+              <Link href="/record">
+                <Button className="border-0 bg-white text-foreground shadow-lg hover:bg-white/90">
+                  {personaStrings.heroCtaLabel}
+                </Button>
+              </Link>
+            }
+          />
+        }
+        contentClassName="space-y-8"
+      >
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 xl:gap-6">
+          <Link href="/record" className="block h-full">
+            <PrimaryPanel className="h-full border-primary/20 transition-all hover:border-primary/40 hover:shadow-md">
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <Mic className="w-7 h-7" />
               </div>
-              <div className="mt-2">
-                <Link href="/record">
-                  <Button className="bg-card text-foreground hover:bg-card/90 shadow-lg border-0 font-semibold">{personaStrings.heroCtaLabel}</Button>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        {/* Primary Actions */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          <Link href="/record" className="group block h-full">
-            <div className="group relative bg-card border-2 border-primary/30 rounded-2xl p-5 md:p-6 hover:border-primary/60 hover:shadow-md transition-all cursor-pointer h-full">
-              <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                <Mic className="w-7 h-7 text-primary" />
-              </div>
-              <h3 className="text-lg md:text-xl font-bold text-foreground mb-2 font-display">New Recording</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">Capture a visit or meeting. AI will draft your note instantly.</p>
-            </div>
+              <h3 className="mb-2 font-display text-xl font-semibold text-foreground">New Recording</h3>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                Capture a visit or meeting with a single primary action and let AI draft the note for you.
+              </p>
+            </PrimaryPanel>
           </Link>
 
-          <Link href="/upload" className="group block h-full">
-            <div className="group relative bg-card border border-border rounded-2xl p-5 md:p-6 hover:shadow-sm transition-all cursor-pointer h-full">
-              <div className="w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center mb-4 group-hover:bg-accent/20 transition-colors">
-                <Upload className="w-7 h-7 text-accent" />
+          <Link href="/upload" className="block h-full">
+            <SecondaryPanel className="h-full">
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/10 text-accent">
+                <Upload className="w-7 h-7" />
               </div>
-              <h3 className="text-lg md:text-xl font-bold text-foreground mb-2 font-display">Upload Audio</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">Import existing recordings from your phone or dictaphone.</p>
-            </div>
+              <h3 className="mb-2 font-display text-xl font-semibold text-foreground">Upload Audio</h3>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                Import a dictaphone or phone recording and continue the workflow without re-capturing.
+              </p>
+            </SecondaryPanel>
           </Link>
 
-          <Link href="/my-notes" className="group block h-full sm:col-span-2 lg:col-span-1">
-            <div className="group relative bg-card border border-border rounded-2xl p-5 md:p-6 hover:shadow-sm transition-all cursor-pointer h-full">
-              <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center mb-4 group-hover:bg-muted/80 transition-colors">
-                <FileText className="w-7 h-7 text-muted-foreground" />
+          <Link href="/my-notes" className="block h-full md:col-span-2 xl:col-span-1">
+            <SecondaryPanel className="h-full">
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+                <FileText className="w-7 h-7" />
               </div>
-              <h3 className="text-lg md:text-xl font-bold text-foreground mb-2 font-display">My Notes</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">View and edit your recent case notes and minutes.</p>
-            </div>
+              <h3 className="mb-2 font-display text-xl font-semibold text-foreground">My Notes</h3>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                Review recent case notes, edit summaries, and move work forward without searching across screens.
+              </p>
+            </SecondaryPanel>
           </Link>
         </div>
 
-        {/* Recent Activity */}
-        <div>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-foreground">Recent Activity</h2>
-            <Link href="/my-notes" className="text-sm font-medium text-primary hover:text-primary/80 flex items-center gap-1 transition-colors">
-              View all <ArrowRight className="w-4 h-4" />
+        <PageSection
+          title="Recent Activity"
+          actions={
+            <Link href="/my-notes" className="flex items-center gap-1 text-sm font-medium text-primary transition-colors hover:text-primary/80">
+              View all
+              <ArrowRight className="w-4 h-4" />
             </Link>
-          </div>
+          }
+        >
           <div className="grid gap-4">
             {recentNotes.length > 0 ? (
               recentNotes.map((note, index) => (
-                <Link key={note.id} href={`/my-notes/${note.id}`} className="block animate-in slide-in-from-bottom-4 fade-in duration-500" style={{ animationDelay: `${index * 100}ms` }}>
-                  <Card className="p-4 hover:bg-muted/50 transition-all duration-300 border-border flex items-center gap-4 group hover:shadow-md hover:border-primary/30">
-                    <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground group-hover:bg-background group-hover:shadow-sm group-hover:text-primary transition-all">
+                <Link
+                  key={note.id}
+                  href={`/my-notes/${note.id}`}
+                  className="block animate-in slide-in-from-bottom-4 fade-in duration-500"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <ListRow className="group flex items-center gap-4 transition-all duration-300 hover:border-primary/24 hover:bg-muted/40">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted text-muted-foreground transition-all group-hover:bg-background group-hover:text-primary">
                       <FileText className="w-5 h-5" />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-foreground truncate group-hover:text-primary transition-colors">{note.title}</h4>
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
+                    <div className="min-w-0 flex-1">
+                      <h4 className="truncate font-semibold text-foreground transition-colors group-hover:text-primary">
+                        {note.title}
+                      </h4>
+                      <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" /> {formatDate(note.date)}
+                          <Clock className="w-3 h-3" />
+                          {formatDate(note.date)}
                         </span>
                         <span>•</span>
                         <span>{note.duration}</span>
                       </div>
                     </div>
                     <Badge variant="outline" className={cn(
-                      "capitalize transition-colors",
-                      note.status === 'draft' ? "bg-warning/10 text-warning border-warning/20 group-hover:bg-warning/20" :
-                      note.status === 'ready' ? "bg-success/10 text-success border-success/20 group-hover:bg-success/20" :
-                      "bg-muted text-muted-foreground border-border group-hover:bg-muted/80"
+                      'capitalize transition-colors',
+                      note.status === 'draft'
+                        ? 'border-warning/20 bg-warning/10 text-warning'
+                        : note.status === 'ready'
+                        ? 'border-success/20 bg-success/10 text-success'
+                        : 'border-border bg-muted text-muted-foreground'
                     )}>
                       {note.status.replace('_', ' ')}
                     </Badge>
-                    <ArrowRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                  </Card>
+                    <ArrowRight className="w-4 h-4 text-muted-foreground/50 transition-all group-hover:translate-x-1 group-hover:text-primary" />
+                  </ListRow>
                 </Link>
               ))
             ) : (
-              <Card className="p-8 text-center border-dashed border-border bg-muted/30">
-                <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3 text-muted-foreground">
+              <EmptyStatePanel>
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
                   <FileText className="w-6 h-6" />
                 </div>
-                <h3 className="text-foreground font-medium mb-1">No recent activity</h3>
-                <p className="text-sm text-muted-foreground mb-4">You haven&apos;t created any notes yet.</p>
+                <h3 className="mb-1 font-medium text-foreground">No recent activity</h3>
+                <p className="mb-4 text-sm text-muted-foreground">You haven&apos;t created any notes yet.</p>
                 <Link href="/record">
                   <Button variant="outline" size="sm">Start a Recording</Button>
                 </Link>
-              </Card>
+              </EmptyStatePanel>
             )}
           </div>
-        </div>
-      </div>
+        </PageSection>
+      </ShellPage>
     );
   }
 
@@ -160,152 +182,170 @@ export default function Dashboard() {
     const approvalsMetrics = getApprovalsMetrics(meetings, currentUser.domain);
     const syncStatus = getSyncStatus(meetings);
     return (
-      <div className="space-y-8 animate-in fade-in duration-500">
-        <div className="flex justify-between items-end">
-          <div>
-            <h1 className="text-3xl font-display font-bold text-foreground mb-2">
-              {personaStrings.heroRole === 'Manager' ? 'Team Lead' : personaStrings.heroRole}
-            </h1>
-            <p className="text-muted-foreground">
-              {currentUser.team} • <span className="font-bold text-foreground">{approvalsMetrics.pending} items</span> require your attention in {config.name}.
-            </p>
-            <p className="text-sm text-muted-foreground italic">{personaStrings.heroGreeting}</p>
-          </div>
-          <div className="flex items-center gap-3 text-xs text-muted-foreground">
-            <span className={`px-2 py-1 rounded-full ${syncStatus.healthy ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'}`}>
-              {syncStatus.label}
-            </span>
-            <span>Last sync: {syncStatus.lastSync}</span>
-          </div>
-        </div>
-
-        {/* Manager Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <ShellPage
+        padded={false}
+        header={
+          <PageHeader
+            eyebrow="Manager"
+            title={personaStrings.heroRole === 'Manager' ? 'Team Lead' : personaStrings.heroRole}
+            description={
+              <>
+                <p>
+                  {currentUser.team} • <span className="font-semibold text-foreground">{approvalsMetrics.pending} items</span> require your attention in {config.name}.
+                </p>
+                <p className="text-sm italic text-muted-foreground">{personaStrings.heroGreeting}</p>
+              </>
+            }
+            metrics={[
+              { label: 'Queue', value: approvalsMetrics.pending, tone: 'brand' },
+              { label: 'SLA', value: approvalsMetrics.slaLabel, tone: 'destructive' },
+              { label: 'Sync', value: syncStatus.label, tone: syncStatus.healthy ? 'success' : 'warning' },
+            ]}
+            actions={
+              <span className="text-xs text-muted-foreground">
+                Last sync: {syncStatus.lastSync}
+              </span>
+            }
+          />
+        }
+        contentClassName="space-y-8"
+      >
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           <Link href="/review-queue">
-            <Card variant="glass" className="p-6 border-l-4 border-l-destructive hover:shadow-xl transition-all cursor-pointer bg-card/80 dark:bg-card/60" hoverEffect>
-              <div className="flex justify-between items-start mb-4">
-                <div className="p-3 bg-destructive/10 rounded-xl text-destructive shadow-sm">
+            <PrimaryPanel className="h-full border-l-4 border-l-destructive transition-all hover:shadow-md">
+              <div className="mb-4 flex items-start justify-between">
+                <div className="rounded-2xl bg-destructive/10 p-3 text-destructive">
                   <CheckSquare className="w-6 h-6" />
                 </div>
-                <Badge className="bg-destructive/10 text-destructive hover:bg-destructive/20 border-0 shadow-sm">{approvalsMetrics.slaLabel}</Badge>
+                <Badge className="border-0 bg-destructive/10 text-destructive">{approvalsMetrics.slaLabel}</Badge>
               </div>
-              <h3 className="text-2xl font-bold text-foreground font-display">Approvals Pending</h3>
-              <p className="text-sm text-muted-foreground mt-1 font-medium">{approvalsMetrics.pending} sign-offs queued.</p>
-            </Card>
+              <h3 className="font-display text-2xl font-semibold text-foreground">Approvals Pending</h3>
+              <p className="mt-1 text-sm font-medium text-muted-foreground">{approvalsMetrics.pending} sign-offs queued.</p>
+            </PrimaryPanel>
           </Link>
 
           <Link href="/insights">
-            <Card variant="glass" className="p-6 border-l-4 border-l-info hover:shadow-xl transition-all cursor-pointer bg-card/80 dark:bg-card/60" hoverEffect>
-              <div className="flex justify-between items-start mb-4">
-                <div className="p-3 bg-info/10 rounded-xl text-info shadow-sm">
+            <PrimaryPanel className="h-full border-l-4 border-l-info transition-all hover:shadow-md">
+              <div className="mb-4 flex items-start justify-between">
+                <div className="rounded-2xl bg-info/10 p-3 text-info">
                   <Activity className="w-6 h-6" />
                 </div>
-                <span className="text-xs font-bold text-success bg-success/10 px-2 py-1 rounded-full border border-success/20">+12% vs last week</span>
+                <span className="rounded-full border border-success/20 bg-success/10 px-2 py-1 text-xs font-bold text-success">
+                  +12% vs last week
+                </span>
               </div>
-              <h3 className="text-2xl font-bold text-foreground font-display">Team Activity</h3>
-              <p className="text-sm text-muted-foreground mt-1 font-medium">{domainMeetings.length} minutes generated</p>
-            </Card>
+              <h3 className="font-display text-2xl font-semibold text-foreground">Team Activity</h3>
+              <p className="mt-1 text-sm font-medium text-muted-foreground">{domainMeetings.length} minutes generated</p>
+            </PrimaryPanel>
           </Link>
 
-          <Card variant="glass" className="p-6 border-l-4 border-l-muted-foreground bg-card/80 dark:bg-card/60" hoverEffect={false}>
-            <div className="flex justify-between items-start mb-4">
-              <div className="p-3 bg-muted rounded-xl text-muted-foreground shadow-sm">
+          <SecondaryPanel className="h-full">
+            <div className="mb-4 flex items-start justify-between">
+              <div className="rounded-2xl bg-muted p-3 text-muted-foreground">
                 <Users className="w-6 h-6" />
               </div>
-              <Badge variant="outline" className="border-border text-muted-foreground bg-card">Team Overview</Badge>
+              <Badge variant="outline" className="border-border bg-card text-muted-foreground">Team Overview</Badge>
             </div>
-            <h3 className="text-2xl font-bold text-foreground font-display">Team Overview</h3>
-            <p className="text-sm text-muted-foreground mt-1 font-medium">{contributors.size || 1} active submitters this week</p>
-          </Card>
+            <h3 className="font-display text-2xl font-semibold text-foreground">Team Overview</h3>
+            <p className="mt-1 text-sm font-medium text-muted-foreground">{contributors.size || 1} active submitters this week</p>
+          </SecondaryPanel>
         </div>
 
-        {/* Priority Review List */}
-        <div>
-	          <div className="flex items-center justify-between mb-6">
-	            <h2 className="text-xl font-bold text-foreground">Priority Reviews</h2>
-	            <Link href="/review-queue">
-	              <Button variant="outline" size="sm" className="gap-2 text-muted-foreground">
-	                <CheckSquare className="w-4 h-4" />
-	                Bulk Approve Low Risk
-	              </Button>
-	            </Link>
-	          </div>
-          <div className="bg-card dark:bg-card rounded-xl border border-border overflow-hidden">
+        <PageSection
+          title="Priority Reviews"
+          actions={
+            <Link href="/review-queue">
+              <Button variant="outline" size="sm" className="gap-2 text-muted-foreground">
+                <CheckSquare className="w-4 h-4" />
+                Bulk Approve Low Risk
+              </Button>
+            </Link>
+          }
+        >
+          <div className="grid gap-4">
+            {reviewItems.slice(0, 5).map((meeting) => {
+              const submitter =
+                (meeting.submittedById && personas[meeting.submittedById]) ||
+                Object.values(personas).find((user) => user.name === meeting.submittedBy);
+              const submitterName = submitter?.name || meeting.submittedBy || 'Unattributed';
 
-	            {reviewItems.slice(0, 5).map((meeting) => {
-	              const submitter =
-	                (meeting.submittedById && personas[meeting.submittedById]) ||
-	                Object.values(personas).find(u => u.name === meeting.submittedBy);
-	              const submitterName = submitter?.name || meeting.submittedBy || 'Unattributed';
-	              return (
-	                <div key={meeting.id} className="p-4 border-b border-border last:border-0 flex items-center gap-4 hover:bg-muted/50 transition-colors cursor-pointer group">
+              return (
+                <ListRow key={meeting.id} className="group flex items-center gap-4 hover:bg-muted/40">
                   {submitter ? (
-                    <Image 
-                      src={submitter.avatar} 
-                      alt={submitter.name} 
-                      width={40} 
-                      height={40} 
+                    <Image
+                      src={submitter.avatar}
+                      alt={submitter.name}
+                      width={40}
+                      height={40}
                       className="rounded-full border border-border object-cover"
                       sizes="40px"
                     />
                   ) : (
-	                    <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center font-bold text-muted-foreground text-xs border border-border">
-	                      {submitterName.split(' ').map(n => n[0]).join('') || '??'}
-	                    </div>
-	                  )}
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-muted text-xs font-bold text-muted-foreground">
+                      {submitterName.split(' ').map((name) => name[0]).join('') || '??'}
+                    </div>
+                  )}
                   <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-bold text-foreground group-hover:text-primary transition-colors">{meeting.title}</h4>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h4 className="font-semibold text-foreground transition-colors group-hover:text-primary">{meeting.title}</h4>
                       {meeting.riskScore && (
                         <Badge variant="outline" className={cn(
-                          "text-[10px] h-5 px-1.5",
-                          meeting.riskScore === 'high' ? "bg-destructive/10 text-destructive border-destructive/30" :
-                          meeting.riskScore === 'medium' ? "bg-warning/10 text-warning border-warning/30" :
-                          "bg-success/10 text-success border-success/30"
+                          'h-5 px-1.5 text-[10px]',
+                          meeting.riskScore === 'high'
+                            ? 'border-destructive/30 bg-destructive/10 text-destructive'
+                            : meeting.riskScore === 'medium'
+                            ? 'border-warning/30 bg-warning/10 text-warning'
+                            : 'border-success/30 bg-success/10 text-success'
                         )}>
                           {meeting.riskScore === 'high' ? 'High Risk' : meeting.riskScore === 'medium' ? 'Medium Risk' : 'Low Risk'}
                         </Badge>
                       )}
                     </div>
-	                    <div className="flex items-center gap-3 text-sm text-muted-foreground mt-0.5">
-	                      <span>{submitterName}</span>
-	                      <span>•</span>
+                    <div className="mt-0.5 flex items-center gap-3 text-sm text-muted-foreground">
+                      <span>{submitterName}</span>
+                      <span>•</span>
                       {(() => {
                         const sla = getSLAStatus(meeting.submittedAt);
                         return (
-                          <span className={cn("font-medium flex items-center gap-1 px-1.5 py-0.5 rounded text-xs", sla.bg, sla.color)}>
-                            <Clock className="w-3 h-3" /> {sla.label}
+                          <span className={cn('flex items-center gap-1 rounded px-1.5 py-0.5 text-xs font-medium', sla.bg, sla.color)}>
+                            <Clock className="w-3 h-3" />
+                            {sla.label}
                           </span>
                         );
                       })()}
                     </div>
                   </div>
-	                  <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-	                    <Button
-	                      size="sm"
-	                      variant="ghost"
-	                      className="text-success hover:text-success hover:bg-success/10"
-	                      onClick={(e) => {
-	                        e.stopPropagation();
-	                        updateMeetingStatus(meeting.id, 'approved', { action: 'approved', by: currentUser.name });
-	                      }}
-	                    >
-	                      Approve
-	                    </Button>
-	                    <Link href={`/my-notes/${meeting.id}`}><Button size="sm" variant="outline" className="text-primary border-primary/30 hover:bg-primary/10">Review</Button></Link>
-	                  </div>
-                </div>
+                  <div className="flex gap-2 opacity-100 transition-opacity xl:opacity-0 xl:group-hover:opacity-100">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-success hover:bg-success/10 hover:text-success"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        updateMeetingStatus(meeting.id, 'approved', { action: 'approved', by: currentUser.name });
+                      }}
+                    >
+                      Approve
+                    </Button>
+                    <Link href={`/my-notes/${meeting.id}`}>
+                      <Button size="sm" variant="outline" className="border-primary/30 text-primary hover:bg-primary/10">
+                        Review
+                      </Button>
+                    </Link>
+                  </div>
+                </ListRow>
               );
             })}
+
             {reviewItems.length === 0 && (
-              <div className="p-8 text-center text-muted-foreground">
-                <CheckSquare className="w-12 h-12 mx-auto mb-3 opacity-20" />
+              <EmptyStatePanel>
+                <CheckSquare className="mx-auto mb-3 w-12 h-12 opacity-20" />
                 <p>All caught up! No pending reviews.</p>
-              </div>
+              </EmptyStatePanel>
             )}
           </div>
-        </div>
-      </div>
+        </PageSection>
+      </ShellPage>
     );
   }
 // --- Admin View ---

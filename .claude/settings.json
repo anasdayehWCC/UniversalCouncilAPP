@@ -1,6 +1,9 @@
 {
   "permissions": {
     "allow": [
+      "Edit",
+      "Write",
+      "NotebookEdit",
       "Bash(pnpm --filter universal-app lint*)",
       "Bash(pnpm --filter universal-app test*)",
       "Bash(pnpm --filter universal-app build*)",
@@ -21,8 +24,23 @@
       "Bash(gh api *)",
       "Bash(ls *)",
       "Bash(cat *)",
-      "Bash(wc *)"
-    ]
+      "Bash(wc *)",
+      "Bash(node *)",
+      "Bash(python *)",
+      "Bash(python3 *)",
+      "Bash(curl *)",
+      "Bash(mkdir *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "WebSearch",
+      "WebFetch",
+      "mcp__deepwiki__*",
+      "mcp__code-search__*",
+      "mcp__chrome-devtools__*",
+      "mcp__playwright__*",
+      "mcp__memory__*"
+    ],
+    "defaultMode": "bypassPermissions"
   },
   "hooks": {
     "PreToolUse": [

@@ -1,11 +1,18 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
-import { CheckCircle2, Clock, FileText, AlertCircle } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { CheckCircle2, Clock, FileText, AlertCircle, ArrowUpDown, Download } from 'lucide-react';
 import { Meeting } from '@/types/demo';
 import { cn } from '@/lib/utils';
 import { useDemo } from '@/context/DemoContext';
@@ -33,6 +40,7 @@ export default function ReviewQueuePage() {
   useRoleGuard(['manager', 'admin']);
   const { meetings, currentUser, updateMeetingStatus, config } = useDemo();
   const [filter, setFilter] = useState<'all' | 'flagged' | 'high'>('all');
+  const [sortBy, setSortBy] = useState<'priority' | 'oldest' | 'newest'>('priority');
   const [activeTab, setActiveTab] = useState<'pending' | 'changes' | 'approved'>('pending');
 
   const queueCandidates = useMemo(
@@ -46,12 +54,39 @@ export default function ReviewQueuePage() {
   );
 
   const filteredQueue = useMemo(() => {
-    return queueCandidates.filter(m => {
+    const filtered = queueCandidates.filter(m => {
       if (filter === 'flagged') return m.status === 'flagged';
       if (filter === 'high') return m.riskScore === 'high';
       return true;
     });
-  }, [queueCandidates, filter]);
+
+    const riskWeight: Record<string, number> = { high: 3, medium: 2, low: 1 };
+
+    return [...filtered].sort((a, b) => {
+      switch (sortBy) {
+        case 'oldest': {
+          const dateA = new Date(a.submittedAt || a.uploadedAt || a.date).getTime();
+          const dateB = new Date(b.submittedAt || b.uploadedAt || b.date).getTime();
+          return dateA - dateB;
+        }
+        case 'newest': {
+          const dateA = new Date(a.submittedAt || a.uploadedAt || a.date).getTime();
+          const dateB = new Date(b.submittedAt || b.uploadedAt || b.date).getTime();
+          return dateB - dateA;
+        }
+        case 'priority':
+        default: {
+          const wa = riskWeight[a.riskScore || 'low'];
+          const wb = riskWeight[b.riskScore || 'low'];
+          if (wa !== wb) return wb - wa;
+          // Secondary sort: oldest first within same priority
+          const dateA = new Date(a.submittedAt || a.uploadedAt || a.date).getTime();
+          const dateB = new Date(b.submittedAt || b.uploadedAt || b.date).getTime();
+          return dateA - dateB;
+        }
+      }
+    });
+  }, [queueCandidates, filter, sortBy]);
 
   const flaggedCount = queueCandidates.filter(m => m.status === 'flagged').length;
   const highRiskCount = queueCandidates.filter(m => m.riskScore === 'high').length;
@@ -62,6 +97,40 @@ export default function ReviewQueuePage() {
       by: currentUser.name,
     });
   };
+
+  const handleBulkExport = useCallback(() => {
+    if (filteredQueue.length === 0) {
+      alert('No items to export.');
+      return;
+    }
+
+    const escapeCSV = (value: string) => {
+      if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+        return `"${value.replace(/"/g, '""')}"`;
+      }
+      return value;
+    };
+
+    const header = ['Title', 'Author', 'Status', 'Submitted Date', 'Risk Level'];
+    const rows = filteredQueue.map(m => [
+      escapeCSV(m.title),
+      escapeCSV(m.submittedBy || 'Unknown'),
+      escapeCSV(m.status),
+      escapeCSV(m.submittedAt || m.uploadedAt || m.date),
+      escapeCSV(m.riskScore || 'N/A'),
+    ]);
+
+    const csvContent = [header.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `review-queue-export-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }, [filteredQueue]);
 
   const handleBulkApproveLowRisk = () => {
     const lowRiskItems = filteredQueue.filter(m => m.riskScore === 'low' && m.status !== 'approved');
@@ -98,8 +167,12 @@ export default function ReviewQueuePage() {
               <CheckCircle2 className="w-4 h-4" />
               Approve Low Risk
             </Button>
-            <Button variant="outline" className="bg-white/10 text-white border-white/40 hover:bg-white/20 gap-2">
-              <FileText className="w-4 h-4" />
+            <Button
+              variant="outline"
+              className="bg-white/10 text-white border-white/40 hover:bg-white/20 gap-2"
+              onClick={handleBulkExport}
+            >
+              <Download className="w-4 h-4" />
               Bulk Export
             </Button>
           </div>
@@ -120,23 +193,39 @@ export default function ReviewQueuePage() {
         </div>
       </Card>
 
-      <div className="flex gap-3 items-center">
-        <span className="text-sm font-medium text-muted-foreground">Filter:</span>
-        <div className="flex gap-2">
-          {[
-            { key: 'all', label: 'All' },
-            { key: 'flagged', label: `Flagged (${flaggedCount})` },
-            { key: 'high', label: `High Risk (${highRiskCount})` },
-          ].map(f => (
-            <Button
-              key={f.key}
-              variant={filter === f.key ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setFilter(f.key as typeof filter)}
-            >
-              {f.label}
-            </Button>
-          ))}
+      <div className="flex flex-wrap gap-3 items-center justify-between">
+        <div className="flex gap-3 items-center">
+          <span className="text-sm font-medium text-muted-foreground">Filter:</span>
+          <div className="flex gap-2">
+            {[
+              { key: 'all', label: 'All' },
+              { key: 'flagged', label: `Flagged (${flaggedCount})` },
+              { key: 'high', label: `High Risk (${highRiskCount})` },
+            ].map(f => (
+              <Button
+                key={f.key}
+                variant={filter === f.key ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setFilter(f.key as typeof filter)}
+              >
+                {f.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex gap-2 items-center">
+          <ArrowUpDown className="w-4 h-4 text-muted-foreground" />
+          <Select value={sortBy} onValueChange={(v: string) => setSortBy(v as typeof sortBy)}>
+            <SelectTrigger className="w-[160px] h-9 text-sm" aria-label="Sort queue items">
+              <SelectValue placeholder="Sort by..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="priority">Priority</SelectItem>
+              <SelectItem value="oldest">Oldest first</SelectItem>
+              <SelectItem value="newest">Newest first</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 

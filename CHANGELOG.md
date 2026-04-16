@@ -1,5 +1,58 @@
 # Changelog
 
+## 2026-04-16 (Orchestration Run 3 — 8-Agent Backlog Sweep)
+
+### Fixed — Record Page (7 items)
+
+- #42: Auth guard moved before consent screen — unauthorized users no longer see consent UI
+- #11: Metadata form collapsed by default on mobile behind "Add case details" disclosure
+- #10: Save/upload status indicator shows "Saving → Saved → Uploaded" during recording
+- #25: RecordingTimer Framer Motion animations respect prefers-reduced-motion
+- #26: DeviceSelector dropdown has ARIA listbox/option semantics + Escape key handler
+- #39: RecordingMetadata toggle has aria-expanded
+- #30: Consent checkbox tap target enlarged to 44px minimum
+
+### Fixed — Review Queue (3 items)
+
+- #15: Sort dropdown added (Oldest/Newest/Priority)
+- #31: ChangesRequested tab shows return reason, timestamp, and cycle count
+- #33: Bulk Export generates CSV download of filtered queue
+
+### Fixed — Admin UX (3 items)
+
+- #34: Admin layout shows loading skeleton during hydration instead of blank page
+- #36: Organisation Name uses controlled input with Save button
+- #16: Module enable now shows confirmation dialog
+
+### Fixed — My-Notes + Export (3 items)
+
+- #9: Export button generates markdown file download
+- #28: "Meeting not found" renders inside ShellPage with Back link
+- #37: AIEditSidebar textarea label programmatically associated
+
+### Fixed — AppShell + Nav (3 items)
+
+- #29: Mobile sidebar has visible X close button
+- #44: "Switch persona" uses router.push instead of window.location.href
+- #32: Review Queue nav item shows pending count badge
+
+### Fixed — Theme (1 item)
+
+- #46: Hardcoded colors replaced in minutes/page.tsx, FeatureToggle, dates/format.ts, minutes/types.ts
+
+### Fixed — DemoContext + Login (3 items)
+
+- #49: Removed console.log calls (not stripped by Turbopack)
+- #48: Combined hydration effects to prevent API/localStorage race
+- #50: Removed dead "Forgot Password?" link, replaced with council IT note
+
+### Added
+
+- `.gitignore` entry for `.claude/worktrees/`
+- `ConfirmDialogRenderer.tsx` and `useConfirmDialog.ts` committed (were untracked)
+- `PageSurface.tsx` committed (was untracked)
+- `audit-premium-ui.mjs` committed (was untracked)
+
 ## 2026-04-16 (Orchestration Run 2 — Critical Backlog Fixes)
 
 ### Fixed — Critical Bugs

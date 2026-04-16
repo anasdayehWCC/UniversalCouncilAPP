@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode, useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useCallback, useEffect, useMemo } from 'react';
 import { ServiceDomain, UserRole, DOMAINS, DomainConfig } from '@/config/domains';
 import { useRouter } from 'next/navigation';
 import { Meeting, MeetingStatus, User, PersonaHistoryEntry, Template } from '@/types/demo';
@@ -19,7 +19,7 @@ interface DemoContextType {
   updateMeetingStatus: (
     meetingId: string,
     status: MeetingStatus,
-    meta?: { action?: 'approved' | 'returned' | 'rejected'; by?: string; timestamp?: string }
+    meta?: { action?: 'approved' | 'returned'; by?: string; timestamp?: string }
   ) => void;
   featureFlags: FeatureFlags;
   setFeatureFlags: (flags: FeatureFlags) => void;
@@ -31,12 +31,10 @@ interface DemoContextType {
   isManager: boolean;
   isAdmin: boolean;
   isAuthenticated: boolean;
-  isSessionHydrated: boolean;
   personaHistory: PersonaHistoryEntry[];
 }
 
 const DemoContext = createContext<DemoContextType | undefined>(undefined);
-const DEFAULT_FEATURE_FLAGS: FeatureFlags = { aiInsights: true, housingPilot: false, smartCapture: true };
 
 function sortMeetings(meetings: Meeting[]) {
   const getDate = (m: Meeting) => new Date(m.uploadedAt || m.submittedAt || m.date).getTime();
@@ -57,13 +55,18 @@ export function DemoProvider({
   defaultUserId = 'sarah',
 }: DemoProviderProps) {
   const personasSeed = initialPersonas ?? PERSONAS;
-  const restoredUserIdRef = useRef<string | null>(null);
 
-  // Always start with the default user so the server and client first render match.
-  // localStorage hydration happens in the useEffect below to avoid SSR mismatch.
+  const getInitialUserId = () => {
+    if (typeof window !== 'undefined') {
+      return window.localStorage.getItem('currentUserId') || defaultUserId;
+    }
+    return defaultUserId;
+  };
+
+  const initialUserId = getInitialUserId();
   const initialUser =
-    personasSeed[defaultUserId] ??
-    PERSONAS[defaultUserId] ??
+    personasSeed[initialUserId] ??
+    PERSONAS[initialUserId] ??
     Object.values(personasSeed)[0] ??
     Object.values(PERSONAS)[0];
 
@@ -76,81 +79,59 @@ export function DemoProvider({
   const [role, setRole] = useState<UserRole>(initialUser.role);
   const [meetings, setMeetings] = useState<Meeting[]>(sortMeetings(initialMeetings ?? PERSONA_MEETINGS));
   const [templates, setTemplates] = useState<Template[]>(PERSONA_TEMPLATES);
-  const [featureFlags, setFeatureFlagsState] = useState<FeatureFlags>(DEFAULT_FEATURE_FLAGS);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [isSessionHydrated, setIsSessionHydrated] = useState<boolean>(false);
-  const [personaHistory, setPersonaHistory] = useState<PersonaHistoryEntry[]>([]);
+  const [featureFlags, setFeatureFlagsState] = useState<FeatureFlags>(() => {
+    if (typeof window !== 'undefined') {
+      const storedFlags = window.localStorage.getItem('demo_feature_flags');
+      if (storedFlags) {
+        try {
+          return JSON.parse(storedFlags) as FeatureFlags;
+        } catch {
+          // fall through to defaults
+        }
+      }
+    }
+    return { aiInsights: true, housingPilot: false, smartCapture: true };
+  });
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return window.localStorage.getItem('isAuthenticated') === 'true';
+  });
 
+  const [personaHistory, setPersonaHistory] = useState<PersonaHistoryEntry[]>([
+    { id: initialUser.id, switchedAt: new Date().toISOString() },
+  ]);
+
+  // Single hydration effect: localStorage (sync) first, then API (async).
+  // The persisted user ID is already restored via the useState initialiser above.
+  // The API fetch only updates persona metadata, meetings, and templates.
+  // If a valid persisted user exists in the fresh persona map we refresh its
+  // metadata (avatar, team, etc.) without changing the user selection.
   useEffect(() => {
     let cancelled = false;
-    const hydrateFromApi = async () => {
+    async function hydrate() {
       try {
         const res = await fetch('/api/demos/personas', { cache: 'no-store' });
-        if (!res.ok) return;
+        if (!res.ok || cancelled) return;
         const json = await res.json();
         if (cancelled) return;
+
         if (json?.personas) {
           setPersonas(json.personas);
-          const restoredUserId = restoredUserIdRef.current;
-          if (restoredUserId) {
-            const restoredUser = json.personas[restoredUserId] ?? PERSONAS[restoredUserId];
-            if (restoredUser) {
-              setCurrentUser(restoredUser);
-              setDomain(restoredUser.domain);
-              setRole(restoredUser.role);
-            }
-          }
+
+          // Keep the persisted user selection but refresh their metadata from API
+          setCurrentUser((prev: User) => {
+            const refreshed = json.personas[prev.id];
+            return refreshed ?? prev;
+          });
         }
         if (json?.meetings) setMeetings(sortMeetings(json.meetings));
         if (json?.templates) setTemplates(json.templates);
-      } catch (err) {
-        console.warn('Falling back to local persona config', err);
-      }
-    };
-    hydrateFromApi();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  // Restore persisted state from localStorage after mount.
-  // MUST run client-side only to keep the first render identical to the server
-  // render and avoid React hydration mismatches.
-  useEffect(() => {
-    const savedId = window.localStorage.getItem('currentUserId');
-    const restoredUserId =
-      savedId && (personasSeed[savedId] ?? PERSONAS[savedId])
-        ? savedId
-        : null;
-    const restoredUser =
-      (restoredUserId ? personasSeed[restoredUserId] ?? PERSONAS[restoredUserId] : null) ??
-      initialUser;
-    restoredUserIdRef.current = restoredUserId;
-
-    setCurrentUser(restoredUser);
-    setDomain(restoredUser.domain);
-    setRole(restoredUser.role);
-
-    const storedFlags = window.localStorage.getItem('demo_feature_flags');
-    let nextFeatureFlags = DEFAULT_FEATURE_FLAGS;
-    if (storedFlags) {
-      try {
-        nextFeatureFlags = JSON.parse(storedFlags) as FeatureFlags;
       } catch {
-        nextFeatureFlags = DEFAULT_FEATURE_FLAGS;
+        // API unavailable — local persona config is already loaded via useState seed
       }
     }
-    const hasPersistedSession =
-      window.localStorage.getItem('isAuthenticated') === 'true' && Boolean(restoredUserId);
-    setFeatureFlagsState(nextFeatureFlags);
-    setIsAuthenticated(hasPersistedSession);
-    setPersonaHistory(
-      hasPersistedSession
-        ? [{ id: restoredUser.id, switchedAt: new Date().toISOString() }]
-        : []
-    );
-    setIsSessionHydrated(true);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    hydrate();
+    return () => { cancelled = true; };
   }, []);
 
   const addMeeting = useCallback((meeting: Meeting) => {
@@ -167,13 +148,13 @@ export function DemoProvider({
   const updateMeetingStatus = useCallback((
     meetingId: string,
     status: MeetingStatus,
-    meta?: { action?: 'approved' | 'returned' | 'rejected'; by?: string; timestamp?: string }
+    meta?: { action?: 'approved' | 'returned'; by?: string; timestamp?: string }
   ) => {
     const at = meta?.timestamp || new Date().toISOString();
     setMeetings(prev => sortMeetings(prev.map(m => m.id === meetingId ? {
       ...m,
       status,
-      lastAction: meta?.action ?? (status === 'approved' ? 'approved' : status === 'rejected' ? 'rejected' : 'returned'),
+      lastAction: meta?.action ?? (status === 'approved' ? 'approved' : 'returned'),
       lastActionAt: at,
       lastActionBy: meta?.by,
       submittedAt: m.submittedAt || at,
@@ -181,7 +162,6 @@ export function DemoProvider({
   }, []);
 
   const setFeatureFlags = useCallback((flags: FeatureFlags) => {
-    console.log('Saving feature flags:', flags);
     setFeatureFlagsState(flags);
     if (typeof window !== 'undefined') {
       window.localStorage.setItem('demo_feature_flags', JSON.stringify(flags));
@@ -191,20 +171,13 @@ export function DemoProvider({
   const router = useRouter();
 
   const switchUser = useCallback((userId: string) => {
-    console.log('[DemoContext] Switching to user:', userId);
     const user = personas[userId];
-    if (!user) {
-      console.error('[DemoContext] User not found:', userId);
-      return;
-    }
+    if (!user) return;
 
-    console.log('[DemoContext] User data:', user);
     setCurrentUser(user);
     setDomain(user.domain);
     setRole(user.role);
     setIsAuthenticated(true);
-    setIsSessionHydrated(true);
-    restoredUserIdRef.current = userId;
 
     if (typeof window !== 'undefined') {
       window.localStorage.setItem('currentUserId', userId);
@@ -216,7 +189,6 @@ export function DemoProvider({
       ...prev.slice(0, 9),
     ]);
 
-    console.log('[DemoContext] Navigation to dashboard');
     // Use setTimeout to ensure state updates complete before navigation
     setTimeout(() => {
       router.push('/');
@@ -234,9 +206,6 @@ export function DemoProvider({
     setDomain(fallbackUser.domain);
     setRole(fallbackUser.role);
     setIsAuthenticated(false);
-    setIsSessionHydrated(true);
-    setPersonaHistory([]);
-    restoredUserIdRef.current = null;
 
     if (typeof window !== 'undefined') {
       window.localStorage.removeItem('currentUserId');
@@ -285,7 +254,6 @@ export function DemoProvider({
     isAdmin,
     personaHistory,
     isAuthenticated,
-    isSessionHydrated,
   }), [
     domain,
     role,
@@ -305,8 +273,7 @@ export function DemoProvider({
     isManager,
     isAdmin,
     personaHistory,
-    isAuthenticated,
-    isSessionHydrated,
+    isAuthenticated
   ]);
 
   return (

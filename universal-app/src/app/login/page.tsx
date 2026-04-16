@@ -28,7 +28,6 @@ export default function LoginPage() {
 
   const handleSelect = (id: string) => {
     switchUser(id);
-    // Navigation handled by switchUser in DemoContext
   };
 
   return (
@@ -236,7 +235,7 @@ export default function LoginPage() {
             Skip for now – continue as {currentUser.name}
           </Button>
           <span>Changes are local to this demo only.</span>
-          <a href="#" className="text-primary/70 hover:text-primary underline mt-2">Forgot Password?</a>
+          <span className="text-muted-foreground mt-2">Password managed by your council IT team</span>
         </div>
       </div>
     </div>

@@ -1,0 +1,58 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm --filter universal-app lint*)",
+      "Bash(pnpm --filter universal-app test*)",
+      "Bash(pnpm --filter universal-app build*)",
+      "Bash(pnpm --filter universal-app audit:premium-ui)",
+      "Bash(pnpm --filter universal-app openapi-ts*)",
+      "Bash(cd minute-main && poetry run pytest*)",
+      "Bash(cd minute-main && poetry run python scripts/validate_configs.py*)",
+      "Bash(git status*)",
+      "Bash(git log*)",
+      "Bash(git diff*)",
+      "Bash(git branch*)",
+      "Bash(git checkout -b *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git merge *)",
+      "Bash(git worktree *)",
+      "Bash(gh pr *)",
+      "Bash(gh api *)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(wc *)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/anasdayeh/Downloads/UniversalCouncilAPP/.claude/hooks/block-sensitive-files.py",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/anasdayeh/Downloads/UniversalCouncilAPP/.claude/hooks/check-theme-tokens.py",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "python3 /Users/anasdayeh/Downloads/UniversalCouncilAPP/.claude/hooks/check-a11y.py",
+            "timeout": 5000
+          }
+        ]
+      }
+    ]
+  }
+}

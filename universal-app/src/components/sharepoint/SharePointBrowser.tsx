@@ -62,8 +62,8 @@ const FileIcon = ({ mimeType, className }: { mimeType?: string; className?: stri
   );
 };
 
-const SearchIcon = () => (
-  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+const SearchIcon = ({ 'aria-hidden': ariaHidden }: { 'aria-hidden'?: 'true' | 'false' }) => (
+  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden={ariaHidden}>
     <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
     <path d="M20 20L16.5 16.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
   </svg>
@@ -411,13 +411,14 @@ export function SharePointBrowser({
         {/* Search and Upload */}
         <div className="flex items-center gap-3">
           <div className="flex-1 relative">
-            <SearchIcon />
+            <SearchIcon aria-hidden="true" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               placeholder="Search files..."
+              aria-label="Search SharePoint files"
               className="w-full pl-9 pr-4 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50"
             />
             {searchQuery && (

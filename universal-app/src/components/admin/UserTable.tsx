@@ -208,11 +208,12 @@ export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTable
           <thead>
             <tr className="border-b border-border bg-muted/50">
               <th className="px-4 py-3 text-left">
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   checked={selectedUsers.size === filteredUsers.length && filteredUsers.length > 0}
                   onChange={toggleSelectAll}
                   className="rounded border-input"
+                  aria-label="Select all users"
                 />
               </th>
               <th 
@@ -262,11 +263,12 @@ export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTable
                 )}
               >
                 <td className="px-4 py-3">
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     checked={selectedUsers.has(user.id)}
                     onChange={() => toggleSelect(user.id)}
                     className="rounded border-input"
+                    aria-label={`Select ${user.name}`}
                   />
                 </td>
                 <td className="px-4 py-3">

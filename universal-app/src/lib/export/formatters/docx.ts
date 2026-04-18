@@ -187,6 +187,19 @@ export class DocxFormatter implements IExportFormatter {
         }
       }
 
+      // Tags
+      if (minute.tags && minute.tags.length > 0) {
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({ text: 'Tags: ', bold: true }),
+              new TextRun({ text: minute.tags.join(', ') }),
+            ],
+            spacing: { after: 400 },
+          })
+        );
+      }
+
       // Attendees
       if (options.includeAttendees && minute.attendees.length > 0) {
         children.push(

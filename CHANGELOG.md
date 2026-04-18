@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-04-18 (Orchestration Run 8 — Export Tags, Hero CTA, Route Boundaries)
+
+### Added — Export Tag Support (#60)
+- Added `tags?: string[]` field to `Minute` type (`lib/minutes/types.ts`)
+- All 4 export formatters (txt, html, docx, pdf) now render tags when present
+- TXT: `Tags: tag1, tag2` line after metadata
+- HTML: styled badge chips with indigo theme
+- DOCX: bold label + comma-separated values
+- PDF: grey text line after metadata
+
+### Fixed — Domain-Specific Hero CTA (#61)
+- Extended `PersonaCopy` with `domainCtaLabels` field for domain-aware hero buttons
+- Children's workers see "Capture Visit", adults see "Capture Session", housing see "Capture Inspection"
+- Housing officer persona defaults to "Capture Inspection"
+
+### Added — 10 Missing Route Boundaries
+- Loading skeletons: `review-queue/[id]`, `templates/[id]`, `capture`, `settings`, `profile`
+- Error boundaries: `capture`, `templates`, `upload`, `settings`, `profile`
+- All skeletons match route structure, use `role="status" aria-busy="true"`
+- Error boundaries detect 404 patterns and show contextual "not found" messaging
+- Templates error links back to `/templates` list, not generic home
+
 ## 2026-04-18 (Orchestration Run 7 — Admin Persistence, Dashboard Realism, Tag Filtering)
 
 ### Fixed — Admin State Persistence (Ship-blockers #2, #3, #18, #19, #35)
@@ -22,6 +44,17 @@
 - Combined filters (search + status + template + tags) with "Clear filters" button
 - Filtered empty state with contextual messaging when no notes match active filters
 
+### Fixed — Smart Capture Shell Integration (#58)
+- Rebuilt `/record` on the shared `ShellPage` and `PageHeader` primitives so Smart Capture now reads as a native workspace route instead of a nested mini-app
+- Moved consent, live capture, and completion states into the shared shell structure with inspector-side status panels and consistent route chrome
+- Replaced the old browser confirm escape hatch with the shared confirmation dialog flow while preserving the rule that `recordedAt` is only stamped after a successful recording start
+- Extended the record-page guard integration test to assert the shared Smart Capture heading and consent state together
+
+### Changed — Runtime Logging Hygiene (WP5)
+- Added `src/lib/dev.ts` to centralize development-only logging helpers (`devLog`, `devWarn`)
+- Removed production `console.log` noise from login, Smart Capture-adjacent flows, notifications, PWA utilities, vitals actions, and minute detail autosave wiring
+- Converted mock menu fallback handlers to development-only warnings so production clicks no longer emit placeholder runtime logs
+
 ### Fixed — Build Blocker
 - `SessionWarning.tsx` implicit `any` type on event handlers — let TypeScript infer correct types
 
@@ -38,7 +71,7 @@
 
 ## 2026-04-18 — GitHub Copilot Customisation + Post-Overhaul Review
 
-### Added — GitHub Copilot Integration (`.github/`)
+### Added — GitHub Copilot Integration (`.github/` — 6 files)
 
 - `.github/copilot-instructions.md` — project-wide instructions for Copilot agent mode (tech stack, critical rules, validation commands, prioritisation matrix)
 - `.github/instructions/frontend-components.instructions.md` — auto-applied to `**/*.tsx` files (theme tokens, a11y, z-index, hydration safety, AppShell patterns)

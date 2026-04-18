@@ -198,6 +198,15 @@ export class PdfFormatter implements IExportFormatter {
         y += 10;
       }
 
+      // Tags
+      if (minute.tags && minute.tags.length > 0) {
+        doc.setFontSize(styles.fontSize.body);
+        doc.setTextColor(100, 100, 100);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Tags: ${minute.tags.join(', ')}`, margin.left, y);
+        y += 8;
+      }
+
       // Attendees
       if (options.includeAttendees && minute.attendees.length > 0) {
         checkPageBreak(30);

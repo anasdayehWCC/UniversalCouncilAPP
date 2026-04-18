@@ -109,9 +109,11 @@ Each section is dated and sourced. Items are sorted by severity within each sect
 | # | Category | Severity | Description | Location | Source Agent |
 |---|----------|----------|-------------|----------|-------------|
 | 59 | infrastructure | high | `@radix-ui/react-dialog` referenced by dialog.tsx and SessionWarning.tsx but NOT in package.json | universal-app/package.json | WP1 (admin) |
-| 60 | export | medium | Tags exist on Meeting type but not on Minute type — export formatters can't include tags | lib/minutes/types.ts, lib/export/formatters/*.ts | WP3 (notes) |
-| 61 | ux | medium | Hero CTA says generic "Create Smart Capture" regardless of domain — should be domain-specific | universal-app/src/copy/strings.ts | WP2 (dashboard) |
+| 60 | export | medium | Tags exist on Meeting type but not on Minute type — export formatters can't include tags | lib/minutes/types.ts, lib/export/formatters/*.ts | WP3 (notes) | resolved |
+| 61 | ux | medium | Hero CTA says generic "Create Smart Capture" regardless of domain — should be domain-specific | universal-app/src/copy/strings.ts | WP2 (dashboard) | resolved |
 | 62 | code-quality | low | SortIcon defined inside UserTable render function — lint warning | universal-app/src/components/admin/UserTable.tsx | WP1 (admin) |
+| 63 | code-quality | low | `useMinutes` still emits raw runtime logs in active flow paths and should move to dev-only logging or structured telemetry | universal-app/src/hooks/useMinutes.ts | WP5 (cleanup) |
+| 64 | code-quality | low | EvidencePopover still contains a direct console log in the minutes UI | universal-app/src/components/minutes/EvidencePopover.tsx | WP5 (cleanup) |
 
 ## 2026-04-18 Route Shell Integration Audit
 
@@ -122,4 +124,4 @@ Each section is dated and sourced. Items are sorted by severity within each sect
 | # | Category | Description | Route | Found By | Confidence | Status |
 |---|----------|-------------|-------|----------|------------|--------|
 | 57 | ux | Admin routes feel like a shell inside a shell because AppShell already owns global chrome, then admin adds a second sticky sidebar in `src/app/admin/layout.tsx` and a second sticky header via `AdminPageWrapper` in `src/components/admin/AdminHeader.tsx`. | /admin* | Manual shell audit | 97 | open |
-| 58 | ux | Smart Capture feels bolted on because `/record` bypasses the shared `ShellPage` and `PageHeader` primitives and renders its own sticky tool header, constrained canvas, and standalone consent/completion states inside the main shell. | /record | Manual shell audit | 95 | open |
+| 58 | ux | Smart Capture feels bolted on because `/record` bypasses the shared `ShellPage` and `PageHeader` primitives and renders its own sticky tool header, constrained canvas, and standalone consent/completion states inside the main shell. | /record | Manual shell audit | 95 | resolved |

@@ -128,6 +128,8 @@ export interface Minute {
   attendees: MinuteAttendee[];
   metadata: MinuteMetadata;
   versions?: MinuteVersion[];
+  /** User-applied topic tags */
+  tags?: string[];
   /** Approval workflow */
   submittedAt?: string;
   submittedBy?: string;
@@ -219,9 +221,9 @@ export const MINUTE_STATUS_CONFIG: Record<MinuteStatus, {
   },
   published: {
     label: 'Published',
-    color: 'text-foreground',
-    bgColor: 'bg-muted',
-    borderColor: 'border-border',
+    color: 'text-slate-700',
+    bgColor: 'bg-slate-100',
+    borderColor: 'border-slate-200',
     icon: 'Globe'
   }
 };
@@ -237,9 +239,9 @@ export const ACTION_PRIORITY_CONFIG: Record<ActionPriority, {
 }> = {
   low: {
     label: 'Low',
-    color: 'text-muted-foreground',
-    bgColor: 'bg-muted',
-    borderColor: 'border-border'
+    color: 'text-slate-600',
+    bgColor: 'bg-slate-50',
+    borderColor: 'border-slate-200'
   },
   medium: {
     label: 'Medium',
@@ -271,8 +273,8 @@ export const ACTION_STATUS_CONFIG: Record<ActionStatus, {
 }> = {
   pending: {
     label: 'Pending',
-    color: 'text-muted-foreground',
-    bgColor: 'bg-muted'
+    color: 'text-slate-600',
+    bgColor: 'bg-slate-100'
   },
   in_progress: {
     label: 'In Progress',
@@ -286,7 +288,7 @@ export const ACTION_STATUS_CONFIG: Record<ActionStatus, {
   },
   cancelled: {
     label: 'Cancelled',
-    color: 'text-muted-foreground',
-    bgColor: 'bg-muted/50'
+    color: 'text-slate-400',
+    bgColor: 'bg-slate-50'
   }
 };

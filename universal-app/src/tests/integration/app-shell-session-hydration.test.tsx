@@ -27,7 +27,7 @@ vi.mock('@/components/ResilienceBanner', () => ({
 }));
 
 vi.mock('@/components/ConnectivityIndicator', () => ({
-  ConnectivityIndicator: () => null,
+  ConnectivityIndicator: () => <div data-testid="connectivity-indicator" />,
 }));
 
 vi.mock('@/components/ui/AnimatedIcon', () => ({
@@ -81,6 +81,7 @@ describe('AppShell session hydration', () => {
       expect(screen.getByText('Protected content')).toBeInTheDocument();
     });
 
+    expect(screen.queryByTestId('connectivity-indicator')).not.toBeInTheDocument();
     expect(replace).not.toHaveBeenCalledWith('/login');
   });
 
@@ -96,5 +97,7 @@ describe('AppShell session hydration', () => {
     await waitFor(() => {
       expect(replace).toHaveBeenCalledWith('/login');
     });
+
+    expect(screen.queryByTestId('connectivity-indicator')).not.toBeInTheDocument();
   });
 });

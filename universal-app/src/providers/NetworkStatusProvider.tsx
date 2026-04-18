@@ -48,9 +48,6 @@ export function NetworkStatusProvider({ children }: { children: React.ReactNode 
 
 /**
  * Read shared network status from the provider.
- *
- * Falls back to a standalone polling instance when used outside the provider,
- * so existing code doesn't break during migration.
  */
 export function useNetworkStatus(): UseNetworkStatusReturn {
   const ctx = useContext(NetworkStatusContext);

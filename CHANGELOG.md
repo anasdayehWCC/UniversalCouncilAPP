@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-04-17
+
+### Fixed — Auth Gating + Network Status
+
+- `useRoleGuard` now treats authorization as `hydrated + authenticated + allowed role`, redirecting signed-out users to `/login` with `router.replace` and wrong-role users to `/`
+- `AppShell` now uses `router.replace('/login')` for automatic auth enforcement and no longer renders a duplicate floating `ConnectivityIndicator`
+- `/record` now uses a guarded wrapper plus authorized inner component so unauthorized sessions never initialize recorder state or paint consent/recorder UI
+- Recorder route network status now comes from `NetworkStatusProvider`, and `OfflineFallback` was migrated to the provider hook as well, eliminating duplicate `/healthcheck` polling from direct low-level hook usage
+- `NetworkStatusProvider` documentation was corrected to describe the provider-only shared polling contract
+
+### Added — Regression Coverage
+
+- Added `/record` guard integration coverage for signed-out fallback personas, wrong-role authenticated sessions, and authorized social workers
+- Added an assertion that recorder routes only hit `/api/proxy/healthcheck` once per mount when wrapped in `NetworkStatusProvider`
+- Extended `useRoleGuard` and AppShell hydration tests to cover the new `replace('/login')` redirect behavior and confirm `AppShell` no longer renders its own connectivity indicator
+
 ## 2026-04-16 (Orchestration Run 3 — 8-Agent Backlog Sweep)
 
 ### Fixed — Record Page (7 items)

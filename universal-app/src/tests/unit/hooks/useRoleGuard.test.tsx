@@ -67,6 +67,23 @@ describe('useRoleGuard', () => {
     });
   });
 
+  it('redirects signed-out fallback personas to login after hydration', async () => {
+    render(
+      <DemoProvider>
+        <GuardProbe allowedRoles={['social_worker']} />
+      </DemoProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('ready')).toHaveTextContent('true');
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('authorized')).toHaveTextContent('false');
+      expect(replace).toHaveBeenCalledWith('/login');
+    });
+  });
+
   it('does not redirect after hydration when the restored role is authorized', async () => {
     window.localStorage.setItem('currentUserId', 'david');
     window.localStorage.setItem('isAuthenticated', 'true');

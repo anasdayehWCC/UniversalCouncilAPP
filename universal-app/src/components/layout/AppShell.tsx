@@ -13,7 +13,6 @@ import { getNavForRole } from '@/config/navigation';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useColorMode } from '@/hooks/useTheme';
 import { ResilienceBanner } from '@/components/ResilienceBanner';
-import { ConnectivityIndicator } from '@/components/ConnectivityIndicator';
 import { ZINDEX_CLASSES } from '@/lib/z-index';
 import {
   DropdownMenu,
@@ -41,7 +40,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   React.useEffect(() => {
     if (isSessionHydrated && !isLogin && !isAuthenticated) {
-      router.push('/login');
+      router.replace('/login');
     }
   }, [isAuthenticated, isLogin, isSessionHydrated, router]);
 
@@ -368,16 +367,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <ResilienceBanner position="inline" className="w-full max-w-xl" />
         </div>
 
-        <div className="pointer-events-none absolute inset-0">
-          <div className="relative mx-auto h-full max-w-7xl">
-            <ConnectivityIndicator
-              position="bottom-right"
-              anchored="absolute"
-              hideWhenOnline
-              className="pointer-events-auto"
-            />
-          </div>
-        </div>
       </div>
     </div>
   </div>

@@ -29,8 +29,8 @@ import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { useDemo } from '@/context/DemoContext';
 import { useRoleGuard } from '@/hooks/useRoleGuard';
-import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { useRecorder, QUALITY_PRESETS } from '@/hooks/useRecorder';
+import { useNetworkStatus } from '@/providers/NetworkStatusProvider';
 import type { AudioQuality, CaseMetadata } from '@/lib/audio/types';
 import type { Meeting } from '@/types/demo';
 
@@ -187,19 +187,19 @@ function RecordingCompleteScreen({
 const ALLOWED_ROLES: Array<'social_worker' | 'housing_officer'> = ['social_worker', 'housing_officer'];
 
 export default function RecordPage() {
-  useRoleGuard(ALLOWED_ROLES);
+  const { isReady, isAuthorized } = useRoleGuard(ALLOWED_ROLES);
 
-  const router = useRouter();
-  const { currentUser, addMeeting, role } = useDemo();
-  const { state: networkState } = useNetworkStatus();
-
-  // Authorization gate: block ALL rendering until role is confirmed.
-  // useRoleGuard redirects via useEffect, but that fires AFTER first render.
-  // Without this early return, unauthorized users briefly see the consent screen.
-  const isAuthorized = (ALLOWED_ROLES as readonly string[]).includes(role);
-  if (!isAuthorized) {
+  if (!isReady || !isAuthorized) {
     return null;
   }
+
+  return <AuthorizedRecordPage />;
+}
+
+function AuthorizedRecordPage() {
+  const router = useRouter();
+  const { currentUser, addMeeting } = useDemo();
+  const { state: networkState } = useNetworkStatus();
 
   // Consent state
   const [showConsent, setShowConsent] = useState(() => {

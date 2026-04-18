@@ -13,7 +13,7 @@ import { useEffect, useState, useSyncExternalStore } from 'react';
 import { motion } from 'framer-motion';
 import { WifiOff, RefreshCw, Cloud, Smartphone, Signal } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useNetworkStatus } from '@/hooks/useNetworkStatus';
+import { useNetworkStatus } from '@/providers/NetworkStatusProvider';
 import { useSyncManager } from '@/hooks/useSyncManager';
 import { useAuth } from '@/hooks/useAuth';
 

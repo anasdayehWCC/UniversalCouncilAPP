@@ -15,6 +15,9 @@
 - Children's workers see "Capture Visit", adults see "Capture Session", housing see "Capture Inspection"
 - Housing officer persona defaults to "Capture Inspection"
 
+### Note — Parallel Session Files (not committed by this session)
+- `.github/copilot-instructions.md`, `.github/hooks/`, `.github/instructions/`, `.github/prompts/` created by parallel session's GitHub Copilot setup — intentionally left uncommitted per coordination protocol
+
 ### Added — 10 Missing Route Boundaries
 - Loading skeletons: `review-queue/[id]`, `templates/[id]`, `capture`, `settings`, `profile`
 - Error boundaries: `capture`, `templates`, `upload`, `settings`, `profile`

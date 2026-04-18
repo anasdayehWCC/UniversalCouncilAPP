@@ -67,18 +67,49 @@ export function DemoProvider({
     Object.values(personasSeed)[0] ??
     Object.values(PERSONAS)[0];
 
-  const [personas] = useState<Record<string, PersonaMetadata>>(personasSeed);
+  const [personas, setPersonas] = useState<Record<string, PersonaMetadata>>(personasSeed);
 
   // Default to persisted user (or Sarah) — always cross-check ROLE_MATRIX.md before changing scopes.
   const [currentUser, setCurrentUser] = useState<User>(initialUser);
   const [domain, setDomain] = useState<ServiceDomain>(initialUser.domain);
   const [role, setRole] = useState<UserRole>(initialUser.role);
   const [meetings, setMeetings] = useState<Meeting[]>(sortMeetings(initialMeetings ?? PERSONA_MEETINGS));
-  const [templates] = useState<Template[]>(PERSONA_TEMPLATES);
+  const [templates, setTemplates] = useState<Template[]>(PERSONA_TEMPLATES);
   const [featureFlags, setFeatureFlagsState] = useState<FeatureFlags>(DEFAULT_FEATURE_FLAGS);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isSessionHydrated, setIsSessionHydrated] = useState<boolean>(false);
   const [personaHistory, setPersonaHistory] = useState<PersonaHistoryEntry[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const hydrateFromApi = async () => {
+      try {
+        const res = await fetch('/api/demos/personas', { cache: 'no-store' });
+        if (!res.ok) return;
+        const json = await res.json();
+        if (cancelled) return;
+        if (json?.personas) {
+          setPersonas(json.personas);
+          const restoredUserId = restoredUserIdRef.current;
+          if (restoredUserId) {
+            const restoredUser = json.personas[restoredUserId] ?? PERSONAS[restoredUserId];
+            if (restoredUser) {
+              setCurrentUser(restoredUser);
+              setDomain(restoredUser.domain);
+              setRole(restoredUser.role);
+            }
+          }
+        }
+        if (json?.meetings) setMeetings(sortMeetings(json.meetings));
+        if (json?.templates) setTemplates(json.templates);
+      } catch (err) {
+        console.warn('Falling back to local persona config', err);
+      }
+    };
+    hydrateFromApi();
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Restore persisted state from localStorage after mount.
   // MUST run client-side only to keep the first render identical to the server

@@ -1,16 +1,15 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { TranscriptTab } from './components';
 import { AIEditSidebar } from '@/components/AIEditSidebar';
-import { ShellPage } from '@/components/layout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  ArrowLeft, Calendar, Clock, Share2, Download,
+import { 
+  ArrowLeft, Calendar, Clock, Share2, Download, 
   FileText, Mic, CheckSquare
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -24,82 +23,16 @@ export default function MeetingDetailPage() {
   const template = templates.find(t => t.id === meeting?.templateId);
   const [activeTab, setActiveTab] = useState<'summary' | 'transcript' | 'tasks'>('summary');
 
-  const handleExport = useCallback(() => {
-    if (!meeting) return;
-
-    const dateStr = formatDate(meeting.date);
-    const timeStr = formatTime(meeting.date);
-    const templateName = template?.name || 'General Meeting';
-
-    const lines: string[] = [
-      `# ${meeting.title}`,
-      '',
-      `**Date:** ${dateStr} at ${timeStr}`,
-      `**Duration:** ${meeting.duration}`,
-      `**Template:** ${templateName}`,
-      `**Status:** ${meeting.status.replace('_', ' ')}`,
-      `**Attendees:** ${meeting.attendees.join(', ')}`,
-      '',
-      '---',
-      '',
-      '## Summary',
-      '',
-      meeting.summary,
-    ];
-
-    if (meeting.tasks.length > 0) {
-      lines.push('', '---', '', '## Tasks', '');
-      for (const task of meeting.tasks) {
-        const checkbox = task.status === 'done' ? '[x]' : '[ ]';
-        const assignee = personas[task.assigneeId]?.name || task.assigneeId;
-        lines.push(`- ${checkbox} ${task.title} (Assigned to: ${assignee}, Due: ${formatDate(task.dueDate)})`);
-      }
-    }
-
-    const content = lines.join('\n');
-    const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-
-    const safeName = meeting.title.replace(/[^a-zA-Z0-9-_ ]/g, '').replace(/\s+/g, '_');
-    const safeDate = meeting.date.split('T')[0] || dateStr.replace(/\s+/g, '_');
-    const filename = `${safeName}_${safeDate}.md`;
-
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = filename;
-    document.body.appendChild(anchor);
-    anchor.click();
-    document.body.removeChild(anchor);
-    URL.revokeObjectURL(url);
-  }, [meeting, template, personas]);
-
   if (!meeting) {
-    return (
-      <ShellPage>
-        <Card className="max-w-md mx-auto mt-12 p-8 text-center bg-card border border-border rounded-xl">
-          <FileText className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-40" />
-          <h2 className="text-xl font-semibold text-foreground mb-2">Meeting not found</h2>
-          <p className="text-sm text-muted-foreground mb-6">
-            The meeting you are looking for does not exist or may have been removed.
-          </p>
-          <Link
-            href="/my-notes"
-            className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to My Notes
-          </Link>
-        </Card>
-      </ShellPage>
-    );
+    return <div className="p-12 text-center">Meeting not found</div>;
   }
 
   return (
     <div className="flex min-h-0 min-w-0">
       {/* Main Content Area — mr-80 makes room for the fixed AI sidebar */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-muted/30 mr-80">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-muted/30 xl:mr-80">
         {/* Header */}
-        <div className="px-8 py-6 border-b border-border bg-card flex-shrink-0 shadow-sm z-10 animate-in fade-in slide-in-from-top-2 duration-500">
+        <div className="px-4 sm:px-8 py-6 border-b border-border bg-card flex-shrink-0 shadow-sm z-10 animate-in fade-in slide-in-from-top-2 duration-500 motion-reduce:animate-none">
             <nav className="flex items-center gap-2 text-sm text-muted-foreground">
               <Link href="/my-notes" className="hover:text-foreground transition-colors flex items-center gap-1">
                 <ArrowLeft className="w-4 h-4" /> My Notes
@@ -107,7 +40,7 @@ export default function MeetingDetailPage() {
               <span className="opacity-30">/</span>
               <span className="font-medium text-foreground truncate max-w-[300px]">{meeting.title}</span>
             </nav>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Badge variant="outline" className="bg-muted text-muted-foreground border-input">
                 {template?.name || 'General Meeting'}
               </Badge>
@@ -139,10 +72,10 @@ export default function MeetingDetailPage() {
             </div>
           </div>
 
-          <div className="flex justify-between items-start">
+          <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-start">
             <div>
               <h1 className="text-2xl font-display font-bold text-foreground mb-2">{meeting.title}</h1>
-              <div className="flex items-center gap-6 text-sm text-muted-foreground">
+              <div className="flex flex-wrap items-center gap-3 sm:gap-6 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
                   {formatDate(meeting.date)} at {formatTime(meeting.date)}
@@ -169,12 +102,12 @@ export default function MeetingDetailPage() {
               </div>
             </div>
             
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-2 sm:gap-3">
               <Button variant="outline" className="gap-2">
                 <Share2 className="w-4 h-4" />
                 Share
               </Button>
-	              <Button className="gap-2 shadow-sm" onClick={handleExport}>
+              <Button className="gap-2 shadow-sm">
                 <Download className="w-4 h-4" />
                 Export
               </Button>
@@ -183,15 +116,15 @@ export default function MeetingDetailPage() {
 
 
         {/* Custom Tabs Header */}
-        <div className="px-8 pt-6 pb-0 bg-card border-b border-border flex-shrink-0">
-          <div className="flex gap-8">
+        <div className="px-4 sm:px-8 pt-6 pb-0 bg-card border-b border-border flex-shrink-0">
+          <div className="flex gap-4 sm:gap-8 overflow-x-auto">
             <button 
               onClick={() => {
                 console.log('Switching to summary');
                 setActiveTab('summary');
               }}
               className={cn(
-                "pb-3 text-sm font-medium flex items-center gap-2 transition-colors border-b-2",
+                "pb-3 text-sm font-medium flex items-center gap-2 transition-colors border-b-2 whitespace-nowrap",
                 activeTab === 'summary' 
                   ? "border-primary text-primary" 
                   : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/50"
@@ -206,7 +139,7 @@ export default function MeetingDetailPage() {
                 setActiveTab('transcript');
               }}
               className={cn(
-                "pb-3 text-sm font-medium flex items-center gap-2 transition-colors border-b-2",
+                "pb-3 text-sm font-medium flex items-center gap-2 transition-colors border-b-2 whitespace-nowrap",
                 activeTab === 'transcript' 
                   ? "border-primary text-primary" 
                   : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/50"
@@ -221,7 +154,7 @@ export default function MeetingDetailPage() {
                 setActiveTab('tasks');
               }}
               className={cn(
-                "pb-3 text-sm font-medium flex items-center gap-2 transition-colors border-b-2",
+                "pb-3 text-sm font-medium flex items-center gap-2 transition-colors border-b-2 whitespace-nowrap",
                 activeTab === 'tasks' 
                   ? "border-primary text-primary" 
                   : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/50"
@@ -238,7 +171,7 @@ export default function MeetingDetailPage() {
 
         {/* Tab Content */}
         <div className="flex-1 overflow-y-auto p-8">
-          <div className={cn("max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500", activeTab !== 'summary' && "hidden")}>
+          <div className={cn("max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 motion-reduce:animate-none", activeTab !== 'summary' && "hidden")}>
             <Card variant="glass" className="rounded-xl border border-border shadow-sm p-8 min-h-[600px] bg-card/80" hoverEffect={false}>
               {/* Render Summary with Markdown-like parsing for bold headers */}
               {meeting.summary.split('\n\n').map((block, i) => {
@@ -271,7 +204,7 @@ export default function MeetingDetailPage() {
             </Card>
           </div>
 
-          <div className={cn("w-full min-h-0 h-full pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500", activeTab !== 'transcript' && "hidden")}>
+          <div className={cn("w-full min-h-0 h-full pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500 motion-reduce:animate-none", activeTab !== 'transcript' && "hidden")}>
             <TranscriptTab 
               recordingId={meeting.id} 
               legacyTranscript={meeting.transcript}
@@ -279,7 +212,7 @@ export default function MeetingDetailPage() {
             />
           </div>
 
-          <div className={cn("max-w-3xl mx-auto pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500", activeTab !== 'tasks' && "hidden")}>
+          <div className={cn("max-w-3xl mx-auto pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500 motion-reduce:animate-none", activeTab !== 'tasks' && "hidden")}>
             <Card variant="glass" className="rounded-xl border border-border shadow-sm overflow-hidden bg-card/80" hoverEffect={false}>
               {meeting.tasks.length > 0 ? meeting.tasks.map((task) => (
                 <div key={task.id} className="p-4 border-b border-border last:border-0 flex items-center gap-4 hover:bg-muted/50 transition-colors group">

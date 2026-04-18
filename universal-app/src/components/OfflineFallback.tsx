@@ -9,7 +9,7 @@
  * @module components/OfflineFallback
  */
 
-import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { WifiOff, RefreshCw, Cloud, Smartphone, Signal } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -43,11 +43,8 @@ export function OfflineFallback({
   children,
   forceOffline = false,
 }: OfflineFallbackProps) {
-  const isMounted = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false
-  );
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => { setIsMounted(true); }, []);
 
   const { state, checkNow, isChecking } = useNetworkStatus();
   const { pendingCount } = useSyncManager();
@@ -222,11 +219,8 @@ interface OfflineCardProps {
  * Compact card variant for embedding in pages
  */
 export function OfflineCard({ className }: OfflineCardProps) {
-  const isMounted = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false
-  );
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => { setIsMounted(true); }, []);
 
   const { state, checkNow, isChecking } = useNetworkStatus();
   const { pendingCount } = useSyncManager();

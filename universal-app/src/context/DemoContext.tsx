@@ -181,7 +181,6 @@ export function DemoProvider({
   }, []);
 
   const setFeatureFlags = useCallback((flags: FeatureFlags) => {
-    console.log('Saving feature flags:', flags);
     setFeatureFlagsState(flags);
     if (typeof window !== 'undefined') {
       window.localStorage.setItem('demo_feature_flags', JSON.stringify(flags));
@@ -191,14 +190,12 @@ export function DemoProvider({
   const router = useRouter();
 
   const switchUser = useCallback((userId: string) => {
-    console.log('[DemoContext] Switching to user:', userId);
     const user = personas[userId];
     if (!user) {
       console.error('[DemoContext] User not found:', userId);
       return;
     }
 
-    console.log('[DemoContext] User data:', user);
     setCurrentUser(user);
     setDomain(user.domain);
     setRole(user.role);
@@ -216,7 +213,6 @@ export function DemoProvider({
       ...prev.slice(0, 9),
     ]);
 
-    console.log('[DemoContext] Navigation to dashboard');
     // Use setTimeout to ensure state updates complete before navigation
     setTimeout(() => {
       router.push('/');

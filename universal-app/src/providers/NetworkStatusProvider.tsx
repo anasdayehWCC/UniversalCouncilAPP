@@ -51,11 +51,8 @@ export function NetworkStatusProvider({ children }: { children: React.ReactNode 
  */
 export function useNetworkStatus(): UseNetworkStatusReturn {
   const ctx = useContext(NetworkStatusContext);
-  if (!ctx) {
-    throw new Error(
-      'useNetworkStatus must be used within <NetworkStatusProvider>. ' +
-      'Wrap your app (or the relevant subtree) in <NetworkStatusProvider>.'
-    );
-  }
-  return ctx;
+  // Fall back to a direct hook instance if called outside the provider
+  // (e.g. in an ErrorBoundary or Suspense boundary above the provider tree).
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  return ctx ?? useNetworkStatusImpl();
 }

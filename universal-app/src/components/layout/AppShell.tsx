@@ -3,12 +3,12 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useDemo } from '@/context/DemoContext';
 import type { ServiceDomain } from '@/config/domains';
 import { cn, hexToRgba } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Bell, Search, Menu, LogOut, ChevronDown, Settings } from 'lucide-react';
+import { Bell, Search, Menu, LogOut, ChevronDown, Settings, X } from 'lucide-react';
 import { getNavForRole } from '@/config/navigation';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useColorMode } from '@/hooks/useTheme';
@@ -25,8 +25,9 @@ import {
 import { AnimatedIcon } from '@/components/ui/AnimatedIcon';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const { config, domain, role, currentUser, switchUser, signOut, featureFlags, personas, isAuthenticated } = useDemo();
+  const { config, domain, role, currentUser, switchUser, signOut, featureFlags, personas, isAuthenticated, isSessionHydrated, meetings } = useDemo();
   const pathname = usePathname();
+  const router = useRouter();
   const { isDark } = useColorMode();
   const [isMounted, setIsMounted] = React.useState(false);
   // Start with sidebar closed on mobile (will be shown via lg:translate-x-0 on desktop)
@@ -38,16 +39,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   React.useEffect(() => {
-    if (!isLogin && !isAuthenticated) {
-      // Use window.location to ensure a clean state if needed, or router for speed.
-      // Since this is a demo app, router is fine.
-      // But we can't use router here because we didn't import it.
-      // Let's use window.location.href for now to be safe.
-      window.location.href = '/login';
+    if (isSessionHydrated && !isLogin && !isAuthenticated) {
+      router.replace('/login');
     }
-  }, [isLogin, isAuthenticated]);
+  }, [isAuthenticated, isLogin, isSessionHydrated, router]);
 
   const navItems = React.useMemo(() => getNavForRole(domain, role, featureFlags), [domain, role, featureFlags]);
+
+  // Count pending review items (ready or flagged) for the Review Queue badge
+  const pendingReviewCount = React.useMemo(
+    () => meetings.filter((m) => m.status === 'ready' || m.status === 'flagged').length,
+    [meetings]
+  );
 
   const sidebarBg = config.theme.primary;
   const isDarkSidebar = true;
@@ -101,6 +104,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     );
   }
 
+  if (!isSessionHydrated) {
+    return (
+      <div
+        className="min-h-[100dvh] bg-background text-foreground transition-colors duration-200"
+        aria-busy="true"
+        role="status"
+      />
+    );
+  }
+
   return (
     <div
       className="relative isolate h-[100dvh] overflow-hidden bg-background text-foreground transition-colors duration-200"
@@ -110,7 +123,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       }}
     >
       <div className="flex h-full min-h-0 relative z-10">
-      <a href="#main-content" className="skip-link">Skip to main content</a>
       {/* Mobile overlay - shows when sidebar is open on mobile */}
       {isSidebarOpen && (
         <div
@@ -129,7 +141,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         aria-label="Main navigation sidebar"
       >
         {/* Logo Area */}
-        <div className="h-16 flex items-center px-6 border-b border-white/10">
+        <div className="h-16 flex items-center justify-between px-6 border-b border-white/10">
           <div className="flex items-center gap-2">
             <div
               className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold shadow-lg"
@@ -141,6 +153,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               Minute<span className="text-muted-foreground">Platform</span>
             </span>
           </div>
+          {/* Mobile close button */}
+          <button
+            className="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+            onClick={() => setIsSidebarOpen(false)}
+            aria-label="Close navigation"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Navigation */}
@@ -152,7 +172,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-            
+            const showBadge = item.href === '/review-queue' && pendingReviewCount > 0;
+
             return (
               <Link
                 key={item.href}
@@ -162,9 +183,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   isActive && "nav-link--active"
                 )}
                 style={navStyle}
+                onClick={() => setIsSidebarOpen(false)}
               >
                 <Icon className="w-5 h-5" style={{ strokeWidth: isActive ? 2.6 : 2.2 }} />
-                {item.label}
+                <span className="flex-1">{item.label}</span>
+                {showBadge && (
+                  <span className="ml-auto inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-destructive text-destructive-foreground text-[11px] font-semibold leading-none">
+                    {pendingReviewCount}
+                  </span>
+                )}
               </Link>
             );
           })}
@@ -243,7 +270,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 min-h-0">
+      <div className="relative flex min-h-0 min-w-0 flex-1 flex-col">
         {/* Header - z-50 to appear above overlay (z-40) */}
         <header className={cn(
           'shrink-0 sticky top-0 bg-card/80 backdrop-blur-md border-b border-border px-6 flex items-center justify-between shadow-sm',
@@ -290,9 +317,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-3">
             <div className="relative hidden sm:block">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input 
-                type="text" 
-                placeholder="Search minutes, people..." 
+              <input
+                type="text"
+                placeholder="Search minutes, people..."
+                aria-label="Search minutes, people"
                 className="h-9 pl-9 pr-4 rounded-full bg-muted border border-border text-sm placeholder:text-muted-foreground focus:ring-2 focus:ring-ring w-64 transition-all text-foreground"
               />
             </div>
@@ -311,9 +339,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <ThemeToggle size="default" />
             <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground" aria-label="Notifications">
               <Bell className="w-5 h-5" />
-              {/* <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span> */}
             </Button>
-            <Button variant="outline" size="sm" onClick={() => window.location.href = '/login'}>
+            <Button variant="outline" size="sm" onClick={() => router.push('/login')}>
               Switch persona
             </Button>
           </div>
@@ -327,10 +354,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </main>
-      </div>
 
-      <div className="pointer-events-none absolute inset-x-0 top-[calc(env(safe-area-inset-top)+var(--shell-header-height)+0.5rem)] z-[45] flex justify-center px-4">
-        <ResilienceBanner position="inline" className="w-full max-w-2xl" />
+        <div
+          className={cn(
+            'pointer-events-none absolute inset-x-0 flex justify-center px-4 sm:px-6 lg:px-8',
+            ZINDEX_CLASSES.floatingAction
+          )}
+          style={{
+            top: 'calc(env(safe-area-inset-top) + var(--shell-header-height) + 0.5rem)',
+          }}
+        >
+          <ResilienceBanner position="inline" className="w-full max-w-xl" />
+        </div>
+
       </div>
     </div>
   </div>

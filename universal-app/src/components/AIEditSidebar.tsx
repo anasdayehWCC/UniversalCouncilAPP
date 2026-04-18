@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Sparkles, Wand2, AlignLeft, Star, EyeOff, Pen, Send } from 'lucide-react';
+import { BottomSheet, useBottomSheet } from '@/components/mobile/BottomSheet';
 
 interface ActionButtonProps {
   icon: React.ReactNode;
@@ -38,23 +39,12 @@ function SectionHeader({ label }: SectionHeaderProps) {
   );
 }
 
-export function AIEditSidebar() {
+/** Shared content rendered in both desktop sidebar and mobile BottomSheet */
+function AIEditContent() {
   return (
-    <aside className="w-80 shrink-0 fixed right-0 top-[var(--shell-header-height)] h-[calc(100dvh-var(--shell-header-height))] flex flex-col bg-card border-l border-border shadow-xl overflow-y-auto z-30">
-      {/* Panel header */}
-      <div className="px-4 py-4 border-b border-border shrink-0">
-        <div className="flex items-center gap-2 text-primary mb-1">
-          <Sparkles className="w-4 h-4" />
-          <span className="text-xs font-bold uppercase tracking-wider">AI Assistant</span>
-        </div>
-        <p className="text-base font-semibold text-foreground">Edit with AI</p>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          Select text in the summary to see context-aware actions.
-        </p>
-      </div>
-
+    <>
       {/* Quick Actions */}
-      <div className="px-4 pt-2">
+      <div className="pt-2">
         <SectionHeader label="Quick Actions" />
         <div className="flex flex-col gap-1.5 pt-2">
           <ActionButton icon={<Wand2 className="w-4 h-4" />} label="Make more professional" />
@@ -64,7 +54,7 @@ export function AIEditSidebar() {
       </div>
 
       {/* Social Care Specific */}
-      <div className="px-4 pt-1">
+      <div className="pt-1">
         <SectionHeader label="Social Care Specific" />
         <div className="flex flex-col gap-1.5 pt-2">
           <ActionButton icon={<Star className="w-4 h-4" />} label="Make strengths-based" />
@@ -73,7 +63,7 @@ export function AIEditSidebar() {
       </div>
 
       {/* Custom Instruction */}
-      <div className="px-4 pt-1 pb-6">
+      <div className="pt-1 pb-6">
         <SectionHeader label="Custom Instruction" />
         <div className="pt-3 flex flex-col gap-2">
           <label className="text-xs font-medium text-muted-foreground">
@@ -89,6 +79,52 @@ export function AIEditSidebar() {
           </button>
         </div>
       </div>
-    </aside>
+    </>
+  );
+}
+
+export function AIEditSidebar() {
+  const { isOpen, open, close } = useBottomSheet();
+
+  return (
+    <>
+      {/* Desktop: fixed sidebar, visible only on xl+ */}
+      <aside className="hidden xl:flex w-80 shrink-0 fixed right-0 top-[var(--shell-header-height)] h-[calc(100dvh-var(--shell-header-height))] flex-col bg-card border-l border-border shadow-xl overflow-y-auto z-30">
+        {/* Panel header */}
+        <div className="px-4 py-4 border-b border-border shrink-0">
+          <div className="flex items-center gap-2 text-primary mb-1">
+            <Sparkles className="w-4 h-4" />
+            <span className="text-xs font-bold uppercase tracking-wider">AI Assistant</span>
+          </div>
+          <p className="text-base font-semibold text-foreground">Edit with AI</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Select text in the summary to see context-aware actions.
+          </p>
+        </div>
+
+        <div className="px-4">
+          <AIEditContent />
+        </div>
+      </aside>
+
+      {/* Mobile/Tablet: FAB + BottomSheet, hidden on xl+ */}
+      <div className="xl:hidden">
+        <button
+          onClick={open}
+          className="fixed bottom-6 right-6 z-[45] flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors motion-reduce:transition-none"
+          aria-label="Open AI Assistant"
+        >
+          <Sparkles className="w-6 h-6" />
+        </button>
+        <BottomSheet
+          isOpen={isOpen}
+          onClose={close}
+          title="AI Assistant"
+          config={{ snapPoints: [0.5, 0.9], initialSnap: 0 }}
+        >
+          <AIEditContent />
+        </BottomSheet>
+      </div>
+    </>
   );
 }

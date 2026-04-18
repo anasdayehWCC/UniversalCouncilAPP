@@ -169,7 +169,7 @@ export default function InsightsPage() {
       </Card>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
         {counts.total === 0 ? (
           <div className="col-span-4 flex flex-col items-center py-12 text-center">
             <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">

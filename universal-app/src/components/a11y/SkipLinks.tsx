@@ -68,7 +68,7 @@ export function SkipLinks({ links = DEFAULT_LINKS, className }: SkipLinksProps) 
     <nav
       aria-label="Skip links"
       className={cn(
-        'fixed top-0 left-0 z-[9999] flex flex-col gap-1 p-2',
+        'fixed top-0 left-0 z-[100] flex flex-col gap-1 p-2',
         className
       )}
     >

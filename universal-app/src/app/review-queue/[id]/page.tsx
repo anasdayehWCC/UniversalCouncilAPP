@@ -14,7 +14,7 @@ interface ReviewDetailPageProps {
 
 export default function ReviewDetailPage({ params }: ReviewDetailPageProps) {
   const { id } = use(params);
-  useRoleGuard(['manager', 'admin']);
+  const { isReady, isAuthorized } = useRoleGuard(['manager', 'admin']);
   const { config } = useDemo();
   const {
     getItem,
@@ -28,6 +28,10 @@ export default function ReviewDetailPage({ params }: ReviewDetailPageProps) {
 
   const item = getItem(id);
   const feedback = getFeedback(id);
+
+  if (!isReady || !isAuthorized) {
+    return null;
+  }
 
   if (!item) {
     notFound();

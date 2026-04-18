@@ -34,6 +34,15 @@ export default function UsersPage() {
     }
   };
 
+  const handleBulkDelete = (userIds: string[]) => {
+    try {
+      userIds.forEach((id) => deleteUser(id));
+      success(`${userIds.length} user${userIds.length !== 1 ? 's' : ''} deleted successfully`);
+    } catch (err) {
+      error('Failed to delete users');
+    }
+  };
+
   const handleSave = async (data: Omit<AdminUser, 'id' | 'createdAt'>) => {
     setIsSubmitting(true);
     try {
@@ -67,10 +76,11 @@ export default function UsersPage() {
       description={`Manage users and roles for ${tenantConfig.name}`}
     >
       <div className="space-y-6">
-        <UserTable 
+        <UserTable
           users={users}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          onBulkDelete={handleBulkDelete}
           onAdd={handleAdd}
           canEdit={canManageUsers}
         />

@@ -75,7 +75,19 @@ export function RecordingMetadata({
   serviceDomain,
 }: RecordingMetadataProps) {
   const [isExpanded, setIsExpanded] = useState(!compact);
+  // On mobile (non-compact, full view), start collapsed so the record button stays primary
+  const [isMobileExpanded, setIsMobileExpanded] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [localMetadata, setLocalMetadata] = useState<Partial<CaseMetadata>>(metadata);
+
+  // Detect mobile breakpoint (below md = 768px)
+  useEffect(() => {
+    const mql = window.matchMedia('(max-width: 767px)');
+    setIsMobile(mql.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  }, []);
 
   // Sync local state with props
   useEffect(() => {
@@ -256,6 +268,7 @@ export function RecordingMetadata({
         {/* Header */}
         <button
           onClick={() => setIsExpanded(!isExpanded)}
+          aria-expanded={isExpanded}
           className="w-full flex items-center justify-between"
         >
           <div className="flex items-center gap-2">
@@ -269,9 +282,9 @@ export function RecordingMetadata({
             )}
           </div>
           {isExpanded ? (
-            <ChevronUp className="w-5 h-5 text-muted-foreground" />
+            <ChevronUp className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
           ) : (
-            <ChevronDown className="w-5 h-5 text-muted-foreground" />
+            <ChevronDown className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
           )}
         </button>
 
@@ -306,55 +319,94 @@ export function RecordingMetadata({
     );
   }
 
-  // Full view
+  // Full view -- on mobile, form is behind a disclosure; on desktop, always expanded
+  const showFormBody = !isMobile || isMobileExpanded;
+
   return (
     <Card
       variant="glass"
       className="p-6 space-y-6"
     >
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
-          <FileText className="w-5 h-5 text-primary" />
+      {/* Header -- tappable disclosure on mobile, static heading on desktop */}
+      {isMobile ? (
+        <button
+          onClick={() => setIsMobileExpanded(!isMobileExpanded)}
+          aria-expanded={isMobileExpanded}
+          className="w-full flex items-center gap-3"
+        >
+          <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center shrink-0">
+            <FileText className="w-5 h-5 text-primary" />
+          </div>
+          <div className="flex-1 text-left">
+            <h3 className="font-semibold">Add case details</h3>
+            <p className="text-sm text-muted-foreground">
+              Add context for your recording
+            </p>
+          </div>
+          {isMobileExpanded ? (
+            <ChevronUp className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
+          ) : (
+            <ChevronDown className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
+          )}
+        </button>
+      ) : (
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+            <FileText className="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <h3 className="font-semibold">Meeting Details</h3>
+            <p className="text-sm text-muted-foreground">
+              Add context for your recording
+            </p>
+          </div>
         </div>
-        <div>
-          <h3 className="font-semibold">Meeting Details</h3>
-          <p className="text-sm text-muted-foreground">
-            Add context for your recording
-          </p>
-        </div>
-      </div>
+      )}
 
-      {/* Main fields */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {fields.map(renderField)}
-      </div>
+      {/* Form body */}
+      <AnimatePresence initial={false}>
+        {showFormBody && (
+          <motion.div
+            initial={isMobile ? { height: 0, opacity: 0 } : false}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={isMobile ? { height: 0, opacity: 0 } : undefined}
+            transition={{ duration: 0.2 }}
+            className="space-y-6 overflow-hidden"
+          >
+            {/* Main fields */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {fields.map(renderField)}
+            </div>
 
-      {/* Consent checkbox */}
-      <div className="flex items-start gap-3 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
-        <input
-          type="checkbox"
-          id="consent"
-          checked={localMetadata.consentAcknowledged ?? false}
-          onChange={(e) => handleChange('consentAcknowledged', e.target.checked)}
-          disabled={disabled}
-          className="mt-0.5 w-4 h-4 rounded border-amber-500/50 text-amber-500 focus:ring-amber-500/50"
-        />
-        <label htmlFor="consent" className="text-sm text-foreground/80">
-          I confirm that all participants have been informed that this meeting will be
-          recorded and have given their consent.
-        </label>
-      </div>
+            {/* Consent checkbox */}
+            <div className="flex items-start gap-3 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
+              <input
+                type="checkbox"
+                id="consent"
+                checked={localMetadata.consentAcknowledged ?? false}
+                onChange={(e) => handleChange('consentAcknowledged', e.target.checked)}
+                disabled={disabled}
+                className="mt-0.5 w-5 h-5 shrink-0 rounded border-amber-500/50 text-amber-500 focus:ring-amber-500/50"
+              />
+              <label htmlFor="consent" className="text-sm text-foreground/80">
+                I confirm that all participants have been informed that this meeting will be
+                recorded and have given their consent.
+              </label>
+            </div>
 
-      {/* Advanced fields */}
-      <details className="group">
-        <summary className="cursor-pointer text-sm font-medium text-muted-foreground hover:text-foreground transition-colors list-none flex items-center gap-2">
-          <ChevronDown className="w-4 h-4 group-open:rotate-180 transition-transform" />
-          Additional Information
-        </summary>
-        <div className="mt-4 space-y-4">
-          {advancedFields.map(renderField)}
-        </div>
-      </details>
+            {/* Advanced fields */}
+            <details className="group">
+              <summary className="cursor-pointer text-sm font-medium text-muted-foreground hover:text-foreground transition-colors list-none flex items-center gap-2">
+                <ChevronDown className="w-4 h-4 group-open:rotate-180 transition-transform" aria-hidden="true" />
+                Additional Information
+              </summary>
+              <div className="mt-4 space-y-4">
+                {advancedFields.map(renderField)}
+              </div>
+            </details>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Card>
   );
 }

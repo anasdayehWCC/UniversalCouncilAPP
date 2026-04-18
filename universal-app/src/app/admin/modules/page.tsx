@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { AdminPageWrapper } from '@/components/admin/AdminHeader';
 import { ModuleToggle } from '@/components/admin/ModuleToggle';
 import { useAdmin } from '@/hooks/useAdmin';
@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { RotateCcw } from 'lucide-react';
 
 export default function AdminModulesPage() {
-  const { modules, toggleModule, canManageModules, tenantConfig, stats } = useAdmin();
+  const { modules, toggleModule, updateModuleSettings, canManageModules, tenantConfig, stats } = useAdmin();
   const { success, info } = useToast();
 
   const handleToggle = (moduleId: string) => {
@@ -22,8 +22,10 @@ export default function AdminModulesPage() {
     }
   };
 
-  const handleConfigure = (moduleId: string) => {
-    info('Module configuration coming soon');
+  const handleSaveSettings = (moduleId: string, settings: Record<string, unknown>) => {
+    updateModuleSettings(moduleId, settings);
+    const targetModule = modules.find(m => m.id === moduleId);
+    success(`${targetModule?.name ?? 'Module'} settings saved`);
   };
 
   const handleResetDefaults = () => {
@@ -49,10 +51,10 @@ export default function AdminModulesPage() {
       }
     >
       <div className="space-y-6">
-        <ModuleToggle 
+        <ModuleToggle
           modules={modules}
           onToggle={handleToggle}
-          onConfigure={handleConfigure}
+          onSaveSettings={handleSaveSettings}
           canEdit={canManageModules}
         />
       </div>

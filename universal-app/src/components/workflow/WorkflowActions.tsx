@@ -20,6 +20,8 @@ import { ApprovalDialog } from './ApprovalDialog';
 import { ChangesRequestDialog } from './ChangesRequestDialog';
 import { EscalationDialog } from './EscalationDialog';
 import { cn } from '@/lib/utils';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
+import { ConfirmDialogRenderer } from '@/components/ui/ConfirmDialogRenderer';
 
 // ============================================================================
 // Types
@@ -139,6 +141,7 @@ export function WorkflowActions({
 }: WorkflowActionsProps) {
   const [activeAction, setActiveAction] = useState<WorkflowAction | null>(null);
   const [processingAction, setProcessingAction] = useState<WorkflowAction | null>(null);
+  const { confirm, confirmDialogState, handleConfirm, handleCancel } = useConfirmDialog();
 
   // Dialog states
   const [approvalDialogOpen, setApprovalDialogOpen] = useState(false);
@@ -177,7 +180,12 @@ export function WorkflowActions({
 
     // Direct actions (submit, resubmit, withdraw, publish)
     if (config.confirmationRequired) {
-      const confirmed = window.confirm(`Are you sure you want to ${config.label.toLowerCase()}?`);
+      const confirmed = await confirm({
+        title: `${config.label}?`,
+        description: `Are you sure you want to ${config.label.toLowerCase()}?`,
+        confirmLabel: config.label,
+        variant: action === 'withdraw' ? 'destructive' : 'default',
+      });
       if (!confirmed) return;
     }
 
@@ -300,6 +308,12 @@ export function WorkflowActions({
         onOpenChange={setEscalationDialogOpen}
         onConfirm={handleEscalationConfirm}
         currentStep={currentStep}
+      />
+
+      <ConfirmDialogRenderer
+        {...confirmDialogState}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
       />
     </>
   );

@@ -1,17 +1,61 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDemo } from '@/context/DemoContext';
-import { 
-  AdminUser, 
-  AdminModule, 
-  AdminTemplate, 
-  TenantSettings, 
-  AuditLogEntry, 
+import {
+  AdminUser,
+  AdminModule,
+  AdminTemplate,
+  TenantSettings,
+  AuditLogEntry,
   AdminStats,
   AdminAction,
   ADMIN_PERMISSIONS
 } from '@/types/admin';
+
+// localStorage keys
+const LS_KEYS = {
+  modules: 'admin_modules',
+  templates: 'admin_templates',
+  settings: 'admin_settings',
+  auditLog: 'admin_audit_log',
+  users: 'admin_users',
+} as const;
+
+/** Safely read and parse JSON from localStorage. Returns null on any failure. */
+function readStorage<T>(key: string): T | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    return JSON.parse(raw) as T;
+  } catch {
+    return null;
+  }
+}
+
+/** Safely write JSON to localStorage. */
+function writeStorage<T>(key: string, value: T): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // Storage quota exceeded — silently degrade
+  }
+}
+
+/** Generate a proper UUID (falls back to crypto.randomUUID or polyfill). */
+function generateId(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  // Fallback for older environments
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
 
 // Mock data for demo
 const MOCK_USERS: AdminUser[] = [
@@ -257,14 +301,58 @@ const MOCK_AUDIT_LOG: AuditLogEntry[] = [
 
 export function useAdmin() {
   const { role, currentUser, config } = useDemo();
-  
-  // State for admin data
-  const [users, setUsers] = useState<AdminUser[]>(MOCK_USERS);
-  const [modules, setModules] = useState<AdminModule[]>(MOCK_MODULES);
-  const [templates, setTemplates] = useState<AdminTemplate[]>(MOCK_TEMPLATES);
-  const [settings, setSettingsState] = useState<TenantSettings>(MOCK_SETTINGS);
-  const [auditLog, setAuditLog] = useState<AuditLogEntry[]>(MOCK_AUDIT_LOG);
-  const [isLoading, setIsLoading] = useState(false);
+
+  // State for admin data — lazy initializers read from localStorage on the
+  // client, falling back to MOCK_* defaults when storage is empty or during SSR.
+  const [users, setUsers] = useState<AdminUser[]>(
+    () => readStorage<AdminUser[]>(LS_KEYS.users) ?? MOCK_USERS
+  );
+  const [modules, setModules] = useState<AdminModule[]>(
+    () => readStorage<AdminModule[]>(LS_KEYS.modules) ?? MOCK_MODULES
+  );
+  const [templates, setTemplates] = useState<AdminTemplate[]>(
+    () => readStorage<AdminTemplate[]>(LS_KEYS.templates) ?? MOCK_TEMPLATES
+  );
+  const [settings, setSettingsState] = useState<TenantSettings>(
+    () => readStorage<TenantSettings>(LS_KEYS.settings) ?? MOCK_SETTINGS
+  );
+  const [auditLog, setAuditLog] = useState<AuditLogEntry[]>(
+    () => readStorage<AuditLogEntry[]>(LS_KEYS.auditLog) ?? MOCK_AUDIT_LOG
+  );
+  const [isLoading] = useState(false);
+
+  // Track whether initial render has completed so persistence effects only
+  // write after the first real state change, not on mount.
+  const mountedRef = useRef(false);
+  useEffect(() => {
+    mountedRef.current = true;
+  }, []);
+
+  // --- Persist to localStorage whenever state changes (skip initial mount) ---
+  useEffect(() => {
+    if (!mountedRef.current) return;
+    writeStorage(LS_KEYS.users, users);
+  }, [users]);
+
+  useEffect(() => {
+    if (!mountedRef.current) return;
+    writeStorage(LS_KEYS.modules, modules);
+  }, [modules]);
+
+  useEffect(() => {
+    if (!mountedRef.current) return;
+    writeStorage(LS_KEYS.templates, templates);
+  }, [templates]);
+
+  useEffect(() => {
+    if (!mountedRef.current) return;
+    writeStorage(LS_KEYS.settings, settings);
+  }, [settings]);
+
+  useEffect(() => {
+    if (!mountedRef.current) return;
+    writeStorage(LS_KEYS.auditLog, auditLog);
+  }, [auditLog]);
 
   // Permission checks
   const permissions = useMemo(() => ADMIN_PERMISSIONS[role] || [], [role]);
@@ -291,6 +379,18 @@ export function useAdmin() {
     totalModules: modules.length
   }), [users, modules]);
 
+  // Reset all admin data to factory defaults (clears localStorage)
+  const resetToDefaults = useCallback(() => {
+    setUsers(MOCK_USERS);
+    setModules(MOCK_MODULES);
+    setTemplates(MOCK_TEMPLATES);
+    setSettingsState(MOCK_SETTINGS);
+    setAuditLog(MOCK_AUDIT_LOG);
+    Object.values(LS_KEYS).forEach((key) => {
+      try { localStorage.removeItem(key); } catch { /* noop */ }
+    });
+  }, []);
+
   // Audit log helper
   const logAction = useCallback((
     action: AuditLogEntry['action'],
@@ -300,7 +400,7 @@ export function useAdmin() {
     details?: Record<string, unknown>
   ) => {
     const entry: AuditLogEntry = {
-      id: Math.random().toString(36).substring(2, 9),
+      id: generateId(),
       timestamp: new Date().toISOString(),
       userId: currentUser.id,
       userName: currentUser.name,
@@ -317,7 +417,7 @@ export function useAdmin() {
   const addUser = useCallback((user: Omit<AdminUser, 'id' | 'createdAt'>) => {
     const newUser: AdminUser = {
       ...user,
-      id: Math.random().toString(36).substring(2, 9),
+      id: generateId(),
       createdAt: new Date().toISOString()
     };
     setUsers(prev => [...prev, newUser]);
@@ -353,11 +453,11 @@ export function useAdmin() {
     }));
   }, [logAction]);
 
-  const updateModuleSettings = useCallback((id: string, settings: Record<string, unknown>) => {
-    setModules(prev => prev.map(m => m.id === id ? { ...m, settings } : m));
-    const module = modules.find(m => m.id === id);
-    if (module) {
-      logAction('update', 'module', id, module.name, { settings });
+  const updateModuleSettings = useCallback((id: string, newSettings: Record<string, unknown>) => {
+    setModules(prev => prev.map(m => m.id === id ? { ...m, settings: newSettings } : m));
+    const targetModule = modules.find(m => m.id === id);
+    if (targetModule) {
+      logAction('update', 'module', id, targetModule.name, { settings: newSettings });
     }
   }, [modules, logAction]);
 
@@ -365,7 +465,7 @@ export function useAdmin() {
   const addTemplate = useCallback((template: Omit<AdminTemplate, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'>) => {
     const newTemplate: AdminTemplate = {
       ...template,
-      id: Math.random().toString(36).substring(2, 9),
+      id: generateId(),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       createdBy: currentUser.id
@@ -431,7 +531,10 @@ export function useAdmin() {
     
     // Settings actions
     updateSettings,
-    
+
+    // Admin data management
+    resetToDefaults,
+
     // Context
     currentUser,
     tenantConfig: config
@@ -441,24 +544,24 @@ export function useAdmin() {
 export function useToast() {
   // Re-export from Toast component for convenience
   const [toasts, setToasts] = useState<Array<{ id: string; type: 'success' | 'error' | 'info'; message: string }>>([]);
-  
+
   const success = useCallback((message: string) => {
-    const id = Math.random().toString(36).substring(2, 9);
+    const id = generateId();
     setToasts(prev => [...prev, { id, type: 'success', message }]);
     setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 5000);
   }, []);
-  
+
   const error = useCallback((message: string) => {
-    const id = Math.random().toString(36).substring(2, 9);
+    const id = generateId();
     setToasts(prev => [...prev, { id, type: 'error', message }]);
     setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 5000);
   }, []);
-  
+
   const info = useCallback((message: string) => {
-    const id = Math.random().toString(36).substring(2, 9);
+    const id = generateId();
     setToasts(prev => [...prev, { id, type: 'info', message }]);
     setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 5000);
   }, []);
-  
+
   return { toasts, success, error, info };
 }

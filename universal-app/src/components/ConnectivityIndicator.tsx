@@ -17,9 +17,8 @@ import { useState, useEffect, useRef, useSyncExternalStore } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Wifi, WifiOff, AlertTriangle, RefreshCw, X, Clock, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useNetworkStatus, type ConnectionState } from '@/hooks/useNetworkStatus';
-import { useSyncManager } from '@/hooks/useSyncManager';
-import { useAuth } from '@/hooks/useAuth';
+import { useNetworkStatus, type ConnectionState } from '@/providers/NetworkStatusProvider';
+import { useSyncManager } from '@/providers/SyncManagerProvider';
 import { ZINDEX_CLASSES } from '@/lib/z-index';
 
 // ============================================================================
@@ -37,22 +36,22 @@ const STATUS_CONFIG: Record<
   }
 > = {
   online: {
-    color: 'bg-emerald-500',
-    bgColor: 'bg-emerald-500/10',
+    color: 'bg-success',
+    bgColor: 'bg-success/10',
     icon: Wifi,
     label: 'Connected',
     description: 'All systems operational',
   },
   degraded: {
-    color: 'bg-amber-500',
-    bgColor: 'bg-amber-500/10',
+    color: 'bg-warning',
+    bgColor: 'bg-warning/10',
     icon: AlertTriangle,
     label: 'Degraded',
     description: 'Backend connectivity issues',
   },
   offline: {
-    color: 'bg-red-500',
-    bgColor: 'bg-red-500/10',
+    color: 'bg-destructive',
+    bgColor: 'bg-destructive/10',
     icon: WifiOff,
     label: 'Offline',
     description: 'No network connection',
@@ -66,6 +65,8 @@ const STATUS_CONFIG: Record<
 interface ConnectivityIndicatorProps {
   /** Position on screen */
   position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
+  /** Whether the indicator is fixed to the viewport or owned by a shell container */
+  anchored?: 'fixed' | 'absolute';
   /** Show expanded details by default */
   defaultExpanded?: boolean;
   /** Hide when online (only show problems) */
@@ -76,6 +77,7 @@ interface ConnectivityIndicatorProps {
 
 export function ConnectivityIndicator({
   position = 'bottom-right',
+  anchored = 'fixed',
   defaultExpanded = false,
   hideWhenOnline = false,
   className,
@@ -90,12 +92,9 @@ export function ConnectivityIndicator({
   const prevStateRef = useRef<ConnectionState | null>(null);
   const pulseResetTimerRef = useRef<number | null>(null);
 
-  // Get auth token for sync operations
-  const { accessToken } = useAuth();
-
   const { state, latencyMs, isChecking, checkNow, errorMessage, lastBackendPing } =
     useNetworkStatus();
-  const { pendingCount, isSyncing, syncAll } = useSyncManager(accessToken);
+  const { pendingCount, isSyncing, syncAll } = useSyncManager();
 
   const config = STATUS_CONFIG[state];
   const Icon = config.icon;
@@ -152,7 +151,7 @@ export function ConnectivityIndicator({
   return (
     <div
       className={cn(
-        'fixed',
+        anchored === 'absolute' ? 'absolute' : 'fixed',
         ZINDEX_CLASSES.notification,
         positionClasses[position],
         className
@@ -316,7 +315,7 @@ export function ConnectivityIndicator({
               <motion.span
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-bold text-white bg-amber-500 rounded-full px-1"
+                className="absolute -top-1 -right-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-warning px-1 text-[10px] font-bold text-white"
               >
                 {pendingCount > 99 ? '99+' : pendingCount}
               </motion.span>

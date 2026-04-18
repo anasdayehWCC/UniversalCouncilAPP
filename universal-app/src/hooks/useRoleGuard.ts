@@ -7,11 +7,27 @@ import { UserRole } from '@/config/domains';
 
 export function useRoleGuard(allowedRoles: UserRole[]) {
   const router = useRouter();
-  const { role } = useDemo();
+  const { role, isAuthenticated, isSessionHydrated } = useDemo();
+  const hasAllowedRole = allowedRoles.includes(role);
+  const isAuthorized = isSessionHydrated && isAuthenticated && hasAllowedRole;
 
   useEffect(() => {
-    if (!allowedRoles.includes(role)) {
+    if (!isSessionHydrated) {
+      return;
+    }
+
+    if (!isAuthenticated) {
+      router.replace('/login');
+      return;
+    }
+
+    if (!hasAllowedRole) {
       router.replace('/');
     }
-  }, [allowedRoles, role, router]);
+  }, [hasAllowedRole, isAuthenticated, isSessionHydrated, router]);
+
+  return {
+    isReady: isSessionHydrated,
+    isAuthorized,
+  };
 }

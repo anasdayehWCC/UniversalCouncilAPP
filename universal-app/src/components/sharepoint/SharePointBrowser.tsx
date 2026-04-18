@@ -16,6 +16,8 @@ import { SharePointFile, SharePointFolder, SharePointSearchOptions } from '@/lib
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
+import { ConfirmDialogRenderer } from '@/components/ui/ConfirmDialogRenderer';
 
 // ============================================================================
 // Icons
@@ -62,8 +64,8 @@ const FileIcon = ({ mimeType, className }: { mimeType?: string; className?: stri
   );
 };
 
-const SearchIcon = () => (
-  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+const SearchIcon = ({ 'aria-hidden': ariaHidden }: { 'aria-hidden'?: 'true' | 'false' }) => (
+  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden={ariaHidden}>
     <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
     <path d="M20 20L16.5 16.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
   </svg>
@@ -193,6 +195,7 @@ export function SharePointBrowser({
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const [isSearching, setIsSearching] = useState(false);
   const [actionMenuId, setActionMenuId] = useState<string | null>(null);
+  const { confirm, confirmDialogState, handleConfirm, handleCancel } = useConfirmDialog();
 
   // Filter items based on accepted types
   const filteredItems = useMemo(() => {
@@ -307,7 +310,13 @@ export function SharePointBrowser({
   }, [downloadFile]);
 
   const handleDelete = useCallback(async (itemId: string) => {
-    if (confirm('Are you sure you want to delete this item?')) {
+    const ok = await confirm({
+      title: 'Delete this item?',
+      description: 'The file will be permanently removed from SharePoint.',
+      confirmLabel: 'Delete',
+      variant: 'destructive',
+    });
+    if (ok) {
       try {
         await deleteItem(itemId);
       } catch {
@@ -315,7 +324,7 @@ export function SharePointBrowser({
       }
     }
     setActionMenuId(null);
-  }, [deleteItem]);
+  }, [deleteItem, confirm]);
 
   // Not connected state
   if (!isConnected && !isConnecting) {
@@ -355,6 +364,11 @@ export function SharePointBrowser({
 
   return (
     <Card className={cn("overflow-hidden", className)}>
+      <ConfirmDialogRenderer
+        {...confirmDialogState}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+      />
       {/* Header */}
       <CardHeader className={cn("space-y-4", compact ? "p-3" : "p-4")}>
         <div className="flex items-center justify-between gap-4">
@@ -411,13 +425,14 @@ export function SharePointBrowser({
         {/* Search and Upload */}
         <div className="flex items-center gap-3">
           <div className="flex-1 relative">
-            <SearchIcon />
+            <SearchIcon aria-hidden="true" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               placeholder="Search files..."
+              aria-label="Search SharePoint files"
               className="w-full pl-9 pr-4 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50"
             />
             {searchQuery && (

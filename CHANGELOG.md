@@ -1,5 +1,472 @@
 # Changelog
 
+## 2026-04-18 (Orchestration Run 8 — Export Tags, Hero CTA, Route Boundaries)
+
+### Added — Export Tag Support (#60)
+- Added `tags?: string[]` field to `Minute` type (`lib/minutes/types.ts`)
+- All 4 export formatters (txt, html, docx, pdf) now render tags when present
+- TXT: `Tags: tag1, tag2` line after metadata
+- HTML: styled badge chips with indigo theme
+- DOCX: bold label + comma-separated values
+- PDF: grey text line after metadata
+
+### Fixed — Domain-Specific Hero CTA (#61)
+- Extended `PersonaCopy` with `domainCtaLabels` field for domain-aware hero buttons
+- Children's workers see "Capture Visit", adults see "Capture Session", housing see "Capture Inspection"
+- Housing officer persona defaults to "Capture Inspection"
+
+### Note — Parallel Session Files (not committed by this session)
+- `.github/copilot-instructions.md`, `.github/hooks/`, `.github/instructions/`, `.github/prompts/` created by parallel session's GitHub Copilot setup — intentionally left uncommitted per coordination protocol
+
+### Added — 10 Missing Route Boundaries
+- Loading skeletons: `review-queue/[id]`, `templates/[id]`, `capture`, `settings`, `profile`
+- Error boundaries: `capture`, `templates`, `upload`, `settings`, `profile`
+- All skeletons match route structure, use `role="status" aria-busy="true"`
+- Error boundaries detect 404 patterns and show contextual "not found" messaging
+- Templates error links back to `/templates` list, not generic home
+
+## 2026-04-18 (Orchestration Run 7 — Admin Persistence, Dashboard Realism, Tag Filtering)
+
+### Fixed — Admin State Persistence (Ship-blockers #2, #3, #18, #19, #35)
+- Module toggles, templates, settings, and audit log now persist to localStorage — changes survive page refresh
+- Audit log entries use `crypto.randomUUID()` instead of `Math.random().toString(36)` for proper identifiers
+- Template edit, duplicate, and set-as-default fully implemented (replaced "coming soon" stubs)
+- Template edit dialog supports name, description, and sections list with reorder/add/remove
+- Bulk-delete button in UserTable wired with confirmation dialog
+- Manager role sees read-only user list — checkboxes and bulk actions hidden when `canManageUsers` is false
+- Added `resetToDefaults()` function to restore mock data from admin hooks
+
+### Fixed — Dashboard Data Realism (#51, #14, #40)
+- MEETINGS seed data updated from 2024 dates to April 2026 (this week) — dashboard metrics now show realistic numbers
+- Manager dashboard shows lightweight compliance summary card (pending reviews, approved this week, avg review time, team members) when `aiInsights` flag is off
+- Practitioner CTA labels are now domain-specific: "Record Visit" (children), "Record Session" (adults), "Record Inspection" (housing)
+
+### Added — Notes Tag Filtering (Phase 30 remaining work)
+- Tag filter chips on My Notes list — toggle to filter by topic (AND logic for multiple tags)
+- Template filter dropdown — filter notes by template type alongside status and tags
+- Combined filters (search + status + template + tags) with "Clear filters" button
+- Filtered empty state with contextual messaging when no notes match active filters
+
+### Fixed — Smart Capture Shell Integration (#58)
+- Rebuilt `/record` on the shared `ShellPage` and `PageHeader` primitives so Smart Capture now reads as a native workspace route instead of a nested mini-app
+- Moved consent, live capture, and completion states into the shared shell structure with inspector-side status panels and consistent route chrome
+- Replaced the old browser confirm escape hatch with the shared confirmation dialog flow while preserving the rule that `recordedAt` is only stamped after a successful recording start
+- Extended the record-page guard integration test to assert the shared Smart Capture heading and consent state together
+
+### Changed — Runtime Logging Hygiene (WP5)
+- Added `src/lib/dev.ts` to centralize development-only logging helpers (`devLog`, `devWarn`)
+- Removed production `console.log` noise from login, Smart Capture-adjacent flows, notifications, PWA utilities, vitals actions, and minute detail autosave wiring
+- Converted mock menu fallback handlers to development-only warnings so production clicks no longer emit placeholder runtime logs
+
+### Fixed — Build Blocker
+- `SessionWarning.tsx` implicit `any` type on event handlers — let TypeScript infer correct types
+
+### Docs — Roadmap Consolidation
+- Consolidated three `ROADMAP_social_care.md` files (root, minute-main, universal-app) into single canonical root file
+- Added Phase 21C (Config-Driven Navigation), 12 status notes for Phases 24–31, Demo UI Phases appendix
+- Fixed Phase 25B malformed markdown (code block swallowing rest of file)
+- Replaced subsidiary copies with redirect pointers
+- Updated cross-references in PLANS.md, AGENTS.md, README.md, architecture.md
+
+### Housekeeping
+- Cleaned 6 stale locked worktrees from Runs 5-6
+- Updated production backlog: 8 items resolved (now 42 of 62 resolved)
+
+## 2026-04-18 — GitHub Copilot Customisation + Post-Overhaul Review
+
+### Added — GitHub Copilot Integration (`.github/` — 6 files)
+
+- `.github/copilot-instructions.md` — project-wide instructions for Copilot agent mode (tech stack, critical rules, validation commands, prioritisation matrix)
+- `.github/instructions/frontend-components.instructions.md` — auto-applied to `**/*.tsx` files (theme tokens, a11y, z-index, hydration safety, AppShell patterns)
+- `.github/instructions/backend-api.instructions.md` — auto-applied to `minute-main/**/*.py` files (FastAPI patterns, service abstractions, config system, migrations)
+- `.github/hooks/copilot-hooks.json` — reuses existing Claude Code hooks (block-sensitive-files, check-theme-tokens, check-a11y) for Copilot's PreToolUse/PostToolUse events
+- `.github/prompts/verify.prompt.md` — reusable health check prompt (lint, build, tests, audit, backend, git state)
+- `.github/prompts/roadmap-status.prompt.md` — reusable roadmap snapshot prompt
+
+### Analysis — Post-Overhaul Session Review
+
+- Confirmed Runs 4 & 5 executed pre-overhaul (15:30-16:00 UTC); new prioritisation/batching logic deployed at 21:33 UTC
+- Claims file shows correct priority ordering: WP1 (admin persistence = ship-blocker) first
+- Two new CLAUDE.md learnings captured from real regressions (provider throw guard, DemoContext hydration)
+- Run 6 focused on category 1-3 work (admin contract, mobile responsiveness, regression fixes) — correct prioritisation
+- First full test of new orchestrator logic still pending
+
+## 2026-04-18 — Admin And Capture Shell Follow-Up
+
+### Documented — Shell Integration Debt
+- Recorded the pre-existing admin and Smart Capture shell cohesion issues in `docs/production-backlog.md`
+- Added `docs/plans/2026-04-18-admin-record-shell-integration.md` with the root-cause notes and follow-up tasks needed to make `/admin` and `/record` feel native to the main app shell
+- Updated `PLANS.md` with the shell-audit snapshot and the exact files responsible for the nested admin chrome and standalone Smart Capture header
+
+## 2026-04-18 (Orchestration Run 6 — UI/UX Refinements + Regression Fixes)
+
+### Fixed — Admin Contract And Build Stabilization
+- Restored backend admin settings/module persistence contract and effective tenant override merging for admin config surfaces in `minute-main`
+- Regenerated `minute-main/openapi-temp.json` and the `universal-app` generated SDK to bring the admin API contract back in sync
+- Excluded the unused generated `@tanstack` React Query helper folder from `universal-app` TypeScript root-file checking because the current generator output is not consumed and breaks `next build`
+- Replaced remaining non-tokenized admin config surface classes in `MainConfigArea.tsx`
+
+### Added — Detail Page Loading Skeletons
+- `my-notes/[id]/loading.tsx` — shimmer skeleton matching page structure (header, tabs, content, sidebar on xl+)
+- `minutes/[id]/loading.tsx` — shimmer skeleton with breadcrumb, editor sections, info sidebar
+
+### Fixed — Mobile Responsiveness
+- AI sidebar: desktop fixed panel on xl+, FAB + BottomSheet on mobile (`AIEditSidebar.tsx`)
+- Note detail header: stacks vertically on mobile, wrapped metadata, responsive padding
+- Note detail tabs: horizontal scroll on mobile, truncated labels
+- Note detail sidebar margin: `mr-80` → `xl:mr-80` (content was pushed off-screen on mobile)
+- Insights metric grid: added `md:grid-cols-3` tablet breakpoint
+- Review queue tab badges: truncation, shrink-0 badges, reduced gap
+- Added missing `motion-reduce:animate-none` on animated elements
+- Minute breadcrumb: added status badge with semantic color tokens
+
+### Fixed — Regressions (from commit history audit)
+- Restored `useNetworkStatus` throw guard (was conditional hook call violating Rules of Hooks)
+- Restored DemoContext API hydration effect (`/api/demos/personas` — was accidentally removed)
+- Replaced OfflineFallback `useSyncExternalStore` mounted guard with standard `useState + useEffect`
+
+### Added — Standalone EmptyStatePanel Component
+- `components/layout/EmptyStatePanel.tsx` — reusable dashed-border empty state container
+
+## 2026-04-18 — Frontend Dev Performance Stabilization
+
+### Fixed — Redundant Demo Hydration
+
+- `DemoProvider` no longer fetches `/api/demos/personas` on mount when the same demo seed data is already available locally
+- Removes a redundant first-load dev compile path that was inflating route startup time in `universal-app`
+
+### Fixed — Shared Sync State
+
+- Added `SyncManagerProvider` so shell-level consumers share one sync manager instance instead of creating duplicate Dexie live queries, timers, and sync bookkeeping on every page
+- Migrated `ConnectivityIndicator`, `ResilienceBanner`, and `OfflineFallback` to the shared provider
+- Removed the unused `DemoContext` subscription from `useSyncManager`
+
+### Changed — Stable Web Dev Default
+
+- Root `pnpm dev:web` and `scripts/dev-frontend.sh` now start the webpack dev server by default
+- Added explicit `pnpm dev:web:turbo` / `pnpm --filter universal-app dev:turbo` escape hatch for Turbopack-specific debugging
+- Documented the default-switch rationale in `README.md` because Next.js 16.2.x Turbopack remains unstable in this repo under real route compilation load
+
+## 2026-04-18 — Development Automation Overhaul (Intelligence, Vision, Efficiency)
+
+### Added — Product Vision (`docs/product-vision.md`)
+
+- Created north-star document defining what the app is, who it's for, what "premium" means
+- Design principles: substance over decoration, consistent rhythm, motion with purpose, mobile-first, calm confidence
+- Prioritisation matrix: ship-blockers > core user flows > integration > design quality > housekeeping > polish/compliance
+- Referenced by orchestrator (Phase 1 ASSESS), review-board (Phase 1 PREPARE), brainstorming, and all agent briefs
+
+### Added — Brainstorming Skill (`.claude/skills/brainstorming/SKILL.md`)
+
+- Structured design-before-code dialogue: one question at a time, 2-3 approaches with tradeoffs, incremental 200-300 word design sections
+- Reads product-vision.md, roadmap, backlog, and CLAUDE.md before exploring approaches
+- Saves validated designs to `docs/plans/YYYY-MM-DD-<topic>-design.md`
+- Hands off to `/writing-plans` for implementation planning
+
+### Added — Writing-Plans Skill (`.claude/skills/writing-plans/SKILL.md`)
+
+- TDD implementation planning with bite-sized 2-5 minute tasks (write failing test → run → implement → run → commit)
+- Dual frontend/backend task templates with project-specific commands (pnpm, poetry)
+- Embeds all project rules (theme tokens, a11y, z-index, hydration safety, API proxy)
+- Three execution options: subagent-driven, orchestrate-driven, parallel session
+
+### Added — Orchestrator Claims (`.claude/orchestrator-claims.json`)
+
+- Contention prevention for concurrent `/orchestrate` sessions
+- Claims written after user approval (Phase 2), released after PR creation (Phase 8)
+- Stale claims (>2 hours) treated as crashed sessions and cleared
+
+### Changed — Orchestrator Intelligence (`.claude/skills/orchestrate/SKILL.md`)
+
+- **Phase 1 ASSESS**: Now reads `product-vision.md` FIRST; added housekeeping scan for cleanup opportunities (every 3rd run)
+- **Phase 2 IDENTIFY**: Replaced "earliest unfinished phase first" with impact-based prioritisation matrix; replaced one-task-per-agent with domain-based work packages (3-5 related tasks per agent, max 3 agents)
+- **Phase 3 PLAN**: Agent briefs now include product context, design intent, success criteria beyond lint, similar code references, visual verification requirement
+- **Phase 5 REVIEW**: Added mandatory visual checkpoint (open browser, check affected routes at desktop and mobile); review agents weight functional completeness (40%) over a11y (5%); weighted review criteria replace flat checklist
+
+### Changed — Review Board Priorities (`.claude/skills/review-board/SKILL.md`)
+
+- "What to Look For" reordered by impact: broken functionality > design quality > missing features > UX > mobile > errors > performance > accessibility
+- Synthesis uses product vision's impact categories; rebalancing rule flags if >40% of findings are polish/compliance
+- Reads `product-vision.md` during PREPARE phase
+
+### Changed — CLAUDE.md (6 new entries)
+
+- Prioritisation matrix guidance, work package batching, visual verification, housekeeping discipline, product vision reference, brainstorming/writing-plans/claims documentation
+
+## 2026-04-18 (Orchestration Run 5 — A11y, Routing, Architecture Doc)
+
+### Added — Architecture Documentation (Phase 15A)
+
+- Created `docs/architecture.md` (536 lines) covering exec summary, component map, data flow, tenancy model, security, offline architecture, module system, accessibility, testing, delivery approach, and open questions
+- Cross-references ROADMAP, AGENTS.md, foundations doc, and user journeys
+
+### Fixed — SortableList Keyboard Accessibility (#23)
+
+- Added keyboard reordering via Arrow Up/Down keys on focused items
+- Added explicit Move Up/Move Down buttons (appear on hover/focus, progressive disclosure)
+- Added ARIA: `role="list"/"listitem"`, `aria-roledescription="sortable list"`, `aria-label` with position, `aria-describedby` instructions
+- Added live region (`aria-live="assertive"`) announcing position changes to screen readers
+- All transitions paired with `motion-reduce:transition-none`; scale paired with `motion-reduce:scale-100`
+
+### Fixed — Quick Fixes (direct)
+
+- #52: Home page Priority Reviews "Review" button now links to `/review-queue/[id]` instead of `/my-notes/[id]`
+- #53: ModuleToggle category badges replaced hardcoded `bg-purple-100/text-purple-700` and `bg-amber-100/text-amber-700` with semantic tokens
+- #54: Login page header text replaced `text-muted-foreground` with `text-white/70`, `text-white/60` for branded dark surface
+
+## 2026-04-18 (Orchestration Run 4 — Dashboard, Admin UX, A11y)
+
+### Added — Manager Dashboard (#13)
+
+- `TeamComplianceWidget` component showing per-worker compliance metrics: recordings this week/month, approval rate, pending reviews, overdue items with color-coded status (good/attention/critical)
+- Derives metrics from existing DemoContext meetings data using `useMemo` — no additional mock data needed
+- Responsive layout: full metric columns on desktop, compact summary on mobile
+- Placed on manager home dashboard between stats cards and priority reviews
+
+### Fixed — Admin Modules UX (#17)
+
+- Replaced raw JSON settings display in `/admin/modules` with structured editable form (`ModuleSettingsForm`)
+- Supports five field types: select dropdowns, text/number inputs, toggle switches (role=switch with aria-checked), and multi-text tag lists
+- Save commits to in-memory state with success toast; Reset discards unsaved changes; "Unsaved changes" indicator
+- All form inputs have programmatic labels (WCAG 1.3.1); disabled state respected for read-only roles
+
+### Fixed — Login Badge Contrast (#38)
+
+- Removed hardcoded `color: '#FFFFFF'` inline styles from persona badges, replaced with `text-white` Tailwind class
+- Fixed `text-foreground` → `text-white/90` on role labels to prevent dark-on-dark in light mode (was ~1.5:1, now 14.94:1)
+- Fixed `text-muted-foreground` → `text-white/60` on team text (was ~3:1 in light mode, now 7.11:1)
+- Increased badge background opacity for better visual domain differentiation (0.2→0.35, 0.25→0.4)
+
+### Fixed — Build Blocker
+
+- Added explicit `Event` type annotation to `SessionWarning.tsx` `onPointerDownOutside` and `onEscapeKeyDown` handlers (was implicit `any`, blocking `pnpm build`)
+
+### Housekeeping
+
+- Updated production backlog: marked 35 of 50 items as resolved (from runs 2, 3, and 2026-04-17 session)
+- Committed pending 2026-04-17 auth/network regression fixes
+- Phase 15A (architecture doc) agent timed out — deferred to next run
+
+## 2026-04-17
+
+### Fixed — Auth Gating + Network Status
+
+- `useRoleGuard` now treats authorization as `hydrated + authenticated + allowed role`, redirecting signed-out users to `/login` with `router.replace` and wrong-role users to `/`
+- `AppShell` now uses `router.replace('/login')` for automatic auth enforcement and no longer renders a duplicate floating `ConnectivityIndicator`
+- `/record` now uses a guarded wrapper plus authorized inner component so unauthorized sessions never initialize recorder state or paint consent/recorder UI
+- Recorder route network status now comes from `NetworkStatusProvider`, and `OfflineFallback` was migrated to the provider hook as well, eliminating duplicate `/healthcheck` polling from direct low-level hook usage
+- `NetworkStatusProvider` documentation was corrected to describe the provider-only shared polling contract
+
+### Added — Regression Coverage
+
+- Added `/record` guard integration coverage for signed-out fallback personas, wrong-role authenticated sessions, and authorized social workers
+- Added an assertion that recorder routes only hit `/api/proxy/healthcheck` once per mount when wrapped in `NetworkStatusProvider`
+- Extended `useRoleGuard` and AppShell hydration tests to cover the new `replace('/login')` redirect behavior and confirm `AppShell` no longer renders its own connectivity indicator
+
+## 2026-04-16 (Orchestration Run 3 — 8-Agent Backlog Sweep)
+
+### Fixed — Record Page (7 items)
+
+- #42: Auth guard moved before consent screen — unauthorized users no longer see consent UI
+- #11: Metadata form collapsed by default on mobile behind "Add case details" disclosure
+- #10: Save/upload status indicator shows "Saving → Saved → Uploaded" during recording
+- #25: RecordingTimer Framer Motion animations respect prefers-reduced-motion
+- #26: DeviceSelector dropdown has ARIA listbox/option semantics + Escape key handler
+- #39: RecordingMetadata toggle has aria-expanded
+- #30: Consent checkbox tap target enlarged to 44px minimum
+
+### Fixed — Review Queue (3 items)
+
+- #15: Sort dropdown added (Oldest/Newest/Priority)
+- #31: ChangesRequested tab shows return reason, timestamp, and cycle count
+- #33: Bulk Export generates CSV download of filtered queue
+
+### Fixed — Admin UX (3 items)
+
+- #34: Admin layout shows loading skeleton during hydration instead of blank page
+- #36: Organisation Name uses controlled input with Save button
+- #16: Module enable now shows confirmation dialog
+
+### Fixed — My-Notes + Export (3 items)
+
+- #9: Export button generates markdown file download
+- #28: "Meeting not found" renders inside ShellPage with Back link
+- #37: AIEditSidebar textarea label programmatically associated
+
+### Fixed — AppShell + Nav (3 items)
+
+- #29: Mobile sidebar has visible X close button
+- #44: "Switch persona" uses router.push instead of window.location.href
+- #32: Review Queue nav item shows pending count badge
+
+### Fixed — Theme (1 item)
+
+- #46: Hardcoded colors replaced in minutes/page.tsx, FeatureToggle, dates/format.ts, minutes/types.ts
+
+### Fixed — DemoContext + Login (3 items)
+
+- #49: Removed console.log calls (not stripped by Turbopack)
+- #48: Combined hydration effects to prevent API/localStorage race
+- #50: Removed dead "Forgot Password?" link, replaced with council IT note
+
+### Added
+
+- `.gitignore` entry for `.claude/worktrees/`
+- `ConfirmDialogRenderer.tsx` and `useConfirmDialog.ts` committed (were untracked)
+- `PageSurface.tsx` committed (was untracked)
+- `audit-premium-ui.mjs` committed (was untracked)
+
+## 2026-04-16 (Orchestration Run 2 — Critical Backlog Fixes)
+
+### Fixed — Critical Bugs
+
+- **#5 Review queue routing**: PendingReviews "Review Note" button now links to `/review-queue/[id]` instead of `/my-notes/[id]`
+- **#12 Reject vs Request Changes**: `useReview.ts` now maps `'reject'` to distinct `'rejected'` status instead of sharing `'flagged'` with `'request_changes'`
+- **#1 Consent persistence**: Consent now required per recording session (not one-time localStorage flag), attached to Meeting record with `consentGiven` + `consentTimestamp`
+- **#41 Network timeout**: Fixed `useNetworkStatus` timeout race — was a no-op (Promise.race against resolved Response)
+- **#43 Triple polling**: Created `NetworkStatusProvider` so one polling loop serves all consumers (was 3 independent intervals)
+
+### Fixed — A11y (7 items)
+
+- **#6**: Added `aria-label` to header search input
+- **#7**: Replaced `div onClick` with keyboard-operable `button` for admin feature toggles
+- **#20**: Removed duplicate skip link from AppShell.tsx
+- **#21**: Added ARIA tab roles to review-queue tab bar
+- **#22**: Added labels to UserTable checkboxes
+- **#24**: Added label to SharePoint search input, hid decorative icon
+- **#27**: Added programmatic label to admin Organisation Name input
+
+### Added
+
+- `universal-app/src/providers/NetworkStatusProvider.tsx` — shared network status context
+
+## 2026-04-16 (Review Board + Orchestration Run)
+
+### Added — Production Review Board
+
+- Launched `/review-board` with 5 persona agents testing the live app at localhost:3000
+- Sarah (SW): 9 findings — consent not persisted (critical), export button dead, no sync indicator
+- David (TM): 8 findings — Review Note wrong route (critical), reject/request-changes same status
+- Priya (Admin): 9 findings — all admin state mock/ephemeral (critical), audit log in-memory, no tenant onboarding
+- Alex (A11y): 13 findings — unlabelled search input (critical), non-keyboard toggles, missing ARIA roles
+- Dev: 10 findings — useNetworkStatus timeout no-op, triple polling, auth guard ordering
+- **50 total findings** written to `docs/production-backlog.md` (7 critical, 20 high, 22 medium, 1 low)
+
+## 2026-04-16 (Orchestration Run — Build Fixes, Error Boundaries, A11y CI)
+
+### Fixed — Build Blockers
+
+- Added missing `@radix-ui/react-dialog` dependency to `universal-app/package.json` (imported by `dialog.tsx` but not listed)
+- Made `InspectorPanel` `children` prop optional in `PageHeader.tsx` (was required but `AIEditSidebar` passed none)
+- Fixed `.claude/settings.json` hook paths from relative to absolute (hooks failed when CWD was `universal-app/` subdirectory)
+
+### Added — Route Error Boundaries (Phase 24A)
+
+- Created `error.tsx` for: `insights`, `my-notes/[id]`, `review-queue`, `review-queue/[id]`
+- Fixed existing `error.tsx` in: `admin` (hardcoded amber → semantic warning tokens), `record` (added offline queue messaging), `minutes/[id]` (added error digest display)
+- All boundaries: client component, contextual messaging, try-again + fallback nav, `console.error` for Sentry pickup, semantic theme tokens, accessible icons
+- Detail routes (`[id]`) detect 404s for friendlier "not found" messaging
+
+### Added — Accessibility CI Gate (Phase 17B)
+
+- `universal-app/scripts/audit-a11y-ci.mjs` — enforces 3 WCAG rules: no hardcoded Tailwind colors, motion-reduce on animations, aria-label on icon buttons
+- `.github/workflows/a11y.yml` — runs on push to main and PRs touching `universal-app/src/`
+- `package.json` script: `audit:a11y` for local/CI execution
+- Initial run found 153 pre-existing violations across 33 files (tracked for future cleanup)
+
+### Research — Architecture & Gap Analysis
+
+- Dispatched 2 research agents: comprehensive architecture exploration and foundations gap analysis
+- Key gaps identified: tenant config validation not enforced, module registry unused by nav, testing infra disabled in CI
+- Phase 15A/15B doc agents crashed (socket errors) — architecture doc deferred to next run
+
+### Orchestrator Infrastructure
+
+- First successful `/orchestrate` run: assessed 41 roadmap phases, dispatched 4 parallel agents in worktrees
+- 2/4 agents succeeded, 2/4 crashed from transient socket errors
+- Created integration branch `feature/orchestrate-2026-04-16`
+
+## 2026-04-16 (Development Automation Infrastructure)
+
+### Added — Orchestrator Skill (`/orchestrate`)
+- Created `.claude/skills/orchestrate/SKILL.md` — autonomous development driver that reads the roadmap, identifies independent parallelizable work items, dispatches sub-agents in isolated git worktrees, reviews/critiques output, merges branches, updates docs, and creates PRs (never direct commits to main)
+- 8-phase workflow: Assess → Identify → Plan → Dispatch → Review → Integrate → Document → PR
+- Safety rails: max 5 sub-agents per run, mandatory review before merge, scope boundaries per agent, independence verification (no agent depends on another's output)
+
+### Added — Supporting Skills
+- `.claude/skills/roadmap-status/SKILL.md` — quick status checker: scans ROADMAP, CHANGELOG, and git history to produce a done/partial/remaining table with recommended next batch
+- `.claude/skills/dev-frontend/SKILL.md` — context loader for frontend sub-agents: theme tokens, a11y rules, layout system, z-index scale, hydration safety, testing commands
+- `.claude/skills/dev-backend/SKILL.md` — context loader for backend sub-agents: FastAPI patterns, config system, queue/storage abstraction, migration workflow, worker architecture
+- `.claude/skills/audit-quality/SKILL.md` — comprehensive quality audit: theme tokens, motion-reduce, aria-labels, z-index, hydration safety, premium UI audit, build/lint checks
+
+### Added — Project Hooks (`.claude/settings.json`)
+- **PreToolUse (Edit/Write)**: blocks edits to `.env.local`, `.env.production`, lock files, and generated API client code
+- **PostToolUse (Edit/Write)**: warns about hardcoded Tailwind colors in components/routes; checks for missing `motion-reduce:animate-none` and `aria-label` on icon buttons
+- Hook scripts in `.claude/hooks/`: `block-sensitive-files.py`, `check-theme-tokens.py`, `check-a11y.py`
+
+### Added — Adversarial Review Board (`/review-board`)
+- Created `.claude/skills/review-board/SKILL.md` — dispatches 5 persona-based adversarial agents that test the running app via Chrome DevTools MCP, report findings with confidence scores (0-100), cross-validate medium-confidence findings, and write a prioritized backlog
+- 5 personas: Sarah (social worker), David (team manager), Priya (digital admin), Dev (senior developer), Alex (a11y auditor)
+- Confidence filtering: findings below 70 are discarded; findings 70-85 are cross-validated by a separate agent
+- Output: structured backlog in `docs/production-backlog.md` consumed by the orchestrator
+
+### Added — Persona Agent Definitions (`.claude/agents/`)
+- `social-worker-reviewer.md` — tests capture, recording, note editing, export flows
+- `team-manager-reviewer.md` — tests review queue, approvals, dashboard, team visibility
+- `digital-admin-reviewer.md` — tests admin console, config, modules, audit logs
+- `developer-reviewer.md` — checks console errors, network failures, hydration, performance
+- `a11y-auditor.md` — tests WCAG 2.2 AA: keyboard nav, contrast, focus, tap targets
+
+### Added — Task Discovery Protocol
+- Orchestrator sub-agents now report "Discovered Tasks" outside their scope using structured format
+- Orchestrator Phase 7c collects discoveries and appends to `docs/production-backlog.md`
+- Orchestrator Phase 1 reads backlog and incorporates critical/high items into work selection
+
+### Added — Production Backlog (`docs/production-backlog.md`)
+- Shared backlog file written by review board and orchestrator, read by orchestrator during ASSESS
+- Structured format with category, severity, confidence, and status columns
+
+### Added — Project Permissions
+- Pre-approved bash commands for lint, test, build, audit, git, and gh operations in `.claude/settings.json`
+
+## 2026-04-02 (Demo Session Hydration & Guard Regression Fix)
+
+### Fixed
+- Added `isSessionHydrated` to the real demo session provider so persisted persona, auth, feature flags, and persona history are restored together before client-only redirects run.
+- Reconciled persisted persona IDs against `/api/demos/personas` results so refreshed manager/admin sessions keep the correct role even after the API-backed persona map replaces local seed data.
+- Updated `useRoleGuard` to wait for hydrated session state and return readiness/authorization metadata, then gated `/admin`, `/review-queue`, `/review-queue/[id]`, `/insights`, `/insights/dashboard`, and `/record` rendering on that contract to stop wrong-role flashes and bad redirects.
+- Switched the app shell login redirect to wait for hydrated session state before redirecting unauthenticated users, preventing persisted demo sessions from being bounced to `/login` on refresh or deep link.
+
+### Added
+- Added focused Vitest regressions for `DemoProvider` hydration, `useRoleGuard` redirect timing, and `AppShell` session redirect timing.
+- Added Playwright regressions covering manager/admin protected-route refresh persistence and unauthenticated protected-route redirect behavior.
+
+## 2026-04-01 (Phase 2 Premium UX Hardening — Complete)
+
+### Fixed
+- **z-index**: `SortableList` drag ghost `z-[9999]` → `z-[100]` (audit: 0 violations now)
+- **Audit close-out**: `insights/page.tsx` `text-slate-900` → `text-neutral-900`
+- **Native dialogs (alert)**: Replaced `alert()` with `useToast` `info()` in `admin/page.tsx` and `MeetingCard.tsx`
+- **Native dialogs (confirm) — 9 files**: Replaced all `confirm()`/`window.confirm()` with `useConfirmDialog` hook + `ConfirmDialogRenderer` (Radix AlertDialog) in: `admin/modules`, `admin/templates`, `admin/modules/ModuleToggle`, `admin/UserTable`, `notifications/NotificationCenter`, `recording/RecordingList`, `admin/MainConfigArea`, `sharepoint/SharePointBrowser`, `workflow/WorkflowActions`
+- **Semantic tokens — 6 files**: Converted all `amber-*` warning states to `warning/*` semantic tokens in: `admin/templates` (DOMAIN_COLORS), `admin/ModuleToggle` (CATEGORY_CONFIG), `minutes/[id]/components/MinuteInfoSidebar`, `minutes/[id]/page`, `record/RecordingTimer`, `record/DeviceSelector`, `record/RecordingMetadata`
+- **ARIA a11y**: Added `role="tablist"`, `role="tab"`, `aria-selected`, `role="tabpanel"` to custom tab buttons in `my-notes/[id]/page.tsx`
+- **ARIA a11y**: Added `aria-pressed` to filter `<Button>` components in `review-queue/page.tsx`
+
+### Added
+- `src/hooks/useConfirmDialog.ts` — Promise-based confirm hook backed by Radix AlertDialog; supports `title`, `description`, `confirmLabel`, `cancelLabel`, `variant` (`default`|`destructive`)
+- `src/components/ui/ConfirmDialogRenderer.tsx` — Stateless render companion for `useConfirmDialog`
+
+## 2026-03-29 (Universal App Premium UX Stabilization)
+
+### Fixed
+- Moved the premium shell toward a single authored layout contract by expanding `ShellPage`, docking overlays through `AppShell`, and converting the AI assistant from a fixed right rail into a shell-managed inspector surface.
+- Rebuilt the high-friction `/templates`, `/record`, `/review-queue`, `/insights`, `/my-notes/[id]`, `/`, and `/login` routes onto the shared page-header and surface grammar so they stop composing bespoke heroes, hover-only previews, sticky headers, and margin hacks.
+- Replaced browser-native confirmation flows in the review and record journeys with product-grade dialogs, and aligned the resilience banner/indicator behavior with the shell-owned overlay model.
+- Added `universal-app/scripts/audit-premium-ui.mjs` plus `pnpm --filter universal-app audit:premium-ui` to block regressions such as browser-native `alert/confirm`, arbitrary z-index utilities, fixed right rails, and raw gray/slate/red/amber/emerald utilities across the stabilized premium routes.
+
+### Validation
+- `pnpm --filter universal-app exec eslint src/components/layout/ShellPage.tsx src/components/layout/AppShell.tsx src/components/ResilienceBanner.tsx src/components/ConnectivityIndicator.tsx src/components/AIEditSidebar.tsx src/components/templates/TemplateSelector.tsx src/app/templates/page.tsx src/app/review-queue/page.tsx src/app/record/page.tsx 'src/app/my-notes/[id]/page.tsx' src/app/insights/page.tsx src/app/page.tsx src/app/login/page.tsx`
+
 ## 2026-03-28 (Massive Theme Token Migration - Subagent-Driven Development)
 
 ### Fixed - Motion-Reduce Accessibility (28 instances total)

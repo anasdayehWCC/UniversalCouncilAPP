@@ -100,6 +100,12 @@ export class TxtFormatter implements IExportFormatter {
         lines.push('');
       }
 
+      // Tags
+      if (minute.tags && minute.tags.length > 0) {
+        lines.push(`Tags: ${minute.tags.join(', ')}`);
+        lines.push('');
+      }
+
       // Attendees
       if (options.includeAttendees && minute.attendees.length > 0) {
         lines.push('ATTENDEES');

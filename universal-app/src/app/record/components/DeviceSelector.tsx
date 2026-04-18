@@ -8,7 +8,7 @@
  * @module app/record/components/DeviceSelector
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, MicOff, ChevronDown, Check, AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -47,6 +47,22 @@ export function DeviceSelector({
   const selectedDevice = devices.find((d) => d.deviceId === selectedDeviceId);
   const hasPermission = permission.state === 'granted';
   const isDenied = permission.state === 'denied';
+  const listboxId = 'device-selector-listbox';
+
+  // Close dropdown on Escape key
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+      }
+    },
+    [isOpen]
+  );
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -96,8 +112,8 @@ export function DeviceSelector({
   // No devices found
   if (devices.length === 0) {
     return (
-      <div className="flex flex-col items-center gap-3 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
-        <div className="flex items-center gap-2 text-amber-500">
+      <div className="flex flex-col items-center gap-3 p-4 rounded-xl bg-warning/10 border border-warning/20">
+        <div className="flex items-center gap-2 text-warning">
           <AlertCircle className="w-5 h-5" />
           <span className="text-sm font-medium">No Microphones Found</span>
         </div>
@@ -121,6 +137,10 @@ export function DeviceSelector({
       <button
         onClick={() => setIsOpen(!isOpen)}
         disabled={disabled}
+        aria-expanded={isOpen}
+        aria-haspopup="listbox"
+        aria-controls={isOpen ? listboxId : undefined}
+        aria-label="Select microphone"
         className={cn(
           'w-full flex items-center justify-between gap-3 px-4 py-3',
           'rounded-xl',
@@ -173,10 +193,17 @@ export function DeviceSelector({
             )}
           >
             {/* Device List */}
-            <div className="max-h-64 overflow-y-auto py-1">
+            <div
+              id={listboxId}
+              role="listbox"
+              aria-label="Available microphones"
+              className="max-h-64 overflow-y-auto py-1"
+            >
               {devices.map((device) => (
                 <button
                   key={device.deviceId}
+                  role="option"
+                  aria-selected={device.deviceId === selectedDeviceId}
                   onClick={() => {
                     onSelectDevice(device.deviceId);
                     setIsOpen(false);

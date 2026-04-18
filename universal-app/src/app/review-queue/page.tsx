@@ -143,25 +143,25 @@ export default function ReviewQueuePage() {
       <Tabs value={activeTab} className="w-full">
         <div className="flex gap-1 p-1 bg-muted rounded-xl mb-6">
           {([
-            { key: 'pending' as const, label: 'Pending Review', icon: <Clock className="w-4 h-4" />, count: filteredQueue.length },
-            { key: 'changes' as const, label: 'Changes Requested', icon: <AlertCircle className="w-4 h-4" />, count: flaggedCount },
-            { key: 'approved' as const, label: 'Approved History', icon: <CheckCircle2 className="w-4 h-4" />, count: approvedItems.length },
+            { key: 'pending' as const, label: 'Pending Review', icon: <Clock className="w-4 h-4 shrink-0" />, count: filteredQueue.length },
+            { key: 'changes' as const, label: 'Changes Requested', icon: <AlertCircle className="w-4 h-4 shrink-0" />, count: flaggedCount },
+            { key: 'approved' as const, label: 'Approved History', icon: <CheckCircle2 className="w-4 h-4 shrink-0" />, count: approvedItems.length },
           ] as const).map(tab => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
               className={cn(
-                "flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+                "flex-1 min-w-0 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                 activeTab === tab.key
                   ? "bg-card text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
               {tab.icon}
-              {tab.label}
+              <span className="truncate">{tab.label}</span>
               {tab.count > 0 && (
                 <span className={cn(
-                  "text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center",
+                  "shrink-0 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center",
                   activeTab === tab.key
                     ? "bg-primary text-primary-foreground"
                     : "bg-muted-foreground/20 text-muted-foreground"

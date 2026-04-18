@@ -1,16 +1,29 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Database, Activity, ToggleRight, ToggleLeft, Mic 
+import { Button } from '@/components/ui/button';
+import {
+  Database, Activity, ToggleRight, ToggleLeft, Mic, Save, Check
 } from 'lucide-react';
 import { useDemo } from '@/context/DemoContext';
+import { useAdmin } from '@/hooks/useAdmin';
 import type { FeatureFlags } from '@/types/flags';
 
 export default function MainConfigArea() {
   const { featureFlags, setFeatureFlags } = useDemo();
+  const { settings, updateSettings } = useAdmin();
+  const [orgName, setOrgName] = useState(settings.name);
+  const [isSaved, setIsSaved] = useState(false);
+
+  const orgNameDirty = orgName !== settings.name;
+
+  const handleSaveOrgName = () => {
+    updateSettings({ name: orgName });
+    setIsSaved(true);
+    setTimeout(() => setIsSaved(false), 2000);
+  };
 
   const toggleFeature = (key: keyof FeatureFlags) => {
     const action = featureFlags[key] ? 'disable' : 'enable';
@@ -30,8 +43,36 @@ export default function MainConfigArea() {
               <h3 className="font-bold text-foreground">Organization Name</h3>
               <p className="text-sm text-muted-foreground">Visible on all reports and exports.</p>
             </div>
-            <div className="w-64">
-              <input type="text" className="w-full p-2 border border-input rounded-md text-sm text-foreground" defaultValue="Westminster City Council" />
+            <div className="flex items-center gap-2">
+              <div className="w-64">
+                <input
+                  type="text"
+                  className="w-full p-2 border border-input rounded-md text-sm text-foreground bg-background"
+                  value={orgName}
+                  onChange={(e) => {
+                    setOrgName(e.target.value);
+                    setIsSaved(false);
+                  }}
+                />
+              </div>
+              <Button
+                size="sm"
+                disabled={!orgNameDirty}
+                onClick={handleSaveOrgName}
+                className="gap-1.5"
+              >
+                {isSaved ? (
+                  <>
+                    <Check className="w-3.5 h-3.5" />
+                    Saved
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-3.5 h-3.5" />
+                    Save
+                  </>
+                )}
+              </Button>
             </div>
           </div>
 

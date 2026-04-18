@@ -6,6 +6,28 @@
 
 import { test, expect } from '@playwright/test';
 
+async function seedDemoSession(
+  page: import('@playwright/test').Page,
+  userId: string,
+  options?: { isAuthenticated?: boolean; featureFlags?: Record<string, boolean> }
+) {
+  const isAuthenticated = options?.isAuthenticated ?? true;
+  const featureFlags = options?.featureFlags ?? {
+    aiInsights: true,
+    housingPilot: false,
+    smartCapture: true,
+  };
+
+  await page.addInitScript(
+    ({ demoUserId, authenticated, flags }) => {
+      localStorage.setItem('currentUserId', demoUserId);
+      localStorage.setItem('isAuthenticated', authenticated ? 'true' : 'false');
+      localStorage.setItem('demo_feature_flags', JSON.stringify(flags));
+    },
+    { demoUserId: userId, authenticated: isAuthenticated, flags: featureFlags }
+  );
+}
+
 test.describe('Authentication', () => {
   test.describe('Login Page', () => {
     test('displays login page for unauthenticated users', async ({ page }) => {
@@ -52,6 +74,33 @@ test.describe('Authentication', () => {
       const hasAuthMessage = await page.locator('text=/sign in|login|unauthorized/i').count() > 0;
       
       expect(isLoginPage || hasAuthMessage).toBeTruthy();
+    });
+
+    test('keeps a persisted manager on review queue after refresh', async ({ page }) => {
+      await seedDemoSession(page, 'david');
+
+      await page.goto('/review-queue');
+      await expect(page).toHaveURL(/\/review-queue$/);
+
+      await page.reload();
+      await expect(page).toHaveURL(/\/review-queue$/);
+    });
+
+    test('keeps a persisted admin on admin after refresh', async ({ page }) => {
+      await seedDemoSession(page, 'priya');
+
+      await page.goto('/admin');
+      await expect(page).toHaveURL(/\/admin$/);
+
+      await page.reload();
+      await expect(page).toHaveURL(/\/admin$/);
+    });
+
+    test('redirects unauthenticated persisted sessions to login on protected routes', async ({ page }) => {
+      await seedDemoSession(page, 'david', { isAuthenticated: false });
+
+      await page.goto('/insights');
+      await expect(page).toHaveURL(/\/login$/);
     });
 
     test('shows loading state while checking auth', async ({ page }) => {

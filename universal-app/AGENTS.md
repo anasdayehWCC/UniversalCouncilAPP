@@ -4,7 +4,7 @@ This file is a frontend-local supplement for `universal-app/`. The root [`AGENTS
 
 ## Ground Rules
 - **Use MCP semantic search first**: run `claude_context_local.index_directory` once per session, then use `claude_context_local.search_code` to explore. Avoid random `grep` unless search misses something.
-- **Roadmap driven**: always open `minute-main/ROADMAP_social_care.md`, pick the earliest phase whose exit criteria are not met, and work that before moving on.
+- **Roadmap driven**: always open the root `ROADMAP_social_care.md` (canonical, consolidated), pick the earliest phase whose exit criteria are not met, and work that before moving on.
 - **Changelog discipline**: any behavioural/UI/schema change must land in the root `CHANGELOG.md` with phase tags and testing notes.
 - **Docs follow code**: when adding patterns or flows, document intended use plus one anti‑pattern.
 - **Layering**: keep shared config in `src/config`, mock/demo data in `src/data`, context in `src/context`, and UI-only components in `src/components`. Do not couple UI to hard-coded domains outside config.

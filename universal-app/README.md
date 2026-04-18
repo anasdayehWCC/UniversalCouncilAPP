@@ -61,7 +61,7 @@ universal-app/
 | [`AGENTS.md`](AGENTS.md) | Frontend-local supplement for `universal-app/` |
 | [`../CHANGELOG.md`](../CHANGELOG.md) | Canonical root change log |
 | [`ROLE_MATRIX.md`](ROLE_MATRIX.md) | Persona/role permissions |
-| [`minute-main/ROADMAP_social_care.md`](minute-main/ROADMAP_social_care.md) | Roadmap and phase tracking |
+| [`../ROADMAP_social_care.md`](../ROADMAP_social_care.md) | Canonical roadmap and phase tracking (consolidated) |
 
 ## Environment Variables
 

@@ -18,11 +18,20 @@ import Image from 'next/image';
 import { personaCopy } from '@/copy/strings';
 import { formatDate, getSLAStatus } from '@/lib/dates';
 
+// Domain-specific labels for practitioner CTAs
+const DOMAIN_LABELS: Record<string, { record: string; upload: string; notes: string }> = {
+  children: { record: 'Record Visit', upload: 'Upload Visit Audio', notes: 'My Case Notes' },
+  adults:   { record: 'Record Session', upload: 'Upload Session Audio', notes: 'My Care Notes' },
+  housing:  { record: 'Record Inspection', upload: 'Upload Inspection Audio', notes: 'My Inspection Notes' },
+};
+const DEFAULT_LABELS = { record: 'New Recording', upload: 'Upload Audio', notes: 'My Notes' };
+
 export default function Dashboard() {
-  const { role, currentUser, meetings, config, personas, updateMeetingStatus } = useDemo();
+  const { role, currentUser, meetings, config, personas, updateMeetingStatus, featureFlags } = useDemo();
   const personaStrings = personaCopy[role];
   const { domainMeetings, drafts, dueToday } = useTenantMetrics(meetings, currentUser.domain);
   const isPractitioner = role === 'social_worker' || role === 'housing_officer';
+  const ctaLabels = DOMAIN_LABELS[currentUser.domain] ?? DEFAULT_LABELS;
 
   // --- Social Worker View ---
   if (isPractitioner) {
@@ -71,7 +80,7 @@ export default function Dashboard() {
               <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
                 <Mic className="w-7 h-7 text-primary" />
               </div>
-              <h3 className="text-lg md:text-xl font-bold text-foreground mb-2 font-display">New Recording</h3>
+              <h3 className="text-lg md:text-xl font-bold text-foreground mb-2 font-display">{ctaLabels.record}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">Capture a visit or meeting. AI will draft your note instantly.</p>
             </div>
           </Link>
@@ -81,7 +90,7 @@ export default function Dashboard() {
               <div className="w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center mb-4 group-hover:bg-accent/20 transition-colors">
                 <Upload className="w-7 h-7 text-accent" />
               </div>
-              <h3 className="text-lg md:text-xl font-bold text-foreground mb-2 font-display">Upload Audio</h3>
+              <h3 className="text-lg md:text-xl font-bold text-foreground mb-2 font-display">{ctaLabels.upload}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">Import existing recordings from your phone or dictaphone.</p>
             </div>
           </Link>
@@ -91,7 +100,7 @@ export default function Dashboard() {
               <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center mb-4 group-hover:bg-muted/80 transition-colors">
                 <FileText className="w-7 h-7 text-muted-foreground" />
               </div>
-              <h3 className="text-lg md:text-xl font-bold text-foreground mb-2 font-display">My Notes</h3>
+              <h3 className="text-lg md:text-xl font-bold text-foreground mb-2 font-display">{ctaLabels.notes}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">View and edit your recent case notes and minutes.</p>
             </div>
           </Link>
@@ -218,6 +227,33 @@ export default function Dashboard() {
             <p className="text-sm text-muted-foreground mt-1 font-medium">{contributors.size || 1} active submitters this week</p>
           </Card>
         </div>
+
+        {/* Team Insights fallback when aiInsights is off */}
+        {!featureFlags.aiInsights && (
+          <Card className="p-6 border border-border bg-card">
+            <h3 className="text-lg font-bold text-foreground mb-4 font-display">Team Compliance Summary</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="text-center p-3 bg-muted/50 rounded-xl">
+                <div className="text-2xl font-bold text-foreground font-display">{approvalsMetrics.pending}</div>
+                <div className="text-xs text-muted-foreground mt-1">Pending Reviews</div>
+              </div>
+              <div className="text-center p-3 bg-muted/50 rounded-xl">
+                <div className="text-2xl font-bold text-success font-display">
+                  {meetings.filter(m => m.status === 'approved' && m.domain === currentUser.domain).length}
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">Approved This Week</div>
+              </div>
+              <div className="text-center p-3 bg-muted/50 rounded-xl">
+                <div className="text-2xl font-bold text-foreground font-display">~45 min</div>
+                <div className="text-xs text-muted-foreground mt-1">Avg. Review Time</div>
+              </div>
+              <div className="text-center p-3 bg-muted/50 rounded-xl">
+                <div className="text-2xl font-bold text-foreground font-display">{contributors.size || 1}</div>
+                <div className="text-xs text-muted-foreground mt-1">Team Members</div>
+              </div>
+            </div>
+          </Card>
+        )}
 
         {/* Priority Review List */}
         <div>

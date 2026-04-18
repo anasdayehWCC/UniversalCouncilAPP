@@ -1,6 +1,6 @@
 import { ServiceDomain, UserRole } from '@/config/domains';
 
-export type MeetingStatus = 'draft' | 'processing' | 'ready' | 'approved' | 'flagged';
+export type MeetingStatus = 'draft' | 'processing' | 'ready' | 'approved' | 'flagged' | 'rejected';
 export type ProcessingMode = 'fast' | 'economy';
 
 export interface Task {
@@ -30,9 +30,11 @@ export interface Meeting {
   submittedById?: string;
   submittedBy?: string;
   submittedAt?: string;
-  lastAction?: 'approved' | 'returned';
+  lastAction?: 'approved' | 'returned' | 'rejected';
   lastActionAt?: string;
   lastActionBy?: string;
+  consentGiven?: boolean;
+  consentTimestamp?: string;
 }
 
 export interface Template {

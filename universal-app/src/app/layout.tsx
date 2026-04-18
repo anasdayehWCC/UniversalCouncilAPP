@@ -10,9 +10,12 @@ import { AppShell } from "@/components/layout/AppShell";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ToastProvider } from "@/components/Toast";
 import { ConnectivityIndicator } from "@/components/ConnectivityIndicator";
+import { NetworkStatusProvider } from "@/providers/NetworkStatusProvider";
+import { SyncManagerProvider } from "@/providers/SyncManagerProvider";
 import { ServiceWorkerRegistration } from "@/lib/pwa";
 import { SkipLinks } from "@/components/a11y/SkipLinks";
 import { getThemeInitScript } from "@/lib/themes/theme-init";
+import Script from "next/script";
 
 export const viewport: Viewport = {
   themeColor: [
@@ -68,8 +71,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script
+        <Script
           id="theme-init"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: getThemeInitScript() }}
         />
         {/* PWA Meta Tags */}
@@ -103,10 +107,14 @@ export default function RootLayout({
               <DemoProvider>
                 <ThemeProvider>
                   <ThemeSetter />
-                  <AppShell>
-                    {children}
-                  </AppShell>
-                  <ConnectivityIndicator position="bottom-right" hideWhenOnline />
+                  <NetworkStatusProvider>
+                    <SyncManagerProvider>
+                      <AppShell>
+                        {children}
+                      </AppShell>
+                      <ConnectivityIndicator position="bottom-right" hideWhenOnline />
+                    </SyncManagerProvider>
+                  </NetworkStatusProvider>
                 </ThemeProvider>
               </DemoProvider>
             </AuthProvider>

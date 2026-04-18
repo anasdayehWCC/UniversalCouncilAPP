@@ -112,7 +112,7 @@ export default function PendingReviews({ items, onAction }: PendingReviewsProps)
             </div>
             
             <div className="flex flex-col gap-2 min-w-[140px]">
-	              <Link href={`/my-notes/${item.id}`}>
+	              <Link href={`/review-queue/${item.id}`}>
 	                <Button className="w-full shadow-sm">
 	                  Review Note
 	                </Button>

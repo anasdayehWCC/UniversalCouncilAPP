@@ -26,6 +26,8 @@ import { cn } from '@/lib/utils';
 import { listQueued, type OfflineRecording } from '@/lib/offline-queue';
 import type { RecordingStatus } from '@/lib/storage-adapter';
 import { RecordingCard } from './RecordingCard';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
+import { ConfirmDialogRenderer } from '@/components/ui/ConfirmDialogRenderer';
 
 interface RecordingListProps {
   /** Filter by status */
@@ -73,6 +75,7 @@ export function RecordingList({
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<RecordingStatus | 'all'>(initialFilter);
   const [playingId, setPlayingId] = useState<number | null>(null);
+  const { confirm, confirmDialogState, handleConfirm, handleCancel } = useConfirmDialog();
 
   // Load recordings
   const loadRecordings = async () => {
@@ -122,7 +125,13 @@ export function RecordingList({
   };
 
   const handleDelete = async (id: number) => {
-    if (confirm('Are you sure you want to delete this recording?')) {
+    const ok = await confirm({
+      title: 'Delete recording?',
+      description: 'The audio file and its transcript will be permanently removed.',
+      confirmLabel: 'Delete',
+      variant: 'destructive',
+    });
+    if (ok) {
       onDelete?.(id);
       setRecordings((prev) => prev.filter((r) => r.id !== id));
     }
@@ -130,6 +139,11 @@ export function RecordingList({
 
   return (
     <div className={cn('space-y-4', className)}>
+      <ConfirmDialogRenderer
+        {...confirmDialogState}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+      />
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="font-semibold flex items-center gap-2">

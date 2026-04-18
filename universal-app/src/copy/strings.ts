@@ -3,6 +3,8 @@ export interface PersonaCopy {
   heroGreeting: string;
   heroSubtext: string;
   heroCtaLabel: string;
+  /** Domain-specific overrides for the hero CTA label */
+  domainCtaLabels?: Record<string, string>;
 }
 
 import type { UserRole } from '@/config/domains';
@@ -12,6 +14,11 @@ const PRACTITIONER_COPY: PersonaCopy = {
   heroGreeting: 'Capture visits, review drafts, and keep minutes moving.',
   heroSubtext: 'Focus on Smart Capture and the notes that matter most.',
   heroCtaLabel: 'Create Smart Capture',
+  domainCtaLabels: {
+    children: 'Capture Visit',
+    adults: 'Capture Session',
+    housing: 'Capture Inspection',
+  },
 };
 
 export const personaCopy: Record<UserRole, PersonaCopy> = {
@@ -21,6 +28,7 @@ export const personaCopy: Record<UserRole, PersonaCopy> = {
     heroRole: 'Housing officer',
     heroGreeting: 'Capture inspections, review drafts, and keep minutes moving.',
     heroSubtext: 'Focus on Smart Capture and housing notes that matter most.',
+    heroCtaLabel: 'Capture Inspection',
   },
   manager: {
     heroRole: 'Manager',

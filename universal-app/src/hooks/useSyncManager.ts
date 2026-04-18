@@ -12,7 +12,6 @@
 import { useCallback, useEffect, useState, useRef } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useToast } from '@/components/Toast';
-import { useDemo } from '@/context/DemoContext';
 import {
   getDatabase,
   type OfflineRecording,
@@ -118,8 +117,6 @@ export function useSyncManager(accessToken?: string | null): UseSyncManagerRetur
 
   // Hooks
   const toast = useToast();
-  // Note: Reserved for future user-scoped sync operations
-  useDemo();
 
   // ---------------------------------------------------------------------------
   // Reactive Queries (Dexie Live Query)

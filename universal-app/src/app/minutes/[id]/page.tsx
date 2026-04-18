@@ -7,12 +7,14 @@ import { useMinutes } from '@/hooks/useMinutes';
 import { MinuteEditor } from '@/components/minutes/MinuteEditor';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { 
-  ArrowLeft, 
-  Loader2,
+import {
+  ArrowLeft,
   FileText,
   AlertTriangle
 } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 export default function MinuteDetailPage() {
   const params = useParams();
@@ -60,15 +62,19 @@ export default function MinuteDetailPage() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-0 bg-background">
-        <div className="max-w-5xl mx-auto px-4 py-8">
-          <div className="flex items-center justify-center py-24">
-            <div className="text-center">
-              <Loader2 className="w-8 h-8 text-[var(--primary)] animate-spin motion-reduce:animate-none mx-auto mb-4" />
-              <p className="text-muted-foreground">Loading minute...</p>
+      <div className="min-h-0 bg-background" role="status" aria-busy="true" aria-label="Loading minute">
+        <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+          <Skeleton shimmer className="h-4 w-48" />
+          <Skeleton shimmer className="h-8 w-96" />
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="space-y-2">
+              <Skeleton shimmer className="h-5 w-40" />
+              <Skeleton shimmer className="h-4 w-full" />
+              <Skeleton shimmer className="h-4 w-3/4" />
             </div>
-          </div>
+          ))}
         </div>
+        <span className="sr-only">Loading minute</span>
       </div>
     );
   }
@@ -134,6 +140,14 @@ export default function MinuteDetailPage() {
           </Link>
           <span>/</span>
           <span className="text-foreground">{minute.title}</span>
+          <Badge variant="outline" className={cn(
+            "ml-2 capitalize",
+            minute.status === 'draft' ? "bg-warning/10 text-warning border-warning/20" :
+            minute.status === 'approved' ? "bg-success/10 text-success border-success/20" :
+            "bg-info/10 text-info border-info/20"
+          )}>
+            {minute.status?.replace('_', ' ') || 'draft'}
+          </Badge>
         </div>
 
         {/* Editor */}

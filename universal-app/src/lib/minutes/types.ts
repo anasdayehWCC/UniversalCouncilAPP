@@ -128,6 +128,8 @@ export interface Minute {
   attendees: MinuteAttendee[];
   metadata: MinuteMetadata;
   versions?: MinuteVersion[];
+  /** User-applied topic tags */
+  tags?: string[];
   /** Approval workflow */
   submittedAt?: string;
   submittedBy?: string;

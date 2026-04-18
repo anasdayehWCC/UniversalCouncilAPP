@@ -50,6 +50,12 @@ pnpm install
 pnpm dev:web
 ```
 
+`pnpm dev:web` now uses the webpack dev server by default because Next.js 16.2.x Turbopack is currently unstable in this repo and can panic or degrade badly during route compilation. If you need to reproduce Turbopack-specific behavior, use:
+
+```bash
+pnpm dev:web:turbo
+```
+
 ### Lint, test, and build web frontend
 ```bash
 pnpm lint:web

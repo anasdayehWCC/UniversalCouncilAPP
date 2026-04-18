@@ -253,7 +253,7 @@ export function formatDayDescription(date: Date, baseDate: Date = new Date()): s
  * Get SLA status for a submitted item
  */
 export function getSLAStatus(submittedAt: string | undefined | null) {
-  if (!submittedAt) return { label: 'Due in 24h', color: 'text-slate-500', bg: 'bg-slate-50', isOverdue: false, overdueHours: 0 };
+  if (!submittedAt) return { label: 'Due in 24h', color: 'text-muted-foreground', bg: 'bg-muted', isOverdue: false, overdueHours: 0 };
   
   const submitted = new Date(submittedAt);
   const now = new Date();
@@ -273,7 +273,7 @@ export function getSLAStatus(submittedAt: string | undefined | null) {
   } else if (diffHours <= 4) {
     return { label: `Due in ${diffHours}h`, color: 'text-orange-700', bg: 'bg-orange-50', isOverdue: false, overdueHours: 0 };
   } else {
-    return { label: `Due in ${diffHours}h`, color: 'text-slate-600', bg: 'bg-slate-50', isOverdue: false, overdueHours: 0 };
+    return { label: `Due in ${diffHours}h`, color: 'text-muted-foreground', bg: 'bg-muted', isOverdue: false, overdueHours: 0 };
   }
 }
 

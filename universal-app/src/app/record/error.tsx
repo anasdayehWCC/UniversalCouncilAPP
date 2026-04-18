@@ -13,7 +13,11 @@ export default function RecordError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  const isMicError = error.message.includes('microphone') || 
+  React.useEffect(() => {
+    console.error('[record/error.tsx] Error caught:', error);
+  }, [error]);
+
+  const isMicError = error.message.includes('microphone') ||
     error.message.includes('getUserMedia') ||
     error.message.includes('NotAllowedError');
 
@@ -23,18 +27,18 @@ export default function RecordError({
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center">
             {isMicError ? (
-              <PhoneOff className="h-6 w-6 text-destructive" />
+              <PhoneOff className="h-6 w-6 text-destructive" aria-hidden="true" />
             ) : (
-              <AlertTriangle className="h-6 w-6 text-destructive" />
+              <AlertTriangle className="h-6 w-6 text-destructive" aria-hidden="true" />
             )}
           </div>
           <CardTitle>
             {isMicError ? 'Microphone Access Required' : 'Recording Error'}
           </CardTitle>
           <CardDescription>
-            {isMicError 
+            {isMicError
               ? 'Please enable microphone permissions in your browser settings.'
-              : 'An error occurred while initializing the recorder.'}
+              : 'Something went wrong with the recording session. Your unsaved recording may still be in the offline queue.'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -48,10 +52,10 @@ export default function RecordError({
               </ol>
             </div>
           )}
-          
+
           <div className="flex flex-col sm:flex-row gap-2">
             <Button variant="outline" className="flex-1" onClick={reset}>
-              <Mic className="mr-2 h-4 w-4" />
+              <Mic className="mr-2 h-4 w-4" aria-hidden="true" />
               Try again
             </Button>
             <Button
@@ -59,7 +63,7 @@ export default function RecordError({
               className="flex-1"
               onClick={() => window.location.href = '/'}
             >
-              <Home className="mr-2 h-4 w-4" />
+              <Home className="mr-2 h-4 w-4" aria-hidden="true" />
               Go home
             </Button>
           </div>

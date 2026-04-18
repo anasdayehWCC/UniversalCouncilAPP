@@ -11,6 +11,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 interface RecordingTimerProps {
   /** Duration in seconds */
@@ -32,6 +33,7 @@ export function RecordingTimer({
   isPaused,
   maxDuration = 0,
 }: RecordingTimerProps) {
+  const prefersReducedMotion = usePrefersReducedMotion();
   const hasMaxDuration = maxDuration > 0;
   const progress = hasMaxDuration ? (duration / maxDuration) * 100 : 0;
   const isNearLimit = hasMaxDuration && progress >= 80;
@@ -49,11 +51,11 @@ export function RecordingTimer({
             isAtLimit && 'text-error'
           )}
           animate={
-            isRecording && !isPaused
+            isRecording && !isPaused && !prefersReducedMotion
               ? { scale: [1, 1.02, 1], opacity: [0.9, 1, 0.9] }
               : {}
           }
-          transition={{ duration: 1, repeat: Infinity }}
+          transition={prefersReducedMotion ? undefined : { duration: 1, repeat: Infinity }}
         >
           {formattedDuration}
         </motion.div>
@@ -62,8 +64,8 @@ export function RecordingTimer({
         {isRecording && !isPaused && (
           <motion.div
             className="absolute -top-2 -right-4 w-4 h-4 rounded-full bg-destructive"
-            animate={{ opacity: [1, 0.5, 1], scale: [1, 1.1, 1] }}
-            transition={{ duration: 1, repeat: Infinity }}
+            animate={prefersReducedMotion ? {} : { opacity: [1, 0.5, 1], scale: [1, 1.1, 1] }}
+            transition={prefersReducedMotion ? undefined : { duration: 1, repeat: Infinity }}
           />
         )}
       </div>
@@ -73,14 +75,14 @@ export function RecordingTimer({
         {isRecording && !isPaused && (
           <motion.span
             className="text-sm font-medium text-destructive"
-            animate={{ opacity: [1, 0.6, 1] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
+            animate={prefersReducedMotion ? {} : { opacity: [1, 0.6, 1] }}
+            transition={prefersReducedMotion ? undefined : { duration: 1.5, repeat: Infinity }}
           >
             ● Recording
           </motion.span>
         )}
         {isPaused && (
-          <span className="text-sm font-medium text-amber-500">
+          <span className="text-sm font-medium text-warning">
             ⏸ Paused
           </span>
         )}
@@ -102,7 +104,7 @@ export function RecordingTimer({
             <motion.div
               className={cn(
                 'h-full rounded-full transition-colors',
-                isNearLimit ? 'bg-amber-500' : 'bg-primary',
+                isNearLimit ? 'bg-warning' : 'bg-primary',
                 isAtLimit && 'bg-error'
               )}
               initial={{ width: 0 }}
@@ -113,7 +115,7 @@ export function RecordingTimer({
           {isNearLimit && (
             <p className={cn(
               'text-xs mt-1 text-center',
-              isAtLimit ? 'text-error' : 'text-amber-500'
+              isAtLimit ? 'text-error' : 'text-warning'
             )}>
               {isAtLimit
                 ? 'Maximum duration reached'

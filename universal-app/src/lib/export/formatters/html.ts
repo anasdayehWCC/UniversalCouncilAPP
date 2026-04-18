@@ -153,6 +153,7 @@ export class HtmlFormatter implements IExportFormatter {
       <header class="document-header">
         <h1 class="title">${escapeHtml(options.customTitle || minute.title)}</h1>
         ${options.includeMetadata ? this.buildMetadata(minute) : ''}
+        ${minute.tags && minute.tags.length > 0 ? this.buildTags(minute.tags) : ''}
       </header>
 
       ${options.includeAttendees && minute.attendees.length > 0 
@@ -272,6 +273,24 @@ export class HtmlFormatter implements IExportFormatter {
     .metadata-label {
       font-weight: 600;
       color: #6b7280;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 12px;
+    }
+
+    .tag-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: ${styles.fontSize.caption}pt;
+      font-weight: 500;
+      background: #e0e7ff;
+      color: #3730a3;
+      border: 1px solid #c7d2fe;
     }
 
     .attendees {
@@ -498,6 +517,14 @@ export class HtmlFormatter implements IExportFormatter {
           <span>${escapeHtml(item.value)}</span>
         </div>
       `).join('')}
+    </div>
+    `;
+  }
+
+  private buildTags(tags: string[]): string {
+    return `
+    <div class="tags">
+      ${tags.map(tag => `<span class="tag-badge">${escapeHtml(tag)}</span>`).join('')}
     </div>
     `;
   }

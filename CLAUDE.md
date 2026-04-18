@@ -48,3 +48,69 @@
 - Trigger: Sidebar instability (profile section falls below visible area).
   Rule: The shell should own the viewport with `h-[100dvh]` and `min-h-0` children, the header should use `--shell-header-height`, and banners should dock below the header safe area instead of covering it.
   Verify: AppShell keeps the sidebar and main content inside one `100dvh` contract; route content scrolls internally; the resilience banner never overlaps the header.
+
+# Automation Infrastructure
+
+- Trigger: Starting a development session or wanting to advance the project.
+  Rule: Use `/orchestrate` to launch the development orchestrator. It reads the roadmap, identifies independent work, dispatches parallel sub-agents in worktrees, reviews output, and creates PRs. Use `/roadmap-status` for a quick check of what's done vs remaining.
+  Verify: Orchestrator creates feature branches (never commits to main), dispatches max 5 sub-agents, and produces a PR with CHANGELOG updates.
+- Trigger: Sub-agents working on frontend code in universal-app.
+  Rule: The `dev-frontend` skill is auto-loaded as context. Sub-agents must follow theme token rules, accessibility patterns, z-index scale, and hydration safety patterns documented in that skill.
+  Verify: Sub-agent output passes `pnpm --filter universal-app audit:premium-ui` and `pnpm --filter universal-app lint`.
+- Trigger: Editing .tsx/.ts files in universal-app components or routes.
+  Rule: PostToolUse hooks automatically check for hardcoded color tokens and accessibility issues (missing motion-reduce, missing aria-labels). PreToolUse hooks block edits to .env files, lock files, and generated API client code.
+  Verify: Hooks are defined in `.claude/settings.json`; scripts are in `.claude/hooks/`.
+- Trigger: Wanting to find gaps, UX issues, or missing features from a stakeholder perspective.
+  Rule: Use `/review-board` to launch 5 adversarial persona agents (social worker, manager, admin, developer, a11y auditor) that test the running app via Chrome DevTools, report findings with confidence scores, and write a prioritized backlog to `docs/production-backlog.md`. The orchestrator reads this backlog during its ASSESS phase.
+  Verify: Dev server is running at localhost:3000 before dispatch; findings below 70 confidence are filtered; backlog file is appended not overwritten.
+- Trigger: Sub-agent discovers a task outside its assigned scope during orchestration.
+  Rule: Report it in the "Discovered Tasks" section of the agent report using the format: `DISCOVERED: [category] [severity] / Description / Location / Suggested action`. The orchestrator collects these and appends them to `docs/production-backlog.md`.
+  Verify: Sub-agent briefs include the discovered tasks protocol; orchestrator Phase 7c writes discoveries to backlog.
+- Trigger: Hook commands in `.claude/settings.json` fail with "no such file or directory".
+  Rule: Always use absolute paths for hook commands (e.g., `python3 /absolute/path/.claude/hooks/script.py`), not relative paths. Hooks execute relative to CWD, which may be a subdirectory when agents or the user work inside `universal-app/`.
+  Verify: All `command` fields in `.claude/settings.json` hooks use absolute paths or `$PROJECT_ROOT`-relative expansion.
+- Trigger: Creating route-level error boundaries in Next.js 16 App Router.
+  Rule: Detail routes (`/[id]/error.tsx`) should detect 404 patterns in the error message and show friendlier "not found" messaging with a link back to the parent list route, not just home.
+  Verify: Detail-route error boundaries check `error.message` for 404/not-found and render contextual "Back to [list]" links.
+- Trigger: Running the a11y audit script (`audit:a11y`).
+  Rule: The script at `universal-app/scripts/audit-a11y-ci.mjs` checks hardcoded colors, motion-reduce, and aria-labels. Files with intentional branded colors must be added to `HARDCODED_COLOR_ALLOWLIST` in the script. CI workflow at `.github/workflows/a11y.yml` runs both this and the premium UI audit.
+  Verify: `node universal-app/scripts/audit-a11y-ci.mjs` exits 0; new components use semantic tokens.
+- Trigger: Review board finds admin state is all ephemeral in-memory mock data.
+  Rule: All admin hooks (`useAdmin`, `useReview`) use `useState` with `MOCK_*` seed data and no API calls. Every write mutates only local React state. A page refresh silently discards all changes. Do not ship admin features without a persistence layer.
+  Verify: Search `useAdmin.ts` and `useReview.ts` for actual API calls (`fetch`, `api-client`); if none exist, the feature is mock-only.
+- Trigger: Review queue "Review Note" button links to the wrong route.
+  Rule: `PendingReviews.tsx` line 115 links to `/my-notes/${item.id}` (worker's personal view) instead of `/review-queue/${item.id}` (manager approval view). This breaks the core manager approval flow.
+  Verify: Check that `PendingReviews.tsx` action button href uses `/review-queue/` prefix, not `/my-notes/`.
+- Trigger: Multiple components independently calling `useNetworkStatus()`.
+  Rule: `useNetworkStatus` creates its own `setInterval` per caller. Three components (ResilienceBanner, ConnectivityIndicator, record/page.tsx) each poll the backend independently. Lift network status into a shared context/provider so only one polling loop runs.
+  Verify: Grep for `useNetworkStatus()` calls; there should be exactly one (in a provider), not per-component.
+- Trigger: Login page or other intentionally branded dark surfaces using semantic tokens like `text-foreground`.
+  Rule: On branded dark surfaces with hardcoded dark backgrounds, do not use theme-adaptive semantic tokens for text. Use explicit `text-white` or `text-white/[opacity]` since the background doesn't change with theme mode. `text-foreground` produces dark-on-dark in light mode.
+  Verify: Check branded dark surfaces (login, hero sections) for `text-foreground` or `text-muted-foreground` usage; all text should use explicit light values.
+- Trigger: Naming variables in Next.js page/layout files.
+  Rule: Never name a variable `module` in Next.js page/layout files; the `@next/next/no-assign-module-variable` lint rule flags it. Use `targetModule`, `matchedModule`, or similar.
+  Verify: `pnpm lint` reports zero `no-assign-module-variable` errors in new code.
+- Trigger: Starting creative work — designing new features, components, APIs, or modifying existing behavior.
+  Rule: Use `/brainstorming` before writing any code. It walks through a structured dialogue: one question at a time, 2-3 approaches with tradeoffs, then design in 200-300 word sections with incremental validation. Saves the validated design to `docs/plans/YYYY-MM-DD-<topic>-design.md` and offers handoff to `/writing-plans` for implementation.
+  Verify: Design document exists in `docs/plans/` before implementation begins; design covers architecture, components, data flow, error handling, and testing.
+- Trigger: Having a spec or validated design and needing to plan multi-step implementation.
+  Rule: Use `/writing-plans` to create detailed implementation plans with bite-sized tasks (2-5 minutes each: write failing test, run, implement, run, commit). Plans include exact file paths, complete code, project-specific rules (theme tokens, a11y, z-index), and validation commands. Saved to `docs/plans/YYYY-MM-DD-<feature-name>.md`. Execution via `executing-plans` skill or `/orchestrate`.
+  Verify: Plan file exists in `docs/plans/`; each task has exact file paths, test commands with expected output, and a commit step.
+- Trigger: Running multiple `/orchestrate` sessions concurrently (e.g., in parallel chat windows).
+  Rule: The orchestrator reads `.claude/orchestrator-claims.json` during ASSESS to check for tasks claimed by other sessions. It writes claims after user approval in IDENTIFY (before dispatching agents) and releases them after PR creation in Phase 8. Claims older than 2 hours are treated as stale from crashed sessions.
+  Verify: `.claude/orchestrator-claims.json` exists with `{"claimed":[]}` when no orchestrator is active; concurrent sessions do not dispatch overlapping tasks.
+- Trigger: Orchestrator or agent deciding what to work on next.
+  Rule: Follow the prioritisation matrix in `docs/product-vision.md`: ship-blockers > core user flows > integration completeness > design quality > housekeeping > polish/compliance. Never prioritise polish/compliance when ship-blockers or core flow gaps remain open. A functioning app with a few aria-label gaps ships; a perfectly compliant app with mock backends doesn't.
+  Verify: Check production-backlog.md for CRITICAL items before dispatching work on MEDIUM/LOW items; at least one work package must address priority categories 1-3 if any exist.
+- Trigger: Orchestrator dispatching sub-agents for development work.
+  Rule: Batch related tasks into work packages (3-5 tasks per domain area) assigned to ONE agent, instead of dispatching one agent per tiny task. One agent with deep context builds more coherent code than 5 agents each making one isolated change. Max 3 work packages per run, not 5 single-task agents.
+  Verify: Each dispatched agent receives a work package brief (not a single ticket) containing product context, design intent, success criteria, and similar code references alongside file paths and rules.
+- Trigger: Completing any UI work — new components, layout changes, styling, or frontend features.
+  Rule: Before reporting success, visually verify the affected routes in a browser at desktop (1440px) and mobile (375px). Ask: does this look like something a social worker would trust? Is the spacing consistent? Does it match the design principles in `docs/product-vision.md`? Lint passing is not visual verification.
+  Verify: Agent report includes a "Visual verification" section describing what was checked and what was observed; OR the orchestrator runs a visual checkpoint in Phase 5 before merging.
+- Trigger: Every 3rd orchestration run, or when technical debt is visibly accumulating.
+  Rule: Allocate one work package to housekeeping — consolidating duplicate patterns, extracting shared components, cleaning up stale code, reorganising files that drift from conventions, removing console.logs and dead code. A real senior developer tidies as they go; the system should too.
+  Verify: Session notes record what was cleaned up; production-backlog.md includes housekeeping-category items discovered during runs.
+- Trigger: Any agent or skill making decisions about what the app should look and feel like.
+  Rule: Read `docs/product-vision.md` first. The app should feel fast, calm, trustworthy, and beautiful — not like a prototype. "Premium" means intentional typography, consistent spacing, fluid animations, and mobile-first design. Substance over decoration. Calm confidence, not enterprise dashboard clutter.
+  Verify: `docs/product-vision.md` exists and is referenced in orchestrator ASSESS phase, review-board PREPARE phase, and agent brief templates.

@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { ConfirmDialog } from '@/components/ui/alert-dialog';
 import {
   Select,
   SelectContent,
@@ -12,16 +13,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { 
-  Search, 
-  MoreVertical, 
-  Edit2, 
-  Trash2, 
+import {
+  Search,
+  MoreVertical,
+  Edit2,
+  Trash2,
   UserPlus,
   ChevronUp,
   ChevronDown,
   Mail,
-  Shield
+  Shield,
+  Eye
 } from 'lucide-react';
 import { AdminUser } from '@/types/admin';
 import { cn } from '@/lib/utils';
@@ -34,6 +36,7 @@ interface UserTableProps {
   users: AdminUser[];
   onEdit: (user: AdminUser) => void;
   onDelete: (userId: string) => void;
+  onBulkDelete?: (userIds: string[]) => void;
   onAdd: () => void;
   canEdit: boolean;
 }
@@ -51,7 +54,7 @@ const ROLE_LABELS: Record<string, string> = {
   housing_officer: 'Housing Officer'
 };
 
-export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTableProps) {
+export function UserTable({ users, onEdit, onDelete, onBulkDelete, onAdd, canEdit }: UserTableProps) {
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -59,6 +62,7 @@ export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTable
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false);
 
   const filteredUsers = useMemo(() => {
     return users
@@ -130,6 +134,17 @@ export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTable
     setSelectedUsers(newSelected);
   };
 
+  const handleBulkDelete = () => {
+    const ids = Array.from(selectedUsers);
+    if (onBulkDelete) {
+      onBulkDelete(ids);
+    } else {
+      ids.forEach((id) => onDelete(id));
+    }
+    setSelectedUsers(new Set());
+    setShowBulkDeleteDialog(false);
+  };
+
   return (
     <Card variant="glass" hoverEffect={false} className="bg-card/80 overflow-hidden">
       {/* Toolbar */}
@@ -174,17 +189,22 @@ export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTable
             </Select>
           </div>
 
-          {/* Add button */}
-          {canEdit && (
+          {/* Add button or View Only badge */}
+          {canEdit ? (
             <Button onClick={onAdd} className="gap-2">
               <UserPlus className="w-4 h-4" />
               Add User
             </Button>
+          ) : (
+            <Badge variant="outline" className="gap-1.5 py-1.5 px-3 text-muted-foreground border-border">
+              <Eye className="w-3.5 h-3.5" />
+              View only
+            </Badge>
           )}
         </div>
 
-        {/* Bulk actions */}
-        {selectedUsers.size > 0 && (
+        {/* Bulk actions — only shown when canEdit and items are selected */}
+        {canEdit && selectedUsers.size > 0 && (
           <div className="flex items-center gap-4 py-2 px-3 bg-muted rounded-lg">
             <span className="text-sm text-muted-foreground">
               {selectedUsers.size} selected
@@ -192,12 +212,15 @@ export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTable
             <Button variant="ghost" size="sm" onClick={() => setSelectedUsers(new Set())}>
               Clear
             </Button>
-            {canEdit && (
-              <Button variant="destructive" size="sm" className="gap-1">
-                <Trash2 className="w-3 h-3" />
-                Delete
-              </Button>
-            )}
+            <Button
+              variant="destructive"
+              size="sm"
+              className="gap-1"
+              onClick={() => setShowBulkDeleteDialog(true)}
+            >
+              <Trash2 className="w-3 h-3" />
+              Delete
+            </Button>
           </div>
         )}
       </div>
@@ -207,14 +230,17 @@ export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTable
         <table className="w-full">
           <thead>
             <tr className="border-b border-border bg-muted/50">
-              <th className="px-4 py-3 text-left">
-                <input 
-                  type="checkbox" 
-                  checked={selectedUsers.size === filteredUsers.length && filteredUsers.length > 0}
-                  onChange={toggleSelectAll}
-                  className="rounded border-input"
-                />
-              </th>
+              {canEdit && (
+                <th className="px-4 py-3 text-left">
+                  <input
+                    type="checkbox"
+                    checked={selectedUsers.size === filteredUsers.length && filteredUsers.length > 0}
+                    onChange={toggleSelectAll}
+                    className="rounded border-input"
+                    aria-label="Select all users"
+                  />
+                </th>
+              )}
               <th 
                 className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider cursor-pointer hover:text-foreground"
                 onClick={() => handleSort('name')}
@@ -252,7 +278,7 @@ export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTable
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-border">
             {filteredUsers.map((user) => (
               <tr 
                 key={user.id} 
@@ -261,14 +287,17 @@ export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTable
                   selectedUsers.has(user.id) && 'bg-info/10'
                 )}
               >
-                <td className="px-4 py-3">
-                  <input 
-                    type="checkbox" 
-                    checked={selectedUsers.has(user.id)}
-                    onChange={() => toggleSelect(user.id)}
-                    className="rounded border-input"
-                  />
-                </td>
+                {canEdit && (
+                  <td className="px-4 py-3">
+                    <input
+                      type="checkbox"
+                      checked={selectedUsers.has(user.id)}
+                      onChange={() => toggleSelect(user.id)}
+                      className="rounded border-input"
+                      aria-label={`Select ${user.name}`}
+                    />
+                  </td>
+                )}
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] flex items-center justify-center text-white font-semibold text-sm">
@@ -381,6 +410,17 @@ export function UserTable({ users, onEdit, onDelete, onAdd, canEdit }: UserTable
       <div className="px-4 py-3 border-t border-border bg-muted/50 text-sm text-muted-foreground">
         Showing {filteredUsers.length} of {users.length} users
       </div>
+
+      {/* Bulk Delete Confirmation Dialog */}
+      <ConfirmDialog
+        open={showBulkDeleteDialog}
+        onOpenChange={setShowBulkDeleteDialog}
+        title={`Delete ${selectedUsers.size} user${selectedUsers.size !== 1 ? 's' : ''}?`}
+        description="This action cannot be undone. The selected user accounts will be permanently removed."
+        confirmText={`Delete ${selectedUsers.size} user${selectedUsers.size !== 1 ? 's' : ''}`}
+        destructive
+        onConfirm={handleBulkDelete}
+      />
     </Card>
   );
 }

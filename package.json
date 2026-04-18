@@ -2,7 +2,8 @@
   "name": "care-minutes-monorepo",
   "private": true,
   "scripts": {
-    "dev:web": "pnpm --filter universal-app dev",
+    "dev:web": "pnpm --filter universal-app dev:webpack",
+    "dev:web:turbo": "pnpm --filter universal-app dev:turbo",
     "build:web": "pnpm --filter universal-app build",
     "lint:web": "pnpm --filter universal-app lint",
     "test:web": "pnpm --filter universal-app test:run",

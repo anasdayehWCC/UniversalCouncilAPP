@@ -18,13 +18,11 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { TemplateCard } from './TemplateCard';
-import { TemplatePreview } from './TemplatePreview';
 import { useTemplates } from '@/hooks/useTemplates';
 import { 
   Template, 
   TemplateCategory, 
   CATEGORY_META,
-  TemplateWithPreferences
 } from '@/lib/templates/types';
 import { cn } from '@/lib/utils';
 
@@ -62,7 +60,6 @@ export function TemplateSelector({
   // State
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
-  const [hoveredTemplate, setHoveredTemplate] = useState<TemplateWithPreferences | null>(null);
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
 
   // Template hook
@@ -124,15 +121,16 @@ export function TemplateSelector({
   return (
     <div className={cn('flex flex-col gap-4', className)}>
       {/* Header & Search */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="flex gap-2">
+      <div className="flex flex-col gap-4 rounded-[24px] border border-border/70 bg-card/88 p-4 shadow-[0_18px_45px_-32px_rgba(15,23,42,0.28)]">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-wrap gap-2">
           <button
             onClick={() => handleTabChange('all')}
             className={cn(
-              'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200',
+              'rounded-full border px-4 py-2 text-sm font-medium transition-colors duration-200',
               activeTab === 'all'
-                ? 'bg-gradient-to-r from-slate-900 to-slate-700 text-white shadow-md'
-                : 'bg-card/60 text-muted-foreground hover:bg-card/80 border border-border'
+                ? 'border-primary/20 bg-primary text-primary-foreground shadow-sm'
+                : 'border-border bg-background/70 text-muted-foreground hover:bg-background hover:text-foreground'
             )}
           >
             All Templates
@@ -140,10 +138,10 @@ export function TemplateSelector({
           <button
             onClick={() => handleTabChange('favorites')}
             className={cn(
-              'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2',
+              'flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors duration-200',
               activeTab === 'favorites'
-                ? 'bg-gradient-to-r from-warning to-orange-500 text-white shadow-md'
-                : 'bg-card/60 text-muted-foreground hover:bg-card/80 border border-border'
+                ? 'border-warning/20 bg-warning/12 text-warning'
+                : 'border-border bg-background/70 text-muted-foreground hover:bg-background hover:text-foreground'
             )}
           >
             <Star className="w-4 h-4" />
@@ -152,26 +150,26 @@ export function TemplateSelector({
           <button
             onClick={() => handleTabChange('recent')}
             className={cn(
-              'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2',
+              'flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors duration-200',
               activeTab === 'recent'
-                ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-md'
-                : 'bg-card/60 text-muted-foreground hover:bg-card/80 border border-border'
+                ? 'border-info/20 bg-info/10 text-info'
+                : 'border-border bg-background/70 text-muted-foreground hover:bg-background hover:text-foreground'
             )}
           >
             <Clock className="w-4 h-4" />
             Recent
           </button>
-        </div>
+          </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center lg:w-auto">
           {/* Search */}
-          <div className="relative flex-1 sm:w-64">
+            <div className="relative flex-1 lg:w-72">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder="Search templates..."
               value={filters.search || ''}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 bg-card/60 border-border focus:bg-card"
+              className="h-11 rounded-full border-border bg-background/70 pl-9 focus:bg-background"
             />
             {filters.search && (
               <button
@@ -184,13 +182,13 @@ export function TemplateSelector({
           </div>
 
           {/* Category filter dropdown */}
-          <div className="relative">
+            <div className="relative">
             <Button
               variant="outline"
               size="default"
               onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
               className={cn(
-                'gap-2 bg-card/60 border-border',
+                'h-11 gap-2 rounded-full border-border bg-background/70',
                 activeCategory && 'border-2'
               )}
               style={activeCategory ? { borderColor: activeCategory.color } : undefined}
@@ -206,7 +204,7 @@ export function TemplateSelector({
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="absolute right-0 mt-2 w-56 bg-card rounded-xl shadow-xl border border-border overflow-hidden z-50"
+                  className="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-2xl border border-border bg-card shadow-xl"
                 >
                   <button
                     onClick={() => handleCategorySelect(null)}
@@ -249,12 +247,12 @@ export function TemplateSelector({
           </div>
 
           {/* View mode toggle */}
-          {!compact && (
-            <div className="flex bg-card/60 border border-border rounded-lg p-1">
+            {!compact && (
+              <div className="flex rounded-full border border-border bg-background/70 p-1">
               <button
                 onClick={() => setViewMode('grid')}
                 className={cn(
-                  'p-2 rounded-md transition-colors',
+                  'rounded-full p-2 transition-colors',
                   viewMode === 'grid'
                     ? 'bg-primary text-primary-foreground'
                     : 'text-muted-foreground hover:text-foreground'
@@ -265,7 +263,7 @@ export function TemplateSelector({
               <button
                 onClick={() => setViewMode('list')}
                 className={cn(
-                  'p-2 rounded-md transition-colors',
+                  'rounded-full p-2 transition-colors',
                   viewMode === 'list'
                     ? 'bg-primary text-primary-foreground'
                     : 'text-muted-foreground hover:text-foreground'
@@ -273,8 +271,9 @@ export function TemplateSelector({
               >
                 <List className="w-4 h-4" />
               </button>
-            </div>
-          )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -351,8 +350,6 @@ export function TemplateSelector({
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.2 }}
-                  onMouseEnter={() => !compact && setHoveredTemplate(template)}
-                  onMouseLeave={() => setHoveredTemplate(null)}
                 >
                   <TemplateCard
                     template={template}
@@ -367,42 +364,6 @@ export function TemplateSelector({
               ))}
             </AnimatePresence>
           </div>
-
-          {/* Preview panel (desktop only, non-compact) */}
-          {!compact && viewMode === 'grid' && (
-            <div className="hidden xl:block w-80 flex-shrink-0">
-              <div className="sticky top-4">
-                <AnimatePresence mode="wait">
-                  {hoveredTemplate ? (
-                    <motion.div
-                      key={hoveredTemplate.id}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 20 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <TemplatePreview
-                        template={hoveredTemplate}
-                        onSelect={() => handleSelect(hoveredTemplate)}
-                        compact
-                      />
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="text-center text-muted-foreground p-8"
-                    >
-                      <div className="p-4 rounded-full bg-muted inline-block mb-4">
-                        <Search className="w-8 h-8" />
-                      </div>
-                      <p className="text-sm">Hover over a template to preview</p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </div>
-          )}
         </div>
       )}
     </div>

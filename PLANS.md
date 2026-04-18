@@ -2,14 +2,14 @@
 
 ## Purpose / Big Picture
 
-- Deliver the Social Care-ready Minute platform per `minute-main/ROADMAP_social_care.md`, under the behavioral guardrails in `AGENTS.md`.
+- Deliver the Social Care-ready Minute platform per `ROADMAP_social_care.md` (root), under the behavioral guardrails in `AGENTS.md`.
 - Optimize for Codex-Max long-run sessions (compaction, multi-window) while keeping costs and safety controls explicit.
 - Record progress and blockers so extended autonomous runs remain coherent.
 
 ## References
 
 - Behavioral rules: `AGENTS.md` (auth, migrations, cost controls, logging/retention, feature flags, dev-preview).
-- Delivery roadmap: `minute-main/ROADMAP_social_care.md` (phases 1–14, success criteria).
+- Delivery roadmap: `ROADMAP_social_care.md` (root — phases 1–41, status notes, demo UI appendix).
 - Model context: GPT-5.1-Codex-Max (compaction; can run 24h+). citeturn0search0
 
 ## 2026-03-28 Repo Baseline
@@ -175,6 +175,13 @@
 - Current state: The active admin console has dashboard, modules, settings, templates, users, and audit surfaces. Adoption and config-detail routes still need either explicit wiring into `universal-app` or retirement from the roadmap claims.
 - Blockers: Phase 38 (yjs) and Phase 39 (Azure Search) require additional infrastructure.
 - Next: Consider Phase 38 yjs integration for real-time collaboration; Phase 39 requires Azure Cognitive Search setup.
+
+### Context Snapshot [2026-04-18T22:55Z]
+
+- Manual shell audit confirms the admin cohesion issue predates the latest backend/admin contract work. The current working tree has no diffs in `universal-app/src/app/admin/page.tsx`, `universal-app/src/components/admin/AdminHeader.tsx`, `universal-app/src/app/admin/settings/page.tsx`, `universal-app/src/app/admin/modules/page.tsx`, or `universal-app/src/app/record/page.tsx`.
+- Root cause: `AppShell` already owns the outer navigation and header, but admin adds a second sticky sidebar in `universal-app/src/app/admin/layout.tsx` plus a second sticky page header in `universal-app/src/components/admin/AdminHeader.tsx`. Smart Capture bypasses the shared `ShellPage`/`PageHeader` primitives and renders a standalone sticky tool header in `universal-app/src/app/record/page.tsx`.
+- Reference pattern: routes such as `/` and `/templates` compose shared page primitives inside `AppShell`; `My Notes` stays visually integrated because it does not introduce duplicate shell chrome even though it uses custom content.
+- Next: treat shell integration as explicit follow-up work using `docs/plans/2026-04-18-admin-record-shell-integration.md` and backlog items 57-58.
 
 ### Context Snapshot [2025-11-21T12:10Z]
 

@@ -61,15 +61,15 @@ export default function LoginPage() {
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-semibold tracking-tight text-white">
               Minute Platform
             </h1>
-            <p className="text-sm sm:text-base text-muted-foreground">
+            <p className="text-sm sm:text-base text-white/70">
               One App. Multiple Domains.
             </p>
           </div>
-          <p className="max-w-xl text-xs sm:text-sm text-muted-foreground text-balance">
+          <p className="max-w-xl text-xs sm:text-sm text-white/60 text-balance">
             Select a persona to see how the interface adapts for social workers, managers, and platform admins across councils.
           </p>
           <div
-            className="inline-flex items-center gap-3 rounded-full border px-4 py-2 text-xs sm:text-sm border-white/10 bg-white/5 text-muted-foreground"
+            className="inline-flex items-center gap-3 rounded-full border px-4 py-2 text-xs sm:text-sm border-white/10 bg-white/5 text-white/60"
           >
             <span
               className="inline-flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-semibold bg-white/20 text-white"
@@ -77,8 +77,8 @@ export default function LoginPage() {
               {config.name[0]}
             </span>
             <span className="font-medium text-white">{config.authorityLabel}</span>
-            <span className="h-1 w-1 rounded-full bg-muted" />
-            <span className="text-muted-foreground">Currently viewing {config.name}</span>
+            <span className="h-1 w-1 rounded-full bg-white/30" />
+            <span className="text-white/60">Currently viewing {config.name}</span>
           </div>
         </header>
 

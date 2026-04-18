@@ -2,11 +2,17 @@
 
 /**
  * SortableList Component
- * Reorderable list with drag and drop support
+ * Reorderable list with drag-and-drop and full keyboard accessibility (WCAG 2.1.1)
+ *
+ * Keyboard controls:
+ *   Arrow Up / Arrow Left  – move focused item up (vertical) or left (horizontal)
+ *   Arrow Down / Arrow Right – move focused item down (vertical) or right (horizontal)
+ *   Explicit "Move up" / "Move down" buttons are rendered per item for discoverability.
  */
 
-import React, { useRef, useCallback, useState, useEffect } from 'react';
+import React, { useRef, useCallback, useState, useEffect, useId } from 'react';
 import { cn } from '@/lib/utils';
+import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useDndContext, getElementRect } from '@/lib/dnd/context';
 import {
   getPointerPosition,
@@ -37,11 +43,16 @@ export function SortableList<T>({
   const containerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Map<DragId, HTMLDivElement>>(new Map());
   const itemRectsRef = useRef<SortableItemState[]>([]);
-  
+
   const [activeId, setActiveId] = useState<DragId | null>(null);
   const [overId, setOverId] = useState<DragId | null>(null);
   const [previewItems, setPreviewItems] = useState<SortableItem<T>[]>(items);
-  
+
+  // Live-region announcement for screen readers
+  const [liveAnnouncement, setLiveAnnouncement] = useState('');
+  const liveRegionId = useId();
+  const instructionsId = useId();
+
   const startPositionRef = useRef<Position | null>(null);
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
   const isDraggingRef = useRef(false);
@@ -69,6 +80,59 @@ export function SortableList<T>({
     itemRectsRef.current = rects;
   }, [items]);
 
+  // ──────────────────────────────────────────────────────────────────────────
+  // Keyboard reordering
+  // ──────────────────────────────────────────────────────────────────────────
+
+  /** Move an item from `fromIndex` to `toIndex` via keyboard and announce the change. */
+  const moveItem = useCallback(
+    (fromIndex: number, toIndex: number) => {
+      const newItems = reorderArray(items, fromIndex, toIndex);
+      onReorder({ items: newItems, fromIndex, toIndex });
+
+      // Announce new position to screen readers
+      setLiveAnnouncement(
+        `Item moved to position ${toIndex + 1} of ${items.length}.`
+      );
+
+      // Move focus to the item at its new position after DOM update
+      requestAnimationFrame(() => {
+        const container = containerRef.current;
+        if (container) {
+          const focusTargets = container.querySelectorAll<HTMLElement>(
+            '[data-sortable-id]'
+          );
+          focusTargets[toIndex]?.focus();
+        }
+      });
+    },
+    [items, onReorder]
+  );
+
+  /** Handle keyboard events on a sortable item row. */
+  const handleItemKeyDown = useCallback(
+    (event: React.KeyboardEvent, index: number) => {
+      if (disabled) return;
+
+      const moveUpKey = direction === 'vertical' ? 'ArrowUp' : 'ArrowLeft';
+      const moveDownKey =
+        direction === 'vertical' ? 'ArrowDown' : 'ArrowRight';
+
+      if (event.key === moveUpKey && index > 0) {
+        event.preventDefault();
+        moveItem(index, index - 1);
+      } else if (event.key === moveDownKey && index < items.length - 1) {
+        event.preventDefault();
+        moveItem(index, index + 1);
+      }
+    },
+    [disabled, direction, items.length, moveItem]
+  );
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // Pointer / drag handlers (unchanged logic)
+  // ──────────────────────────────────────────────────────────────────────────
+
   // Handle pointer down on item
   const handleItemPointerDown = useCallback((
     event: React.PointerEvent,
@@ -79,7 +143,7 @@ export function SortableList<T>({
     if (event.button !== 0) return;
 
     event.preventDefault();
-    
+
     const position = getPointerPosition(event);
     startPositionRef.current = position;
     activeItemRef.current = item;
@@ -107,10 +171,10 @@ export function SortableList<T>({
     if (!element) return;
 
     const offset = calculateOffset(element, position);
-    
+
     isDraggingRef.current = true;
     setActiveId(item.id);
-    
+
     startDrag(
       {
         id: item.id,
@@ -159,7 +223,7 @@ export function SortableList<T>({
             clearTimeout(longPressTimerRef.current);
             longPressTimerRef.current = null;
           }
-          
+
           const index = items.findIndex(i => i.id === activeItemRef.current?.id);
           if (index !== -1) {
             startDragging(activeItemRef.current, index, position);
@@ -234,9 +298,18 @@ export function SortableList<T>({
   // Render items in preview order during drag
   const displayItems = isDraggingRef.current ? previewItems : items;
 
+  // Determine which icon pair to use based on direction
+  const MoveBackIcon = direction === 'vertical' ? ChevronUp : ChevronLeft;
+  const MoveForwardIcon = direction === 'vertical' ? ChevronDown : ChevronRight;
+  const moveBackLabel = direction === 'vertical' ? 'Move item up' : 'Move item left';
+  const moveForwardLabel = direction === 'vertical' ? 'Move item down' : 'Move item right';
+
   return (
     <div
       ref={containerRef}
+      role="list"
+      aria-roledescription="sortable list"
+      aria-label="Reorderable list"
       className={cn(
         'relative',
         direction === 'vertical' && 'flex flex-col',
@@ -245,34 +318,106 @@ export function SortableList<T>({
       )}
       style={{ gap }}
     >
+      {/* Screen reader instructions (hidden visually) */}
+      <span id={instructionsId} className="sr-only">
+        Use arrow keys to reorder items. Or use the move buttons on each item.
+      </span>
+
       {displayItems.map((item, index) => {
         const isActive = item.id === activeId;
         const isOver = item.id === overId;
+        const isFirst = index === 0;
+        const isLast = index === displayItems.length - 1;
 
         return (
           <div
             key={item.id}
             ref={(el) => setItemRef(item.id, el)}
+            role="listitem"
+            tabIndex={disabled ? -1 : 0}
+            aria-describedby={instructionsId}
+            aria-label={`Item ${index + 1} of ${displayItems.length}`}
             className={cn(
-              'touch-none select-none transition-transform duration-200',
+              'group touch-none select-none',
+              'transition-transform duration-200 motion-reduce:transition-none',
               !disabled && !isActive && 'cursor-grab',
               isActive && 'cursor-grabbing opacity-50',
-              isOver && !isActive && 'scale-[1.02]',
+              isOver && !isActive && 'scale-[1.02] motion-reduce:scale-100',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md',
               itemClassName
             )}
             onPointerDown={(e) => handleItemPointerDown(e, item, index)}
             onPointerMove={handleItemPointerMove}
             onPointerUp={handleItemPointerUp}
             onPointerCancel={handleItemPointerCancel}
+            onKeyDown={(e) => handleItemKeyDown(e, index)}
             data-sortable-id={item.id}
             data-active={isActive}
             data-over={isOver}
           >
-            {renderItem(item, index, isActive)}
+            <div className="flex items-center gap-1">
+              {/* Keyboard reorder controls */}
+              {!disabled && (
+                <div
+                  className={cn(
+                    'flex flex-shrink-0',
+                    direction === 'vertical' ? 'flex-col' : 'flex-row',
+                    'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100',
+                    'transition-opacity duration-150 motion-reduce:transition-none'
+                  )}
+                >
+                  <button
+                    type="button"
+                    aria-label={`${moveBackLabel}, currently at position ${index + 1}`}
+                    disabled={isFirst}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (!isFirst) moveItem(index, index - 1);
+                    }}
+                    className={cn(
+                      'inline-flex items-center justify-center',
+                      'h-6 w-6 rounded',
+                      'text-muted-foreground hover:text-foreground',
+                      'hover:bg-muted focus-visible:bg-muted',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                      'transition-colors duration-150 motion-reduce:transition-none',
+                      isFirst && 'opacity-30 cursor-not-allowed'
+                    )}
+                  >
+                    <MoveBackIcon className="h-3.5 w-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label={`${moveForwardLabel}, currently at position ${index + 1}`}
+                    disabled={isLast}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (!isLast) moveItem(index, index + 1);
+                    }}
+                    className={cn(
+                      'inline-flex items-center justify-center',
+                      'h-6 w-6 rounded',
+                      'text-muted-foreground hover:text-foreground',
+                      'hover:bg-muted focus-visible:bg-muted',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                      'transition-colors duration-150 motion-reduce:transition-none',
+                      isLast && 'opacity-30 cursor-not-allowed'
+                    )}
+                  >
+                    <MoveForwardIcon className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              )}
+
+              {/* Item content */}
+              <div className="flex-1 min-w-0">
+                {renderItem(item, index, isActive)}
+              </div>
+            </div>
           </div>
         );
       })}
-      
+
       {/* Drag preview overlay */}
       {isDraggingRef.current && activeId !== null && state.position && state.offset && (
         <DragPreview
@@ -283,6 +428,17 @@ export function SortableList<T>({
           itemRef={itemRefs.current.get(activeId)}
         />
       )}
+
+      {/* Live region for screen reader announcements */}
+      <div
+        id={liveRegionId}
+        role="status"
+        aria-live="assertive"
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {liveAnnouncement}
+      </div>
     </div>
   );
 }
@@ -306,7 +462,7 @@ function DragPreview<T>({
 
   return (
     <div
-      className="fixed pointer-events-none z-[100]"
+      className="fixed pointer-events-none z-[9999]"
       style={{
         left: position.x - offset.x,
         top: position.y - offset.y,

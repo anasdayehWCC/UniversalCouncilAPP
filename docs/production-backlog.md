@@ -54,7 +54,7 @@ Each section is dated and sourced. Items are sorted by severity within each sect
 | 20 | a11y | Duplicate competing skip links — one in layout.tsx, one in AppShell.tsx (WCAG 2.4.1) | All routes | Alex | 98 | resolved |
 | 21 | a11y | Review-queue tab bar missing role="tablist", role="tab", aria-selected (WCAG 4.1.2) | /review-queue | Alex | 97 | resolved |
 | 22 | a11y | UserTable checkboxes (select-all and per-row) have no accessible labels (WCAG 1.3.1) | /admin/users | Alex | 96 | resolved |
-| 23 | a11y | SortableList drag-and-drop has no keyboard alternative — pointer-only (WCAG 2.1.1) | /admin | Alex | 95 | open |
+| 23 | a11y | SortableList drag-and-drop has no keyboard alternative — pointer-only (WCAG 2.1.1) | /admin | Alex | 95 | resolved |
 | 24 | a11y | SharePoint browser search input and icon buttons unlabelled (WCAG 1.3.1, 1.1.1) | SharePoint modal | Alex | 98 | resolved |
 | 25 | a11y | RecordingTimer Framer Motion animations ignore prefers-reduced-motion (WCAG 2.3.3) | /record | Alex | 85 | resolved |
 | 26 | a11y | DeviceSelector custom dropdown lacks ARIA combobox/listbox semantics, no Escape handler (WCAG 4.1.2) | /record | Alex | 90 | resolved |
@@ -98,8 +98,8 @@ Each section is dated and sourced. Items are sorted by severity within each sect
 | # | Category | Severity | Description | Location | Source Agent |
 |---|----------|----------|-------------|----------|-------------|
 | 51 | data | low | Demo MEETINGS seed data uses 2024 dates — all time-relative metrics (this week/month, overdue) show zero | universal-app/src/config/personas.ts | Agent 2 (compliance widget) |
-| 52 | bug | medium | Priority Reviews "Review" button on home page links to /my-notes/ instead of /review-queue/ | universal-app/src/app/page.tsx:296 | Agent 2 (compliance widget) |
-| 53 | a11y | medium | ModuleToggle CATEGORY_CONFIG uses hardcoded bg-purple-100/text-purple-700 and bg-amber-100/text-amber-700 | universal-app/src/components/admin/ModuleToggle.tsx:34-35 | Agent 3 (module settings) |
-| 54 | a11y | medium | Login page header area uses text-muted-foreground on dark surface — poor contrast in light mode | universal-app/src/app/login/page.tsx:64,68,72,81 | Agent 4 (login contrast) |
+| 52 | bug | medium | Priority Reviews "Review" button on home page links to /my-notes/ instead of /review-queue/ | universal-app/src/app/page.tsx:296 | Agent 2 (compliance widget) | resolved |
+| 53 | a11y | medium | ModuleToggle CATEGORY_CONFIG uses hardcoded bg-purple-100/text-purple-700 and bg-amber-100/text-amber-700 | universal-app/src/components/admin/ModuleToggle.tsx:34-35 | Agent 3 (module settings) | resolved |
+| 54 | a11y | medium | Login page header area uses text-muted-foreground on dark surface — poor contrast in light mode | universal-app/src/app/login/page.tsx:64,68,72,81 | Agent 4 (login contrast) | resolved |
 | 55 | refinement | low | Login page gradient uses hardcoded from-slate-900/950 — evaluate for token migration or add to allowlist | universal-app/src/app/login/page.tsx:43,134,153 | Agent 4 (login contrast) |
 | 56 | refinement | low | No Switch UI primitive in components/ui/ — custom toggle built inline in ModuleSettingsForm | universal-app/src/components/ui/ | Agent 3 (module settings) |

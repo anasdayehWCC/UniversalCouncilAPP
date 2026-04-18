@@ -335,7 +335,7 @@ export default function Dashboard() {
                     >
                       Approve
                     </Button>
-                    <Link href={`/my-notes/${meeting.id}`}>
+                    <Link href={`/review-queue/${meeting.id}`}>
                       <Button size="sm" variant="outline" className="border-primary/30 text-primary hover:bg-primary/10">
                         Review
                       </Button>

@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-04-18 (Orchestration Run 5 — A11y, Routing, Architecture Doc)
+
+### Added — Architecture Documentation (Phase 15A)
+
+- Created `docs/architecture.md` (536 lines) covering exec summary, component map, data flow, tenancy model, security, offline architecture, module system, accessibility, testing, delivery approach, and open questions
+- Cross-references ROADMAP, AGENTS.md, foundations doc, and user journeys
+
+### Fixed — SortableList Keyboard Accessibility (#23)
+
+- Added keyboard reordering via Arrow Up/Down keys on focused items
+- Added explicit Move Up/Move Down buttons (appear on hover/focus, progressive disclosure)
+- Added ARIA: `role="list"/"listitem"`, `aria-roledescription="sortable list"`, `aria-label` with position, `aria-describedby` instructions
+- Added live region (`aria-live="assertive"`) announcing position changes to screen readers
+- All transitions paired with `motion-reduce:transition-none`; scale paired with `motion-reduce:scale-100`
+
+### Fixed — Quick Fixes (direct)
+
+- #52: Home page Priority Reviews "Review" button now links to `/review-queue/[id]` instead of `/my-notes/[id]`
+- #53: ModuleToggle category badges replaced hardcoded `bg-purple-100/text-purple-700` and `bg-amber-100/text-amber-700` with semantic tokens
+- #54: Login page header text replaced `text-muted-foreground` with `text-white/70`, `text-white/60` for branded dark surface
+
 ## 2026-04-18 (Orchestration Run 4 — Dashboard, Admin UX, A11y)
 
 ### Added — Manager Dashboard (#13)

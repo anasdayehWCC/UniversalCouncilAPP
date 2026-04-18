@@ -90,3 +90,12 @@
 - Trigger: Naming variables in Next.js page/layout files.
   Rule: Never name a variable `module` in Next.js page/layout files; the `@next/next/no-assign-module-variable` lint rule flags it. Use `targetModule`, `matchedModule`, or similar.
   Verify: `pnpm lint` reports zero `no-assign-module-variable` errors in new code.
+- Trigger: Starting creative work — designing new features, components, APIs, or modifying existing behavior.
+  Rule: Use `/brainstorming` before writing any code. It walks through a structured dialogue: one question at a time, 2-3 approaches with tradeoffs, then design in 200-300 word sections with incremental validation. Saves the validated design to `docs/plans/YYYY-MM-DD-<topic>-design.md` and offers handoff to `/writing-plans` for implementation.
+  Verify: Design document exists in `docs/plans/` before implementation begins; design covers architecture, components, data flow, error handling, and testing.
+- Trigger: Having a spec or validated design and needing to plan multi-step implementation.
+  Rule: Use `/writing-plans` to create detailed implementation plans with bite-sized tasks (2-5 minutes each: write failing test, run, implement, run, commit). Plans include exact file paths, complete code, project-specific rules (theme tokens, a11y, z-index), and validation commands. Saved to `docs/plans/YYYY-MM-DD-<feature-name>.md`. Execution via `executing-plans` skill or `/orchestrate`.
+  Verify: Plan file exists in `docs/plans/`; each task has exact file paths, test commands with expected output, and a commit step.
+- Trigger: Running multiple `/orchestrate` sessions concurrently (e.g., in parallel chat windows).
+  Rule: The orchestrator reads `.claude/orchestrator-claims.json` during ASSESS to check for tasks claimed by other sessions. It writes claims after user approval in IDENTIFY (before dispatching agents) and releases them after PR creation in Phase 8. Claims older than 2 hours are treated as stale from crashed sessions.
+  Verify: `.claude/orchestrator-claims.json` exists with `{"claimed":[]}` when no orchestrator is active; concurrent sessions do not dispatch overlapping tasks.

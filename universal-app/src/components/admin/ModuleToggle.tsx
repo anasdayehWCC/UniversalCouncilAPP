@@ -31,9 +31,9 @@ interface ModuleToggleProps {
 
 const CATEGORY_CONFIG: Record<AdminModule['category'], { icon: React.ReactNode; label: string; color: string }> = {
   core: { icon: <Puzzle className="w-4 h-4" />, label: 'Core', color: 'bg-info/10 text-info' },
-  ai: { icon: <Sparkles className="w-4 h-4" />, label: 'AI Features', color: 'bg-purple-100 text-purple-700' },
+  ai: { icon: <Sparkles className="w-4 h-4" />, label: 'AI Features', color: 'bg-accent/10 text-accent-foreground' },
   integration: { icon: <Plug className="w-4 h-4" />, label: 'Integration', color: 'bg-success/10 text-success' },
-  pilot: { icon: <TestTube className="w-4 h-4" />, label: 'Pilot', color: 'bg-amber-100 text-amber-700' }
+  pilot: { icon: <TestTube className="w-4 h-4" />, label: 'Pilot', color: 'bg-warning/10 text-warning' }
 };
 
 export function ModuleToggle({ modules, onToggle, onConfigure, onSaveSettings, canEdit }: ModuleToggleProps) {

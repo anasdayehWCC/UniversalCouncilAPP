@@ -12,5 +12,5 @@ if [ ! -d "$ROOT/node_modules" ]; then
   pnpm install
 fi
 
-echo "[dev-frontend] Starting Next.js dev server (universal-app workspace)..."
+echo "[dev-frontend] Starting Next.js dev server with webpack (stable local dev path)..."
 pnpm dev:web

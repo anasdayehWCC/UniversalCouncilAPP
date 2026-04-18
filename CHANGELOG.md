@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-04-18 — Frontend Dev Performance Stabilization
+
+### Fixed — Redundant Demo Hydration
+
+- `DemoProvider` no longer fetches `/api/demos/personas` on mount when the same demo seed data is already available locally
+- Removes a redundant first-load dev compile path that was inflating route startup time in `universal-app`
+
+### Fixed — Shared Sync State
+
+- Added `SyncManagerProvider` so shell-level consumers share one sync manager instance instead of creating duplicate Dexie live queries, timers, and sync bookkeeping on every page
+- Migrated `ConnectivityIndicator`, `ResilienceBanner`, and `OfflineFallback` to the shared provider
+- Removed the unused `DemoContext` subscription from `useSyncManager`
+
+### Changed — Stable Web Dev Default
+
+- Root `pnpm dev:web` and `scripts/dev-frontend.sh` now start the webpack dev server by default
+- Added explicit `pnpm dev:web:turbo` / `pnpm --filter universal-app dev:turbo` escape hatch for Turbopack-specific debugging
+- Documented the default-switch rationale in `README.md` because Next.js 16.2.x Turbopack remains unstable in this repo under real route compilation load
+
 ## 2026-04-18 — Development Automation Overhaul (Intelligence, Vision, Efficiency)
 
 ### Added — Product Vision (`docs/product-vision.md`)

@@ -84,3 +84,9 @@
 - Trigger: Multiple components independently calling `useNetworkStatus()`.
   Rule: `useNetworkStatus` creates its own `setInterval` per caller. Three components (ResilienceBanner, ConnectivityIndicator, record/page.tsx) each poll the backend independently. Lift network status into a shared context/provider so only one polling loop runs.
   Verify: Grep for `useNetworkStatus()` calls; there should be exactly one (in a provider), not per-component.
+- Trigger: Login page or other intentionally branded dark surfaces using semantic tokens like `text-foreground`.
+  Rule: On branded dark surfaces with hardcoded dark backgrounds, do not use theme-adaptive semantic tokens for text. Use explicit `text-white` or `text-white/[opacity]` since the background doesn't change with theme mode. `text-foreground` produces dark-on-dark in light mode.
+  Verify: Check branded dark surfaces (login, hero sections) for `text-foreground` or `text-muted-foreground` usage; all text should use explicit light values.
+- Trigger: Naming variables in Next.js page/layout files.
+  Rule: Never name a variable `module` in Next.js page/layout files; the `@next/next/no-assign-module-variable` lint rule flags it. Use `targetModule`, `matchedModule`, or similar.
+  Verify: `pnpm lint` reports zero `no-assign-module-variable` errors in new code.

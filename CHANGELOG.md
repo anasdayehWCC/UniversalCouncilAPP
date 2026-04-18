@@ -1,5 +1,38 @@
 # Changelog
 
+## 2026-04-18 (Orchestration Run 4 — Dashboard, Admin UX, A11y)
+
+### Added — Manager Dashboard (#13)
+
+- `TeamComplianceWidget` component showing per-worker compliance metrics: recordings this week/month, approval rate, pending reviews, overdue items with color-coded status (good/attention/critical)
+- Derives metrics from existing DemoContext meetings data using `useMemo` — no additional mock data needed
+- Responsive layout: full metric columns on desktop, compact summary on mobile
+- Placed on manager home dashboard between stats cards and priority reviews
+
+### Fixed — Admin Modules UX (#17)
+
+- Replaced raw JSON settings display in `/admin/modules` with structured editable form (`ModuleSettingsForm`)
+- Supports five field types: select dropdowns, text/number inputs, toggle switches (role=switch with aria-checked), and multi-text tag lists
+- Save commits to in-memory state with success toast; Reset discards unsaved changes; "Unsaved changes" indicator
+- All form inputs have programmatic labels (WCAG 1.3.1); disabled state respected for read-only roles
+
+### Fixed — Login Badge Contrast (#38)
+
+- Removed hardcoded `color: '#FFFFFF'` inline styles from persona badges, replaced with `text-white` Tailwind class
+- Fixed `text-foreground` → `text-white/90` on role labels to prevent dark-on-dark in light mode (was ~1.5:1, now 14.94:1)
+- Fixed `text-muted-foreground` → `text-white/60` on team text (was ~3:1 in light mode, now 7.11:1)
+- Increased badge background opacity for better visual domain differentiation (0.2→0.35, 0.25→0.4)
+
+### Fixed — Build Blocker
+
+- Added explicit `Event` type annotation to `SessionWarning.tsx` `onPointerDownOutside` and `onEscapeKeyDown` handlers (was implicit `any`, blocking `pnpm build`)
+
+### Housekeeping
+
+- Updated production backlog: marked 35 of 50 items as resolved (from runs 2, 3, and 2026-04-17 session)
+- Committed pending 2026-04-17 auth/network regression fixes
+- Phase 15A (architecture doc) agent timed out — deferred to next run
+
 ## 2026-04-17
 
 ### Fixed — Auth Gating + Network Status

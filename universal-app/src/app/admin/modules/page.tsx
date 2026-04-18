@@ -1,20 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { AdminPageWrapper } from '@/components/admin/AdminHeader';
 import { ModuleToggle } from '@/components/admin/ModuleToggle';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useToast } from '@/components/Toast';
-import { useConfirmDialog } from '@/hooks/useConfirmDialog';
-import { ConfirmDialogRenderer } from '@/components/ui/ConfirmDialogRenderer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { RotateCcw } from 'lucide-react';
 
 export default function AdminModulesPage() {
-  const { modules, toggleModule, canManageModules, tenantConfig, stats } = useAdmin();
+  const { modules, toggleModule, updateModuleSettings, canManageModules, tenantConfig, stats } = useAdmin();
   const { success, info } = useToast();
-  const { confirm, confirmDialogState, handleConfirm, handleCancel } = useConfirmDialog();
 
   const handleToggle = (moduleId: string) => {
     const module = modules.find(m => m.id === moduleId);
@@ -25,18 +22,14 @@ export default function AdminModulesPage() {
     }
   };
 
-  const handleConfigure = (moduleId: string) => {
-    info('Module configuration coming soon');
+  const handleSaveSettings = (moduleId: string, settings: Record<string, unknown>) => {
+    updateModuleSettings(moduleId, settings);
+    const targetModule = modules.find(m => m.id === moduleId);
+    success(`${targetModule?.name ?? 'Module'} settings saved`);
   };
 
-  const handleResetDefaults = async () => {
-    const ok = await confirm({
-      title: 'Reset all modules to defaults?',
-      description: 'This will restore all modules to their default configuration. Active module sessions may be interrupted.',
-      confirmLabel: 'Reset',
-      variant: 'destructive',
-    });
-    if (ok) {
+  const handleResetDefaults = () => {
+    if (confirm('Reset all modules to default configuration?')) {
       info('Modules reset to defaults');
     }
   };
@@ -57,16 +50,11 @@ export default function AdminModulesPage() {
         </div>
       }
     >
-      <ConfirmDialogRenderer
-        {...confirmDialogState}
-        onConfirm={handleConfirm}
-        onCancel={handleCancel}
-      />
       <div className="space-y-6">
-        <ModuleToggle 
+        <ModuleToggle
           modules={modules}
           onToggle={handleToggle}
-          onConfigure={handleConfigure}
+          onSaveSettings={handleSaveSettings}
           canEdit={canManageModules}
         />
       </div>

@@ -17,6 +17,7 @@ import { PENDING_REVIEW_STATUSES } from '@/config/constants';
 import Image from 'next/image';
 import { personaCopy } from '@/copy/strings';
 import { formatDate, getSLAStatus } from '@/lib/dates';
+import { TeamComplianceWidget } from '@/components/dashboards/TeamComplianceWidget';
 import {
   EmptyStatePanel,
   ListRow,
@@ -250,6 +251,13 @@ export default function Dashboard() {
             <p className="mt-1 text-sm font-medium text-muted-foreground">{contributors.size || 1} active submitters this week</p>
           </SecondaryPanel>
         </div>
+
+        {/* Team Compliance */}
+        <TeamComplianceWidget
+          meetings={meetings}
+          personas={personas}
+          domain={currentUser.domain}
+        />
 
         <PageSection
           title="Priority Reviews"

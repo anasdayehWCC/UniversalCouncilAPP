@@ -19,13 +19,13 @@ import {
 import { AdminModule } from '@/types/admin';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useConfirmDialog } from '@/hooks/useConfirmDialog';
-import { ConfirmDialogRenderer } from '@/components/ui/ConfirmDialogRenderer';
+import { ModuleSettingsForm } from '@/components/admin/ModuleSettingsForm';
 
 interface ModuleToggleProps {
   modules: AdminModule[];
   onToggle: (moduleId: string) => void;
   onConfigure?: (moduleId: string) => void;
+  onSaveSettings?: (moduleId: string, settings: Record<string, unknown>) => void;
   canEdit: boolean;
 }
 
@@ -33,12 +33,11 @@ const CATEGORY_CONFIG: Record<AdminModule['category'], { icon: React.ReactNode; 
   core: { icon: <Puzzle className="w-4 h-4" />, label: 'Core', color: 'bg-info/10 text-info' },
   ai: { icon: <Sparkles className="w-4 h-4" />, label: 'AI Features', color: 'bg-purple-100 text-purple-700' },
   integration: { icon: <Plug className="w-4 h-4" />, label: 'Integration', color: 'bg-success/10 text-success' },
-  pilot: { icon: <TestTube className="w-4 h-4" />, label: 'Pilot', color: 'bg-warning/10 text-warning' }
+  pilot: { icon: <TestTube className="w-4 h-4" />, label: 'Pilot', color: 'bg-amber-100 text-amber-700' }
 };
 
-export function ModuleToggle({ modules, onToggle, onConfigure, canEdit }: ModuleToggleProps) {
+export function ModuleToggle({ modules, onToggle, onConfigure, onSaveSettings, canEdit }: ModuleToggleProps) {
   const [expandedModule, setExpandedModule] = useState<string | null>(null);
-  const { confirm, confirmDialogState, handleConfirm, handleCancel } = useConfirmDialog();
 
   // Group modules by category
   const groupedModules = modules.reduce((acc, module) => {
@@ -47,7 +46,7 @@ export function ModuleToggle({ modules, onToggle, onConfigure, canEdit }: Module
     return acc;
   }, {} as Record<string, AdminModule[]>);
 
-  const handleToggle = async (module: AdminModule) => {
+  const handleToggle = (module: AdminModule) => {
     // Check dependencies
     if (!module.enabled && module.dependencies) {
       const missingDeps = module.dependencies.filter(
@@ -57,8 +56,9 @@ export function ModuleToggle({ modules, onToggle, onConfigure, canEdit }: Module
         const depNames = missingDeps.map(
           depId => modules.find(m => m.id === depId)?.name || depId
         ).join(', ');
-        const ok = await confirm({ title: `Enable dependencies first?`, description: `This module requires: ${depNames}.`, confirmLabel: 'Enable dependencies', variant: 'default' });
-        if (!ok) return;
+        if (!confirm(`This module requires: ${depNames}. Enable dependencies first?`)) {
+          return;
+        }
         // Enable dependencies
         missingDeps.forEach(depId => onToggle(depId));
       }
@@ -66,8 +66,9 @@ export function ModuleToggle({ modules, onToggle, onConfigure, canEdit }: Module
 
     // Confirm destructive action
     if (module.enabled) {
-      const ok = await confirm({ title: `Disable ${module.name}?`, description: 'Users will lose access to this feature.', confirmLabel: 'Disable', variant: 'destructive' });
-      if (!ok) return;
+      if (!confirm(`Disable ${module.name}? Users will lose access to this feature.`)) {
+        return;
+      }
     }
 
     onToggle(module.id);
@@ -75,11 +76,6 @@ export function ModuleToggle({ modules, onToggle, onConfigure, canEdit }: Module
 
   return (
     <div className="space-y-6">
-      <ConfirmDialogRenderer
-        {...confirmDialogState}
-        onConfirm={handleConfirm}
-        onCancel={handleCancel}
-      />
       {Object.entries(groupedModules).map(([category, categoryModules]) => {
         const config = CATEGORY_CONFIG[category as AdminModule['category']];
         return (
@@ -182,9 +178,19 @@ export function ModuleToggle({ modules, onToggle, onConfigure, canEdit }: Module
                               className="overflow-hidden"
                             >
                               <div className="mt-3 p-3 bg-muted rounded-lg">
-                                <pre className="text-xs text-muted-foreground font-mono">
-                                  {JSON.stringify(module.settings, null, 2)}
-                                </pre>
+                                {onSaveSettings ? (
+                                  <ModuleSettingsForm
+                                    moduleId={module.id}
+                                    moduleName={module.name}
+                                    settings={module.settings as Record<string, unknown>}
+                                    onSave={onSaveSettings}
+                                    disabled={!canEdit}
+                                  />
+                                ) : (
+                                  <pre className="text-xs text-muted-foreground font-mono">
+                                    {JSON.stringify(module.settings, null, 2)}
+                                  </pre>
+                                )}
                               </div>
                             </motion.div>
                           )}

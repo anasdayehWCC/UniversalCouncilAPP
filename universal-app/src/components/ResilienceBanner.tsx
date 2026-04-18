@@ -15,8 +15,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { WifiOff, CloudOff, RefreshCw, AlertTriangle, CheckCircle, X, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNetworkStatus, type ConnectionState } from '@/providers/NetworkStatusProvider';
-import { useSyncManager } from '@/hooks/useSyncManager';
-import { useAuth } from '@/hooks/useAuth';
+import { useSyncManager } from '@/providers/SyncManagerProvider';
 import { ZINDEX_CLASSES } from '@/lib/z-index';
 
 // ============================================================================
@@ -91,9 +90,8 @@ export function ResilienceBanner({
   const autoExpandTimerRef = useRef<number | null>(null);
   const autoCollapseTimerRef = useRef<number | null>(null);
 
-  const { accessToken } = useAuth();
   const { state, checkNow, isChecking } = useNetworkStatus();
-  const { pendingCount, isSyncing, syncAll, failedCount, retryFailedItems } = useSyncManager(accessToken);
+  const { pendingCount, isSyncing, syncAll, failedCount, retryFailedItems } = useSyncManager();
 
   const config = BANNER_CONFIG[state];
   const Icon = config.icon;
@@ -396,9 +394,8 @@ export function CompactResilienceBanner({ className }: CompactResilienceBannerPr
     () => false
   );
 
-  const { accessToken } = useAuth();
   const { state } = useNetworkStatus();
-  const { pendingCount } = useSyncManager(accessToken);
+  const { pendingCount } = useSyncManager();
 
   if (!isMounted || (state === 'online' && pendingCount === 0)) {
     return null;

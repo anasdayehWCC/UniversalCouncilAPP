@@ -18,8 +18,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Wifi, WifiOff, AlertTriangle, RefreshCw, X, Clock, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNetworkStatus, type ConnectionState } from '@/providers/NetworkStatusProvider';
-import { useSyncManager } from '@/hooks/useSyncManager';
-import { useAuth } from '@/hooks/useAuth';
+import { useSyncManager } from '@/providers/SyncManagerProvider';
 import { ZINDEX_CLASSES } from '@/lib/z-index';
 
 // ============================================================================
@@ -93,12 +92,9 @@ export function ConnectivityIndicator({
   const prevStateRef = useRef<ConnectionState | null>(null);
   const pulseResetTimerRef = useRef<number | null>(null);
 
-  // Get auth token for sync operations
-  const { accessToken } = useAuth();
-
   const { state, latencyMs, isChecking, checkNow, errorMessage, lastBackendPing } =
     useNetworkStatus();
-  const { pendingCount, isSyncing, syncAll } = useSyncManager(accessToken);
+  const { pendingCount, isSyncing, syncAll } = useSyncManager();
 
   const config = STATUS_CONFIG[state];
   const Icon = config.icon;

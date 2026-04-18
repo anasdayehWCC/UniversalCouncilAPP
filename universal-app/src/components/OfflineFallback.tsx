@@ -14,8 +14,7 @@ import { motion } from 'framer-motion';
 import { WifiOff, RefreshCw, Cloud, Smartphone, Signal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNetworkStatus } from '@/providers/NetworkStatusProvider';
-import { useSyncManager } from '@/hooks/useSyncManager';
-import { useAuth } from '@/hooks/useAuth';
+import { useSyncManager } from '@/providers/SyncManagerProvider';
 
 // ============================================================================
 // Component
@@ -51,8 +50,7 @@ export function OfflineFallback({
   );
 
   const { state, checkNow, isChecking } = useNetworkStatus();
-  const { accessToken } = useAuth();
-  const { pendingCount } = useSyncManager(accessToken);
+  const { pendingCount } = useSyncManager();
   const [retryCount, setRetryCount] = useState(0);
 
   const isOffline = forceOffline || state === 'offline';

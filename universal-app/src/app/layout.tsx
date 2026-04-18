@@ -11,6 +11,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ToastProvider } from "@/components/Toast";
 import { ConnectivityIndicator } from "@/components/ConnectivityIndicator";
 import { NetworkStatusProvider } from "@/providers/NetworkStatusProvider";
+import { SyncManagerProvider } from "@/providers/SyncManagerProvider";
 import { ServiceWorkerRegistration } from "@/lib/pwa";
 import { SkipLinks } from "@/components/a11y/SkipLinks";
 import { getThemeInitScript } from "@/lib/themes/theme-init";
@@ -107,10 +108,12 @@ export default function RootLayout({
                 <ThemeProvider>
                   <ThemeSetter />
                   <NetworkStatusProvider>
-                    <AppShell>
-                      {children}
-                    </AppShell>
-                    <ConnectivityIndicator position="bottom-right" hideWhenOnline />
+                    <SyncManagerProvider>
+                      <AppShell>
+                        {children}
+                      </AppShell>
+                      <ConnectivityIndicator position="bottom-right" hideWhenOnline />
+                    </SyncManagerProvider>
                   </NetworkStatusProvider>
                 </ThemeProvider>
               </DemoProvider>

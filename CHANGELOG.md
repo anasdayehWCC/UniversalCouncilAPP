@@ -1,5 +1,97 @@
 # Changelog
 
+## 2026-04-18 (Orchestration Run 7 — Admin Persistence, Dashboard Realism, Tag Filtering)
+
+### Fixed — Admin State Persistence (Ship-blockers #2, #3, #18, #19, #35)
+- Module toggles, templates, settings, and audit log now persist to localStorage — changes survive page refresh
+- Audit log entries use `crypto.randomUUID()` instead of `Math.random().toString(36)` for proper identifiers
+- Template edit, duplicate, and set-as-default fully implemented (replaced "coming soon" stubs)
+- Template edit dialog supports name, description, and sections list with reorder/add/remove
+- Bulk-delete button in UserTable wired with confirmation dialog
+- Manager role sees read-only user list — checkboxes and bulk actions hidden when `canManageUsers` is false
+- Added `resetToDefaults()` function to restore mock data from admin hooks
+
+### Fixed — Dashboard Data Realism (#51, #14, #40)
+- MEETINGS seed data updated from 2024 dates to April 2026 (this week) — dashboard metrics now show realistic numbers
+- Manager dashboard shows lightweight compliance summary card (pending reviews, approved this week, avg review time, team members) when `aiInsights` flag is off
+- Practitioner CTA labels are now domain-specific: "Record Visit" (children), "Record Session" (adults), "Record Inspection" (housing)
+
+### Added — Notes Tag Filtering (Phase 30 remaining work)
+- Tag filter chips on My Notes list — toggle to filter by topic (AND logic for multiple tags)
+- Template filter dropdown — filter notes by template type alongside status and tags
+- Combined filters (search + status + template + tags) with "Clear filters" button
+- Filtered empty state with contextual messaging when no notes match active filters
+
+### Fixed — Build Blocker
+- `SessionWarning.tsx` implicit `any` type on event handlers — let TypeScript infer correct types
+
+### Docs — Roadmap Consolidation
+- Consolidated three `ROADMAP_social_care.md` files (root, minute-main, universal-app) into single canonical root file
+- Added Phase 21C (Config-Driven Navigation), 12 status notes for Phases 24–31, Demo UI Phases appendix
+- Fixed Phase 25B malformed markdown (code block swallowing rest of file)
+- Replaced subsidiary copies with redirect pointers
+- Updated cross-references in PLANS.md, AGENTS.md, README.md, architecture.md
+
+### Housekeeping
+- Cleaned 6 stale locked worktrees from Runs 5-6
+- Updated production backlog: 8 items resolved (now 42 of 62 resolved)
+
+## 2026-04-18 — GitHub Copilot Customisation + Post-Overhaul Review
+
+### Added — GitHub Copilot Integration (`.github/`)
+
+- `.github/copilot-instructions.md` — project-wide instructions for Copilot agent mode (tech stack, critical rules, validation commands, prioritisation matrix)
+- `.github/instructions/frontend-components.instructions.md` — auto-applied to `**/*.tsx` files (theme tokens, a11y, z-index, hydration safety, AppShell patterns)
+- `.github/instructions/backend-api.instructions.md` — auto-applied to `minute-main/**/*.py` files (FastAPI patterns, service abstractions, config system, migrations)
+- `.github/hooks/copilot-hooks.json` — reuses existing Claude Code hooks (block-sensitive-files, check-theme-tokens, check-a11y) for Copilot's PreToolUse/PostToolUse events
+- `.github/prompts/verify.prompt.md` — reusable health check prompt (lint, build, tests, audit, backend, git state)
+- `.github/prompts/roadmap-status.prompt.md` — reusable roadmap snapshot prompt
+
+### Analysis — Post-Overhaul Session Review
+
+- Confirmed Runs 4 & 5 executed pre-overhaul (15:30-16:00 UTC); new prioritisation/batching logic deployed at 21:33 UTC
+- Claims file shows correct priority ordering: WP1 (admin persistence = ship-blocker) first
+- Two new CLAUDE.md learnings captured from real regressions (provider throw guard, DemoContext hydration)
+- Run 6 focused on category 1-3 work (admin contract, mobile responsiveness, regression fixes) — correct prioritisation
+- First full test of new orchestrator logic still pending
+
+## 2026-04-18 — Admin And Capture Shell Follow-Up
+
+### Documented — Shell Integration Debt
+- Recorded the pre-existing admin and Smart Capture shell cohesion issues in `docs/production-backlog.md`
+- Added `docs/plans/2026-04-18-admin-record-shell-integration.md` with the root-cause notes and follow-up tasks needed to make `/admin` and `/record` feel native to the main app shell
+- Updated `PLANS.md` with the shell-audit snapshot and the exact files responsible for the nested admin chrome and standalone Smart Capture header
+
+## 2026-04-18 (Orchestration Run 6 — UI/UX Refinements + Regression Fixes)
+
+### Fixed — Admin Contract And Build Stabilization
+- Restored backend admin settings/module persistence contract and effective tenant override merging for admin config surfaces in `minute-main`
+- Regenerated `minute-main/openapi-temp.json` and the `universal-app` generated SDK to bring the admin API contract back in sync
+- Excluded the unused generated `@tanstack` React Query helper folder from `universal-app` TypeScript root-file checking because the current generator output is not consumed and breaks `next build`
+- Replaced remaining non-tokenized admin config surface classes in `MainConfigArea.tsx`
+
+### Added — Detail Page Loading Skeletons
+- `my-notes/[id]/loading.tsx` — shimmer skeleton matching page structure (header, tabs, content, sidebar on xl+)
+- `minutes/[id]/loading.tsx` — shimmer skeleton with breadcrumb, editor sections, info sidebar
+
+### Fixed — Mobile Responsiveness
+- AI sidebar: desktop fixed panel on xl+, FAB + BottomSheet on mobile (`AIEditSidebar.tsx`)
+- Note detail header: stacks vertically on mobile, wrapped metadata, responsive padding
+- Note detail tabs: horizontal scroll on mobile, truncated labels
+- Note detail sidebar margin: `mr-80` → `xl:mr-80` (content was pushed off-screen on mobile)
+- Insights metric grid: added `md:grid-cols-3` tablet breakpoint
+- Review queue tab badges: truncation, shrink-0 badges, reduced gap
+- Added missing `motion-reduce:animate-none` on animated elements
+- Minute breadcrumb: added status badge with semantic color tokens
+
+### Fixed — Regressions (from commit history audit)
+- Restored `useNetworkStatus` throw guard (was conditional hook call violating Rules of Hooks)
+- Restored DemoContext API hydration effect (`/api/demos/personas` — was accidentally removed)
+- Replaced OfflineFallback `useSyncExternalStore` mounted guard with standard `useState + useEffect`
+
+### Added — Standalone EmptyStatePanel Component
+- `components/layout/EmptyStatePanel.tsx` — reusable dashed-border empty state container
+
 ## 2026-04-18 — Frontend Dev Performance Stabilization
 
 ### Fixed — Redundant Demo Hydration

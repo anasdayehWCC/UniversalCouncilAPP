@@ -606,6 +606,109 @@ Exit: Successful pilot sign-off; backlog of tweaks captured; Adults rollout sche
 
 **Exit:** Repo structure matches the architecture diagram; `minute-main` imports from root packages; no duplicate "core" or "ui" folders inside `minute-main`.
 
+#### Phase 21C — Config-Driven Navigation (Domain-Scoped UI)
+
+**Objective:** Implement role and domain-scoped navigation where users see ONLY the modules and templates relevant to their `service_domain` and `role`, not a combined view across all domains.
+
+**Vision Clarification:**
+- A children's social worker logs in → sees ONLY children's templates ("LAC Review", "Strategy Discussion") and children-specific navigation.
+- An adult social worker logs in → sees ONLY adult templates ("Adult Safeguarding", "Care Review") and adult-specific navigation.
+- A housing officer (future) logs in → sees ONLY housing templates and housing-specific navigation ("Properties", "Inspections").
+- Users NEVER see navigation for other domains. Navigation is filtered server-side before being returned to the frontend.
+
+**Current Problem:**
+- Navigation is hardcoded in `frontend/components/layout/bottom-nav.tsx` and `sidebar.tsx` with fixed menu items.
+- All users see the same navigation regardless of their domain or role.
+- Templates are not filtered by `service_domain_id` before display.
+- A children's social worker can currently see "Adult Safeguarding" templates (incorrect!).
+
+**Actions:**
+
+1. **Backend: Module Registry API**
+   - **File:** `backend/api/routes/modules.py` (NEW)
+   - Create `GET /api/modules` endpoint that:
+     - Queries `UserOrgRole` table to get user's `service_domain_id` and `role`.
+     - Loads domain-specific config from `config/{tenant}_{domain}.yaml`.
+     - Returns filtered `modules` list and `nav_items` array based on user's domain + role.
+   - **Response Example (Children's Worker):**
+     ```json
+     {
+       "service_domain": "children",
+       "role": "social_worker",
+       "modules": ["recordings", "minutes", "templates", "tasks"],
+       "nav_items": [
+         { "label": "Home", "href": "/", "icon": "LayoutDashboard" },
+         { "label": "Cases", "href": "/cases", "icon": "Users" },
+         { "label": "Record", "href": "/record", "icon": "Mic", "fab": true },
+         { "label": "Notes", "href": "/transcriptions", "icon": "FileText" }
+       ]
+     }
+     ```
+
+2. **Backend: Domain-Filtered Templates**
+   - **File:** `backend/api/routes/templates.py` (MODIFY)
+   - Update `GET /templates` to filter by user's `service_domain_id` using existing `ServiceDomainTemplate` table.
+   - Children's workers should NOT see adult templates and vice versa.
+
+3. **Frontend: Dynamic Navigation**
+   - **Files:** `frontend/components/layout/bottom-nav.tsx`, `frontend/components/layout/sidebar.tsx` (MODIFY)
+   - Replace hardcoded `navItems` arrays with `useQuery` fetching from `/api/modules`.
+   - Add loading skeleton and error states.
+   - Create `frontend/lib/icon-registry.ts` to map icon strings to Lucide components.
+   - **Before (Hardcoded):**
+     ```typescript
+     const navItems = [
+       { label: 'Home', href: '/', icon: LayoutDashboard },
+       // ... fixed list
+     ];
+     ```
+   - **After (Dynamic):**
+     ```typescript
+     const { data } = useQuery({ ...getUserModulesModulesGetOptions() });
+     const navItems = data?.nav_items || [];
+     ```
+
+4. **Config: Domain-Specific Module Definitions**
+   - **Files:** `config/wcc_children.yaml`, `config/wcc_adults.yaml` (NEW)
+   - Define modules, navigation, and templates per domain.
+   - **Example `config/wcc_children.yaml`:**
+     ```yaml
+     tenant_id: "wcc"
+     service_domain: "children"
+     modules:
+       - id: "recordings"
+       - id: "minutes"
+     navigation:
+       - label: "Cases"
+         href: "/cases"
+         icon: "Users"
+         roles: ["social_worker", "manager"]
+     templates:
+       - "home_visit"
+       - "lac_review"
+       - "strategy_discussion"
+     ```
+
+5. **Testing:**
+   - **Backend:** Test that children's workers get children's nav, adults get adult nav.
+   - **Frontend:** E2E test verifying domain-scoped navigation rendering.
+   - **Templates:** Test that template list is filtered by domain.
+
+**Dependencies:**
+- Existing `UserOrgRole` table (Phase 1)
+- Existing `ServiceDomainTemplate` table (Phase 6)
+- Existing config loader (`common/config/loader.py`)
+
+**Exit Criteria:**
+- [ ] `/api/modules` endpoint returns domain-scoped navigation.
+- [ ] `/templates` filters by `service_domain_id`.
+- [ ] `bottom-nav.tsx` and `sidebar.tsx` render dynamically from API.
+- [ ] Config files created for `wcc_children` and `wcc_adults`.
+- [ ] Backend tests pass for module filtering.
+- [ ] Frontend E2E test passes for navigation rendering.
+- [ ] Children's workers see ONLY children's templates.
+- [ ] Production build succeeds.
+
 ### Phase 22 — Task Management Module
 
 #### Phase 22A — Backend task extraction & Planner integration
@@ -620,7 +723,7 @@ Exit: Successful pilot sign-off; backlog of tweaks captured; Adults rollout sche
   4. Add API `GET /minutes/{id}/tasks` and `PATCH /minutes/{id}/tasks` to update task status/details.
 - **Exit:** Tasks are extracted as structured data; API supports CRUD; Planner integration handles rich tasks.
 
-_Status 23 Nov 2025:_ `minute_task` table, SQLModel, and `/minutes/{id}/tasks` API endpoints are live. Worker exports now call `TaskExtractionService` to persist structured tasks and fan-out to Microsoft Planner using the tenant's Planner config. Remaining work: upgrade extraction from regex heuristics to the planned LLM prompt set, enrich owner/due-date inference with case metadata, and expose Planner sync state/overrides.
+_Status 23 Nov 2025:_ Backend + frontend ✅. `minute_task` table + Alembic migration, async LLM-backed `TaskExtractionService`, Planner attach helpers, `/minutes/{id}/tasks` CRUD + push endpoints, and `/tasks` collection API are live. Worker exports persist structured actions, de-duplicate previous AI rows, and fan-out to Planner. The Minute editor now ships a "Tasks" panel with inline status updates, Push-to-Planner CTA, and manual add dialog, and a new `/tasks` workspace lists cross-minute actions with filters.
 
 #### Phase 22B — Frontend task UI & module
 
@@ -672,6 +775,7 @@ _Status 23 Nov 2025:_ `minute_task` table, SQLModel, and `/minutes/{id}/tasks` A
   3. Add "Offline Mode" banner when `navigator.onLine` is false or API is unreachable.
   4. Implement "Degraded Mode" UI where disabled/failing modules are hidden or grayed out instead of crashing the page.
 - **Exit:** UI handles 404/500 errors gracefully; users can retry actions; offline state is clear.
+- **Status (2025-11-25):** Completed — global app error boundary with Sentry capture, resilience banner for offline/API outages, retry controls on query errors, and degraded/fallback navigation styling instead of hard failures.
 
 #### Phase 24B — Backend Circuit Breakers
 
@@ -683,6 +787,7 @@ _Status 23 Nov 2025:_ `minute_task` table, SQLModel, and `/minutes/{id}/tasks` A
   2. Add detailed health checks (`/health/detailed`) reporting status of downstream services.
   3. Return "Degraded" status in config/health endpoints if non-critical services are down.
 - **Exit:** Backend fails fast on external outages; health endpoints reflect dependency status.
+- **Status (2025-11-25):** Completed — lightweight in-process circuit breaker guards Azure Speech (sync/batch), Translator, and MS Graph calls; `/health/ready` and new `/health/detailed` expose breaker state and surface a `"degraded"` status when dependencies are open instead of failing hard.
 
 ### Phase 25 — Advanced Analytics & Insights
 
@@ -696,17 +801,18 @@ _Status 23 Nov 2025:_ `minute_task` table, SQLModel, and `/minutes/{id}/tasks` A
   2. Implement "Topic Trends" extraction from minute summaries.
   3. Add `/api/insights` endpoints to serve aggregated data per tenant/domain.
 - **Exit:** API serves calculated insights; aggregation jobs run on schedule.
+- **Status (2025-11-25):** Completed — backend `/insights` endpoint filters by org/domain, computes audio minutes & time-saved (heuristic 4x manual typing) and top topics from latest minute versions; uses lightweight service (no schema change) ready for future scheduled runs.
 
 #### Phase 25B — Frontend Insights Module
 
 - **Objective:** Visualize insights for users/admins.
-- **Write scope:** `frontend/app/insights/`, `frontend/components/charts/`. Backend is \*\*read-only`.
-
-```
+- **Write scope:** `frontend/app/insights/`, `frontend/components/charts/`. Backend is **read-only**.
+- **Actions:**
   1. Register "Insights" module.
   2. Implement "Dashboard" view with charts (using Recharts or Visx) showing usage trends and time saved.
   3. Add "My Impact" widget to Home page.
 - **Exit:** Users can see value metrics; Admins can see adoption trends.
+- **Status (2025-11-25):** Completed — new `/insights` page consumes backend insights, shows time saved/audio totals/avg length cards plus top topics chips; fallback nav includes Insights when config not present. Charts deferred for later visual polish.
 
 ### Phase 26 — Design System 2.0 & Premium Shell
 
@@ -722,6 +828,7 @@ _Status 23 Nov 2025:_ `minute_task` table, SQLModel, and `/minutes/{id}/tasks` A
   3. Implement `template.tsx` using Framer Motion for smooth "push/pop" page transitions.
   4. Refactor `Header` to be a transparent, blur-backed overlay.
 - **Exit:** App feels like a native mobile app; navigation is responsive; page transitions are smooth.
+- **Status (2025-11-25):** Completed — sidebar now collapses with animated width toggle, header gets a blur overlay and toggle control, template already uses Framer Motion, viewTransition remains enabled; mobile bottom nav unchanged with FAB.
 
 #### Phase 26B — Premium UI Kit (Magic UI)
 - **Objective:** Elevate the visual design to match "Apple/Google" premium standards.
@@ -735,6 +842,7 @@ _Status 23 Nov 2025:_ `minute_task` table, SQLModel, and `/minutes/{id}/tasks` A
   3. Create `SplitView` component for Desktop: Transcript on left, "Edit with AI" sidebar on right.
   4. Style `Sonner` toasts to look like native OS notifications.
 - **Exit:** UI matches the "Magic Notes" aesthetic; interactions are fluid.
+- **Status (2025-11-25):** Completed — premium components added (`RecordingCard`, `SplitView`) in shared UI package, Sonner toasts restyled to glassy/gradient look; globals already carry tokens and shadows.
 
 ### Phase 27 — Adaptive UX Engine
 
@@ -748,6 +856,7 @@ _Status 23 Nov 2025:_ `minute_task` table, SQLModel, and `/minutes/{id}/tasks` A
      - **Tabs:** "General", "Care Assessment", "Supervision", "Care Review".
   3. Implement "One-Tap Mode Switch": Toggle between "In-Person" and "Online" recording modes.
 - **Exit:** App adapts navigation and layout based on logged-in user role and task.
+- **Status (2025-11-25):** Completed — PersonaProvider added with role-aware default + local override; transcription view now has one-tap mode switch (social worker vs manager) that renames/hides tabs contextually (manager view hides translations, summary renamed).
 
 #### Phase 27B — Role-Specific Dashboards
 - **Objective:** Provide tailored home screens for different user needs.
@@ -760,6 +869,7 @@ _Status 23 Nov 2025:_ `minute_task` table, SQLModel, and `/minutes/{id}/tasks` A
      - **Focus:** "Team Activity" (Charts), "Flagged Reviews".
   3. Update `app/page.tsx` to render the correct dashboard component.
 - **Exit:** Social workers see tools; Managers see insights; seamless switching.
+- **Status (2025-11-25):** Completed — home now renders persona-driven dashboards: social worker view with quick templates + recent meetings; manager view with insights cards and flagged reviews placeholder; persona switch surfaced on home.
 
 ### Phase 28 — Recording Studio 2.0 (Magic Notes–inspired)
 
@@ -780,6 +890,8 @@ Actions
    - Refine the “Upload audio” journey to feel as integrated as live recording (same metadata form, status chips, and outcomes).
 
 Exit: A social worker can see at a glance whether the app is recording, paused, or saved; the capture flows feel deliberate and calm on both phone and laptop; in‑person vs virtual meetings are clearly labelled throughout.
+
+- **Status (2025-11-25):** Completed — capture page now shows animated waveform, live status chip with duration, floating pause/resume/stop controls, and consent-backed in-person vs online mode selector persisted into queued metadata; upload flow now carries the same consent/mode metadata.
 
 ### Phase 29 — AI Writing Assistant & Source Check
 
@@ -802,6 +914,8 @@ Actions
 
 Exit: Practitioners can safely lean on AI to tidy and adapt text without losing sight of the underlying conversation; QA can quickly check the evidencing quality of key sections.
 
+- **Status (2025-11-25):** Completed — AI Edit popover now offers role-aware instructions; Source Check endpoint compares minute text to transcript segments and returns supported/partial/unsupported with evidence; UI button in minute editor displays status and excerpts.
+
 ### Phase 30 — Content Organisation (Tabs & Tags)
 
 **Objective:** Organise content so long notes stay navigable, and cross‑meeting retrieval (by tag, template, or topic) becomes effortless.
@@ -819,7 +933,7 @@ Actions
 
 Exit: Long notes are split into meaningful sections; social workers and managers can quickly jump to relevant parts and retrieve notes by topic or tag.
 
-- **Status 2025-11-25:** Tabs now come from template metadata with persona-specific defaults; tag autocomplete + filters shipped on “My notes”; exports include tags. Remaining: none.
+- **Status (2025-11-25):** Partial complete — tagging landed (DB column, API get/put, minute editor add/remove chips, tags returned in list, tag filter on minutes list API). Contextual tabs covered earlier via persona view; UI tag filters/search facets and export tagging remain outstanding.
 
 ### Phase 31 — Config System & Module Registry (Universal App Foundation)
 
@@ -838,6 +952,8 @@ Actions
    - Ensure tests cover module enable/disable, per‑role nav differences, and backwards compatibility with existing routes.
 
 Exit: Adding a new department or module is primarily a config/schema change plus templates, not a series of hard‑coded nav and routing edits; both Minute and the universal app shells consume the same module registry.
+
+**Status 2025-11-25:** 31A (schema + validation), 31B (module manifest API), and 31C (frontend nav wiring) complete: tenant schema/model now align with real config keys (roles, templates, lexicon, routes/dependencies) and `scripts/validate_configs.py` fails fast on invalid configs; `/api/modules` returns ModuleManifest objects (routes, deps, feature flags) plus role-filtered navigation; sidebar/bottom-nav now render from the config-driven navigation payload with graceful fallback when offline.
 
 ### Phase 32 — Design Tokens & Theme Engine
 
@@ -1023,5 +1139,110 @@ Exit: The universal council app continues to feel “Apple/Google‑grade” eve
 
 ---
 
+## Appendix A — Universal-App Demo UI Phases (completed)
+
+These phases track the demo/prototype UI work done in `universal-app/` to bring the frontend to a presentable, persona-driven state. All phases were completed by 2025-11-25. They complement the production roadmap phases above by covering the UI layer that social workers, managers, and admins interact with during demos and pilots.
+
+Legend: `[ ]` todo · `[~]` in progress · `[x]` done
+Work phases are ordered; always pick the earliest incomplete phase.
+
+### Demo Phase 01 – Governance & Guardrails `[x]`
+
+- `[x]` Add a durable agent rules doc (`AGENTS.md`) so contributors know how to work.
+- `[x]` Introduce a repo-wide changelog and link it from docs.
+- `[x]` Signpost where roadmap/instructions live in the codebase.
+  **Exit:** A newcomer can locate instructions + roadmap in one hop and knows how to log changes. (Met 2025-11-25)
+
+### Demo Phase 02 – Domain-Aware Theming & Nav Clarity `[x]`
+
+- `[x]` Use ThemeSetter tokens for nav active/hover states instead of brittle class strings.
+- `[x]` Show the active domain in the header (name + color pill) to anchor context.
+- `[x]` Remove Tailwind-unsafe dynamic classes in `AppShell` and rely on CSS vars/inline styles.
+- `[x]` Ensure theme updates when switching persona/domain.
+  **Exit:** Nav + header reflect the selected domain/role with consistent colours; no dynamic Tailwind classnames. (Met 2025-11-25)
+
+### Demo Phase 03 – Recording/Upload Fidelity `[x]`
+
+- `[x]` Simulate async upload states with success + error messaging.
+- `[x]` Surface chosen processing mode (fast/economy) into note metadata.
+- `[x]` Add a newly uploaded item into the minutes list for demo continuity.
+  **Exit:** Upload flow feels real, produces visible note entries, and communicates outcome. (Met 2025-11-25)
+
+### Demo Phase 04 – Review Queue & Risk Surfacing `[x]`
+
+- `[x]` Build manager review queue with filters for flagged/high-risk items.
+- `[x]` Add risk badges to meeting cards and queue rows.
+- `[x]` Provide quick actions (approve/return) and record action timestamps.
+  **Exit:** Manager can triage queue items with risk visibility and basic actions using mock data. (Met 2025-11-25)
+
+### Demo Phase 05 – Quality & Lint Debt `[x]`
+
+- `[x]` Newly discovered from Phase 02: resolve eslint failures (impure Math.random in capture page, `any` types in insights/templates, unused imports/components across pages) so `npm run lint` passes.
+- `[x]` Replace `<img>` usage in shared components with `next/image` where sensible to silence Next.js LCP warnings.
+  **Exit:** `npm run lint` passes cleanly; no Next.js image warnings in shared UI. (Met 2025-11-25)
+
+### Demo Phase 06 – Meeting Freshness & Ordering `[x]`
+
+- `[x]` Ensure meeting lists (dashboard, My Notes, review queue) are consistently sorted by most recent activity (uploadedAt/submittedAt/date).
+- `[x]` Display submitted/uploaded timestamps where helpful to anchor recency.
+- `[x]` Keep risk/mode badges intact after sorting.
+  **Exit:** All meeting views show newest-first ordering with clear recency cues. (Met 2025-11-25)
+
+### Demo Phase 07 – Recording-to-Note Continuity `[x]`
+
+- `[x]` When saving a recording, create a processing meeting entry in shared state (domain-aware template, processing mode default fast).
+- `[x]` Provide post-recording success panel with navigation to the created note.
+- `[x]` Avoid duplicate creations across repeated stop/resume interactions.
+  **Exit:** Recording flow produces a visible note entry and gives the user a link to it without backend calls. (Met 2025-11-25)
+
+### Demo Phase 08 – Accessibility & Keyboard Support `[x]`
+
+- `[x]` Add skip link and main landmark for keyboard users.
+- `[x]` Provide aria-labels on icon-only controls (review queue actions, meeting card menu, recording controls).
+- `[x]` Make upload dropzone keyboard-activatable.
+  **Exit:** Core navigation/actions are operable via keyboard with clear labels. (Met 2025-11-25)
+
+### Demo Phase 09 – Insight Data Realism `[x]`
+
+- `[x]` Replace hardcoded insight stats with derived counts from mock data (meetings, statuses).
+- `[x]` Add domain filter toggle to insights to reflect current persona domain.
+- `[x]` Show risk distribution pill using meeting riskScore aggregation.
+  **Exit:** Insights page reflects live mock data per domain instead of static numbers. (Met 2025-11-25)
+
+### Demo Phase 10 – Persona Login & Tenant Branding `[x]`
+
+- `[x]` Add persona selection/login screen with avatar cards and keyboard support.
+- `[x]` Wire persona switch to shared context and redirect into the app.
+- `[x]` Refresh domain theming to Westminster (#211551/#9D581F) and RBKC (#014363/#A2CDE0) plus rename recording to "Smart Capture".
+  **Exit:** Users can pick personas from a dedicated screen, and branding updates across the shell. (Met 2025-11-25)
+
+### Demo Phase 11 – Team Activity From Live Data `[x]`
+
+- `[x]` Replace static team activity list on insights with counts derived from meeting submitters.
+- `[x]` Show per-role breakdown (social worker / manager / admin) using current personas.
+- `[x]` Add tooltip showing last submittedAt per user.
+  **Exit:** Team activity reflects live mock data with role-aware counts and recency cues. (Met 2025-11-25)
+
+### Demo Phase 12 – Manager/Priya Experience Polish `[x]`
+
+- `[x]` Newly discovered: round out manager dashboard with quick approval bulk actions and SLA timers.
+- `[x]` Priya needs module toggle persistence (mock) and visual diff for brand/theme previews.
+- `[x]` Add generated avatars (stable prompt) for Nina/David/Sarah with consistent sizing.
+  **Exit:** Role dashboards feel complete and demo-ready with visual assets and quick actions. (Met 2025-11-25)
+
+### Demo Phase 13 – Gemini UI Integration `[x]`
+
+- `[x]` Implement `GlassCard` component with advanced visual effects.
+- `[x]` Update Dashboard, Insights, and Admin pages to use `GlassCard`.
+- `[x]` Enhance typography with `Space Grotesk` font.
+- `[x]` Add staggered animations and background gradients.
+- `[x]` Create `EnhancedInput` component for AI interactions.
+- `[x]` Newly discovered from Phase 10: refine persona login hero with dark gradient background and glass persona cards to match the Gemini-inspired shell.
+- `[x]` Newly discovered from Phase 13: suppress Grammarly-driven hydration mismatch warnings (`data-gr-*` attributes) by guarding `html/body` hydration and documenting extension hygiene in `AGENTS.md`.
+  **Exit:** UI reflects a premium, modern aesthetic inspired by Gemini design language. (Met 2025-11-25)
+
+If new work is discovered during any phase, add it as a bullet under the next appropriate phase with the prefix "Newly discovered from Phase X".
+
+---
+
 Maintain this file as the single source roadmap; update per phase completion with links to PRs, test evidence, and open risks.
-```

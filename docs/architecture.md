@@ -523,7 +523,7 @@ See `docs/adr/` for detailed decisions. Key ADRs:
 
 ## 18. References & External Docs
 
-- **Roadmap:** `minute-main/ROADMAP_social_care.md` (phases 15–40, detailed requirements, tech debt)
+- **Roadmap:** `ROADMAP_social_care.md` (root — phases 1–41, status notes, demo UI appendix; canonical consolidated file)
 - **Foundations:** `minute-main/docs/universal_council_app_foundations.md` (platform vision, repo layout)
 - **User Journeys:** `minute-main/docs/user_journeys.md` (personas: social worker, manager, QA, admin; flows)
 - **AGENTS Rules:** `/AGENTS.md` (development rules, architecture patterns, no forks)

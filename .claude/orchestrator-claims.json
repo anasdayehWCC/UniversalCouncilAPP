@@ -1,1 +1,9 @@
-{"claimed":[]}
+{
+  "claimed": [
+    {"task": "WP1: Admin persistence — module toggles, audit log, bulk-delete, user list, template editor", "claimedAt": "2026-04-18T15:30:00Z"},
+    {"task": "WP2: Seed data & dashboard realism — meeting dates, insights fallback, domain CTAs", "claimedAt": "2026-04-18T15:30:00Z"},
+    {"task": "WP3: Notes tag filtering — tag chips, combined filters, export tags", "claimedAt": "2026-04-18T15:30:00Z"},
+    {"task": "WP4: Smart Capture shell integration — shared page primitives, consent/completion states, native AppShell route chrome", "claimedAt": "2026-04-18T22:12:42Z"},
+    {"task": "WP5: Platform cleanup — remove production console logs and clean up mock-action defaults in active universal-app runtime code", "claimedAt": "2026-04-18T22:12:42Z"}
+  ]
+}

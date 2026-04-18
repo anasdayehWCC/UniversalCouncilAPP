@@ -249,8 +249,8 @@ export function SessionWarning({
           className
         )}
         showCloseButton={false}
-        onPointerDownOutside={(e: Event) => e.preventDefault()}
-        onEscapeKeyDown={(e: Event) => e.preventDefault()}
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
       >
         <DialogHeader className="text-center sm:text-center">
           <DialogTitle className="text-xl font-semibold text-foreground">

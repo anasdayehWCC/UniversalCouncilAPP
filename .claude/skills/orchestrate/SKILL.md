@@ -30,13 +30,17 @@ Autonomous development driver for the Universal Council App. Reads the roadmap, 
 Read these files to understand current state:
 
 ```
-1. ROADMAP_social_care.md          — all phases and requirements
-2. CHANGELOG.md (last 200 lines)   — what's been done recently
-3. git log --oneline -30            — recent commit history
-4. CLAUDE.md                        — project rules and patterns
-5. AGENTS.md                        — development guardrails
-6. docs/production-backlog.md       — tasks discovered by review board and sub-agents
+1. docs/product-vision.md           — what the app is, who it's for, what premium means
+2. ROADMAP_social_care.md           — all phases and requirements
+3. CHANGELOG.md (last 200 lines)    — what's been done recently
+4. git log --oneline -30             — recent commit history
+5. CLAUDE.md                         — project rules and patterns
+6. AGENTS.md                         — development guardrails
+7. docs/production-backlog.md        — tasks discovered by review board and sub-agents
+8. .claude/orchestrator-claims.json  — tasks claimed by concurrent sessions
 ```
+
+**Read `docs/product-vision.md` FIRST.** It defines what "done" looks like and the prioritisation guidance. Every decision in this run should be informed by it.
 
 Build a status table with columns: `Phase | Status | Key Remaining Work | Dependencies`
 
@@ -52,29 +56,87 @@ Status values:
 
 Present this table to the user as a quick summary.
 
+**Claims check**: Read `.claude/orchestrator-claims.json`. If `claimed` is non-empty, report which tasks are already claimed by another session and exclude them from work selection. If a claim has a `claimedAt` timestamp older than 2 hours, treat it as stale (the claiming session likely crashed) — remove stale claims and note this in the summary.
+
+**Housekeeping scan**: Alongside feature work, look for systemic issues:
+- Scattered utility files that should be consolidated
+- Duplicate component patterns that should be extracted to the shared UI kit
+- Stale branches or worktrees from previous runs
+- `console.log` statements left from debugging
+- TODO/FIXME comments that should be tracked in the backlog
+- File/folder organisation that drifts from the documented conventions
+
+If housekeeping items are found, note them in the status summary. Every 3rd orchestration run, allocate one work package specifically to cleanup — a real senior developer tidies as they go.
+
 ---
 
-## Phase 2: IDENTIFY — Select Independent Work Items
+## Phase 2: IDENTIFY — Select Work Packages
 
-From the status table, find work items that satisfy ALL of:
+### Prioritisation Matrix (mandatory — follow this order)
 
-1. Status is "Not Started" or "Partial"
-2. No dependency on another incomplete phase
-3. Touches different files/directories than other selected items
-4. Can be completed in a single focused session
+Read `docs/product-vision.md` section "Prioritisation Guidance for Agents" and apply it:
 
-**Independence rules** (critical for parallel safety):
-- Frontend-only tasks can run parallel to backend-only tasks
-- Different route directories (`src/app/X/` vs `src/app/Y/`) can run in parallel
-- Component work in different folders can run in parallel
+1. **Ship-blockers** — Features that are broken, mock-only, or prevent real usage (e.g., admin state not persisted, templates can't be edited, core flows broken). If ANY ship-blockers exist, at least one work package MUST address one.
+2. **Core user flows** — End-to-end paths real users execute daily (record → transcribe → review → export)
+3. **Integration completeness** — Frontend built but no backend, or backend built but no UI
+4. **Design & UX quality** — Does the app look premium? Is it intuitive? Does it match the design principles?
+5. **Housekeeping** — Refactoring, file organisation, stale code cleanup, technical debt (every 3rd run)
+6. **Polish & compliance** — Accessibility edge cases, theme token migration, lint cleanup
+
+**NEVER prioritise category 6 when categories 1-3 have open items.** A functioning app with a few aria-label gaps ships; a perfectly compliant app with mock backends doesn't.
+
+### Task Batching — Work Packages, Not Individual Tickets
+
+Group tasks into **work packages**, not individual tickets. A work package is:
+- 3-5 related tasks in the same domain area
+- OR 2-3 tasks that share code paths or UI context
+- Assigned to ONE agent who handles all of them in sequence within one session
+
+**Why**: One agent with deep context builds more coherent, higher-quality code than 5 agents each making one isolated change. Context loading is expensive — reuse it.
+
+**Batch by domain area**, not by file independence:
+- **Recording domain**: capture, playback, offline sync, waveform, status indicators
+- **Review domain**: queue, approval, annotations, manager dashboard, compliance
+- **Admin domain**: modules, tenants, roles, audit trail, config persistence
+- **Notes/Minutes domain**: editing, templates, export, versioning, AI generation
+- **Platform domain**: auth, theme, config, API client, shared hooks, providers
+
+One work package per domain area per run. **Max 3 work packages** — beyond 3, review quality drops and merge complexity rises.
+
+### Independence Rules (for parallel safety)
+
+- Different domain areas can run in parallel (recording + admin = safe)
+- Frontend-only and backend-only work can run in parallel
 - Config/schema work should NOT run parallel to route work that reads config
 - Database migration tasks must run sequentially, never in parallel
+- If two work packages touch the same shared file (layout, providers, hooks), run them sequentially
 
-Select **3-5 items** maximum. Prefer a mix of frontend and backend.
+### Selection Process
 
-If the user specified a focus area (e.g., `/orchestrate phase 38`), prioritize that area but still find parallel work in other areas.
+1. Scan the status table for open items in priority categories 1-3
+2. Group related items into domain-based work packages (3-5 tasks each)
+3. Select up to 3 independent work packages from different domains
+4. If the user specified a focus area (e.g., `/orchestrate admin persistence`), prioritise that domain but still find parallel work in other domains
 
-Present selected items to user for approval before dispatching.
+Present selected work packages to user for approval before dispatching. For each package, explain:
+- Which priority category it addresses (1-6)
+- Why these tasks belong together
+- What "done" looks like for this package (functional outcome, not just lint passing)
+
+**Write claims**: After the user approves the selected items, immediately write them to `.claude/orchestrator-claims.json` before dispatching any agents:
+
+```bash
+cat > .claude/orchestrator-claims.json << 'CLAIMS'
+{
+  "claimed": [
+    {"task": "[exact task description from roadmap]", "claimedAt": "YYYY-MM-DDTHH:MM:SSZ"},
+    {"task": "[exact task description from roadmap]", "claimedAt": "YYYY-MM-DDTHH:MM:SSZ"}
+  ]
+}
+CLAIMS
+```
+
+This prevents a concurrent `/orchestrate` session from selecting the same work items.
 
 ---
 
@@ -344,6 +406,16 @@ EOF
 )"
 ```
 
+### Release claims
+
+After the PR is created (or if the run is aborted at any point), clear the claims file:
+
+```bash
+echo '{"claimed":[]}' > .claude/orchestrator-claims.json
+```
+
+Claims are released after PRs are open, not after merge. The ROADMAP status markers and CHANGELOG serve as the durable done signal.
+
 ---
 
 ## Repeat Pattern
@@ -365,3 +437,4 @@ After creating the PR, tell the user:
 - **Stop on ambiguity** — if requirements are unclear, ask the user
 - **Respect scope** — only work on approved items
 - **Preserve working state** — if integration fails, keep branches for manual resolution
+- **Claim before dispatch** — always write `.claude/orchestrator-claims.json` before launching sub-agents; release claims after PR creation or run abort

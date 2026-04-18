@@ -2,7 +2,7 @@ import React from 'react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { DemoProvider, useDemo } from '@/context/DemoContext';
-import { PERSONAS, MEETINGS, TEMPLATES } from '@/config/personas';
+import { PERSONAS } from '@/config/personas';
 
 function DemoStateProbe() {
   const {
@@ -28,30 +28,18 @@ function DemoStateProbe() {
 }
 
 describe('DemoProvider session hydration', () => {
-  const apiPersonas = {
-    ...PERSONAS,
-    david: {
-      ...PERSONAS.david,
-      name: 'David Okafor API',
-    },
-  };
-
   let fetchSpy: ReturnType<typeof vi.spyOn>;
+  let warnSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
     window.localStorage.clear();
-    fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        personas: apiPersonas,
-        meetings: MEETINGS,
-        templates: TEMPLATES,
-      }),
-    } as Response);
+    fetchSpy = vi.spyOn(global, 'fetch').mockRejectedValue(new Error('DemoProvider should not fetch demo personas on mount'));
+    warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
   afterEach(() => {
     fetchSpy.mockRestore();
+    warnSpy.mockRestore();
   });
 
   it('restores persisted persona, auth, flags, and history after hydration', async () => {
@@ -76,7 +64,8 @@ describe('DemoProvider session hydration', () => {
       expect(screen.getByTestId('user-id')).toHaveTextContent('david');
     });
 
-    expect(screen.getByTestId('user-name')).toHaveTextContent('David Okafor API');
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(screen.getByTestId('user-name')).toHaveTextContent(PERSONAS.david.name);
     expect(screen.getByTestId('role')).toHaveTextContent('manager');
     expect(screen.getByTestId('authenticated')).toHaveTextContent('true');
     expect(screen.getByTestId('housing-pilot')).toHaveTextContent('true');

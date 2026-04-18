@@ -1,5 +1,51 @@
 # Changelog
 
+## 2026-04-18 — Development Automation Overhaul (Intelligence, Vision, Efficiency)
+
+### Added — Product Vision (`docs/product-vision.md`)
+
+- Created north-star document defining what the app is, who it's for, what "premium" means
+- Design principles: substance over decoration, consistent rhythm, motion with purpose, mobile-first, calm confidence
+- Prioritisation matrix: ship-blockers > core user flows > integration > design quality > housekeeping > polish/compliance
+- Referenced by orchestrator (Phase 1 ASSESS), review-board (Phase 1 PREPARE), brainstorming, and all agent briefs
+
+### Added — Brainstorming Skill (`.claude/skills/brainstorming/SKILL.md`)
+
+- Structured design-before-code dialogue: one question at a time, 2-3 approaches with tradeoffs, incremental 200-300 word design sections
+- Reads product-vision.md, roadmap, backlog, and CLAUDE.md before exploring approaches
+- Saves validated designs to `docs/plans/YYYY-MM-DD-<topic>-design.md`
+- Hands off to `/writing-plans` for implementation planning
+
+### Added — Writing-Plans Skill (`.claude/skills/writing-plans/SKILL.md`)
+
+- TDD implementation planning with bite-sized 2-5 minute tasks (write failing test → run → implement → run → commit)
+- Dual frontend/backend task templates with project-specific commands (pnpm, poetry)
+- Embeds all project rules (theme tokens, a11y, z-index, hydration safety, API proxy)
+- Three execution options: subagent-driven, orchestrate-driven, parallel session
+
+### Added — Orchestrator Claims (`.claude/orchestrator-claims.json`)
+
+- Contention prevention for concurrent `/orchestrate` sessions
+- Claims written after user approval (Phase 2), released after PR creation (Phase 8)
+- Stale claims (>2 hours) treated as crashed sessions and cleared
+
+### Changed — Orchestrator Intelligence (`.claude/skills/orchestrate/SKILL.md`)
+
+- **Phase 1 ASSESS**: Now reads `product-vision.md` FIRST; added housekeeping scan for cleanup opportunities (every 3rd run)
+- **Phase 2 IDENTIFY**: Replaced "earliest unfinished phase first" with impact-based prioritisation matrix; replaced one-task-per-agent with domain-based work packages (3-5 related tasks per agent, max 3 agents)
+- **Phase 3 PLAN**: Agent briefs now include product context, design intent, success criteria beyond lint, similar code references, visual verification requirement
+- **Phase 5 REVIEW**: Added mandatory visual checkpoint (open browser, check affected routes at desktop and mobile); review agents weight functional completeness (40%) over a11y (5%); weighted review criteria replace flat checklist
+
+### Changed — Review Board Priorities (`.claude/skills/review-board/SKILL.md`)
+
+- "What to Look For" reordered by impact: broken functionality > design quality > missing features > UX > mobile > errors > performance > accessibility
+- Synthesis uses product vision's impact categories; rebalancing rule flags if >40% of findings are polish/compliance
+- Reads `product-vision.md` during PREPARE phase
+
+### Changed — CLAUDE.md (6 new entries)
+
+- Prioritisation matrix guidance, work package batching, visual verification, housekeeping discipline, product vision reference, brainstorming/writing-plans/claims documentation
+
 ## 2026-04-18 (Orchestration Run 5 — A11y, Routing, Architecture Doc)
 
 ### Added — Architecture Documentation (Phase 15A)

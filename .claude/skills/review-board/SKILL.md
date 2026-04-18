@@ -42,9 +42,10 @@ If not running, tell the user:
 
 Also read key context:
 ```
-1. minute-main/docs/user_journeys.md  — persona definitions and expected flows
-2. ROADMAP_social_care.md             — what should exist
-3. docs/production-backlog.md          — existing known issues (avoid duplicates)
+1. docs/product-vision.md             — what premium means, design principles, prioritisation
+2. minute-main/docs/user_journeys.md  — persona definitions and expected flows
+3. ROADMAP_social_care.md             — what should exist
+4. docs/production-backlog.md          — existing known issues (avoid duplicates)
 ```
 
 ---
@@ -88,15 +89,18 @@ Use the Chrome DevTools MCP tools to:
 ## Workflows to Test
 [List 3-5 specific user journeys for this persona from user_journeys.md]
 
-## What to Look For
-- Missing features your persona needs
-- Confusing UX or unclear labels
-- Broken flows or dead ends
-- Accessibility issues (contrast, keyboard nav, screen reader)
-- Performance problems (slow loads, janky animations)
-- Missing error handling or unhelpful error messages
-- Inconsistencies in design or behavior across pages
-- Mobile responsiveness issues
+## What to Look For (in priority order)
+1. **Broken functionality** — flows that don't work, features that crash, data that doesn't persist
+2. **Design quality** — does it look premium? Is spacing consistent? Does it feel calm and trustworthy?
+   Reference the design principles in docs/product-vision.md. Ask: would a social worker trust this?
+3. **Missing features** — things your persona needs that don't exist yet
+4. **Confusing UX** — unclear labels, dead ends, too many clicks, cognitive overload
+5. **Mobile experience** — test at 375px. Is it usable with a thumb?
+6. **Error handling** — what happens when things go wrong? Are messages helpful?
+7. **Performance** — slow loads, janky animations, layout shifts
+8. **Accessibility** — contrast, keyboard nav, screen reader (important but lower priority
+   than broken functionality — flag it, but don't fill your report with minor a11y issues
+   when the feature itself doesn't work)
 
 ## Report Format
 For EACH finding, use this exact format:
@@ -185,7 +189,16 @@ Findings 85+ confidence pass without validation.
 
 ### 3e. Prioritize
 
-Sort by: severity (critical > high > medium > low), then by number of personas who found it, then by confidence score.
+**Primary sort: impact category** (from `docs/product-vision.md` prioritisation guidance):
+1. Ship-blockers (broken features, mock-only data, data loss risks) → always CRITICAL
+2. Core user flow gaps (record/review/export can't be completed) → HIGH minimum
+3. Integration gaps (frontend built but no backend, or vice versa) → HIGH
+4. Design/UX quality (looks broken, inconsistent, or untrustworthy) → MEDIUM-HIGH
+5. Polish/compliance (a11y edge cases, minor token issues) → MEDIUM-LOW
+
+**Secondary sort:** number of personas who found it (cross-persona findings are higher signal), then confidence score.
+
+**Rebalancing rule:** If more than 40% of confirmed findings are category 5 (polish/compliance), the review board is focused too narrowly. Re-examine whether the review missed functional or design issues by checking: can each persona actually complete their core workflow end-to-end?
 
 ---
 

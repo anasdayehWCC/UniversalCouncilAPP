@@ -142,54 +142,95 @@ This prevents a concurrent `/orchestrate` session from selecting the same work i
 
 ## Phase 3: PLAN — Write Sub-Agent Briefs
 
-For each approved work item, write a detailed brief containing:
+For each approved work package, write a detailed brief. Each brief covers the FULL work package (3-5 related tasks), not a single ticket. The agent handles them in sequence within one session.
 
 ### Brief Template
 
 ```markdown
-## Task: [Phase X — Short Title]
+## Work Package: [Domain Area — Short Description]
 
-### What to Build
-[Specific requirements from ROADMAP_social_care.md, quoted or paraphrased]
+### Tasks in This Package
+1. [Task description] — [priority category from product-vision.md]
+2. [Task description]
+3. [Task description]
+Handle these in sequence. They share context and code paths — that's why they're bundled.
+
+### Product Context
+[WHY these tasks matter — what user problem they solve, from docs/product-vision.md]
+[Which of the four "What Done Looks Like" goals this advances]
+[What "premium" means for this specific feature area]
+
+### Design Intent
+[What the affected UI should LOOK and FEEL like — reference the design principles in product-vision.md]
+[Name 1-2 existing components in the codebase that are good visual reference points]
+[If the feature has UI: "Test it visually — open the browser, navigate to the affected route,
+and verify it looks intentional and premium before reporting success."]
 
 ### Files to Create/Modify
 - Create: `exact/path/to/new-file.tsx`
 - Modify: `exact/path/to/existing-file.tsx` (lines ~X-Y)
 - Test: `exact/path/to/test-file.test.ts`
 
+### Similar Code to Reference
+[Point to 1-2 existing files that follow the pattern this work should follow]
+[E.g., "See src/components/review/ReviewQueue.tsx for how list views are structured"]
+[E.g., "See minute-main/app/routes/minutes.py for the API contract pattern"]
+
 ### Project Rules That Apply
-[Copy relevant rules from CLAUDE.md, e.g.:]
+[Copy relevant rules from CLAUDE.md:]
 - Use semantic tokens (text-foreground, bg-card) not hardcoded colors
 - Pair animate-spin with motion-reduce:animate-none
 - Icon buttons need aria-label
 - Use ZINDEX constants from lib/z-index.ts
+- [Add any domain-specific rules]
+
+### Success Criteria
+Beyond lint and build passing, this work package is done when:
+- [ ] [Functional outcome — e.g., "Manager can approve a note without switching windows"]
+- [ ] [Integration check — e.g., "Form submission persists to backend, not just local state"]
+- [ ] [Visual check — e.g., "Dashboard looks clean at 375px and 1440px viewports"]
+- [ ] [Edge case — e.g., "Handles empty state gracefully with helpful messaging"]
 
 ### How to Test
-- Run: `pnpm --filter universal-app lint`
-- Run: `pnpm --filter universal-app test:run`
-- Run: `pnpm --filter universal-app build`
-- [Any specific test commands]
+```bash
+# Code quality
+pnpm --filter universal-app lint
+pnpm --filter universal-app build
+pnpm --filter universal-app test:run
+
+# Visual verification (mandatory for UI changes)
+# Start dev server, open affected routes, check:
+# - Does it look right at desktop and mobile viewports?
+# - Do loading and error states render properly?
+# - Does it match the design principles in product-vision.md?
+
+# Backend (if applicable)
+cd minute-main && poetry run pytest tests/ -x -q
+```
 
 ### Scope Boundary
 DO NOT modify files outside these directories: [list]
 DO NOT add new dependencies without noting them in your report
 DO NOT modify CHANGELOG.md or CLAUDE.md (orchestrator handles this)
+If you find the backend API doesn't exist yet for a frontend feature, note it as a
+discovered task — do NOT build a mock that hides the gap.
 
 ### Report Format
 When done, report:
-1. What you implemented (with file paths)
-2. Test results (paste output)
-3. Any learnings (trigger/rule/verify format)
-4. Any concerns or deviations from the brief
-5. **Discovered tasks** (IMPORTANT — see below)
+1. What you implemented (with file paths) — per task in the package
+2. Test results (paste lint, build, test output)
+3. Visual verification: did you check affected routes in the browser? What did you see?
+4. Any learnings (trigger/rule/verify format)
+5. Any concerns or deviations from the brief
+6. **Discovered tasks** (IMPORTANT — see below)
 
 ### Discovered Tasks Protocol
 While working, you may notice things OUTSIDE your assigned scope that need attention:
-- A missing feature referenced by your code
+- A missing feature or API endpoint referenced by your code
 - A bug in an adjacent component
-- An accessibility gap in a related page
-- A TODO comment that should be tracked
-- An integration point that doesn't exist yet
+- A visual/design issue on a related page
+- An integration point that doesn't exist yet (frontend expects API that's not built)
+- File organisation issues (duplicate patterns, scattered utils, stale code)
 - A test that should exist but doesn't
 
 For EACH discovery, report it in this exact format:
@@ -198,11 +239,11 @@ For EACH discovery, report it in this exact format:
   Location: [file path or route, if known]
   Suggested action: [what should be done]
 
-Categories: bug, feature, refinement, a11y, performance, security, test, docs
+Categories: bug, feature, refinement, a11y, performance, security, test, docs, housekeeping
 Severity: critical, high, medium, low
 
-DO NOT fix these yourself — just report them. The orchestrator collects
-them into the production backlog for future runs.
+DO NOT fix these yourself unless they are trivially small AND within your scope boundary.
+The orchestrator collects discoveries into the production backlog for future runs.
 ```
 
 ---
@@ -251,28 +292,35 @@ For each agent that made changes:
 
 ### 5a. Spec compliance check
 
-Launch a review agent per completed task:
+Launch a review agent per completed work package (not per individual task — one reviewer per package):
 
 ```
 Agent({
-  description: "Review spec compliance for [task]",
+  description: "Review [domain area] work package",
   subagent_type: "senior-code-reviewer",
-  prompt: "Review whether this implementation matches its spec.
+  prompt: "Review whether this work package matches its spec and the product vision.
     
-    SPEC: [paste the original brief]
+    PRODUCT VISION: [paste the 'What Premium Means' section from docs/product-vision.md]
+    
+    WORK PACKAGE SPEC: [paste the original brief]
     
     AGENT REPORT: [paste agent's report]
     
     BRANCH: [branch name from worktree]
     
     Check the actual code on this branch. Verify:
-    - All requirements met (nothing missing)
-    - No extra unneeded work (YAGNI)
-    - Theme tokens used (no hardcoded colors)
-    - Accessibility rules followed (aria-labels, motion-reduce)
-    - Tests exist and are meaningful
+    1. FUNCTIONAL: All tasks in the package completed, features work end-to-end
+    2. PRODUCT FIT: Does this advance the product vision? Does it feel premium?
+    3. INTEGRATION: Are backend/frontend contracts aligned? Any mock data hiding a gap?
+    4. DESIGN QUALITY: Theme tokens used, spacing consistent, mobile considered
+    5. CODE QUALITY: No extra unneeded work (YAGNI), tests meaningful, no dead code
+    6. ACCESSIBILITY: aria-labels, motion-reduce, contrast — but ONLY flag if genuinely broken
     
-    Report: ✅ Compliant or ❌ Issues: [list with file:line refs]"
+    Weight your review: functional completeness (40%), product fit (25%), integration (20%),
+    code quality (10%), accessibility (5%). Do NOT spend the review on minor lint issues
+    if the feature doesn't actually work.
+    
+    Report: ✅ Ship-ready or ❌ Issues: [list with file:line refs, sorted by weight]"
 })
 ```
 
@@ -289,10 +337,34 @@ git diff --name-only main...[branch2]
 
 If conflicts exist: resolve them manually or dispatch a fix agent.
 
-### 5c. Fix issues
+### 5c. Visual checkpoint (mandatory for UI changes)
 
-If reviewers found issues, dispatch fix agents targeting specific problems.
+After merging agent branches into the integration branch, start the dev server and actually look at the app:
+
+```bash
+pnpm --filter universal-app dev &
+# Wait for server to be ready
+```
+
+For each route affected by the work packages:
+1. Open `http://localhost:3000` in Chrome (via Chrome DevTools MCP or browser)
+2. Navigate to the affected routes
+3. Check at desktop (1440px) and mobile (375px) viewports
+4. Ask yourself: **Does this look like something a social worker would trust?**
+   - Is the spacing consistent? Is it readable? Is it calm?
+   - Do loading states render properly or flash empty?
+   - Does it match the existing design language or stick out?
+5. Check dark mode if the feature touches themed surfaces
+
+If something looks wrong — broken layout, misaligned elements, jarring visual inconsistency — this is a **higher priority fix** than lint warnings. Dispatch a fix agent with specific visual instructions.
+
+Do NOT merge visually broken work just because lint passes.
+
+### 5d. Fix issues
+
+If reviewers or the visual checkpoint found issues, dispatch fix agents targeting specific problems.
 Do NOT proceed to integration with open issues.
+Fix agents should receive the review feedback AND the visual context (what looked wrong and why).
 
 ---
 

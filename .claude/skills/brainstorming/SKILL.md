@@ -15,11 +15,16 @@ Start by understanding the current project context, then ask questions one at a 
 
 **Understanding the idea:**
 - Check the current project state first:
+  - `docs/product-vision.md` — what the app is, who it's for, what premium means, design principles
   - `ROADMAP_social_care.md` — what's planned and what's done
   - `CHANGELOG.md` (last 200 lines) — recent work
   - `git log --oneline -20` — recent commits
   - `docs/production-backlog.md` — known gaps and bugs
   - `CLAUDE.md` — project rules and patterns
+- Before exploring approaches, check the proposed feature against `docs/product-vision.md`:
+  - Does it advance one of the "What Done Looks Like" goals?
+  - Does it align with the design principles?
+  - Where does it sit in the prioritisation matrix?
 - Ask questions one at a time to refine the idea
 - Prefer multiple choice questions when possible, but open-ended is fine too
 - Only one question per message — if a topic needs more exploration, break it into multiple questions

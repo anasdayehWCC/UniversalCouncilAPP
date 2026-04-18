@@ -99,3 +99,18 @@
 - Trigger: Running multiple `/orchestrate` sessions concurrently (e.g., in parallel chat windows).
   Rule: The orchestrator reads `.claude/orchestrator-claims.json` during ASSESS to check for tasks claimed by other sessions. It writes claims after user approval in IDENTIFY (before dispatching agents) and releases them after PR creation in Phase 8. Claims older than 2 hours are treated as stale from crashed sessions.
   Verify: `.claude/orchestrator-claims.json` exists with `{"claimed":[]}` when no orchestrator is active; concurrent sessions do not dispatch overlapping tasks.
+- Trigger: Orchestrator or agent deciding what to work on next.
+  Rule: Follow the prioritisation matrix in `docs/product-vision.md`: ship-blockers > core user flows > integration completeness > design quality > housekeeping > polish/compliance. Never prioritise polish/compliance when ship-blockers or core flow gaps remain open. A functioning app with a few aria-label gaps ships; a perfectly compliant app with mock backends doesn't.
+  Verify: Check production-backlog.md for CRITICAL items before dispatching work on MEDIUM/LOW items; at least one work package must address priority categories 1-3 if any exist.
+- Trigger: Orchestrator dispatching sub-agents for development work.
+  Rule: Batch related tasks into work packages (3-5 tasks per domain area) assigned to ONE agent, instead of dispatching one agent per tiny task. One agent with deep context builds more coherent code than 5 agents each making one isolated change. Max 3 work packages per run, not 5 single-task agents.
+  Verify: Each dispatched agent receives a work package brief (not a single ticket) containing product context, design intent, success criteria, and similar code references alongside file paths and rules.
+- Trigger: Completing any UI work — new components, layout changes, styling, or frontend features.
+  Rule: Before reporting success, visually verify the affected routes in a browser at desktop (1440px) and mobile (375px). Ask: does this look like something a social worker would trust? Is the spacing consistent? Does it match the design principles in `docs/product-vision.md`? Lint passing is not visual verification.
+  Verify: Agent report includes a "Visual verification" section describing what was checked and what was observed; OR the orchestrator runs a visual checkpoint in Phase 5 before merging.
+- Trigger: Every 3rd orchestration run, or when technical debt is visibly accumulating.
+  Rule: Allocate one work package to housekeeping — consolidating duplicate patterns, extracting shared components, cleaning up stale code, reorganising files that drift from conventions, removing console.logs and dead code. A real senior developer tidies as they go; the system should too.
+  Verify: Session notes record what was cleaned up; production-backlog.md includes housekeeping-category items discovered during runs.
+- Trigger: Any agent or skill making decisions about what the app should look and feel like.
+  Rule: Read `docs/product-vision.md` first. The app should feel fast, calm, trustworthy, and beautiful — not like a prototype. "Premium" means intentional typography, consistent spacing, fluid animations, and mobile-first design. Substance over decoration. Calm confidence, not enterprise dashboard clutter.
+  Verify: `docs/product-vision.md` exists and is referenced in orchestrator ASSESS phase, review-board PREPARE phase, and agent brief templates.
